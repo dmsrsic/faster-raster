@@ -1,0 +1,18 @@
+{
+  "adapter_wave": "wave_3_grib_index_probe",
+  "endpoint_id": "hrrr_20230101_idx",
+  "evidence": {
+    "bytes_read": 9108,
+    "content_type": "binary/octet-stream",
+    "http_status": 206,
+    "result_class": "pass_range_limited",
+    "selected_url": "https://noaa-hrrr-bdp-pds.s3.amazonaws.com/hrrr.20230101/conus/hrrr.t00z.wrfsfcf00.grib2.idx",
+    "sha256": "0ee1558a9e2a97ed71584092e137c27cdb686e31e13d759b2b9c5812346ba8f8"
+  },
+  "experimental_adapter_candidate": true,
+  "live_source_id": "noaa_hrrr_open_data",
+  "promotion_decision": "ready_for_experimental_grib_index_adapter",
+  "required_next_step": "ready_for_experimental_grib_index_adapter",
+  "runtime_promotion_allowed_now": false,
+  "source_id": "noaa_hrrr_public_cloud"
+}

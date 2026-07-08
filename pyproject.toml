@@ -1,0 +1,26 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "faster-raster"
+version = "0.5.3"
+description = "Deterministic raster URL planning and harmonization planning."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+  "pydantic>=2.7",
+  "typer>=0.12",
+  "PyYAML>=6.0"
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0"
+]
+
+[project.scripts]
+faster-raster = "faster_raster.cli:app"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

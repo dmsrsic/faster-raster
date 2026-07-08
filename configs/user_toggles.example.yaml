@@ -1,0 +1,33 @@
+lingo_mode:
+  default: mixed
+  allowed: [standard, mixed, kitchen]
+network_mode:
+  default: "off"
+  allowed: ["off", dry_run, metadata_dip, tiny_dip]
+source_scope:
+  no_auth_only: true
+  official_or_institutional_only: true
+  allow_mirror_candidates: false
+  allow_credentialed: false
+  max_sources_per_run: 5
+dip_limits:
+  max_bytes_per_source: 65536
+  timeout_seconds: 20
+  allow_http_206: true
+  allow_text_preview: true
+  allow_binary_preview: false
+promotion_policy:
+  default: proposal_only
+  allowed: [none, proposal_only, experimental_only]
+  forbid_runtime_registry_edit: true
+safety:
+  require_allow_network_for_live: true
+  forbid_secret_values: true
+  forbid_unbounded_downloads: true
+  forbid_extraction: true
+  fail_closed_on_unknown_endpoint: true
+output:
+  write_json: true
+  write_markdown: true
+  write_cli_preview: true
+  write_screenshot_scene: false

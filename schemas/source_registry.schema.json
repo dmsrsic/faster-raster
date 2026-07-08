@@ -1,0 +1,175 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "sources": {
+      "additionalProperties": {
+        "additionalProperties": true,
+        "properties": {
+          "adapter": {
+            "enum": [
+              "arcgis_imageserver",
+              "generic_https_template"
+            ],
+            "type": "string"
+          },
+          "base_url": {
+            "type": "string"
+          },
+          "bbox_crs_param": {
+            "type": "string"
+          },
+          "bbox_param": {
+            "type": "string"
+          },
+          "bbox_request_policy": {
+            "enum": [
+              "preserve_input_bbox_with_bboxsr",
+              "project_bbox_to_service_crs",
+              "no_bbox_url_template"
+            ],
+            "type": "string"
+          },
+          "collection": {
+            "type": "string"
+          },
+          "default_export_image_crs": {
+            "type": "string"
+          },
+          "default_format": {
+            "type": "string"
+          },
+          "default_image_format": {
+            "type": "string"
+          },
+          "default_response_format": {
+            "type": "string"
+          },
+          "format_param": {
+            "type": "string"
+          },
+          "h": {
+            "type": "string"
+          },
+          "image_crs_param": {
+            "type": "string"
+          },
+          "max_height": {
+            "type": "integer"
+          },
+          "max_width": {
+            "type": "integer"
+          },
+          "mosaic_rule_param": {
+            "type": "string"
+          },
+          "native_crs": {
+            "type": "string"
+          },
+          "native_pixel_type": {
+            "type": "string"
+          },
+          "operation": {
+            "type": "string"
+          },
+          "product": {
+            "type": "string"
+          },
+          "product_code": {
+            "type": "string"
+          },
+          "product_slug": {
+            "type": "string"
+          },
+          "provider": {
+            "type": "string"
+          },
+          "region": {
+            "type": "string"
+          },
+          "resolution": {
+            "type": "string"
+          },
+          "response_format_param": {
+            "type": "string"
+          },
+          "semantic_type": {
+            "enum": [
+              "categorical",
+              "continuous"
+            ],
+            "type": "string"
+          },
+          "service_crs": {
+            "type": "string"
+          },
+          "size_param": {
+            "type": "string"
+          },
+          "supported_years": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array"
+          },
+          "supports_bbox_crs_param": {
+            "type": "boolean"
+          },
+          "supports_tiling": {
+            "type": "boolean"
+          },
+          "template_tile_id": {
+            "type": "string"
+          },
+          "temporal_frequency": {
+            "type": "string"
+          },
+          "time_param": {
+            "type": "string"
+          },
+          "time_parameter_strategy": {
+            "type": "string"
+          },
+          "time_value": {
+            "type": "string"
+          },
+          "url_template": {
+            "type": "string"
+          },
+          "v": {
+            "type": "string"
+          },
+          "variable": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "year_parameter_strategy": {
+            "enum": [
+              "time_value",
+              "mosaic_rule_by_attribute"
+            ],
+            "type": "string"
+          },
+          "yyyymmdd": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "adapter",
+          "provider",
+          "product",
+          "semantic_type"
+        ],
+        "type": "object"
+      },
+      "type": "object"
+    }
+  },
+  "required": [
+    "sources"
+  ],
+  "title": "FasterRaster source_registry.yaml",
+  "type": "object"
+}

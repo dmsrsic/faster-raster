@@ -1,0 +1,7 @@
+Source scope / cook safety scope
+no_auth_only: True
+official_or_institutional_only: True
+allow_mirror_candidates: False
+allow_credentialed: False
+max_sources_per_run: 5
+

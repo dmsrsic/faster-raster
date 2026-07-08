@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.DS_Store
+.ipynb_checkpoints/
+*.egg-info/
+.env
+.venv/
+venv/
+configs/user_toggles.live-cook-local.yaml
+configs/*local*.yaml

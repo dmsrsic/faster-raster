@@ -1,0 +1,82 @@
+auth_profiles:
+- auth_profile_id: public_none
+  provider: public
+  auth_type: none
+  required_env_vars: []
+  optional_env_vars: []
+  request_injection: none
+  redaction_policy: redact_all_secret_refs
+  enabled_default: false
+  implementation_status: scaffold_only
+- auth_profile_id: earthdata_env_placeholder
+  provider: NASA_EARTHDATA
+  auth_type: earthdata_login_placeholder
+  required_env_vars:
+  - EARTHDATA_USERNAME
+  - EARTHDATA_PASSWORD
+  optional_env_vars: []
+  request_injection: netrc_or_session_future
+  redaction_policy: redact_all_secret_refs
+  enabled_default: false
+  implementation_status: scaffold_only
+- auth_profile_id: copernicus_token_placeholder
+  provider: COPERNICUS_DATASPACE
+  auth_type: copernicus_oauth_placeholder
+  required_env_vars:
+  - COPERNICUS_TOKEN
+  optional_env_vars: []
+  request_injection: header_authorization_bearer
+  redaction_policy: redact_all_secret_refs
+  enabled_default: false
+  implementation_status: scaffold_only
+- auth_profile_id: usgs_m2m_placeholder
+  provider: USGS_EROS
+  auth_type: usgs_m2m_placeholder
+  required_env_vars:
+  - USGS_M2M_TOKEN
+  optional_env_vars: []
+  request_injection: header_authorization_bearer
+  redaction_policy: redact_all_secret_refs
+  enabled_default: false
+  implementation_status: scaffold_only
+- auth_profile_id: aws_requester_pays_placeholder
+  provider: AWS_REQUESTER_PAYS
+  auth_type: aws_requester_pays_placeholder
+  required_env_vars:
+  - AWS_PROFILE
+  optional_env_vars:
+  - AWS_REGION
+  request_injection: aws_requester_pays
+  redaction_policy: redact_all_secret_refs
+  enabled_default: false
+  implementation_status: scaffold_only
+- auth_profile_id: esgf_bearer_placeholder
+  provider: ESGF
+  auth_type: bearer_token_env
+  required_env_vars:
+  - ESGF_TOKEN
+  optional_env_vars: []
+  request_injection: header_authorization_bearer
+  redaction_policy: redact_all_secret_refs
+  enabled_default: false
+  implementation_status: scaffold_only
+- auth_profile_id: planetary_computer_token_placeholder
+  provider: MICROSOFT_PLANETARY_COMPUTER
+  auth_type: bearer_token_env
+  required_env_vars:
+  - PLANETARY_COMPUTER_TOKEN
+  optional_env_vars: []
+  request_injection: header_authorization_bearer
+  redaction_policy: redact_all_secret_refs
+  enabled_default: false
+  implementation_status: scaffold_only
+- auth_profile_id: opentopography_token_placeholder
+  provider: OPENTOPOGRAPHY
+  auth_type: bearer_token_env
+  required_env_vars:
+  - OPENTOPOGRAPHY_API_KEY
+  optional_env_vars: []
+  request_injection: header_authorization_bearer
+  redaction_policy: redact_all_secret_refs
+  enabled_default: false
+  implementation_status: scaffold_only

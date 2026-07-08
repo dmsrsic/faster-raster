@@ -1,0 +1,211 @@
+{
+  "unlock_plan": [
+    {
+      "bounded_probe_appropriate": true,
+      "class": "adapter_next",
+      "credential_requirement": "none",
+      "display_name": "gridMET daily meteorology",
+      "recommended_action": "write metadata-only adapter/probe design",
+      "score": 85,
+      "source_id": "gridmet_daily"
+    },
+    {
+      "bounded_probe_appropriate": true,
+      "class": "adapter_next",
+      "credential_requirement": "none",
+      "display_name": "NOAA GFS NOMADS GRIB filter",
+      "recommended_action": "write metadata-only adapter/probe design",
+      "score": 85,
+      "source_id": "noaa_gfs_nomads_grib_filter"
+    },
+    {
+      "bounded_probe_appropriate": true,
+      "class": "adapter_next",
+      "credential_requirement": "none",
+      "display_name": "NOAA/NCEI service class",
+      "recommended_action": "write metadata-only adapter/probe design",
+      "score": 85,
+      "source_id": "noaa_ncei_service_class"
+    },
+    {
+      "bounded_probe_appropriate": true,
+      "class": "adapter_next",
+      "credential_requirement": "none",
+      "display_name": "TerraClimate monthly climate grids",
+      "recommended_action": "write metadata-only adapter/probe design",
+      "score": 85,
+      "source_id": "terraclimate_monthly"
+    },
+    {
+      "bounded_probe_appropriate": true,
+      "class": "adapter_next",
+      "credential_requirement": "none",
+      "display_name": "USGS 3DEP DEM",
+      "recommended_action": "write metadata-only adapter/probe design",
+      "score": 85,
+      "source_id": "usgs_3dep_dem"
+    },
+    {
+      "bounded_probe_appropriate": true,
+      "class": "docs_research_next",
+      "credential_requirement": "none",
+      "display_name": "CHIRPS daily precipitation",
+      "recommended_action": "verify official docs and endpoint semantics",
+      "score": 75,
+      "source_id": "chirps_daily_precipitation"
+    },
+    {
+      "bounded_probe_appropriate": true,
+      "class": "probe_next",
+      "credential_requirement": "none",
+      "display_name": "Daymet single-pixel REST service proof guard",
+      "recommended_action": "run or preserve bounded opt-in probe",
+      "score": 75,
+      "source_id": "daymet_single_pixel_rest_duplicate_guard"
+    },
+    {
+      "bounded_probe_appropriate": false,
+      "class": "adapter_next",
+      "credential_requirement": "none",
+      "display_name": "NOAA HRRR public cloud/NOMADS",
+      "recommended_action": "write metadata-only adapter/probe design",
+      "score": 60,
+      "source_id": "noaa_hrrr_public_cloud"
+    },
+    {
+      "bounded_probe_appropriate": false,
+      "class": "adapter_next",
+      "credential_requirement": "none",
+      "display_name": "NOAA MRMS precipitation",
+      "recommended_action": "write metadata-only adapter/probe design",
+      "score": 60,
+      "source_id": "noaa_mrms_precipitation"
+    },
+    {
+      "bounded_probe_appropriate": false,
+      "class": "docs_research_next",
+      "credential_requirement": "none",
+      "display_name": "WorldClim / BioClim climate normals",
+      "recommended_action": "verify official docs and endpoint semantics",
+      "score": 50,
+      "source_id": "worldclim_bioclim_normals"
+    },
+    {
+      "bounded_probe_appropriate": false,
+      "class": "auth_scaffold_next",
+      "credential_requirement": "bearer_token",
+      "display_name": "OpenTopography DEM sources",
+      "recommended_action": "complete credential/session scaffold before live probe",
+      "score": 20,
+      "source_id": "opentopography_dem"
+    },
+    {
+      "bounded_probe_appropriate": false,
+      "class": "auth_scaffold_next",
+      "credential_requirement": "bearer_token",
+      "display_name": "Microsoft Planetary Computer STAC candidates",
+      "recommended_action": "complete credential/session scaffold before live probe",
+      "score": 10,
+      "source_id": "microsoft_planetary_computer_stac"
+    },
+    {
+      "bounded_probe_appropriate": false,
+      "class": "docs_research_next",
+      "credential_requirement": "none",
+      "display_name": "Pangeo-hosted climate/Zarr catalogs",
+      "recommended_action": "verify official docs and endpoint semantics",
+      "score": 10,
+      "source_id": "pangeo_climate_zarr_catalogs"
+    },
+    {
+      "bounded_probe_appropriate": false,
+      "class": "auth_scaffold_next",
+      "credential_requirement": "earthdata_login",
+      "display_name": "Daymet THREDDS/NCSS",
+      "recommended_action": "complete credential/session scaffold before live probe",
+      "score": 5,
+      "source_id": "daymet_ncss"
+    },
+    {
+      "bounded_probe_appropriate": false,
+      "class": "auth_scaffold_next",
+      "credential_requirement": "bearer_token",
+      "display_name": "ERA5 / ERA5-Land via CDS",
+      "recommended_action": "complete credential/session scaffold before live probe",
+      "score": 5,
+      "source_id": "era5_cds"
+    },
+    {
+      "bounded_probe_appropriate": false,
+      "class": "auth_scaffold_next",
+      "credential_requirement": "usgs_m2m_token",
+      "display_name": "Landsat Collection 2",
+      "recommended_action": "complete credential/session scaffold before live probe",
+      "score": 5,
+      "source_id": "landsat_collection2"
+    },
+    {
+      "bounded_probe_appropriate": false,
+      "class": "auth_scaffold_next",
+      "credential_requirement": "earthdata_login",
+      "display_name": "MODIS via NASA CMR",
+      "recommended_action": "complete credential/session scaffold before live probe",
+      "score": 5,
+      "source_id": "modis_nasa_earthdata_cmr"
+    },
+    {
+      "bounded_probe_appropriate": false,
+      "class": "auth_scaffold_next",
+      "credential_requirement": "aws_requester_pays",
+      "display_name": "Annual NLCD land cover",
+      "recommended_action": "complete credential/session scaffold before live probe",
+      "score": 5,
+      "source_id": "nlcd_annual_landcover"
+    },
+    {
+      "bounded_probe_appropriate": false,
+      "class": "auth_scaffold_next",
+      "credential_requirement": "earthdata_login",
+      "display_name": "NLDAS/GLDAS via GES DISC",
+      "recommended_action": "complete credential/session scaffold before live probe",
+      "score": 5,
+      "source_id": "nldas_gldas_gesdisc"
+    },
+    {
+      "bounded_probe_appropriate": false,
+      "class": "auth_scaffold_next",
+      "credential_requirement": "copernicus_token",
+      "display_name": "Sentinel via Copernicus Data Space",
+      "recommended_action": "complete credential/session scaffold before live probe",
+      "score": 5,
+      "source_id": "sentinel_copernicus_dataspace"
+    },
+    {
+      "bounded_probe_appropriate": false,
+      "class": "auth_scaffold_next",
+      "credential_requirement": "unknown",
+      "display_name": "ECMWF/Copernicus derived mirror candidates",
+      "recommended_action": "complete credential/session scaffold before live probe",
+      "score": 0,
+      "source_id": "ecmwf_copernicus_mirror_candidate"
+    },
+    {
+      "bounded_probe_appropriate": false,
+      "class": "auth_scaffold_next",
+      "credential_requirement": "unknown",
+      "display_name": "E-OBS European climate grids",
+      "recommended_action": "complete credential/session scaffold before live probe",
+      "score": 0,
+      "source_id": "eobs_european_climate"
+    },
+    {
+      "bounded_probe_appropriate": false,
+      "class": "auth_scaffold_next",
+      "credential_requirement": "bearer_token",
+      "display_name": "CMIP6/ESGF climate model outputs",
+      "recommended_action": "complete credential/session scaffold before live probe",
+      "score": -15,
+      "source_id": "cmip6_esgf"
+    }
+  ]
+}

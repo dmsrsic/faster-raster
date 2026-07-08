@@ -1,0 +1,33 @@
+probe_version: daymet-single-pixel-probe-0.1
+runtime_registry: false
+source_id: ornl_daymet_single_pixel_rest_public_probe_candidate
+discovery_mechanism: DAYMET_SINGLE_PIXEL_REST
+access_pattern: public_service_probe_candidate
+credential_scope: none_public
+status: experimental_probe_design
+network_default: disabled
+official_docs:
+  - https://daymet.ornl.gov/web_services
+
+endpoint: https://daymet.ornl.gov/single-pixel/api/data
+scenario:
+  lat: 39.805
+  lon: -83.195
+  vars: prcp
+  start: "2023-01-01"
+  end: "2023-01-01"
+  expected_format: csv_or_text
+  max_bytes: 65536
+  extraction: false
+  preview_lines: 8
+
+expected_success_signals:
+  - http_status_200
+  - text_or_csv_response
+  - bytes_read_lte_max_bytes_or_truncated_flag
+  - no_extraction_performed
+failure_signals:
+  - http_401_auth_required_or_expired
+  - http_403_access_policy_or_endpoint_unresolved
+  - http_404_endpoint_or_parameter_drift
+  - query_parameter_rejected

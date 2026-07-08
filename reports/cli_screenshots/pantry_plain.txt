@@ -1,0 +1,30 @@
+Pantry: sauces ready for stacking
+source_id                                 provider                  bucket              trust                 credential      promotion                   next_unlock_short    
+----------------------------------------  ------------------------  ------------------  --------------------  --------------  --------------------------  ---------------------
+prism_daily_ppt_static_zip                PRISM Climate Group       static_verified     verified_live         none            experimental_probe_suppor?  preserve proof       
+daymet_single_pixel_prcp_rest             ORNL DAAC                 service_discovered  verified_live         none            experimental_probe_suppor?  preserve proof       
+cdl_arcgis_tiny_export                    USDA_NASS                 service_discovered  verified_live         none            runtime_supported           preserve proof       
+daymet_ncss                               ORNL DAAC                 credential_gated    documented_unverifi?  earthdata_log?  blocked_by_auth             auth scaffold        
+nlcd_annual_landcover                     USGS/MRLC                 credential_gated    documented_unverifi?  aws_requester?  blocked_by_auth             auth scaffold        
+usgs_3dep_dem                             USGS                      service_discovered  documented_unverifi?  none            blocked_by_adapter          metadata adapter     
+landsat_collection2                       USGS                      credential_gated    documented_unverifi?  usgs_m2m_token  blocked_by_auth             auth scaffold        
+sentinel_copernicus_dataspace             Copernicus                credential_gated    documented_unverifi?  copernicus_to?  blocked_by_auth             auth scaffold        
+modis_nasa_earthdata_cmr                  NASA Earthdata            credential_gated    documented_unverifi?  earthdata_log?  blocked_by_auth             auth scaffold        
+noaa_ncei_service_class                   NOAA/NCEI                 service_discovered  documented_unverifi?  none            blocked_by_adapter          metadata adapter     
+chirps_daily_precipitation                UCSB CHC                  future_unverified   documented_unverifi?  none            research_only               verify endpoint      
+terraclimate_monthly                      University of Idaho / T?  future_unverified   documented_unverifi?  none            blocked_by_adapter          metadata adapter     
+worldclim_bioclim_normals                 WorldClim                 future_unverified   documented_unverifi?  none            research_only               verify endpoint      
+gridmet_daily                             University of Idaho / g?  future_unverified   documented_unverifi?  none            blocked_by_adapter          metadata adapter     
+era5_cds                                  ECMWF Copernicus Climat?  credential_gated    documented_unverifi?  bearer_token    blocked_by_auth             auth scaffold        
+nldas_gldas_gesdisc                       NASA GES DISC             credential_gated    documented_unverifi?  earthdata_log?  blocked_by_auth             auth scaffold        
+noaa_gfs_nomads_grib_filter               NOAA/NCEP                 service_discovered  documented_unverifi?  none            blocked_by_adapter          metadata adapter     
+noaa_hrrr_public_cloud                    NOAA                      future_unverified   documented_unverifi?  none            blocked_by_adapter          metadata adapter     
+noaa_mrms_precipitation                   NOAA                      future_unverified   documented_unverifi?  none            blocked_by_adapter          metadata adapter     
+cmip6_esgf                                ESGF                      credential_gated    documented_unverifi?  bearer_token    blocked_by_auth             auth scaffold        
+pangeo_climate_zarr_catalogs              Pangeo community          mirror_candidate    mirror_needs_valida?  none            research_only               verify endpoint      
+microsoft_planetary_computer_stac         Microsoft Planetary Com?  api_discovered      documented_unverifi?  bearer_token    blocked_by_adapter          auth scaffold        
+opentopography_dem                        OpenTopography            api_discovered      documented_unverifi?  bearer_token    blocked_by_auth             auth scaffold        
+eobs_european_climate                     ECA&D / Copernicus-adja?  mirror_candidate    documented_unverifi?  unknown         research_only               auth scaffold        
+ecmwf_copernicus_mirror_candidate         ECMWF/Copernicus          mirror_candidate    mirror_needs_valida?  unknown         research_only               auth scaffold        
+daymet_single_pixel_rest_duplicate_guard  ORNL DAAC                 service_discovered  verified_live         none            experimental_probe_suppor?  preserve opt-in proof
+

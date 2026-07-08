@@ -1,0 +1,27 @@
+{
+  "policies": [
+    {
+      "checksum_policy": "verify_when_checksum_present_else_record_observed_hash",
+      "failure_mode": "fail_fast",
+      "failure_policy_id": "default",
+      "partial_file_handling_policy": "write_to_temp_then_atomic_rename; remove_temp_on_failure",
+      "retry_backoff_strategy": "exponential_jitter_capped",
+      "retry_count": 2,
+      "scheduler_exit_code_expectations": {
+        "contract_validation_failure": 2,
+        "permanent_failure": 1,
+        "retryable_failure": 75,
+        "success": 0
+      },
+      "timeout_policy": {
+        "default_timeout_seconds": 3600,
+        "stage_timeout_seconds": {
+          "fetch": 3600,
+          "harmonize": 7200,
+          "inspect_output": 300,
+          "validate_download": 600
+        }
+      }
+    }
+  ]
+}

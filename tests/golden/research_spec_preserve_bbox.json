@@ -1,0 +1,37 @@
+{
+  "aoi": {
+    "bbox_policy": "tile_to_source_limits",
+    "input_crs": "EPSG:4326",
+    "path": "/home/dmsrsic/raster-work/projects/ohio_cdl_edges/inputs/aoi.geojson"
+  },
+  "outputs": {
+    "manifest_dir": "manifests",
+    "plan_dir": "plans",
+    "raster_format": "COG"
+  },
+  "project": {
+    "created": "2026-07-06",
+    "id": "golden_cdl_preserve_bbox"
+  },
+  "sources": [
+    {
+      "acquisition_mode": "arcgis_export_image",
+      "id": "cdl",
+      "registry_key": "usda_nass_cdl_imageserver",
+      "resampling": "nearest",
+      "semantic_type": "categorical",
+      "thematic_layers": [
+        "crop_type"
+      ],
+      "years": [
+        2023
+      ]
+    }
+  ],
+  "target_grid": {
+    "crs": "EPSG:5070",
+    "nodata": 255,
+    "resolution_m": 30,
+    "snap": "aoi_bounds"
+  }
+}

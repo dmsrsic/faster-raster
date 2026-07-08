@@ -1,0 +1,147 @@
+﻿probe_version: multi-source-stack-probe-0.1
+network_default: disabled
+target:
+  lat: 39.805
+  lon: -83.195
+  bbox: [-83.20, 39.80, -83.19, 39.81]
+  bbox_crs: EPSG:4326
+  date: "2023-01-01"
+  year: 2023
+  max_bytes_per_source: 65536
+  extraction: false
+  full_raster_processing: false
+
+sources:
+  - source_id: prism_daily_ppt_static_zip
+    label: PRISM daily precipitation static HTTPS ZIP
+    access_mode: static_https_zip
+    target_variable: ppt
+    temporal_key: "2023-01-01"
+    spatial_key: us
+    probe_type: live_bounded_probe
+    endpoint_or_url: https://data.prism.oregonstate.edu/time_series/us/an/4km/ppt/daily/2023/prism_ppt_us_25m_20230101.zip
+    max_bytes: 65536
+    expected_success_status: [200, 206]
+    failure_gate_classification: fail_http
+
+  - source_id: daymet_single_pixel_prcp_rest
+    label: Daymet single-pixel REST precipitation
+    access_mode: public_rest_text
+    target_variable: prcp
+    temporal_key: "2023-01-01"
+    spatial_key:
+      lat: 39.805
+      lon: -83.195
+    probe_type: live_bounded_probe
+    endpoint_or_url: https://daymet.ornl.gov/single-pixel/api/data?lat=39.805&lon=-83.195&vars=prcp&start=2023-01-01&end=2023-01-01
+    max_bytes: 65536
+    expected_success_status: [200]
+    failure_gate_classification: fail_http
+
+  - source_id: cdl_arcgis_tiny_export
+    label: CDL ArcGIS ImageServer tiny export
+    access_mode: arcgis_imageserver_export_image
+    target_variable: crop_type
+    temporal_key: 2023
+    spatial_key:
+      bbox: [-83.20, 39.80, -83.199, 39.801]
+      bbox_crs: EPSG:4326
+    probe_type: live_bounded_probe
+    endpoint_or_url: https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?bbox=-83.20000000,39.80000000,-83.19900000,39.80100000&bboxSR=4326&imageSR=3857&size=16,16&format=tiff&f=image&time=2023
+    max_bytes: 65536
+    expected_success_status: [200, 206]
+    failure_gate_classification: fail_http
+
+  - source_id: nlcd_annual_landcover
+    label: NLCD static/template candidate
+    access_mode: requester_pays_or_catalog_required
+    target_variable: land_cover
+    temporal_key: 2023
+    spatial_key: unknown
+    probe_type: classify_without_probe
+    endpoint_or_url: null
+    max_bytes: 65536
+    expected_success_status: []
+    skip_reason: anonymous HTTPS/static template path is known to be 403/credential-gated from prior probes
+    failure_gate_classification: credential_gated
+
+  - source_id: daymet_ncss_access_surface
+    label: Daymet NCSS access-surface classification
+    access_mode: thredds_ncss_research
+    target_variable: prcp
+    temporal_key: "2023-01-01"
+    spatial_key:
+      bbox: [-83.20, 39.80, -83.19, 39.81]
+      bbox_crs: EPSG:4326
+    probe_type: existing_result_only
+    existing_report: reports/daymet_access_surface_probe.json
+    endpoint_or_url: null
+    max_bytes: 65536
+    expected_success_status: []
+    skip_reason: reuse access-surface report; do not rerun NCSS subset or metadata
+    failure_gate_classification: credential_gated
+
+  - source_id: usgs_3dep_dem
+    label: USGS 3DEP/DEM
+    access_mode: future_service_or_catalog
+    target_variable: elevation
+    temporal_key: static_or_vintage
+    spatial_key: unknown
+    probe_type: classify_without_probe
+    endpoint_or_url: null
+    max_bytes: 65536
+    expected_success_status: []
+    skip_reason: no safe public metadata endpoint is defined in current research docs
+    failure_gate_classification: adapter_needed
+
+  - source_id: landsat_collection2
+    label: Landsat Collection 2
+    access_mode: future_stac_or_m2m
+    target_variable: reflectance
+    temporal_key: "2023-01-01"
+    spatial_key: catalog_search_required
+    probe_type: classify_without_probe
+    endpoint_or_url: null
+    max_bytes: 65536
+    expected_success_status: []
+    skip_reason: credential or catalog discovery needed
+    failure_gate_classification: adapter_needed
+
+  - source_id: sentinel_copernicus
+    label: Sentinel Copernicus
+    access_mode: future_stac_or_odata
+    target_variable: reflectance
+    temporal_key: "2023-01-01"
+    spatial_key: catalog_search_required
+    probe_type: classify_without_probe
+    endpoint_or_url: null
+    max_bytes: 65536
+    expected_success_status: []
+    skip_reason: credential or catalog discovery needed
+    failure_gate_classification: adapter_needed
+
+  - source_id: modis_nasa_earthdata
+    label: MODIS/NASA Earthdata
+    access_mode: future_cmr_or_earthdata
+    target_variable: product_specific
+    temporal_key: "2023-01-01"
+    spatial_key: catalog_search_required
+    probe_type: classify_without_probe
+    endpoint_or_url: null
+    max_bytes: 65536
+    expected_success_status: []
+    skip_reason: Earthdata credentials needed
+    failure_gate_classification: credential_gated
+
+  - source_id: noaa_ncei
+    label: NOAA/NCEI
+    access_mode: future_thredds_ncss_or_api
+    target_variable: dataset_specific
+    temporal_key: "2023-01-01"
+    spatial_key: dataset_specific
+    probe_type: classify_without_probe
+    endpoint_or_url: null
+    max_bytes: 65536
+    expected_success_status: []
+    skip_reason: no safe public metadata probe is defined in current research docs
+    failure_gate_classification: adapter_needed

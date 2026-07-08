@@ -1,0 +1,81 @@
+# Official Daymet NCSS docs consulted:
+# - https://daymet.ornl.gov/web_services
+# - https://daac.ornl.gov/DAYMET/guides/Daymet_Daily_V4.html
+# Official NCSS example shape: https://thredds.daac.ornl.gov/thredds/ncss/ornldaac/1840/daymet_v4_daily_na_tmin_2015.nc?...accept=netcdf
+# Probe dataset path for region=na, parameter=prcp, year=2023:
+# ornldaac/1840/daymet_v4_daily_na_prcp_2023.nc
+probe_version: daymet-ncss-probe-0.1
+runtime_registry: false
+source_id: ornl_daymet_daily_ncss_service_aware
+discovery_mechanism: THREDDS_NCSS_QUERY
+access_pattern: service_discovered
+credential_scope: none_public_or_unknown
+status: experimental_probe_design
+network_default: disabled
+
+scenario:
+  variable: prcp
+  semantic_type: continuous
+  recommended_resampling: bilinear
+  temporal_range:
+    start: "2023-01-01"
+    end: "2023-01-01"
+  bbox:
+    values: [-83.20, 39.80, -83.19, 39.81]
+    crs: EPSG:4326
+  expected_format: netcdf
+  output_format_parameter: needs_official_verification
+  max_bytes: 65536
+  extraction: false
+
+probe_sequence:
+  - name: metadata_only
+    mode: metadata
+    allow_network_required: true
+    endpoint: https://thredds.daac.ornl.gov/thredds/ncss/ornldaac/1840/daymet_v4_daily_na_prcp_2023.nc/dataset.html
+    expected_success_signals:
+      - http_status_200_or_supported_redirect
+      - dataset_metadata_present
+      - variable_list_available
+      - ncss_endpoint_discovered
+    failure_signals:
+      - http_401_auth_required_or_expired
+      - http_403_access_policy_or_endpoint_unresolved
+      - http_404_catalog_version_drift
+      - missing_variable_metadata
+  - name: tiny_subset
+    mode: bounded_subset
+    allow_network_required: true
+    endpoint: https://thredds.daac.ornl.gov/thredds/ncss/ornldaac/1840/daymet_v4_daily_na_prcp_2023.nc
+    params:
+      var: prcp
+      north: 39.81
+      south: 39.80
+      east: -83.19
+      west: -83.20
+      time_start: "2023-01-01"
+      time_end: "2023-01-01"
+      accept: netcdf
+    expected_success_signals:
+      - http_status_200
+      - content_type_netcdf_or_octet_stream
+      - bytes_read_lte_max_bytes_or_truncated_flag
+      - no_extraction_performed
+    failure_signals:
+      - http_401_auth_required_or_expired
+      - http_403_access_policy_or_endpoint_unresolved
+      - http_404_catalog_version_drift
+      - query_parameter_rejected
+      - response_exceeds_probe_policy
+
+planned_request_fields:
+  request_id: daymet_prcp_20230101_probe_bbox_000001
+  adapter: thredds_ncss
+  discovery_mechanism: THREDDS_NCSS_QUERY
+  method: GET
+  endpoint: https://thredds.daac.ornl.gov/thredds/ncss/ornldaac/1840/daymet_v4_daily_na_prcp_2023.nc
+  params: deterministic_sorted_query_params
+  bbox_crs: EPSG:4326
+  target_grid_crs: EPSG:5070
+  expected_format: netcdf
+  max_probe_bytes: 65536

@@ -1,0 +1,13 @@
+Recipe Board
+candidate_source_count: 10
+verified_live_source_count: 3
+credential_gated_count: 3
+adapter_needed_count: 4
+mirror_candidate_count: 3
+future_unverified_count: 6
+highest_verified_stack_count: 3
+live_bytes_read: 67156
+reused_bytes: 8749
+fail_count: 0
+runtime_drift_status: not_checked_by_cli
+

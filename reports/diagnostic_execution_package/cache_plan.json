@@ -1,0 +1,37 @@
+{
+  "cache_plan_version": "0.3.1",
+  "entries": [
+    {
+      "cache_key": "deebe752a8fa7e57386adde05d37beae568fb5998c41d6d21203f1e2b2d6aeda",
+      "content_addressed_path": "cache/cdl/2023/crop_type/386c2589dc0bf1a2c7f02d2e9728dbebf9121d68c571e03548332243d300d2eb.tiff",
+      "expected_file_extension": ".tiff",
+      "request_id": "cdl_2023_crop_type_tile_000001",
+      "source_id": "cdl",
+      "source_url_hash": "386c2589dc0bf1a2c7f02d2e9728dbebf9121d68c571e03548332243d300d2eb",
+      "thematic_layer": "crop_type",
+      "tile_id": "000001",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?bbox=-83.20000000%2C39.80000000%2C-82.90000000%2C40.10000000&bboxSR=4326&f=image&format=tiff&imageSR=3857&size=1114%2C1453&time=2023",
+      "year": 2023
+    },
+    {
+      "cache_key": "124719305ba68607d22522e70e11a56dd7bff09aa962acd3246e770ce50f570a",
+      "content_addressed_path": "cache/cdl/2024/crop_type/66b07cd7f50f1dbb412cfa575b8a511cbbcc9cb8fb5785da1be57ff6833910e9.tiff",
+      "expected_file_extension": ".tiff",
+      "request_id": "cdl_2024_crop_type_tile_000001",
+      "source_id": "cdl",
+      "source_url_hash": "66b07cd7f50f1dbb412cfa575b8a511cbbcc9cb8fb5785da1be57ff6833910e9",
+      "thematic_layer": "crop_type",
+      "tile_id": "000001",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?bbox=-83.20000000%2C39.80000000%2C-82.90000000%2C40.10000000&bboxSR=4326&f=image&format=tiff&imageSR=3857&size=1114%2C1453&time=2024",
+      "year": 2024
+    }
+  ],
+  "extension_counts": {
+    ".tiff": 2
+  },
+  "group_counts": {
+    "cdl|2023|crop_type": 1,
+    "cdl|2024|crop_type": 1
+  },
+  "notes": "No files are downloaded by this cache plan. Paths are deterministic proposals for later execution."
+}

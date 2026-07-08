@@ -1,0 +1,29 @@
+{
+  "access_mode": "opendap",
+  "access_pattern_category": "future_unverified",
+  "bounded_probe_appropriate": true,
+  "credential_requirement": "none",
+  "display_name": "gridMET daily meteorology",
+  "probe": {
+    "accept_ranges": null,
+    "bytes_read": 0,
+    "content_length": null,
+    "content_type": null,
+    "elapsed_seconds": 0.0,
+    "error": "endpoint_or_catalog_url is missing or unknown",
+    "first_byte_seconds": null,
+    "http_status": null,
+    "max_bytes": null,
+    "method": null,
+    "network_opt_in": false,
+    "result_class": "skipped_policy",
+    "sha256": null,
+    "text_preview": [],
+    "timestamp_utc": "2026-07-08T20:16:10Z",
+    "truncated": false,
+    "url": null
+  },
+  "promotion_status": "blocked_by_adapter",
+  "provider": "University of Idaho / gridMET",
+  "source_id": "gridmet_daily"
+}

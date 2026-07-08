@@ -1,0 +1,410 @@
+registry_version: "service-aware-draft-0.1"
+schema_status: design_draft
+runtime_registry: false
+notes: "This draft must not replace configs/source_registry.yaml until adapters, capability probes, and tests are implemented."
+
+sources:
+  usgs_annual_nlcd_landcover_service_aware:
+    adapter: stac_api
+    provider: USGS_MRLC
+    product: Annual NLCD Land Cover
+    status: needs_official_verification
+    trust_level: external_candidate_unverified
+    current_offline_v0_usable: false
+    future_live_discovery_required: true
+    known_vs_unverified:
+      known:
+        - "USGS documentation describes Annual NLCD access via EarthExplorer, MRLC, ScienceBase, web services, and USGS AWS S3."
+        - "USGS documentation describes S3 prefix family s3://usgs-landcover/annual-nlcd/c1/v0/[region]/tile/h{xx}v{yy}/ and /mosaic/."
+        - "Existing anonymous HTTPS bounded probes returned 403 for current candidate tile/mosaic URLs."
+      unverified:
+        - "Current exact Collection 1.2 object key layout."
+        - "Whether anonymous HTTPS access is supported for individual objects."
+        - "Whether a STAC/catalog endpoint can resolve valid object keys."
+        - "Categorical land-cover nodata, legend URL, and checksums."
+    semantic_contract:
+      default_semantic_type: categorical
+      allowed_layers:
+        land_cover:
+          semantic_type: categorical
+          recommended_resampling: nearest
+          nodata: null
+          legend_url: null
+          qa_policy: "needs_official_verification"
+        land_cover_change:
+          semantic_type: categorical
+          recommended_resampling: nearest
+          nodata: null
+          legend_url: null
+          qa_policy: "needs_official_verification"
+        fractional_impervious:
+          semantic_type: continuous
+          recommended_resampling: bilinear
+          nodata: null
+          legend_url: null
+          qa_policy: "needs_official_verification"
+      crs:
+        native_crs: EPSG:5070
+        target_crs_recommendation: EPSG:5070
+      resolution:
+        native_resolution_m: 30
+        min_safe_resolution_m: 30
+    orchestration_logic:
+      discovery_mechanism: STAC_API
+      credential_scope: MRLC_PUBLIC
+      asset_resolution_strategy: STAC_ASSET_ID
+      stream_handler: GDAL_VSICURL
+      live_mode_required: true
+      source_side_subset:
+        spatial: false
+        temporal: false
+        variables: false
+        reprojection: false
+      capability_probe:
+        probe_type: STAC_CONFORMANCE
+        max_probe_bytes: 65536
+        validates:
+          - collection_exists
+          - asset_key_exists
+          - range_request_supported
+      retry_policy:
+        on_401: fail_closed
+        on_403: requester_pays_adapter_required
+        on_404: version_drift
+        on_429: backoff
+        max_attempts: 2
+    discovery:
+      endpoint: "needs_official_verification"
+      collection_id: null
+      item_filters:
+        datetime: "{start}/{end}"
+        bbox: "{aoi_bbox_epsg4326}"
+        intersects: "{aoi_geojson}"
+      asset_selectors:
+        preferred_asset_ids: ["land_cover"]
+        preferred_roles: ["data"]
+        media_types: ["image/tiff", "image/geotiff", "application/vnd+geotiff"]
+    query_template:
+      base_url: null
+      method: GET
+      params: {}
+    documentation:
+      official_urls:
+        - "https://www.usgs.gov/centers/eros/science/annual-nlcd-data-access"
+        - "https://www.mrlc.gov/sites/default/files/docs/LSDS-2103%20Annual%20National%20Land%20Cover%20Database%20%28NLCD%29%20Collection%201%20Science%20Product%20User%20Guide%20-v1.0%202024_10_15.pdf"
+      notes: "Do not promote current static HTTPS templates. Resolve valid assets via official catalog/STAC/S3 requester-pays-aware workflow first."
+      open_questions:
+        - "What official endpoint resolves Collection 1.2 asset object keys?"
+        - "Is requester-pays S3 mandatory for AWS object access?"
+        - "Where are legends, nodata metadata, and checksums published?"
+
+  ornl_daymet_daily_ncss_service_aware:
+    adapter: thredds_ncss
+    provider: ORNL_DAAC
+    product: Daymet Daily
+    status: future_adapter
+    trust_level: docs_verified
+    current_offline_v0_usable: false
+    future_live_discovery_required: true
+    known_vs_unverified:
+      known:
+        - "Daymet V4/V4R1 provides daily variables as netCDF files by variable/year/region."
+        - "Daymet data are in a Lambert Conformal Conic projection and are CF-compliant netCDF."
+        - "Existing unauthenticated experimental NCSS probe returned 401."
+      unverified:
+        - "Exact current NCSS endpoint and dataset id for V4R1."
+        - "Exact NCSS parameter syntax to use for small bbox/time subsets."
+        - "Which access paths require Earthdata credentials."
+    semantic_contract:
+      default_semantic_type: continuous
+      allowed_layers:
+        prcp: {semantic_type: continuous, recommended_resampling: bilinear, nodata: null, legend_url: null, qa_policy: null}
+        tmin: {semantic_type: continuous, recommended_resampling: bilinear, nodata: null, legend_url: null, qa_policy: null}
+        tmax: {semantic_type: continuous, recommended_resampling: bilinear, nodata: null, legend_url: null, qa_policy: null}
+        srad: {semantic_type: continuous, recommended_resampling: bilinear, nodata: null, legend_url: null, qa_policy: null}
+        vp: {semantic_type: continuous, recommended_resampling: bilinear, nodata: null, legend_url: null, qa_policy: null}
+        swe: {semantic_type: continuous, recommended_resampling: bilinear, nodata: null, legend_url: null, qa_policy: null}
+        dayl: {semantic_type: continuous, recommended_resampling: bilinear, nodata: null, legend_url: null, qa_policy: null}
+      crs:
+        native_crs: "Lambert_Conformal_Conic_needs_exact_proj_verification"
+        target_crs_recommendation: EPSG:5070
+      resolution:
+        native_resolution_m: 1000
+        min_safe_resolution_m: 1000
+    orchestration_logic:
+      discovery_mechanism: THREDDS_NCSS_QUERY
+      credential_scope: NASA_EARTHDATA
+      asset_resolution_strategy: NCSS_DYNAMIC_SUBSET
+      stream_handler: GDAL_NETCDF
+      live_mode_required: true
+      source_side_subset:
+        spatial: true
+        temporal: true
+        variables: true
+        reprojection: false
+      capability_probe:
+        probe_type: THREDDS_METADATA
+        max_probe_bytes: 65536
+        validates:
+          - authentication
+          - bbox_subset_supported
+          - variable_subset_supported
+          - temporal_subset_supported
+      retry_policy:
+        on_401: refresh_credentials
+        on_403: refresh_credentials
+        on_404: recatalog
+        on_429: backoff
+        max_attempts: 2
+    discovery:
+      endpoint: "https://thredds.daac.ornl.gov/thredds/"
+      collection_id: "ornldaac_2129_needs_official_verification"
+      item_filters:
+        datetime: "{start}/{end}"
+        bbox: "{aoi_bbox_epsg4326}"
+        intersects: "{aoi_geojson}"
+      asset_selectors:
+        preferred_asset_ids: []
+        preferred_roles: []
+        media_types: ["application/x-netcdf", "application/netcdf"]
+    query_template:
+      base_url: "needs_official_verification"
+      method: GET
+      params:
+        var: "{variables}"
+        north: "{north}"
+        south: "{south}"
+        east: "{east}"
+        west: "{west}"
+        time_start: "{start}"
+        time_end: "{end}"
+        accept: "netcdf4_needs_official_verification"
+    documentation:
+      official_urls:
+        - "https://daymet.ornl.gov/getdata"
+        - "https://daymet.ornl.gov/static/files/NCSS_Daymet_Subset_Guide_v3.pdf"
+        - "https://daac.ornl.gov/DAYMET/guides/Daymet_Daily_V4.html"
+        - "https://www.earthdata.nasa.gov/data/catalog/ornl-cloud-daymet-daily-v4r1-2129-4.1"
+      notes: "Do not implement as static generic_https_template."
+      open_questions:
+        - "Exact NCSS V4R1 endpoint and query syntax."
+        - "Credential requirements for metadata vs subset requests."
+        - "Server-side query size and timeout limits."
+
+  usda_nass_cdl_imageserver_existing:
+    adapter: arcgis_imageserver
+    provider: USDA_NASS
+    product: Cropland Data Layer
+    status: implemented
+    trust_level: repo_verified
+    current_offline_v0_usable: true
+    future_live_discovery_required: false
+    semantic_contract:
+      default_semantic_type: categorical
+      allowed_layers:
+        crop_type:
+          semantic_type: categorical
+          recommended_resampling: nearest
+          nodata: null
+          legend_url: null
+          qa_policy: null
+      crs:
+        native_crs: EPSG:3857
+        target_crs_recommendation: EPSG:5070
+      resolution:
+        native_resolution_m: 30
+        min_safe_resolution_m: 30
+    orchestration_logic:
+      discovery_mechanism: ARCGIS_IMAGESERVER
+      credential_scope: PUBLIC
+      asset_resolution_strategy: ARCGIS_EXPORT_IMAGE
+      stream_handler: GDAL_HTTP_RANGE
+      live_mode_required: false
+      source_side_subset:
+        spatial: true
+        temporal: true
+        variables: false
+        reprojection: true
+      capability_probe:
+        probe_type: ARCGIS_SERVICE_INFO
+        max_probe_bytes: 65536
+        validates:
+          - collection_exists
+          - bbox_subset_supported
+          - temporal_subset_supported
+      retry_policy:
+        on_401: fail_closed
+        on_403: fail_closed
+        on_404: version_drift
+        on_429: backoff
+        max_attempts: 2
+    discovery:
+      endpoint: "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer"
+      collection_id: null
+      item_filters:
+        datetime: "{start}/{end}"
+        bbox: "{aoi_bbox_epsg4326}"
+        intersects: "{aoi_geojson}"
+      asset_selectors:
+        preferred_asset_ids: []
+        preferred_roles: []
+        media_types: ["image/tiff"]
+    query_template:
+      base_url: "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage"
+      method: GET
+      params:
+        bbox: "{bbox}"
+        bboxSR: "{bbox_crs}"
+        imageSR: "{export_image_crs}"
+        size: "{width},{height}"
+        format: "tiff"
+        f: "image"
+        time: "{year}"
+    documentation:
+      official_urls:
+        - "https://www.nass.usda.gov/Research_and_Science/Cropland/SARS1a.php"
+        - "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer"
+      notes: "Current deterministic planning behavior should be preserved."
+      open_questions:
+        - "Confirm year/time strategy and nodata/category metadata from official service info."
+
+  prism_daily_static_range_existing:
+    adapter: generic_https_template
+    provider: PRISM
+    product: PRISM Daily
+    status: implemented
+    trust_level: repo_verified
+    current_offline_v0_usable: true
+    future_live_discovery_required: false
+    semantic_contract:
+      default_semantic_type: continuous
+      allowed_layers:
+        ppt: {semantic_type: continuous, recommended_resampling: bilinear, nodata: null, legend_url: null, qa_policy: null}
+      crs:
+        native_crs: EPSG:4326
+        target_crs_recommendation: EPSG:5070
+      resolution:
+        native_resolution_m: null
+        min_safe_resolution_m: null
+    orchestration_logic:
+      discovery_mechanism: STATIC_TEMPLATE
+      credential_scope: PUBLIC
+      asset_resolution_strategy: STATIC_TEMPLATE
+      stream_handler: GDAL_HTTP_RANGE
+      live_mode_required: false
+      source_side_subset:
+        spatial: false
+        temporal: false
+        variables: false
+        reprojection: false
+      capability_probe:
+        probe_type: HTTP_HEAD_RANGE
+        max_probe_bytes: 65536
+        validates:
+          - range_request_supported
+          - asset_key_exists
+      retry_policy:
+        on_401: fail_closed
+        on_403: fail_closed
+        on_404: version_drift
+        on_429: backoff
+        max_attempts: 2
+    discovery:
+      endpoint: "https://data.prism.oregonstate.edu"
+      collection_id: null
+      item_filters:
+        datetime: "{start}/{end}"
+        bbox: "{aoi_bbox_epsg4326}"
+        intersects: "{aoi_geojson}"
+      asset_selectors:
+        preferred_asset_ids: []
+        preferred_roles: []
+        media_types: ["application/zip"]
+    query_template:
+      base_url: "https://data.prism.oregonstate.edu/time_series/{region}/an/{resolution}/{variable}/{temporal_frequency}/{year}/prism_{variable}_{region}_25m_{yyyymmdd}.zip"
+      method: GET
+      params: {}
+    documentation:
+      official_urls:
+        - "https://prism.oregonstate.edu/recent/"
+        - "https://prism.oregonstate.edu/"
+      notes: "Bounded range probe has succeeded for one daily ppt example."
+      open_questions:
+        - "Confirm all valid variables, resolution path components, nodata, and sidecar metadata."
+
+  landsat_collection2_stac_future:
+    adapter: stac_api
+    provider: USGS
+    product: Landsat Collection 2
+    status: future_adapter
+    trust_level: needs_official_verification
+    current_offline_v0_usable: false
+    future_live_discovery_required: true
+    semantic_contract:
+      default_semantic_type: mixed
+      allowed_layers:
+        surface_reflectance:
+          semantic_type: continuous
+          recommended_resampling: bilinear
+          nodata: null
+          legend_url: null
+          qa_policy: "needs_official_verification"
+        qa_pixel:
+          semantic_type: categorical
+          recommended_resampling: nearest
+          nodata: null
+          legend_url: null
+          qa_policy: "required"
+      crs:
+        native_crs: "UTM_zone_specific_needs_resolution_per_asset"
+        target_crs_recommendation: EPSG:5070
+      resolution:
+        native_resolution_m: 30
+        min_safe_resolution_m: 30
+    orchestration_logic:
+      discovery_mechanism: STAC_API
+      credential_scope: USGS_EROS
+      asset_resolution_strategy: STAC_ASSET_ID
+      stream_handler: GDAL_VSICURL
+      live_mode_required: true
+      source_side_subset:
+        spatial: false
+        temporal: false
+        variables: false
+        reprojection: false
+      capability_probe:
+        probe_type: STAC_CONFORMANCE
+        max_probe_bytes: 65536
+        validates:
+          - authentication
+          - collection_exists
+          - asset_key_exists
+          - range_request_supported
+      retry_policy:
+        on_401: refresh_credentials
+        on_403: refresh_credentials
+        on_404: recatalog
+        on_429: backoff
+        max_attempts: 2
+    discovery:
+      endpoint: "needs_official_verification"
+      collection_id: null
+      item_filters:
+        datetime: "{start}/{end}"
+        bbox: "{aoi_bbox_epsg4326}"
+        intersects: "{aoi_geojson}"
+      asset_selectors:
+        preferred_asset_ids: ["SR_B2", "SR_B3", "SR_B4", "SR_B5", "QA_PIXEL"]
+        preferred_roles: ["data"]
+        media_types: ["image/tiff", "image/geotiff", "application/vnd+geotiff"]
+    query_template:
+      base_url: null
+      method: POST
+      params: {}
+    documentation:
+      official_urls:
+        - "https://www.usgs.gov/landsat-missions/landsat-collection-2"
+      notes: "Do not infer object URLs from path/row alone. Use STAC/API discovery."
+      open_questions:
+        - "Which official STAC endpoint and auth mode should FasterRaster target?"
+        - "Which asset IDs are stable across Landsat Collection 2 products?"

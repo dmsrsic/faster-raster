@@ -1,0 +1,26 @@
+╭────────────────────────────────────────────────────── Buckets ───────────────────────────────────────────────────────╮
+│ goods: 3                                                                                                             │
+│ bads: 21                                                                                                             │
+│ duplicate guards hidden by default                                                                                   │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+                                                     Goods and Bads                                                     
+┏━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ bucket ┃ sauce                         ┃ provider            ┃ next                                                  ┃
+┡━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ goods  │ prism_daily_ppt_static_zip    │ PRISM Climate Group │ preserve proof and add contract fixture               │
+│ goods  │ daymet_single_pixel_prcp_rest │ ORNL DAAC           │ preserve proof and add contract fixture               │
+│ goods  │ cdl_arcgis_tiny_export        │ USDA_NASS           │ preserve proof and add contract fixture               │
+│ bads   │ daymet_ncss                   │ ORNL DAAC           │ complete credential/session scaffold before live      │
+│        │                               │                     │ probe                                                 │
+│ bads   │ nlcd_annual_landcover         │ USGS/MRLC           │ complete credential/session scaffold before live      │
+│        │                               │                     │ probe                                                 │
+│ bads   │ usgs_3dep_dem                 │ USGS                │ write metadata-only adapter/probe design              │
+│ bads   │ landsat_collection2           │ USGS                │ complete credential/session scaffold before live      │
+│        │                               │                     │ probe                                                 │
+│ bads   │ sentinel_copernicus_dataspace │ Copernicus          │ complete credential/session scaffold before live      │
+│        │                               │                     │ probe                                                 │
+│ bads   │ modis_nasa_earthdata_cmr      │ NASA Earthdata      │ complete credential/session scaffold before live      │
+│        │                               │                     │ probe                                                 │
+│ bads   │ noaa_ncei_service_class       │ NOAA/NCEI           │ write metadata-only adapter/probe design              │
+│ bads   │ chirps_daily_precipitation    │ UCSB CHC            │ verify official docs and endpoint semantics           │
+└────────┴───────────────────────────────┴─────────────────────┴───────────────────────────────────────────────────────┘

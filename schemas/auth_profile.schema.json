@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "auth_profile_id": {
+      "type": "string"
+    },
+    "auth_type": {
+      "enum": [
+        "none",
+        "bearer_token_env",
+        "basic_env",
+        "netrc",
+        "earthdata_login_placeholder",
+        "copernicus_oauth_placeholder",
+        "usgs_m2m_placeholder",
+        "aws_requester_pays_placeholder"
+      ]
+    },
+    "enabled_default": {
+      "type": "boolean"
+    },
+    "implementation_status": {
+      "enum": [
+        "scaffold_only",
+        "metadata_probe_only",
+        "live_download_supported"
+      ]
+    },
+    "optional_env_vars": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "provider": {
+      "type": "string"
+    },
+    "redaction_policy": {
+      "type": "string"
+    },
+    "request_injection": {
+      "type": "string"
+    },
+    "required_env_vars": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "auth_profile_id",
+    "provider",
+    "auth_type",
+    "required_env_vars",
+    "optional_env_vars",
+    "request_injection",
+    "redaction_policy",
+    "enabled_default",
+    "implementation_status"
+  ],
+  "title": "FasterRaster auth profile",
+  "type": "object"
+}

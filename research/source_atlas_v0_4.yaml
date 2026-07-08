@@ -1,0 +1,888 @@
+atlas_version: '0.4'
+runtime_impact: none
+network_default: disabled
+sources:
+- source_id: prism_daily_ppt_static_zip
+  display_name: PRISM daily precipitation
+  provider: PRISM Climate Group
+  source_family: PRISM
+  source_kind: climate_grid
+  access_mode: static_https
+  access_pattern_category: static_verified
+  provenance_class: official_primary
+  trust_level: verified_live
+  endpoint_or_catalog_url: https://data.prism.oregonstate.edu
+  query_pattern: Versioned static HTTPS ZIP path for daily variable/date products.
+  deterministic_url_generation_direct: true
+  deterministic_asset_resolution_after_discovery: true
+  bounded_probe_appropriate: true
+  credential_profile_id: null
+  credential_requirement: none
+  auth_not_implemented_reason: null
+  expected_formats:
+  - zip
+  - bil
+  - metadata_sidecars
+  native_crs_or_grid: unknown
+  target_crs_assumption: EPSG:5070 for CONUS analysis
+  temporal_key_structure: daily YYYY-MM-DD / YYYYMMDD token
+  spatial_key_structure: CONUS grid; no source-side AOI subset in legacy static file
+  nodata_metadata: unknown
+  checksum_metadata: FGDC XML sidecars documented; checksums unknown
+  rate_limit_caveats: Preliminary grids can be revised; use bounded probes only.
+  license_or_terms_url: https://prism.oregonstate.edu/terms/
+  official_docs:
+  - https://prism.oregonstate.edu/data/
+  - https://prism.oregonstate.edu/downloads/
+  promotion_status: experimental_probe_supported
+  last_probe_report: reports/live_url_structure_probe_64k.json
+  notes: Verified by bounded range probe; no extraction.
+- source_id: daymet_single_pixel_prcp_rest
+  display_name: Daymet single-pixel REST
+  provider: ORNL DAAC
+  source_family: Daymet
+  source_kind: station_or_point_service
+  access_mode: parameterized_rest
+  access_pattern_category: service_discovered
+  provenance_class: official_primary
+  trust_level: verified_live
+  endpoint_or_catalog_url: https://daymet.ornl.gov/single-pixel/api/data
+  query_pattern: Parameterized point REST query lat/lon/vars/start/end.
+  deterministic_url_generation_direct: true
+  deterministic_asset_resolution_after_discovery: true
+  bounded_probe_appropriate: true
+  credential_profile_id: null
+  credential_requirement: none
+  auth_not_implemented_reason: null
+  expected_formats:
+  - csv
+  - text
+  native_crs_or_grid: Daymet grid behind point extraction
+  target_crs_assumption: not a raster target; point proof only
+  temporal_key_structure: start/end date
+  spatial_key_structure: lat/lon point
+  nodata_metadata: service response metadata
+  checksum_metadata: none observed in proof
+  rate_limit_caveats: Use point proof only; not raster/NCSS support.
+  license_or_terms_url: null
+  official_docs:
+  - https://daymet.ornl.gov/web_services
+  promotion_status: experimental_probe_supported
+  last_probe_report: reports/daymet_single_pixel_probe.json
+  notes: Public service proof passed with 474 byte response.
+- source_id: cdl_arcgis_tiny_export
+  display_name: USDA NASS CDL ImageServer
+  provider: USDA_NASS
+  source_family: CDL
+  source_kind: landcover
+  access_mode: arcgis_imageserver
+  access_pattern_category: service_discovered
+  provenance_class: official_primary
+  trust_level: verified_live
+  endpoint_or_catalog_url: https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer
+  query_pattern: ArcGIS exportImage with bbox/bboxSR/imageSR/size/format/f/time.
+  deterministic_url_generation_direct: true
+  deterministic_asset_resolution_after_discovery: true
+  bounded_probe_appropriate: true
+  credential_profile_id: null
+  credential_requirement: none
+  auth_not_implemented_reason: null
+  expected_formats:
+  - tiff_export
+  native_crs_or_grid: EPSG:3857 service grid
+  target_crs_assumption: EPSG:5070 default CONUS analysis
+  temporal_key_structure: year/time parameter
+  spatial_key_structure: bbox exportImage request
+  nodata_metadata: 0 needs service metadata confirmation
+  checksum_metadata: ArcGIS metadata; checksums unknown
+  rate_limit_caveats: Respect service max dimensions.
+  license_or_terms_url: null
+  official_docs:
+  - https://www.nass.usda.gov/Research_and_Science/Cropland/SARS1a.php
+  - https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer?f=pjson
+  promotion_status: runtime_supported
+  last_probe_report: reports/multi_source_stack_probe.json
+  notes: Runtime ArcGIS planner exists; tiny export proof passed.
+- source_id: daymet_ncss
+  display_name: Daymet THREDDS/NCSS
+  provider: ORNL DAAC
+  source_family: Daymet
+  source_kind: climate_grid
+  access_mode: thredds_ncss
+  access_pattern_category: credential_gated
+  provenance_class: official_primary
+  trust_level: documented_unverified
+  endpoint_or_catalog_url: https://thredds.daac.ornl.gov
+  query_pattern: NCSS dynamic subset by dataset/variable/time/bbox after metadata
+    access.
+  deterministic_url_generation_direct: false
+  deterministic_asset_resolution_after_discovery: true
+  bounded_probe_appropriate: false
+  credential_profile_id: earthdata_env_placeholder
+  credential_requirement: earthdata_login
+  auth_not_implemented_reason: Access-surface probe returned 401 for dataset/NCSS
+    endpoints; credential/session design needed.
+  expected_formats:
+  - netcdf
+  native_crs_or_grid: Daymet LCC grid needs metadata confirmation
+  target_crs_assumption: EPSG:5070 later if harmonized
+  temporal_key_structure: daily no-leap calendar caveat
+  spatial_key_structure: bbox query after endpoint metadata
+  nodata_metadata: unknown
+  checksum_metadata: NetCDF metadata expected
+  rate_limit_caveats: Metadata endpoint access gated in current probe.
+  license_or_terms_url: null
+  official_docs:
+  - https://daymet.ornl.gov/getdata
+  - https://daac.ornl.gov/DAYMET/guides/Daymet_Daily_V4.html
+  promotion_status: blocked_by_auth
+  last_probe_report: reports/daymet_access_surface_probe.json
+  notes: Keep NCSS research; do not runtime-register.
+- source_id: nlcd_annual_landcover
+  display_name: Annual NLCD land cover
+  provider: USGS/MRLC
+  source_family: NLCD
+  source_kind: landcover
+  access_mode: s3_requester_pays
+  access_pattern_category: credential_gated
+  provenance_class: official_cloud_mirror
+  trust_level: documented_unverified
+  endpoint_or_catalog_url: s3://usgs-landcover
+  query_pattern: Resolve official collection/version/object through catalog or requester-pays
+    S3-aware adapter.
+  deterministic_url_generation_direct: false
+  deterministic_asset_resolution_after_discovery: true
+  bounded_probe_appropriate: false
+  credential_profile_id: aws_requester_pays_placeholder
+  credential_requirement: aws_requester_pays
+  auth_not_implemented_reason: Anonymous HTTPS probes returned 403; requester-pays/catalog
+    handling needed.
+  expected_formats:
+  - GeoTIFF
+  - COG_candidate
+  native_crs_or_grid: product metadata required
+  target_crs_assumption: EPSG:5070 likely analysis target
+  temporal_key_structure: annual year
+  spatial_key_structure: CONUS mosaic or ARD tile
+  nodata_metadata: unknown
+  checksum_metadata: unknown
+  rate_limit_caveats: Requester-pays can return 403 without AWS configuration.
+  license_or_terms_url: null
+  official_docs:
+  - https://www.usgs.gov/centers/eros/science/annual-nlcd-data-access
+  - https://www.mrlc.gov/data-services-page
+  promotion_status: blocked_by_auth
+  last_probe_report: reports/live_url_structure_probe_64k.json
+  notes: Prioritize categorical land cover, not FctImp-only.
+- source_id: usgs_3dep_dem
+  display_name: USGS 3DEP DEM
+  provider: USGS
+  source_family: 3DEP
+  source_kind: elevation
+  access_mode: unknown_future
+  access_pattern_category: service_discovered
+  provenance_class: official_primary
+  trust_level: documented_unverified
+  endpoint_or_catalog_url: null
+  query_pattern: Resolve DEM product/service through TNM or 3DEP service metadata
+    before probe.
+  deterministic_url_generation_direct: false
+  deterministic_asset_resolution_after_discovery: true
+  bounded_probe_appropriate: true
+  credential_profile_id: null
+  credential_requirement: none
+  auth_not_implemented_reason: null
+  expected_formats:
+  - GeoTIFF
+  - COG
+  - IMG
+  native_crs_or_grid: product-specific
+  target_crs_assumption: EPSG:5070 or native terrain workflow
+  temporal_key_structure: vintage/product update metadata
+  spatial_key_structure: AOI/product tile resolution
+  nodata_metadata: unknown
+  checksum_metadata: unknown
+  rate_limit_caveats: Select concrete endpoint before probe.
+  license_or_terms_url: null
+  official_docs:
+  - https://www.usgs.gov/3d-elevation-program/about-3dep-products-services
+  promotion_status: blocked_by_adapter
+  last_probe_report: null
+  notes: Good no-auth adapter/probe candidate once endpoint selected.
+- source_id: landsat_collection2
+  display_name: Landsat Collection 2
+  provider: USGS
+  source_family: Landsat
+  source_kind: satellite_scene
+  access_mode: stac_api
+  access_pattern_category: credential_gated
+  provenance_class: official_cloud_mirror
+  trust_level: documented_unverified
+  endpoint_or_catalog_url: null
+  query_pattern: Catalog search by collection/time/bbox/cloud then asset selection.
+  deterministic_url_generation_direct: false
+  deterministic_asset_resolution_after_discovery: true
+  bounded_probe_appropriate: false
+  credential_profile_id: usgs_m2m_placeholder
+  credential_requirement: usgs_m2m_token
+  auth_not_implemented_reason: M2M token or requester-pays cloud setup needed.
+  expected_formats:
+  - COG
+  - MTL
+  - XML
+  native_crs_or_grid: scene-specific
+  target_crs_assumption: read from STAC/metadata
+  temporal_key_structure: acquisition datetime
+  spatial_key_structure: WRS path/row or geometry
+  nodata_metadata: band-specific
+  checksum_metadata: metadata/product-specific
+  rate_limit_caveats: Requester-pays and API limits apply.
+  license_or_terms_url: null
+  official_docs:
+  - https://www.usgs.gov/landsat-missions/landsat-collection-2
+  promotion_status: blocked_by_auth
+  last_probe_report: null
+  notes: Future STAC/M2M source.
+- source_id: sentinel_copernicus_dataspace
+  display_name: Sentinel via Copernicus Data Space
+  provider: Copernicus
+  source_family: Sentinel
+  source_kind: satellite_scene
+  access_mode: stac_api
+  access_pattern_category: credential_gated
+  provenance_class: official_primary
+  trust_level: documented_unverified
+  endpoint_or_catalog_url: https://browser.stac.dataspace.copernicus.eu
+  query_pattern: STAC/OData discovery by collection/time/footprint; authenticated
+    product/asset access.
+  deterministic_url_generation_direct: false
+  deterministic_asset_resolution_after_discovery: true
+  bounded_probe_appropriate: false
+  credential_profile_id: copernicus_token_placeholder
+  credential_requirement: copernicus_token
+  auth_not_implemented_reason: Bearer/OAuth credential flow not implemented.
+  expected_formats:
+  - SAFE
+  - zip
+  - asset-specific
+  native_crs_or_grid: product/tile-specific
+  target_crs_assumption: read from catalog metadata
+  temporal_key_structure: sensing datetime
+  spatial_key_structure: catalog footprint / tile
+  nodata_metadata: product-specific
+  checksum_metadata: unknown
+  rate_limit_caveats: CDSE auth and transfer constraints may apply.
+  license_or_terms_url: null
+  official_docs:
+  - https://documentation.dataspace.copernicus.eu/APIs/STAC.html
+  - https://documentation.dataspace.copernicus.eu/APIs/OData.html
+  promotion_status: blocked_by_auth
+  last_probe_report: null
+  notes: Future STAC/OData source.
+- source_id: modis_nasa_earthdata_cmr
+  display_name: MODIS via NASA CMR
+  provider: NASA Earthdata
+  source_family: MODIS
+  source_kind: satellite_scene
+  access_mode: cmr_api
+  access_pattern_category: credential_gated
+  provenance_class: official_primary
+  trust_level: documented_unverified
+  endpoint_or_catalog_url: https://cmr.earthdata.nasa.gov/search
+  query_pattern: CMR/CMR-STAC collection/granule discovery then DAAC link resolution.
+  deterministic_url_generation_direct: false
+  deterministic_asset_resolution_after_discovery: true
+  bounded_probe_appropriate: false
+  credential_profile_id: earthdata_env_placeholder
+  credential_requirement: earthdata_login
+  auth_not_implemented_reason: Earthdata credentialed link resolution not implemented.
+  expected_formats:
+  - HDF
+  - NetCDF
+  - GeoTIFF product-specific
+  native_crs_or_grid: product-specific
+  target_crs_assumption: read from metadata
+  temporal_key_structure: granule temporal metadata
+  spatial_key_structure: MODIS tile/swath geometry
+  nodata_metadata: product-specific
+  checksum_metadata: CMR link-specific
+  rate_limit_caveats: DAAC-specific auth/limits.
+  license_or_terms_url: null
+  official_docs:
+  - https://www.earthdata.nasa.gov/about/esdis/eosdis/cmr
+  - https://cmr.earthdata.nasa.gov/stac/docs/index.html
+  promotion_status: blocked_by_auth
+  last_probe_report: null
+  notes: Future CMR adapter family.
+- source_id: noaa_ncei_service_class
+  display_name: NOAA/NCEI service class
+  provider: NOAA/NCEI
+  source_family: NOAA
+  source_kind: weather_model
+  access_mode: thredds_catalog
+  access_pattern_category: service_discovered
+  provenance_class: official_primary
+  trust_level: documented_unverified
+  endpoint_or_catalog_url: null
+  query_pattern: Dataset-specific THREDDS/NCSS/OPeNDAP/NOMADS metadata then subset/filter.
+  deterministic_url_generation_direct: false
+  deterministic_asset_resolution_after_discovery: true
+  bounded_probe_appropriate: true
+  credential_profile_id: null
+  credential_requirement: none
+  auth_not_implemented_reason: null
+  expected_formats:
+  - NetCDF
+  - GRIB2
+  native_crs_or_grid: dataset-specific
+  target_crs_assumption: dataset-specific
+  temporal_key_structure: model run or time axis
+  spatial_key_structure: bbox/grid dataset-specific
+  nodata_metadata: dataset-specific
+  checksum_metadata: unknown
+  rate_limit_caveats: NOMADS throttling and archive availability vary.
+  license_or_terms_url: null
+  official_docs:
+  - https://www.ncei.noaa.gov/index.php/access/thredds-user-guide
+  - https://nomads.ncep.noaa.gov/info.php?page=gribfilter
+  promotion_status: blocked_by_adapter
+  last_probe_report: null
+  notes: Choose a concrete NOAA dataset before probe.
+- source_id: chirps_daily_precipitation
+  display_name: CHIRPS daily precipitation
+  provider: UCSB CHC
+  source_family: CHIRPS
+  source_kind: climate_grid
+  access_mode: static_https
+  access_pattern_category: future_unverified
+  provenance_class: official_primary
+  trust_level: documented_unverified
+  endpoint_or_catalog_url: null
+  query_pattern: needs source-specific official endpoint and query verification before
+    runtime use
+  deterministic_url_generation_direct: false
+  deterministic_asset_resolution_after_discovery: false
+  bounded_probe_appropriate: true
+  credential_profile_id: null
+  credential_requirement: none
+  auth_not_implemented_reason: null
+  expected_formats:
+  - GeoTIFF
+  - NetCDF_candidate
+  native_crs_or_grid: unknown
+  target_crs_assumption: unknown
+  temporal_key_structure: dataset-specific
+  spatial_key_structure: dataset-specific
+  nodata_metadata: unknown
+  checksum_metadata: unknown
+  rate_limit_caveats: unknown
+  license_or_terms_url: null
+  official_docs:
+  - https://www.chc.ucsb.edu/data/chirps
+  promotion_status: research_only
+  last_probe_report: null
+  notes: Candidate no-auth climate grid; endpoint matrix not encoded yet.
+- source_id: terraclimate_monthly
+  display_name: TerraClimate monthly climate grids
+  provider: University of Idaho / TerraClimate
+  source_family: TerraClimate
+  source_kind: climate_grid
+  access_mode: opendap
+  access_pattern_category: future_unverified
+  provenance_class: official_primary
+  trust_level: documented_unverified
+  endpoint_or_catalog_url: null
+  query_pattern: needs source-specific official endpoint and query verification before
+    runtime use
+  deterministic_url_generation_direct: false
+  deterministic_asset_resolution_after_discovery: true
+  bounded_probe_appropriate: true
+  credential_profile_id: null
+  credential_requirement: none
+  auth_not_implemented_reason: null
+  expected_formats:
+  - NetCDF
+  native_crs_or_grid: unknown
+  target_crs_assumption: unknown
+  temporal_key_structure: dataset-specific
+  spatial_key_structure: dataset-specific
+  nodata_metadata: unknown
+  checksum_metadata: unknown
+  rate_limit_caveats: unknown
+  license_or_terms_url: null
+  official_docs:
+  - https://www.climatologylab.org/terraclimate.html
+  promotion_status: blocked_by_adapter
+  last_probe_report: null
+  notes: Potential OPeNDAP/NetCDF metadata probe; no endpoint encoded.
+- source_id: worldclim_bioclim_normals
+  display_name: WorldClim / BioClim climate normals
+  provider: WorldClim
+  source_family: WorldClim
+  source_kind: climate_grid
+  access_mode: static_https
+  access_pattern_category: future_unverified
+  provenance_class: official_primary
+  trust_level: documented_unverified
+  endpoint_or_catalog_url: null
+  query_pattern: needs source-specific official endpoint and query verification before
+    runtime use
+  deterministic_url_generation_direct: false
+  deterministic_asset_resolution_after_discovery: false
+  bounded_probe_appropriate: false
+  credential_profile_id: null
+  credential_requirement: none
+  auth_not_implemented_reason: null
+  expected_formats:
+  - GeoTIFF
+  - zip
+  native_crs_or_grid: unknown
+  target_crs_assumption: unknown
+  temporal_key_structure: dataset-specific
+  spatial_key_structure: dataset-specific
+  nodata_metadata: unknown
+  checksum_metadata: unknown
+  rate_limit_caveats: unknown
+  license_or_terms_url: null
+  official_docs:
+  - https://www.worldclim.org/data/index.html
+  promotion_status: research_only
+  last_probe_report: null
+  notes: Static climate normals candidate; no URL template promoted.
+- source_id: gridmet_daily
+  display_name: gridMET daily meteorology
+  provider: University of Idaho / gridMET
+  source_family: gridMET
+  source_kind: climate_grid
+  access_mode: opendap
+  access_pattern_category: future_unverified
+  provenance_class: official_primary
+  trust_level: documented_unverified
+  endpoint_or_catalog_url: null
+  query_pattern: needs source-specific official endpoint and query verification before
+    runtime use
+  deterministic_url_generation_direct: false
+  deterministic_asset_resolution_after_discovery: true
+  bounded_probe_appropriate: true
+  credential_profile_id: null
+  credential_requirement: none
+  auth_not_implemented_reason: null
+  expected_formats:
+  - NetCDF
+  native_crs_or_grid: unknown
+  target_crs_assumption: unknown
+  temporal_key_structure: dataset-specific
+  spatial_key_structure: dataset-specific
+  nodata_metadata: unknown
+  checksum_metadata: unknown
+  rate_limit_caveats: unknown
+  license_or_terms_url: null
+  official_docs:
+  - https://www.climatologylab.org/gridmet.html
+  promotion_status: blocked_by_adapter
+  last_probe_report: null
+  notes: Candidate OPeNDAP/NetCDF service; needs endpoint verification.
+- source_id: era5_cds
+  display_name: ERA5 / ERA5-Land via CDS
+  provider: ECMWF Copernicus Climate Data Store
+  source_family: ERA5
+  source_kind: climate_grid
+  access_mode: authenticated_https
+  access_pattern_category: credential_gated
+  provenance_class: official_primary
+  trust_level: documented_unverified
+  endpoint_or_catalog_url: null
+  query_pattern: needs source-specific official endpoint and query verification before
+    runtime use
+  deterministic_url_generation_direct: false
+  deterministic_asset_resolution_after_discovery: false
+  bounded_probe_appropriate: false
+  credential_profile_id: copernicus_token_placeholder
+  credential_requirement: bearer_token
+  auth_not_implemented_reason: Credential flow is scaffold-only in v0.4.
+  expected_formats:
+  - NetCDF
+  - GRIB
+  native_crs_or_grid: unknown
+  target_crs_assumption: unknown
+  temporal_key_structure: dataset-specific
+  spatial_key_structure: dataset-specific
+  nodata_metadata: unknown
+  checksum_metadata: unknown
+  rate_limit_caveats: unknown
+  license_or_terms_url: null
+  official_docs:
+  - https://cds.climate.copernicus.eu/
+  promotion_status: blocked_by_auth
+  last_probe_report: null
+  notes: CDS API/auth workflow required; no probe without credentials.
+- source_id: nldas_gldas_gesdisc
+  display_name: NLDAS/GLDAS via GES DISC
+  provider: NASA GES DISC
+  source_family: NLDAS_GLDAS
+  source_kind: climate_grid
+  access_mode: cmr_api
+  access_pattern_category: credential_gated
+  provenance_class: official_primary
+  trust_level: documented_unverified
+  endpoint_or_catalog_url: null
+  query_pattern: needs source-specific official endpoint and query verification before
+    runtime use
+  deterministic_url_generation_direct: false
+  deterministic_asset_resolution_after_discovery: true
+  bounded_probe_appropriate: false
+  credential_profile_id: earthdata_env_placeholder
+  credential_requirement: earthdata_login
+  auth_not_implemented_reason: Credential flow is scaffold-only in v0.4.
+  expected_formats:
+  - NetCDF
+  native_crs_or_grid: unknown
+  target_crs_assumption: unknown
+  temporal_key_structure: dataset-specific
+  spatial_key_structure: dataset-specific
+  nodata_metadata: unknown
+  checksum_metadata: unknown
+  rate_limit_caveats: unknown
+  license_or_terms_url: null
+  official_docs:
+  - https://disc.gsfc.nasa.gov/
+  promotion_status: blocked_by_auth
+  last_probe_report: null
+  notes: Earthdata/CMR or GES DISC access; no credentialed probe.
+- source_id: noaa_gfs_nomads_grib_filter
+  display_name: NOAA GFS NOMADS GRIB filter
+  provider: NOAA/NCEP
+  source_family: GFS
+  source_kind: weather_model
+  access_mode: grib_filter
+  access_pattern_category: service_discovered
+  provenance_class: official_primary
+  trust_level: documented_unverified
+  endpoint_or_catalog_url: null
+  query_pattern: needs source-specific official endpoint and query verification before
+    runtime use
+  deterministic_url_generation_direct: false
+  deterministic_asset_resolution_after_discovery: true
+  bounded_probe_appropriate: true
+  credential_profile_id: null
+  credential_requirement: none
+  auth_not_implemented_reason: null
+  expected_formats:
+  - GRIB2
+  native_crs_or_grid: unknown
+  target_crs_assumption: unknown
+  temporal_key_structure: dataset-specific
+  spatial_key_structure: dataset-specific
+  nodata_metadata: unknown
+  checksum_metadata: unknown
+  rate_limit_caveats: unknown
+  license_or_terms_url: null
+  official_docs:
+  - https://nomads.ncep.noaa.gov/
+  - https://nomads.ncep.noaa.gov/info.php?page=gribfilter
+  promotion_status: blocked_by_adapter
+  last_probe_report: null
+  notes: Good no-auth metadata/filter candidate after endpoint selection.
+- source_id: noaa_hrrr_public_cloud
+  display_name: NOAA HRRR public cloud/NOMADS
+  provider: NOAA
+  source_family: HRRR
+  source_kind: weather_model
+  access_mode: s3_public
+  access_pattern_category: future_unverified
+  provenance_class: official_cloud_mirror
+  trust_level: documented_unverified
+  endpoint_or_catalog_url: null
+  query_pattern: needs source-specific official endpoint and query verification before
+    runtime use
+  deterministic_url_generation_direct: false
+  deterministic_asset_resolution_after_discovery: false
+  bounded_probe_appropriate: false
+  credential_profile_id: null
+  credential_requirement: none
+  auth_not_implemented_reason: null
+  expected_formats:
+  - GRIB2
+  native_crs_or_grid: unknown
+  target_crs_assumption: unknown
+  temporal_key_structure: dataset-specific
+  spatial_key_structure: dataset-specific
+  nodata_metadata: unknown
+  checksum_metadata: unknown
+  rate_limit_caveats: unknown
+  license_or_terms_url: null
+  official_docs:
+  - https://registry.opendata.aws/noaa-hrrr-pds/
+  promotion_status: blocked_by_adapter
+  last_probe_report: null
+  notes: Public cloud candidate; object path/filter policy not encoded.
+- source_id: noaa_mrms_precipitation
+  display_name: NOAA MRMS precipitation
+  provider: NOAA
+  source_family: MRMS
+  source_kind: weather_model
+  access_mode: unknown_future
+  access_pattern_category: future_unverified
+  provenance_class: official_primary
+  trust_level: documented_unverified
+  endpoint_or_catalog_url: null
+  query_pattern: needs source-specific official endpoint and query verification before
+    runtime use
+  deterministic_url_generation_direct: false
+  deterministic_asset_resolution_after_discovery: false
+  bounded_probe_appropriate: false
+  credential_profile_id: null
+  credential_requirement: none
+  auth_not_implemented_reason: null
+  expected_formats:
+  - GRIB2
+  - NetCDF_candidate
+  native_crs_or_grid: unknown
+  target_crs_assumption: unknown
+  temporal_key_structure: dataset-specific
+  spatial_key_structure: dataset-specific
+  nodata_metadata: unknown
+  checksum_metadata: unknown
+  rate_limit_caveats: unknown
+  license_or_terms_url: null
+  official_docs:
+  - https://www.nssl.noaa.gov/projects/mrms/
+  promotion_status: blocked_by_adapter
+  last_probe_report: null
+  notes: Endpoint/access pattern needs official verification.
+- source_id: cmip6_esgf
+  display_name: CMIP6/ESGF climate model outputs
+  provider: ESGF
+  source_family: CMIP6
+  source_kind: climate_grid
+  access_mode: authenticated_https
+  access_pattern_category: credential_gated
+  provenance_class: institutional_mirror
+  trust_level: documented_unverified
+  endpoint_or_catalog_url: null
+  query_pattern: needs source-specific official endpoint and query verification before
+    runtime use
+  deterministic_url_generation_direct: false
+  deterministic_asset_resolution_after_discovery: false
+  bounded_probe_appropriate: false
+  credential_profile_id: esgf_bearer_placeholder
+  credential_requirement: bearer_token
+  auth_not_implemented_reason: Credential flow is scaffold-only in v0.4.
+  expected_formats:
+  - NetCDF
+  - Zarr_candidate
+  native_crs_or_grid: unknown
+  target_crs_assumption: unknown
+  temporal_key_structure: dataset-specific
+  spatial_key_structure: dataset-specific
+  nodata_metadata: unknown
+  checksum_metadata: unknown
+  rate_limit_caveats: unknown
+  license_or_terms_url: null
+  official_docs:
+  - https://esgf-node.llnl.gov/projects/cmip6/
+  promotion_status: blocked_by_auth
+  last_probe_report: null
+  notes: Large model data; needs catalog/auth and size policy.
+- source_id: pangeo_climate_zarr_catalogs
+  display_name: Pangeo-hosted climate/Zarr catalogs
+  provider: Pangeo community
+  source_family: Pangeo
+  source_kind: catalog_only
+  access_mode: mirror_https
+  access_pattern_category: mirror_candidate
+  provenance_class: community_mirror
+  trust_level: mirror_needs_validation
+  endpoint_or_catalog_url: null
+  query_pattern: needs source-specific official endpoint and query verification before
+    runtime use
+  deterministic_url_generation_direct: false
+  deterministic_asset_resolution_after_discovery: false
+  bounded_probe_appropriate: false
+  credential_profile_id: null
+  credential_requirement: none
+  auth_not_implemented_reason: null
+  expected_formats:
+  - Zarr
+  native_crs_or_grid: unknown
+  target_crs_assumption: unknown
+  temporal_key_structure: dataset-specific
+  spatial_key_structure: dataset-specific
+  nodata_metadata: unknown
+  checksum_metadata: unknown
+  rate_limit_caveats: unknown
+  license_or_terms_url: null
+  official_docs:
+  - https://pangeo.io/
+  promotion_status: research_only
+  last_probe_report: null
+  notes: Mirror/catalog candidate only; validate institutional provenance before probe.
+- source_id: microsoft_planetary_computer_stac
+  display_name: Microsoft Planetary Computer STAC candidates
+  provider: Microsoft Planetary Computer
+  source_family: PlanetaryComputer
+  source_kind: catalog_only
+  access_mode: stac_api
+  access_pattern_category: api_discovered
+  provenance_class: institutional_mirror
+  trust_level: documented_unverified
+  endpoint_or_catalog_url: null
+  query_pattern: needs source-specific official endpoint and query verification before
+    runtime use
+  deterministic_url_generation_direct: false
+  deterministic_asset_resolution_after_discovery: true
+  bounded_probe_appropriate: false
+  credential_profile_id: planetary_computer_token_placeholder
+  credential_requirement: bearer_token
+  auth_not_implemented_reason: Credential flow is scaffold-only in v0.4.
+  expected_formats:
+  - COG
+  - STAC
+  native_crs_or_grid: unknown
+  target_crs_assumption: unknown
+  temporal_key_structure: dataset-specific
+  spatial_key_structure: dataset-specific
+  nodata_metadata: unknown
+  checksum_metadata: unknown
+  rate_limit_caveats: unknown
+  license_or_terms_url: null
+  official_docs:
+  - https://planetarycomputer.microsoft.com/docs/quickstarts/reading-stac/
+  promotion_status: blocked_by_adapter
+  last_probe_report: null
+  notes: STAC catalog candidate; signing/token details vary by asset.
+- source_id: opentopography_dem
+  display_name: OpenTopography DEM sources
+  provider: OpenTopography
+  source_family: OpenTopography
+  source_kind: elevation
+  access_mode: authenticated_https
+  access_pattern_category: api_discovered
+  provenance_class: official_primary
+  trust_level: documented_unverified
+  endpoint_or_catalog_url: null
+  query_pattern: needs source-specific official endpoint and query verification before
+    runtime use
+  deterministic_url_generation_direct: false
+  deterministic_asset_resolution_after_discovery: false
+  bounded_probe_appropriate: false
+  credential_profile_id: opentopography_token_placeholder
+  credential_requirement: bearer_token
+  auth_not_implemented_reason: Credential flow is scaffold-only in v0.4.
+  expected_formats:
+  - GeoTIFF
+  - point_cloud_candidate
+  native_crs_or_grid: unknown
+  target_crs_assumption: unknown
+  temporal_key_structure: dataset-specific
+  spatial_key_structure: dataset-specific
+  nodata_metadata: unknown
+  checksum_metadata: unknown
+  rate_limit_caveats: unknown
+  license_or_terms_url: null
+  official_docs:
+  - https://opentopography.org/developers
+  promotion_status: blocked_by_auth
+  last_probe_report: null
+  notes: API/token possible; no endpoint defined in atlas.
+- source_id: eobs_european_climate
+  display_name: E-OBS European climate grids
+  provider: ECA&D / Copernicus-adjacent
+  source_family: E-OBS
+  source_kind: climate_grid
+  access_mode: mirror_https
+  access_pattern_category: mirror_candidate
+  provenance_class: institutional_mirror
+  trust_level: documented_unverified
+  endpoint_or_catalog_url: null
+  query_pattern: needs source-specific official endpoint and query verification before
+    runtime use
+  deterministic_url_generation_direct: false
+  deterministic_asset_resolution_after_discovery: false
+  bounded_probe_appropriate: false
+  credential_profile_id: null
+  credential_requirement: unknown
+  auth_not_implemented_reason: Credential flow is scaffold-only in v0.4.
+  expected_formats:
+  - NetCDF
+  native_crs_or_grid: unknown
+  target_crs_assumption: unknown
+  temporal_key_structure: dataset-specific
+  spatial_key_structure: dataset-specific
+  nodata_metadata: unknown
+  checksum_metadata: unknown
+  rate_limit_caveats: unknown
+  license_or_terms_url: null
+  official_docs:
+  - https://surfobs.climate.copernicus.eu/dataaccess/access_eobs.php
+  promotion_status: research_only
+  last_probe_report: null
+  notes: Institutional access candidate; no direct endpoint encoded.
+- source_id: ecmwf_copernicus_mirror_candidate
+  display_name: ECMWF/Copernicus derived mirror candidates
+  provider: ECMWF/Copernicus
+  source_family: ECMWF_mirrors
+  source_kind: climate_grid
+  access_mode: mirror_https
+  access_pattern_category: mirror_candidate
+  provenance_class: institutional_mirror
+  trust_level: mirror_needs_validation
+  endpoint_or_catalog_url: null
+  query_pattern: needs source-specific official endpoint and query verification before
+    runtime use
+  deterministic_url_generation_direct: false
+  deterministic_asset_resolution_after_discovery: false
+  bounded_probe_appropriate: false
+  credential_profile_id: null
+  credential_requirement: unknown
+  auth_not_implemented_reason: Credential flow is scaffold-only in v0.4.
+  expected_formats:
+  - NetCDF
+  - GRIB
+  native_crs_or_grid: unknown
+  target_crs_assumption: unknown
+  temporal_key_structure: dataset-specific
+  spatial_key_structure: dataset-specific
+  nodata_metadata: unknown
+  checksum_metadata: unknown
+  rate_limit_caveats: unknown
+  license_or_terms_url: null
+  official_docs:
+  - https://cds.climate.copernicus.eu/
+  promotion_status: research_only
+  last_probe_report: null
+  notes: Treat mirrors carefully; official credentialed source preferred.
+- source_id: daymet_single_pixel_rest_duplicate_guard
+  display_name: Daymet single-pixel REST service proof guard
+  provider: ORNL DAAC
+  source_family: Daymet
+  source_kind: station_or_point_service
+  access_mode: parameterized_rest
+  access_pattern_category: service_discovered
+  provenance_class: official_primary
+  trust_level: verified_live
+  endpoint_or_catalog_url: https://daymet.ornl.gov/single-pixel/api/data
+  query_pattern: needs source-specific official endpoint and query verification before
+    runtime use
+  deterministic_url_generation_direct: false
+  deterministic_asset_resolution_after_discovery: false
+  bounded_probe_appropriate: true
+  credential_profile_id: null
+  credential_requirement: none
+  auth_not_implemented_reason: null
+  expected_formats:
+  - csv
+  - text
+  native_crs_or_grid: unknown
+  target_crs_assumption: unknown
+  temporal_key_structure: dataset-specific
+  spatial_key_structure: dataset-specific
+  nodata_metadata: unknown
+  checksum_metadata: unknown
+  rate_limit_caveats: unknown
+  license_or_terms_url: null
+  official_docs:
+  - https://daymet.ornl.gov/web_services
+  promotion_status: experimental_probe_supported
+  last_probe_report: null
+  notes: Second atlas row for access-mode guard; points to same proof family.

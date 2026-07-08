@@ -1,0 +1,31 @@
+sources:
+  usda_nass_cdl_imageserver:
+    adapter: arcgis_imageserver
+    base_url: https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer
+    bbox_crs_param: bboxSR
+    bbox_param: bbox
+    bbox_request_policy: preserve_input_bbox_with_bboxsr
+    default_export_image_crs: EPSG:3857
+    default_image_format: tiff
+    default_response_format: image
+    format_param: format
+    image_crs_param: imageSR
+    max_height: 4097
+    max_width: 4097
+    mosaic_rule_param: mosaicRule
+    native_pixel_type: uint8
+    operation: exportImage
+    product: Cropland Data Layer
+    provider: USDA_NASS
+    response_format_param: f
+    semantic_type: categorical
+    service_crs: EPSG:3857
+    size_param: size
+    supported_years:
+    - 2023
+    - 2024
+    supports_bbox_crs_param: true
+    time_param: time
+    time_parameter_strategy: year_query_param
+    time_value: '{year}'
+    year_parameter_strategy: time_value

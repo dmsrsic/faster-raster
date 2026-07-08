@@ -1,0 +1,21 @@
+                                                Batcher / unlock planner                                                
+┏━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ rank ┃ sauce                              ┃ action class       ┃ locks/adapters ┃ next                               ┃
+┡━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ 1    │ gridmet_daily                      │ adapter_next       │ none           │ write metadata-only adapter/probe  │
+│      │                                    │                    │                │ design                             │
+│ 2    │ noaa_gfs_nomads_grib_filter        │ adapter_next       │ none           │ write metadata-only adapter/probe  │
+│      │                                    │                    │                │ design                             │
+│ 3    │ noaa_ncei_service_class            │ adapter_next       │ none           │ write metadata-only adapter/probe  │
+│      │                                    │                    │                │ design                             │
+│ 4    │ terraclimate_monthly               │ adapter_next       │ none           │ write metadata-only adapter/probe  │
+│      │                                    │                    │                │ design                             │
+│ 5    │ usgs_3dep_dem                      │ adapter_next       │ none           │ write metadata-only adapter/probe  │
+│      │                                    │                    │                │ design                             │
+│ 6    │ chirps_daily_precipitation         │ docs_research_next │ none           │ verify official docs and endpoint  │
+│      │                                    │                    │                │ semantics                          │
+│ 7    │ daymet_single_pixel_rest_duplicat… │ probe_next         │ none           │ run or preserve bounded opt-in     │
+│      │                                    │                    │                │ probe                              │
+│ 8    │ noaa_hrrr_public_cloud             │ adapter_next       │ none           │ write metadata-only adapter/probe  │
+│      │                                    │                    │                │ design                             │
+└──────┴────────────────────────────────────┴────────────────────┴────────────────┴────────────────────────────────────┘

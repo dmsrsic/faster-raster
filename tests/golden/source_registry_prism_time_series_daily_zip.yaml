@@ -1,0 +1,45 @@
+sources:
+  prism_time_series_daily_zip:
+    adapter: generic_https_template
+    base_url: null
+    bbox_crs_param: null
+    bbox_param: null
+    bbox_request_policy: no_bbox_url_template
+    collection: null
+    default_export_image_crs: EPSG:4326
+    default_format: zip
+    default_image_format: null
+    default_response_format: null
+    format_param: null
+    h: null
+    image_crs_param: null
+    max_height: 4097
+    max_width: 4097
+    mosaic_rule_param: mosaicRule
+    native_crs: EPSG:4326
+    native_pixel_type: null
+    operation: null
+    product: PRISM Time Series Daily
+    product_code: null
+    product_slug: null
+    provider: PRISM_OSU
+    region: us
+    resolution: 4km
+    response_format_param: null
+    semantic_type: continuous
+    service_crs: null
+    size_param: null
+    supported_years: null
+    supports_bbox_crs_param: false
+    supports_tiling: false
+    template_tile_id: null
+    temporal_frequency: daily
+    time_param: time
+    time_parameter_strategy: null
+    time_value: '{year}'
+    url_template: https://data.prism.oregonstate.edu/time_series/{region}/an/{resolution}/{variable}/{temporal_frequency}/{year}/prism_{variable}_{region}_25m_{yyyymmdd}.zip
+    v: null
+    variable: ppt
+    version: null
+    year_parameter_strategy: time_value
+    yyyymmdd: '20260101'

@@ -1,0 +1,10 @@
+╭────────────────────────────────────────────── Sauce Card: PRISM goods ───────────────────────────────────────────────╮
+│ sauce: prism_daily_ppt_static_zip                                                                                    │
+│ flavor: zip, bil, metadata_sidecars                                                                                  │
+│ crop-cookie: CONUS grid; no source-side AOI subset in legacy static file                                             │
+│ goods status: verified_now                                                                                           │
+│ bt: bounded probe budgeted by policy                                                                                 │
+│ at: last bytes 65536                                                                                                 │
+│ crumbs: sha256_present=True                                                                                          │
+│ provider: PRISM Climate Group                                                                                        │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯

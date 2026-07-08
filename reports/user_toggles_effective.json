@@ -1,0 +1,39 @@
+{
+  "effective_toggles": {
+    "dip_limits": {
+      "allow_binary_preview": false,
+      "allow_http_206": true,
+      "allow_text_preview": true,
+      "max_bytes_per_source": 65536,
+      "timeout_seconds": 20
+    },
+    "lingo_mode": "mixed",
+    "network_mode": "off",
+    "output": {
+      "write_cli_preview": true,
+      "write_json": true,
+      "write_markdown": true,
+      "write_screenshot_scene": false
+    },
+    "promotion_policy": {
+      "forbid_runtime_registry_edit": true,
+      "mode": "proposal_only"
+    },
+    "safety": {
+      "fail_closed_on_unknown_endpoint": true,
+      "forbid_extraction": true,
+      "forbid_secret_values": true,
+      "forbid_unbounded_downloads": true,
+      "require_allow_network_for_live": true
+    },
+    "source_scope": {
+      "allow_credentialed": false,
+      "allow_mirror_candidates": false,
+      "max_sources_per_run": 5,
+      "no_auth_only": true,
+      "official_or_institutional_only": true
+    }
+  },
+  "errors": [],
+  "status": "PASS"
+}

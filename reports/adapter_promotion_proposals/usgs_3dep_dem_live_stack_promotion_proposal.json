@@ -1,0 +1,18 @@
+{
+  "adapter_wave": "wave_2_metadata_json_discovery",
+  "endpoint_id": "tnm_products_bbox_json",
+  "evidence": {
+    "bytes_read": 8232,
+    "content_type": "application/json",
+    "http_status": 200,
+    "result_class": "pass_verified",
+    "selected_url": "https://tnmaccess.nationalmap.gov/api/v1/products?datasets=Digital+Elevation+Model+(DEM)+1+meter&bbox=-83.20,39.80,-83.19,39.81&prodFormats=GeoTIFF&outputFormat=JSON",
+    "sha256": "23f88b2f3196d0ca0c30eda15e68193a72aee063f846070ac44bb4fd4b3a3985"
+  },
+  "experimental_adapter_candidate": true,
+  "live_source_id": "usgs_3dep_tnm",
+  "promotion_decision": "ready_for_experimental_metadata_json_adapter",
+  "required_next_step": "ready_for_experimental_metadata_json_adapter",
+  "runtime_promotion_allowed_now": false,
+  "source_id": "usgs_3dep_dem"
+}

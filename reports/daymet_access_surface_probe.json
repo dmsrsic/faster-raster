@@ -1,0 +1,97 @@
+{
+  "max_bytes": 65536,
+  "network_opt_in": true,
+  "results": [
+    {
+      "accept_ranges": null,
+      "bytes_read": 4332,
+      "classification": "malformed_request_expected",
+      "content_length": "4332",
+      "content_type": "text/html;charset=ISO-8859-1",
+      "elapsed_seconds": 0.469667,
+      "endpoint": "https://thredds.daac.ornl.gov/thredds/catalog/ornldaac/1840/catalog.xml",
+      "error": "HTTPError: 400 ",
+      "first_byte_seconds": 0.46958,
+      "http_status": 400,
+      "name": "thredds_catalog_xml",
+      "sha256": "1738ba992f293b1c61a1630e2b64af3561ee6aabf6ce6fbbea55f68e602109b7",
+      "truncated": false
+    },
+    {
+      "accept_ranges": null,
+      "bytes_read": 4336,
+      "classification": "malformed_request_expected",
+      "content_length": "4336",
+      "content_type": "text/html;charset=ISO-8859-1",
+      "elapsed_seconds": 0.410639,
+      "endpoint": "https://thredds.daac.ornl.gov/thredds/catalog/ornldaac/1840/catalog.html",
+      "error": "HTTPError: 400 ",
+      "first_byte_seconds": 0.410601,
+      "http_status": 400,
+      "name": "thredds_catalog_html",
+      "sha256": "c42db1ff0cb7edb26cbdee46f3e62c1e68689582b3539df05b9d630cc4e5d03c",
+      "truncated": false
+    },
+    {
+      "accept_ranges": null,
+      "bytes_read": 27,
+      "classification": "unauthorized",
+      "content_length": null,
+      "content_type": "text/html; charset=utf-8",
+      "elapsed_seconds": 1.020861,
+      "endpoint": "https://thredds.daac.ornl.gov/thredds/catalog/ornldaac/1840/daymet_v4_daily_na_prcp_2023.nc.html",
+      "error": "HTTPError: 401 Unauthorized",
+      "first_byte_seconds": 1.020825,
+      "http_status": 401,
+      "name": "thredds_dataset_catalog_page",
+      "sha256": "82cacc83f152a50c54f60e43a77794b0d80373216d94c18751f94e36fe93777a",
+      "truncated": false
+    },
+    {
+      "accept_ranges": null,
+      "bytes_read": 27,
+      "classification": "unauthorized",
+      "content_length": null,
+      "content_type": "text/html; charset=utf-8",
+      "elapsed_seconds": 0.870653,
+      "endpoint": "https://thredds.daac.ornl.gov/thredds/ncss/ornldaac/1840/daymet_v4_daily_na_prcp_2023.nc/dataset.html",
+      "error": "HTTPError: 401 Unauthorized",
+      "first_byte_seconds": 0.870619,
+      "http_status": 401,
+      "name": "ncss_dataset_form",
+      "sha256": "82cacc83f152a50c54f60e43a77794b0d80373216d94c18751f94e36fe93777a",
+      "truncated": false
+    },
+    {
+      "accept_ranges": null,
+      "bytes_read": 27,
+      "classification": "unauthorized",
+      "content_length": null,
+      "content_type": "text/html; charset=utf-8",
+      "elapsed_seconds": 0.86127,
+      "endpoint": "https://thredds.daac.ornl.gov/thredds/ncss/ornldaac/1840/daymet_v4_daily_na_prcp_2023.nc",
+      "error": "HTTPError: 401 Unauthorized",
+      "first_byte_seconds": 0.861235,
+      "http_status": 401,
+      "name": "raw_ncss_no_query",
+      "sha256": "82cacc83f152a50c54f60e43a77794b0d80373216d94c18751f94e36fe93777a",
+      "truncated": false
+    }
+  ],
+  "summary": {
+    "malformed_request_expected": [
+      "thredds_catalog_xml",
+      "thredds_catalog_html"
+    ],
+    "not_found": [],
+    "public_metadata_access": [],
+    "service_error": [],
+    "unauthorized": [
+      "thredds_dataset_catalog_page",
+      "ncss_dataset_form",
+      "raw_ncss_no_query"
+    ],
+    "unknown": []
+  },
+  "timestamp_utc": "2026-07-07T20:12:47Z"
+}

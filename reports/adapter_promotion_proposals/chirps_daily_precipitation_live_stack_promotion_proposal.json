@@ -1,0 +1,18 @@
+{
+  "adapter_wave": "wave_1_static_range_http",
+  "endpoint_id": "chirps_20230101_tif_gz",
+  "evidence": {
+    "bytes_read": 65536,
+    "content_type": "application/octet-stream",
+    "http_status": 206,
+    "result_class": "pass_range_limited",
+    "selected_url": "https://data.chc.ucsb.edu/products/CHIRPS-2.0/global_daily/tifs/p05/2023/chirps-v2.0.2023.01.01.tif.gz",
+    "sha256": "fa6755981504a1a8f46ab4c3cc305fc3f70f96bd0c4ae132066f6e22dcfef886"
+  },
+  "experimental_adapter_candidate": true,
+  "live_source_id": "chirps_daily",
+  "promotion_decision": "ready_for_experimental_static_range_adapter",
+  "required_next_step": "ready_for_experimental_static_range_adapter",
+  "runtime_promotion_allowed_now": false,
+  "source_id": "chirps_daily_precipitation"
+}

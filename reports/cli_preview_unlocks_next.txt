@@ -1,0 +1,8 @@
+bounded_probe_appropriate: True
+class: adapter_next
+credential_requirement: none
+display_name: gridMET daily meteorology
+recommended_action: write metadata-only adapter/probe design
+score: 85
+source_id: gridmet_daily
+

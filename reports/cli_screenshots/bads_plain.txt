@@ -1,0 +1,25 @@
+Bads / blocked, gated, and waiting sauces
+source_id                          provider                  blocker            credential      next_unlock_short
+---------------------------------  ------------------------  -----------------  --------------  -----------------
+daymet_ncss                        ORNL DAAC                 credential_gated   earthdata_log?  auth scaffold    
+nlcd_annual_landcover              USGS/MRLC                 credential_gated   aws_requester?  auth scaffold    
+usgs_3dep_dem                      USGS                      adapter_needed     none            metadata adapter 
+landsat_collection2                USGS                      adapter_needed     usgs_m2m_token  auth scaffold    
+sentinel_copernicus_dataspace      Copernicus                credential_gated   copernicus_to?  auth scaffold    
+modis_nasa_earthdata_cmr           NASA Earthdata            credential_gated   earthdata_log?  auth scaffold    
+noaa_ncei_service_class            NOAA/NCEI                 adapter_needed     none            metadata adapter 
+chirps_daily_precipitation         UCSB CHC                  future_unverified  none            verify endpoint  
+terraclimate_monthly               University of Idaho / T?  adapter_needed     none            metadata adapter 
+worldclim_bioclim_normals          WorldClim                 future_unverified  none            verify endpoint  
+gridmet_daily                      University of Idaho / g?  adapter_needed     none            metadata adapter 
+era5_cds                           ECMWF Copernicus Climat?  credential_gated   bearer_token    auth scaffold    
+nldas_gldas_gesdisc                NASA GES DISC             credential_gated   earthdata_log?  auth scaffold    
+noaa_gfs_nomads_grib_filter        NOAA/NCEP                 adapter_needed     none            metadata adapter 
+noaa_hrrr_public_cloud             NOAA                      adapter_needed     none            metadata adapter 
+noaa_mrms_precipitation            NOAA                      adapter_needed     none            metadata adapter 
+cmip6_esgf                         ESGF                      credential_gated   bearer_token    auth scaffold    
+microsoft_planetary_computer_stac  Microsoft Planetary Com?  credential_gated   bearer_token    auth scaffold    
+opentopography_dem                 OpenTopography            credential_gated   bearer_token    auth scaffold    
+eobs_european_climate              ECA&D / Copernicus-adja?  credential_gated   unknown         auth scaffold    
+ecmwf_copernicus_mirror_candidate  ECMWF/Copernicus          credential_gated   unknown         auth scaffold    
+

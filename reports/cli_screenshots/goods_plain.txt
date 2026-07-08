@@ -1,0 +1,7 @@
+Goods / verified sauces: 3
+source_id                      provider             access              trust          promotion                   next_unlock_short
+-----------------------------  -------------------  ------------------  -------------  --------------------------  -----------------
+prism_daily_ppt_static_zip     PRISM Climate Group  static_verified     verified_live  experimental_probe_suppor?  preserve proof   
+daymet_single_pixel_prcp_rest  ORNL DAAC            service_discovered  verified_live  experimental_probe_suppor?  preserve proof   
+cdl_arcgis_tiny_export         USDA_NASS            service_discovered  verified_live  runtime_supported           preserve proof   
+

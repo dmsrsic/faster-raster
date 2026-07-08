@@ -1,0 +1,89 @@
+immediate_docs_only:
+- source_id: prism_daily_static_range_existing
+  reason: Current example is working, but 2025+ format/service transition needs docs
+    before registry edits.
+- source_id: usgs_raster_services_generic_future
+  reason: Too broad for runtime; use as source taxonomy guidance only.
+- source_id: usda_nass_cdl_imageserver_existing
+  reason: Runtime already works; proposed metadata enrichments require service-info
+    verification before registry changes.
+safe_for_bounded_probe_design:
+- source_id: usgs_annual_nlcd_landcover_service_aware
+  proposed_probe_type: catalog/requester-pays-aware S3 capability probe
+  required_credentials: AWS requester-pays configuration or official catalog access
+    if needed
+  max_bytes: 65536
+  expected_success_signal: resolved asset metadata plus range-readable object or approved
+    service descriptor
+- source_id: ornl_daymet_daily_ncss_service_aware
+  proposed_probe_type: credential/session-aware THREDDS metadata probe; keep research-only
+    until auth behavior is designed
+  required_credentials: unknown; access-surface probe suggests credential or session
+    gating
+  max_bytes: 65536
+  expected_success_signal: authenticated metadata response or documented public alternate
+    endpoint
+- source_id: usgs_3dep_dem_service_aware
+  proposed_probe_type: TNM/API or ImageServer service-info probe
+  required_credentials: none_public
+  max_bytes: 65536
+  expected_success_signal: concrete DEM product/service metadata and range/export
+    capability
+- source_id: noaa_ncei_thredds_raster_future
+  proposed_probe_type: THREDDS catalog/capabilities plus tiny subset
+  required_credentials: usually none_public, dataset-specific
+  max_bytes: 65536
+  expected_success_signal: dataset metadata and subset-compatible request descriptor
+- source_id: ornl_daymet_single_pixel_rest_public_probe_candidate
+  proposed_probe_type: public REST single-pixel bounded text response
+  required_credentials: none_public
+  max_bytes: 65536
+  expected_success_signal: HTTP 200 text/CSV response containing requested prcp value
+    for one point and one day
+future_adapter_candidates:
+- source_id: usgs_annual_nlcd_landcover_service_aware
+  adapter_type: catalog_s3_requester_pays or stac_api
+  required_discovery_mechanism: MRLC/USGS catalog, ScienceBase, STAC, or requester-pays
+    S3 resolver
+  blocker: No verified runtime object resolution path yet.
+- source_id: ornl_daymet_daily_ncss_service_aware
+  adapter_type: thredds_ncss
+  required_discovery_mechanism: THREDDS_NCSS_QUERY
+  blocker: Exact endpoint, query syntax, and auth behavior need verification.
+- source_id: landsat_collection2_stac_future
+  adapter_type: stac_api_or_usgs_m2m
+  required_discovery_mechanism: STAC_API_OR_USGS_M2M_API
+  blocker: Endpoint, credentials, and asset selector policy not selected.
+- source_id: sentinel_copernicus_dataspace_future
+  adapter_type: stac_api_or_odata
+  required_discovery_mechanism: STAC_API_OR_ODATA
+  blocker: Credential/token and asset/package strategy not designed.
+- source_id: modis_nasa_earthdata_cmr_future
+  adapter_type: cmr_api_or_cmr_stac
+  required_discovery_mechanism: CMR_API_OR_CMR_STAC
+  blocker: Product-specific source entries and credential handling required.
+- source_id: nasa_earthdata_raster_sources_future
+  adapter_type: cmr_api_or_cmr_stac
+  required_discovery_mechanism: CMR_API_OR_CMR_STAC
+  blocker: Too broad until product family is chosen.
+- source_id: noaa_ncei_thredds_raster_future
+  adapter_type: thredds_ncss_or_nomads
+  required_discovery_mechanism: THREDDS_NCSS_QUERY_OR_OPENDAP
+  blocker: Choose first NOAA dataset and confirm capability endpoint.
+runtime_do_not_touch:
+- source_id: usgs_annual_nlcd_landcover_service_aware
+  reason: Failed anonymous HTTPS probes and likely requester-pays/catalog resolution
+    requirement.
+- source_id: ornl_daymet_daily_ncss_service_aware
+  reason: Classified as credential_or_session_gated_research after access-surface
+    probe; do not runtime-promote NCSS.
+- source_id: landsat_collection2_stac_future
+  reason: Needs STAC/M2M discovery and credential handling.
+- source_id: sentinel_copernicus_dataspace_future
+  reason: Needs STAC/OData discovery and authentication.
+- source_id: modis_nasa_earthdata_cmr_future
+  reason: Needs CMR/Earthdata credential-aware adapter.
+- source_id: nasa_earthdata_raster_sources_future
+  reason: Generic source family is too broad for runtime.
+- source_id: usgs_raster_services_generic_future
+  reason: Generic taxonomy only; no concrete source endpoint.

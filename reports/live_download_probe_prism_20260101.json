@@ -1,0 +1,32 @@
+{
+  "bytes_read": 1501753,
+  "chunk_size": 65536,
+  "complete": true,
+  "completed_at_utc": "2026-07-07T03:22:17Z",
+  "content_length_header": 1501753,
+  "content_type": "application/zip",
+  "elapsed_seconds": 1.118366,
+  "error": null,
+  "etag": "\"16ea39-65490fd59ec86\"",
+  "first_byte_seconds": 0.706045,
+  "last_modified": "Fri, 19 Jun 2026 01:12:42 GMT",
+  "max_bytes": 5000000,
+  "sha256": "1a8e89f92ba451f67e6065073d86f90780daaa87cd71876affe8b6dfd46efd1a",
+  "started_at_utc": "2026-07-07T03:22:16Z",
+  "status_code": 200,
+  "throughput_bytes_per_second": 1342810.391,
+  "throughput_mb_per_second": 1.280604,
+  "truncated": false,
+  "url": "https://data.prism.oregonstate.edu/time_series/us/an/4km/ppt/daily/2026/prism_ppt_us_25m_20260101.zip",
+  "zip_entries_preview": [
+    "prism_ppt_us_25m_20260101.info.txt",
+    "prism_ppt_us_25m_20260101.prj",
+    "prism_ppt_us_25m_20260101.stn.csv",
+    "prism_ppt_us_25m_20260101.stx",
+    "prism_ppt_us_25m_20260101.tif",
+    "prism_ppt_us_25m_20260101.tif.aux.xml",
+    "prism_ppt_us_25m_20260101.xml"
+  ],
+  "zip_entry_count": 7,
+  "zip_valid": true
+}

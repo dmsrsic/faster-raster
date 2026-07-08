@@ -1,0 +1,11 @@
+auth_profile_id                       provider                      auth_type                       required_env_vars    implementation_status  enabled_default
+------------------------------------  ----------------------------  ------------------------------  -------------------  ---------------------  ---------------
+public_none                           public                        none                                                 scaffold_only          False          
+earthdata_env_placeholder             NASA_EARTHDATA                earthdata_login_placeholder     <ENV_REF>,<ENV_REF>  scaffold_only          False          
+copernicus_token_placeholder          COPERNICUS_DATASPACE          copernicus_oauth_placeholder    <ENV_REF>            scaffold_only          False          
+usgs_m2m_placeholder                  USGS_EROS                     usgs_m2m_placeholder            <ENV_REF>            scaffold_only          False          
+aws_requester_pays_placeholder        AWS_REQUESTER_PAYS            aws_requester_pays_placeholder  <ENV_REF>            scaffold_only          False          
+esgf_bearer_placeholder               ESGF                          bearer_token_env                <ENV_REF>            scaffold_only          False          
+planetary_computer_token_placeholder  MICROSOFT_PLANETARY_COMPUTER  bearer_token_env                <ENV_REF>            scaffold_only          False          
+opentopography_token_placeholder      OPENTOPOGRAPHY                bearer_token_env                <ENV_REF>            scaffold_only          False          
+

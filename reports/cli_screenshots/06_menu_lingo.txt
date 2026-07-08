@@ -1,0 +1,12 @@
+╭───────────────────────────────────────────────────── Menu Lingo ─────────────────────────────────────────────────────╮
+│ pantry = source atlas                                                                                                │
+│ sauces = sources / datasets                                                                                          │
+│ reigns = grouped source families                                                                                     │
+│ buckets = status groups                                                                                              │
+│ recipes = stack plans                                                                                                │
+│ dips = bounded probes                                                                                                │
+│ crop-cookie = AOI bounds                                                                                             │
+│ bt / at = expected / actual time                                                                                     │
+│ goods / bads = ready / blocked sources                                                                               │
+│ locks / flips / crumbs = auth gates / transforms / provenance                                                        │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯

@@ -1,0 +1,18 @@
+{
+  "adapter_wave": "wave_1_static_range_http",
+  "endpoint_id": "gridmet_pr_2023_nc",
+  "evidence": {
+    "bytes_read": 65536,
+    "content_type": "application/x-netcdf",
+    "http_status": 206,
+    "result_class": "pass_range_limited",
+    "selected_url": "https://www.northwestknowledge.net/metdata/data/pr_2023.nc",
+    "sha256": "b1a8ed52034ad00a0ba19768e60d6a2eb09e20dfdf394446d3ecdda045803876"
+  },
+  "experimental_adapter_candidate": true,
+  "live_source_id": "gridmet_daily",
+  "promotion_decision": "ready_for_experimental_static_range_adapter",
+  "required_next_step": "ready_for_experimental_static_range_adapter",
+  "runtime_promotion_allowed_now": false,
+  "source_id": "gridmet_daily"
+}

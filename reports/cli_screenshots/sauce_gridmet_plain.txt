@@ -1,0 +1,24 @@
+Sauce Card
+source_id: gridmet_daily
+display_name: gridMET daily meteorology
+provider: University of Idaho / gridMET
+access_mode: opendap
+access_pattern_category: future_unverified
+provenance_class: official_primary
+trust_level: documented_unverified
+endpoint_or_catalog_url: None
+temporal_key_structure: dataset-specific
+spatial_key_structure: dataset-specific
+expected_formats: NetCDF
+native_crs_or_grid: unknown
+target_crs_assumption: unknown
+credential_requirement: none
+credential_profile_id: None
+bounded_probe_appropriate: True
+promotion_status: blocked_by_adapter
+last_probe_report: None
+next_unlock_step: write metadata-only adapter/probe design
+official_docs:
+  - https://www.climatologylab.org/gridmet.html
+notes: Candidate OPeNDAP/NetCDF service; needs endpoint verification.
+

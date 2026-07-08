@@ -1,0 +1,22 @@
+{
+  "dag_validation_status": "PASS",
+  "dependency_count": 6,
+  "hashes": {
+    "README.md": "1de9231a46e4b00d24b1c6a5484fe82ca1cae757b16eafb65e09cc7c43a9b3ce",
+    "job_index.tsv": "998fa40833ef03617028868cf179597f2791ac4fcbf9e2644ae19cbf69c11e59",
+    "scheduler_summary.json": "d42208cc0bc8aba9fdfd39021edb80ebbdb1239499e1fb222451f1b929a8a371",
+    "slurm_array.sh": "957222eaa6ea9396d461402078a7b0b26e362d9bb980b5ab9bb2dcd7af8e447a"
+  },
+  "job_count": 8,
+  "notes": "Scheduler exports are dry-run artifacts only; no downloads are executed.",
+  "output_directory": "/home/dmsrsic/raster-work/faster-raster/reports/diagnostic_scheduler_slurm",
+  "package_id": "fr_exec_51438d1287b43021",
+  "request_count": 2,
+  "scheduler": "slurm",
+  "stage_counts": {
+    "fetch": 2,
+    "harmonize": 2,
+    "inspect_output": 2,
+    "validate_download": 2
+  }
+}

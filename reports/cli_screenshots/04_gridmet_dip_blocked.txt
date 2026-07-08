@@ -1,0 +1,8 @@
+╭───────────────────────────────────────────── Dip Check: gridMET blocked ─────────────────────────────────────────────╮
+│ dip check: gridmet_daily                                                                                             │
+│ classification: blocked_by_endpoint_uncertainty                                                                      │
+│ bad/blocker: endpoint_or_catalog_url is missing or unknown                                                           │
+│ network: no network, dry-run only                                                                                    │
+│ next unlock step: write metadata-only adapter/probe design                                                           │
+│ provider: University of Idaho / gridMET                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯

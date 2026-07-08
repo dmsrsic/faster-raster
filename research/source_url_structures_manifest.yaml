@@ -1,0 +1,291 @@
+sources:
+  - source_family: "CDL / USDA Cropland Data Layer"
+    source_id: usda_nass_cdl_imageserver
+    status: implemented
+    adapter: arcgis_imageserver
+    base_url: "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer"
+    url_templates:
+      - name: exportImage
+        template: "{base_url}/exportImage?bbox={bbox}&bboxSR={bbox_crs}&imageSR={image_crs}&size={size}&format={format}&f={response_format}&time={year}"
+        example_url: null
+        placeholders: [base_url, bbox, bbox_crs, image_crs, size, format, response_format, year]
+    expected_format: tiff
+    spatial_keys: {bbox: true, tile_id: true, tile_grid: unknown}
+    temporal_keys: {year: true, time_parameter: time}
+    crs: {source_crs: unknown, bbox_crs: EPSG:4326, export_image_crs: EPSG:3857, target_grid_crs_recommendation: EPSG:5070}
+    raster_semantics: {semantic_type: categorical, resampling: nearest, nodata: unknown}
+    validation: {checksum_available: unknown, metadata_endpoint: unknown, coverage_test_possible: unknown, bounded_probe_safe: unknown}
+    docs: {official: [], secondary: []}
+    open_questions:
+      - "Confirm official endpoint documentation and current service URL."
+      - "Confirm time/year parameter strategy and categorical metadata endpoints."
+    confidence: medium
+
+  - source_family: "Annual NLCD AWS tile"
+    source_id: annual_nlcd_aws_tile
+    status: implemented
+    adapter: generic_https_template
+    base_url: "https://usgs-landcover.s3.us-west-2.amazonaws.com"
+    url_templates:
+      - name: annual_nlcd_tile
+        template: "https://usgs-landcover.s3.us-west-2.amazonaws.com/annual-nlcd/{collection}/{version}/{region}/tile/{tile_id}/Annual_NLCD_{h}{v}_{product_code}_{year}_CU_C1V0.tif"
+        example_url: "https://usgs-landcover.s3.us-west-2.amazonaws.com/annual-nlcd/c1/v0/cu/tile/h14v15/Annual_NLCD_H14V15_FctImp_1985_CU_C1V0.tif"
+        placeholders: [collection, version, region, tile_id, h, v, product_code, year]
+    expected_format: tif
+    spatial_keys: {tile_id: h14v15, h: H14, v: V15}
+    temporal_keys: {year: true}
+    crs: {source_crs: EPSG:5070, bbox_crs: null, export_image_crs: EPSG:5070, target_grid_crs_recommendation: EPSG:5070}
+    raster_semantics: {semantic_type: continuous, resampling: bilinear, nodata: unknown}
+    validation: {checksum_available: unknown, metadata_endpoint: unknown, coverage_test_possible: unknown, bounded_probe_safe: unknown}
+    docs:
+      official:
+        - "https://www.usgs.gov/centers/eros/science/annual-nlcd-data-access"
+        - "https://www.usgs.gov/media/videos/new-annual-1985-2023-national-land-cover-database-improving-a-30-year-legacy"
+        - "https://www.mrlc.gov/sites/default/files/docs/LSDS-2103%20Annual%20National%20Land%20Cover%20Database%20%28NLCD%29%20Collection%201%20Science%20Product%20User%20Guide%20-v1.0%202024_10_15.pdf"
+      secondary: []
+    open_questions:
+      - "Confirm current Collection 1.2 object paths and all product codes."
+      - "Confirm categorical land-cover naming and nodata metadata."
+    confidence: medium
+
+  - source_family: "Annual NLCD AWS mosaic"
+    source_id: annual_nlcd_aws_mosaic
+    status: implemented
+    adapter: generic_https_template
+    base_url: "https://usgs-landcover.s3.us-west-2.amazonaws.com"
+    url_templates:
+      - name: annual_nlcd_mosaic
+        template: "https://usgs-landcover.s3.us-west-2.amazonaws.com/annual-nlcd/{collection}/{version}/{region}/mosaic/Annual_NLCD_{product_code}_{year}_CU_C1V0.tif"
+        example_url: "https://usgs-landcover.s3.us-west-2.amazonaws.com/annual-nlcd/c1/v0/cu/mosaic/Annual_NLCD_FctImp_1985_CU_C1V0.tif"
+        placeholders: [collection, version, region, product_code, year]
+    expected_format: tif
+    spatial_keys: {mosaic: true}
+    temporal_keys: {year: true}
+    crs: {source_crs: EPSG:5070, bbox_crs: null, export_image_crs: EPSG:5070, target_grid_crs_recommendation: EPSG:5070}
+    raster_semantics: {semantic_type: continuous, resampling: bilinear, nodata: unknown}
+    validation: {checksum_available: unknown, metadata_endpoint: unknown, coverage_test_possible: unknown, bounded_probe_safe: unknown}
+    docs:
+      official:
+        - "https://www.usgs.gov/centers/eros/science/annual-nlcd-data-access"
+      secondary: []
+    open_questions:
+      - "Confirm current mosaic paths for all products and versions."
+    confidence: medium
+
+  - source_family: PRISM
+    source_id: prism_time_series_daily_zip
+    status: implemented
+    adapter: generic_https_template
+    base_url: "https://data.prism.oregonstate.edu"
+    url_templates:
+      - name: prism_time_series_daily_zip
+        template: "https://data.prism.oregonstate.edu/time_series/{region}/an/{resolution}/{variable}/{temporal_frequency}/{year}/prism_{variable}_{region}_25m_{yyyymmdd}.zip"
+        example_url: "https://data.prism.oregonstate.edu/time_series/us/an/4km/ppt/daily/2026/prism_ppt_us_25m_20260101.zip"
+        placeholders: [region, resolution, variable, temporal_frequency, year, yyyymmdd]
+    expected_format: zip
+    spatial_keys: {region: us}
+    temporal_keys: {year: true, yyyymmdd: true, temporal_frequency: daily}
+    crs: {source_crs: EPSG:4326, bbox_crs: null, export_image_crs: EPSG:4326, target_grid_crs_recommendation: EPSG:5070}
+    raster_semantics: {semantic_type: continuous, resampling: bilinear, nodata: unknown}
+    validation: {checksum_available: unknown, metadata_endpoint: unknown, coverage_test_possible: unknown, bounded_probe_safe: unknown}
+    docs:
+      official:
+        - "https://prism.oregonstate.edu/recent/"
+        - "https://prism.oregonstate.edu/"
+      secondary: []
+    open_questions:
+      - "Confirm all valid variables, frequency names, region/resolution path components, CRS, and nodata."
+    confidence: medium
+
+  - source_family: Daymet
+    source_id: daymet_ncss_query_template_EXPERIMENTAL
+    status: experimental
+    adapter: future_ncss
+    base_url: "https://thredds.daac.ornl.gov/thredds/ncss/grid/ornldaac/1328/"
+    url_templates:
+      - name: daymet_ncss_query_template
+        template: unknown
+        example_url: null
+        placeholders: [year, variable, region]
+    expected_format: unknown
+    spatial_keys: {bbox: unknown, region: unknown}
+    temporal_keys: {year: true, date_range: unknown}
+    crs: {source_crs: unknown, bbox_crs: unknown, export_image_crs: unknown, target_grid_crs_recommendation: EPSG:5070}
+    raster_semantics: {semantic_type: continuous, resampling: bilinear, nodata: unknown}
+    validation: {checksum_available: unknown, metadata_endpoint: unknown, coverage_test_possible: unknown, bounded_probe_safe: unknown}
+    docs:
+      official:
+        - "https://daymet.ornl.gov/getdata"
+        - "https://daymet.ornl.gov/static/files/NCSS_Daymet_Subset_Guide_v3.pdf"
+      secondary: []
+    open_questions:
+      - "Determine NCSS query contract and whether a dedicated thredds_ncss_template adapter is required."
+    confidence: low
+
+  - source_family: "DEM / elevation"
+    source_id: dem_elevation
+    status: missing
+    adapter: unknown
+    base_url: unknown
+    url_templates:
+      - name: unknown
+        template: unknown
+        example_url: null
+        placeholders: []
+    expected_format: unknown
+    spatial_keys: {}
+    temporal_keys: {}
+    crs: {source_crs: unknown, bbox_crs: unknown, export_image_crs: unknown, target_grid_crs_recommendation: unknown}
+    raster_semantics: {semantic_type: unknown, resampling: unknown, nodata: unknown}
+    validation: {checksum_available: unknown, metadata_endpoint: unknown, coverage_test_possible: unknown, bounded_probe_safe: unknown}
+    docs: {official: [], secondary: []}
+    open_questions:
+      - "Identify official access documentation, deterministic URL patterns, and whether API/STAC/search is required."
+    confidence: low
+
+  - source_family: "MODIS"
+    source_id: modis
+    status: missing
+    adapter: unknown
+    base_url: unknown
+    url_templates:
+      - name: unknown
+        template: unknown
+        example_url: null
+        placeholders: []
+    expected_format: unknown
+    spatial_keys: {}
+    temporal_keys: {}
+    crs: {source_crs: unknown, bbox_crs: unknown, export_image_crs: unknown, target_grid_crs_recommendation: unknown}
+    raster_semantics: {semantic_type: unknown, resampling: unknown, nodata: unknown}
+    validation: {checksum_available: unknown, metadata_endpoint: unknown, coverage_test_possible: unknown, bounded_probe_safe: unknown}
+    docs: {official: [], secondary: []}
+    open_questions:
+      - "Identify official access documentation, deterministic URL patterns, and whether API/STAC/search is required."
+    confidence: low
+
+  - source_family: "Landsat"
+    source_id: landsat
+    status: missing
+    adapter: unknown
+    base_url: unknown
+    url_templates:
+      - name: unknown
+        template: unknown
+        example_url: null
+        placeholders: []
+    expected_format: unknown
+    spatial_keys: {}
+    temporal_keys: {}
+    crs: {source_crs: unknown, bbox_crs: unknown, export_image_crs: unknown, target_grid_crs_recommendation: unknown}
+    raster_semantics: {semantic_type: unknown, resampling: unknown, nodata: unknown}
+    validation: {checksum_available: unknown, metadata_endpoint: unknown, coverage_test_possible: unknown, bounded_probe_safe: unknown}
+    docs: {official: [], secondary: []}
+    open_questions:
+      - "Identify official access documentation, deterministic URL patterns, and whether API/STAC/search is required."
+    confidence: low
+
+  - source_family: "Sentinel"
+    source_id: sentinel
+    status: missing
+    adapter: unknown
+    base_url: unknown
+    url_templates:
+      - name: unknown
+        template: unknown
+        example_url: null
+        placeholders: []
+    expected_format: unknown
+    spatial_keys: {}
+    temporal_keys: {}
+    crs: {source_crs: unknown, bbox_crs: unknown, export_image_crs: unknown, target_grid_crs_recommendation: unknown}
+    raster_semantics: {semantic_type: unknown, resampling: unknown, nodata: unknown}
+    validation: {checksum_available: unknown, metadata_endpoint: unknown, coverage_test_possible: unknown, bounded_probe_safe: unknown}
+    docs: {official: [], secondary: []}
+    open_questions:
+      - "Identify official access documentation, deterministic URL patterns, and whether API/STAC/search is required."
+    confidence: low
+
+  - source_family: "NOAA climate/ocean/coastal rasters"
+    source_id: noaa_climate_ocean_coastal_rasters
+    status: missing
+    adapter: unknown
+    base_url: unknown
+    url_templates:
+      - name: unknown
+        template: unknown
+        example_url: null
+        placeholders: []
+    expected_format: unknown
+    spatial_keys: {}
+    temporal_keys: {}
+    crs: {source_crs: unknown, bbox_crs: unknown, export_image_crs: unknown, target_grid_crs_recommendation: unknown}
+    raster_semantics: {semantic_type: unknown, resampling: unknown, nodata: unknown}
+    validation: {checksum_available: unknown, metadata_endpoint: unknown, coverage_test_possible: unknown, bounded_probe_safe: unknown}
+    docs: {official: [], secondary: []}
+    open_questions:
+      - "Identify official access documentation, deterministic URL patterns, and whether API/STAC/search is required."
+    confidence: low
+
+  - source_family: "NASA Earthdata-style rasters"
+    source_id: nasa_earthdata_style_rasters
+    status: missing
+    adapter: unknown
+    base_url: unknown
+    url_templates:
+      - name: unknown
+        template: unknown
+        example_url: null
+        placeholders: []
+    expected_format: unknown
+    spatial_keys: {}
+    temporal_keys: {}
+    crs: {source_crs: unknown, bbox_crs: unknown, export_image_crs: unknown, target_grid_crs_recommendation: unknown}
+    raster_semantics: {semantic_type: unknown, resampling: unknown, nodata: unknown}
+    validation: {checksum_available: unknown, metadata_endpoint: unknown, coverage_test_possible: unknown, bounded_probe_safe: unknown}
+    docs: {official: [], secondary: []}
+    open_questions:
+      - "Identify official access documentation, deterministic URL patterns, and whether API/STAC/search is required."
+    confidence: low
+
+  - source_family: "USGS raster services"
+    source_id: usgs_raster_services
+    status: missing
+    adapter: unknown
+    base_url: unknown
+    url_templates:
+      - name: unknown
+        template: unknown
+        example_url: null
+        placeholders: []
+    expected_format: unknown
+    spatial_keys: {}
+    temporal_keys: {}
+    crs: {source_crs: unknown, bbox_crs: unknown, export_image_crs: unknown, target_grid_crs_recommendation: unknown}
+    raster_semantics: {semantic_type: unknown, resampling: unknown, nodata: unknown}
+    validation: {checksum_available: unknown, metadata_endpoint: unknown, coverage_test_possible: unknown, bounded_probe_safe: unknown}
+    docs: {official: [], secondary: []}
+    open_questions:
+      - "Identify official access documentation, deterministic URL patterns, and whether API/STAC/search is required."
+    confidence: low
+
+  - source_family: "state/local ArcGIS ImageServer sources"
+    source_id: state_local_arcgis_imageserver_sources
+    status: missing
+    adapter: unknown
+    base_url: unknown
+    url_templates:
+      - name: unknown
+        template: unknown
+        example_url: null
+        placeholders: []
+    expected_format: unknown
+    spatial_keys: {}
+    temporal_keys: {}
+    crs: {source_crs: unknown, bbox_crs: unknown, export_image_crs: unknown, target_grid_crs_recommendation: unknown}
+    raster_semantics: {semantic_type: unknown, resampling: unknown, nodata: unknown}
+    validation: {checksum_available: unknown, metadata_endpoint: unknown, coverage_test_possible: unknown, bounded_probe_safe: unknown}
+    docs: {official: [], secondary: []}
+    open_questions:
+      - "Identify official access documentation, deterministic URL patterns, and whether API/STAC/search is required."
+    confidence: low

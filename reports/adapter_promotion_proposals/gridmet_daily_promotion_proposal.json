@@ -1,0 +1,58 @@
+{
+  "credential_status": "none",
+  "current_status": "blocked_by_adapter",
+  "endpoint_status": "missing_or_unknown",
+  "expected_adapter_type": "metadata_probe_adapter_future",
+  "files_that_would_need_changes": [
+    "configs/source_registry.yaml",
+    "faster_raster/adapters/",
+    "tests/golden/",
+    "docs/ADAPTERS.md"
+  ],
+  "forbidden_edits_performed": [],
+  "probe_evidence": {
+    "access_mode": "opendap",
+    "access_pattern_category": "future_unverified",
+    "bounded_probe_appropriate": true,
+    "credential_requirement": "none",
+    "display_name": "gridMET daily meteorology",
+    "probe": {
+      "accept_ranges": null,
+      "bytes_read": 0,
+      "content_length": null,
+      "content_type": null,
+      "elapsed_seconds": 0.0,
+      "error": "endpoint_or_catalog_url is missing or unknown",
+      "first_byte_seconds": null,
+      "http_status": null,
+      "max_bytes": null,
+      "method": null,
+      "network_opt_in": false,
+      "result_class": "skipped_policy",
+      "sha256": null,
+      "text_preview": [],
+      "timestamp_utc": "2026-07-08T20:16:10Z",
+      "truncated": false,
+      "url": null
+    },
+    "promotion_status": "blocked_by_adapter",
+    "provider": "University of Idaho / gridMET",
+    "source_id": "gridmet_daily"
+  },
+  "promotion_decision": "not_ready",
+  "proposal_only": true,
+  "required_evidence": [
+    "verified bounded metadata/capability probe",
+    "deterministic URL or asset resolution contract",
+    "golden fixture",
+    "offline tests"
+  ],
+  "runtime_registry_edit_forbidden": true,
+  "source_id": "gridmet_daily",
+  "tests_required": [
+    "capability validation",
+    "URL/metadata determinism",
+    "golden byte stability",
+    "no-network unit test"
+  ]
+}

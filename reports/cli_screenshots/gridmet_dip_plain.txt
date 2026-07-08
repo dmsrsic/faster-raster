@@ -1,0 +1,10 @@
+source_id: gridmet_daily
+classification: blocked_by_endpoint_uncertainty
+result_class: skipped_policy
+http_status: None
+bytes_read: 0
+credential_requirement: none
+bounded_probe_appropriate: True
+endpoint: None
+error: endpoint_or_catalog_url is missing or unknown
+

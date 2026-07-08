@@ -1,0 +1,45 @@
+sources:
+  annual_nlcd_aws_mosaic:
+    adapter: generic_https_template
+    base_url: null
+    bbox_crs_param: null
+    bbox_param: null
+    bbox_request_policy: no_bbox_url_template
+    collection: c1
+    default_export_image_crs: EPSG:5070
+    default_format: tif
+    default_image_format: null
+    default_response_format: null
+    format_param: null
+    h: null
+    image_crs_param: null
+    max_height: 4097
+    max_width: 4097
+    mosaic_rule_param: mosaicRule
+    native_crs: EPSG:5070
+    native_pixel_type: null
+    operation: null
+    product: Annual NLCD
+    product_code: FctImp
+    product_slug: null
+    provider: USGS_MRLC
+    region: cu
+    resolution: null
+    response_format_param: null
+    semantic_type: continuous
+    service_crs: null
+    size_param: null
+    supported_years: null
+    supports_bbox_crs_param: false
+    supports_tiling: false
+    template_tile_id: null
+    temporal_frequency: null
+    time_param: time
+    time_parameter_strategy: null
+    time_value: '{year}'
+    url_template: https://usgs-landcover.s3.us-west-2.amazonaws.com/annual-nlcd/{collection}/{version}/{region}/mosaic/Annual_NLCD_{product_code}_{year}_CU_C1V0.tif
+    v: null
+    variable: null
+    version: v0
+    year_parameter_strategy: time_value
+    yyyymmdd: null

@@ -1,0 +1,18 @@
+{
+  "adapter_wave": "wave_1_parameterized_rest_fixture",
+  "endpoint_id": "daymet_single_pixel_csv",
+  "evidence": {
+    "bytes_read": 474,
+    "content_type": "text/csv; charset=utf-8",
+    "http_status": 200,
+    "result_class": "pass_verified",
+    "selected_url": "https://daymet.ornl.gov/single-pixel/api/data?lat=39.805&lon=-83.195&vars=prcp&start=2023-01-01&end=2023-01-01",
+    "sha256": "e182dfb0db67b0ba9a240bb93c1bc7816e96814a98e3dc40c6a41b349bd0b5f4"
+  },
+  "experimental_adapter_candidate": false,
+  "live_source_id": "daymet_single_pixel",
+  "promotion_decision": "preserve_as_contract_fixture",
+  "required_next_step": "preserve_as_contract_fixture",
+  "runtime_promotion_allowed_now": false,
+  "source_id": "daymet_single_pixel_prcp_rest"
+}

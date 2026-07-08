@@ -1,0 +1,106 @@
+sources:
+  usda_nass_cdl_imageserver:
+    adapter: arcgis_imageserver
+    provider: USDA_NASS
+    product: Cropland Data Layer
+    base_url: https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer
+    operation: exportImage
+    bbox_param: bbox
+    bbox_crs_param: bboxSR
+    image_crs_param: imageSR
+    size_param: size
+    format_param: format
+    response_format_param: f
+    default_image_format: tiff
+    default_response_format: image
+    max_width: 4097
+    max_height: 4097
+    service_crs: EPSG:3857
+    default_export_image_crs: EPSG:3857
+    bbox_request_policy: preserve_input_bbox_with_bboxsr
+    supports_bbox_crs_param: true
+    semantic_type: categorical
+    supported_years:
+      - 2023
+      - 2024
+    native_pixel_type: uint8
+    time_parameter_strategy: year_query_param
+    year_parameter_strategy: time_value
+    time_param: time
+    time_value: "{year}"
+    mosaic_rule_param: mosaicRule
+    planned_year_parameter_strategies:
+      - mosaic_rule_by_attribute
+  generic_demo_cog:
+    adapter: generic_https_template
+    provider: DEMO_PROVIDER
+    product: Demo Cloud Raster (deprecated fixture)
+    url_template: "https://example.invalid/rasters/{product_slug}/{year}/{thematic_layer}/{tile_id}.tif"
+    product_slug: demo-cog
+    semantic_type: continuous
+    native_crs: EPSG:4326
+    default_export_image_crs: EPSG:4326
+    bbox_request_policy: no_bbox_url_template
+    supports_bbox_crs_param: false
+    supports_tiling: true
+    default_format: tif
+    max_width: 4097
+    max_height: 4097
+  annual_nlcd_aws_tile:
+    adapter: generic_https_template
+    provider: USGS_MRLC
+    product: Annual NLCD
+    url_template: "https://usgs-landcover.s3.us-west-2.amazonaws.com/annual-nlcd/{collection}/{version}/{region}/tile/{tile_id}/Annual_NLCD_{h}{v}_{product_code}_{year}_CU_C1V0.tif"
+    semantic_type: continuous
+    native_crs: EPSG:5070
+    default_export_image_crs: EPSG:5070
+    bbox_request_policy: no_bbox_url_template
+    supports_bbox_crs_param: false
+    supports_tiling: false
+    default_format: tif
+    region: cu
+    h: H14
+    v: V15
+    template_tile_id: h14v15
+    product_code: FctImp
+    collection: c1
+    version: v0
+    max_width: 4097
+    max_height: 4097
+  annual_nlcd_aws_mosaic:
+    adapter: generic_https_template
+    provider: USGS_MRLC
+    product: Annual NLCD
+    url_template: "https://usgs-landcover.s3.us-west-2.amazonaws.com/annual-nlcd/{collection}/{version}/{region}/mosaic/Annual_NLCD_{product_code}_{year}_CU_C1V0.tif"
+    semantic_type: continuous
+    native_crs: EPSG:5070
+    default_export_image_crs: EPSG:5070
+    bbox_request_policy: no_bbox_url_template
+    supports_bbox_crs_param: false
+    supports_tiling: false
+    default_format: tif
+    region: cu
+    product_code: FctImp
+    collection: c1
+    version: v0
+    max_width: 4097
+    max_height: 4097
+  prism_time_series_daily_zip:
+    adapter: generic_https_template
+    provider: PRISM_OSU
+    product: PRISM Time Series Daily
+    url_template: "https://data.prism.oregonstate.edu/time_series/{region}/an/{resolution}/{variable}/{temporal_frequency}/{year}/prism_{variable}_{region}_25m_{yyyymmdd}.zip"
+    semantic_type: continuous
+    native_crs: EPSG:4326
+    default_export_image_crs: EPSG:4326
+    bbox_request_policy: no_bbox_url_template
+    supports_bbox_crs_param: false
+    supports_tiling: false
+    default_format: zip
+    variable: ppt
+    yyyymmdd: "20260101"
+    resolution: 4km
+    region: us
+    temporal_frequency: daily
+    max_width: 4097
+    max_height: 4097

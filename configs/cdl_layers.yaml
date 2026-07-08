@@ -1,0 +1,10 @@
+layers:
+  crop_type:
+    semantic_type: categorical
+    default_resampling: nearest
+    nodata: 255
+    forbidden_resampling:
+      - bilinear
+      - cubic
+      - lanczos
+

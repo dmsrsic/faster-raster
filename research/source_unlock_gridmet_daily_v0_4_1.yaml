@@ -1,0 +1,20 @@
+source_id: gridmet_daily
+milestone: v0.4.1
+review_status: blocked_by_endpoint_uncertainty
+source_family: gridMET
+provider: University of Idaho / gridMET
+expected_access_mode: opendap
+expected_format: NetCDF
+likely_temporal_key: daily date or year-organized daily variable file
+likely_spatial_key: gridded coordinate subset or client-side subset after metadata resolution
+source_side_subset: unknown
+bounded_metadata_probe_appropriate: true
+exact_endpoint_or_capability_url: null
+uncertainty_fields:
+  - official OPeNDAP/THREDDS endpoint URL
+  - dataset variable naming
+  - metadata/capability URL shape
+  - safe bounded probe method
+next_decision: blocked_by_endpoint_uncertainty
+action: verify official gridMET endpoint/capability URL before running probe_atlas_source
+runtime_impact: none

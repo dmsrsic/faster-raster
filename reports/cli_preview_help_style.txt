@@ -1,0 +1,19 @@
+FasterRaster status legend
+
+- verified_now
+- reused_existing_result
+- credential_gated
+- adapter_needed
+- mirror_candidate
+- future_unverified
+- blocked
+- failed_probe
+- skipped_policy
+
+Dry-run probes never call the network; live probes require --allow-network.
+Credential outputs show environment variable names only and never secret values.
+Blocked sources are planning states, not global failures.
+Examples:
+  faster-raster sources list
+  faster-raster probe atlas gridmet_daily --dry-run
+

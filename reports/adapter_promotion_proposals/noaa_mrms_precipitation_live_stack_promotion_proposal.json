@@ -1,0 +1,18 @@
+{
+  "adapter_wave": "wave_3_public_bucket_product_resolver",
+  "endpoint_id": "mrms_bucket_index",
+  "evidence": {
+    "bytes_read": 36822,
+    "content_type": "text/html",
+    "http_status": 206,
+    "result_class": "pass_range_limited",
+    "selected_url": "https://noaa-mrms-pds.s3.amazonaws.com/index.html",
+    "sha256": "48661c476a2bde160781f149d112592fa9ef719376f181049b351a585491d9a2"
+  },
+  "experimental_adapter_candidate": false,
+  "live_source_id": "noaa_mrms_open_data",
+  "promotion_decision": "needs_product_specific_key_resolution",
+  "required_next_step": "needs_product_specific_key_resolution",
+  "runtime_promotion_allowed_now": false,
+  "source_id": "noaa_mrms_precipitation"
+}

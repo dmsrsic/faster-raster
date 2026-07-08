@@ -1,0 +1,22 @@
+{
+  "dag_validation_status": "PASS",
+  "dependency_count": 6,
+  "hashes": {
+    "README.md": "6de6ed731f41141536e09b8fcdfe126054b38ea942e68d94dba75890d6813f48",
+    "job_index.tsv": "998fa40833ef03617028868cf179597f2791ac4fcbf9e2644ae19cbf69c11e59",
+    "run_local_dry_run.sh": "a0d19c4e6adf87085406dbb480eaafc14a131b5ca0fe72f7e5559b73eb86b0c5",
+    "scheduler_summary.json": "ee937073fda84ffde3db6aee4a0ce34591f9ad83c57b1042dd99d25994316234"
+  },
+  "job_count": 8,
+  "notes": "Scheduler exports are dry-run artifacts only; no downloads are executed.",
+  "output_directory": "/home/dmsrsic/raster-work/faster-raster/reports/diagnostic_scheduler_local_dry_run",
+  "package_id": "fr_exec_51438d1287b43021",
+  "request_count": 2,
+  "scheduler": "local-dry-run",
+  "stage_counts": {
+    "fetch": 2,
+    "harmonize": 2,
+    "inspect_output": 2,
+    "validate_download": 2
+  }
+}

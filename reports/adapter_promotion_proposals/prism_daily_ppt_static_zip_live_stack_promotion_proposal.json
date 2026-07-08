@@ -1,0 +1,18 @@
+{
+  "adapter_wave": "wave_1_static_range_http_fixture",
+  "endpoint_id": "prism_daily_zip",
+  "evidence": {
+    "bytes_read": 65536,
+    "content_type": "application/zip",
+    "http_status": 206,
+    "result_class": "pass_range_limited",
+    "selected_url": "https://data.prism.oregonstate.edu/time_series/us/an/4km/ppt/daily/2023/prism_ppt_us_25m_20230101.zip",
+    "sha256": "cc89306d4d5b510b0ce2e19829777a7cabad6c15fb12bb7dc4bb56c1270ea283"
+  },
+  "experimental_adapter_candidate": false,
+  "live_source_id": "prism_daily_ppt",
+  "promotion_decision": "preserve_as_contract_fixture",
+  "required_next_step": "preserve_as_contract_fixture",
+  "runtime_promotion_allowed_now": false,
+  "source_id": "prism_daily_ppt_static_zip"
+}

@@ -1,0 +1,34 @@
+sources:
+  generic_demo_cog:
+    adapter: generic_https_template
+    base_url: null
+    bbox_crs_param: null
+    bbox_param: null
+    bbox_request_policy: no_bbox_url_template
+    default_export_image_crs: EPSG:4326
+    default_format: tif
+    default_image_format: null
+    default_response_format: null
+    format_param: null
+    image_crs_param: null
+    max_height: 4097
+    max_width: 4097
+    mosaic_rule_param: mosaicRule
+    native_crs: EPSG:4326
+    native_pixel_type: null
+    operation: null
+    product: Demo Cloud Raster
+    product_slug: demo-cog
+    provider: DEMO_PROVIDER
+    response_format_param: null
+    semantic_type: continuous
+    service_crs: null
+    size_param: null
+    supported_years: null
+    supports_bbox_crs_param: false
+    supports_tiling: true
+    time_param: time
+    time_parameter_strategy: null
+    time_value: '{year}'
+    url_template: https://example.invalid/rasters/{product_slug}/{year}/{thematic_layer}/{tile_id}.tif
+    year_parameter_strategy: time_value

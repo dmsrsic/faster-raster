@@ -1,0 +1,102 @@
+{
+  "descriptor": {
+    "access_pattern": "service_discovered",
+    "adapter": "thredds_ncss",
+    "bbox": {
+      "crs": "EPSG:4326",
+      "values": [
+        -83.2,
+        39.8,
+        -83.19,
+        39.81
+      ]
+    },
+    "credential_scope": "none_public_or_unknown",
+    "discovery_mechanism": "THREDDS_NCSS_QUERY",
+    "endpoint": "https://thredds.daac.ornl.gov/thredds/ncss/ornldaac/1840/daymet_v4_daily_na_prcp_2023.nc",
+    "expected_format": "netcdf",
+    "experimental": true,
+    "extraction": false,
+    "max_probe_bytes": 65536,
+    "method": "GET",
+    "network_default": "disabled",
+    "params": {
+      "accept": "netcdf",
+      "east": -83.19,
+      "north": 39.81,
+      "south": 39.8,
+      "time_end": "2023-01-01",
+      "time_start": "2023-01-01",
+      "var": "prcp",
+      "west": -83.2
+    },
+    "request_id": "daymet_prcp_20230101_probe_bbox_000001",
+    "resampling": "bilinear",
+    "runtime_enabled": false,
+    "semantic_type": "continuous",
+    "source_id": "ornl_daymet_daily_ncss_service_aware",
+    "status": "planned_experimental",
+    "target_grid_crs": "EPSG:5070",
+    "time_range": {
+      "end": "2023-01-01",
+      "start": "2023-01-01"
+    },
+    "variables": [
+      "prcp"
+    ]
+  },
+  "endpoint": "https://thredds.daac.ornl.gov/thredds/ncss/ornldaac/1840/daymet_v4_daily_na_prcp_2023.nc",
+  "max_bytes": 65536,
+  "metadata_only": true,
+  "network_opt_in": true,
+  "params": {
+    "accept": "netcdf",
+    "east": -83.19,
+    "north": 39.81,
+    "south": 39.8,
+    "time_end": "2023-01-01",
+    "time_start": "2023-01-01",
+    "var": "prcp",
+    "west": -83.2
+  },
+  "probe_status": "FAIL",
+  "request_id": "daymet_prcp_20230101_probe_bbox_000001",
+  "source_id": "ornl_daymet_daily_ncss_service_aware",
+  "stage_results": [
+    {
+      "bytes_read": 0,
+      "content_length": null,
+      "content_type": "text/html; charset=utf-8",
+      "elapsed_seconds": 1.225919,
+      "endpoint": "https://thredds.daac.ornl.gov/thredds/ncss/ornldaac/1840/daymet_v4_daily_na_prcp_2023.nc/dataset.html",
+      "error": "HTTPError: 401 Unauthorized",
+      "first_byte_seconds": null,
+      "http_status": 401,
+      "max_bytes": 65536,
+      "requested_range": "bytes=0-65535",
+      "sha256": null,
+      "stage": "metadata",
+      "stage_status": "FAIL",
+      "timestamp_utc": "2026-07-07T20:09:58Z",
+      "truncated": false
+    },
+    {
+      "bytes_read": 0,
+      "content_length": null,
+      "content_type": null,
+      "elapsed_seconds": 0.0,
+      "endpoint": null,
+      "error": "metadata-only mode",
+      "first_byte_seconds": null,
+      "http_status": null,
+      "max_bytes": null,
+      "params": {},
+      "sha256": null,
+      "stage": "tiny_subset",
+      "stage_status": "SKIPPED",
+      "timestamp_utc": "2026-07-07T20:10:00Z",
+      "truncated": false
+    }
+  ],
+  "timestamp_utc": "2026-07-07T20:10:00Z"
+}

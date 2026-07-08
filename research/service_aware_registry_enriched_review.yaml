@@ -1,0 +1,421 @@
+review_metadata:
+  source: research/model_source_enrichment_raw.md
+  baseline_registry_draft: research/service_aware_registry_draft.yaml
+  baseline_architecture_doc: docs/SERVICE_AWARE_REGISTRY_RECONSTRUCTION.md
+  status: candidate_reviewed
+  runtime_impact: none
+  reviewer_policy:
+  - Do not accept model confidence as verification.
+  - Keep unverified sources out of runtime registry.
+  - Prefer docs/research and bounded-probe design until official docs and probes pass.
+sources:
+  usda_nass_cdl_imageserver_existing:
+    review_status: candidate_reviewed
+    runtime_promotion: keep_docs_only
+    current_access_pattern: service_discovered
+    proposed_access_pattern: service_discovered
+    accepted_fields:
+      discovery_mechanism: ARCGIS_IMAGESERVER
+      asset_resolution_strategy: ARCGIS_EXPORT_IMAGE
+      credential_requirements: none_public_service
+      deterministic_url_generation_direct: true
+      deterministic_asset_resolution_after_discovery: true
+      bounded_stream_probes_appropriate: true
+    rejected_fields:
+      stream_download_strategy: Do not promote GDAL streaming language into runtime
+        until execution adapters exist.
+      nodata_metadata: 0 requires official metadata verification before source registry
+        promotion.
+      maxDownloadSizeLimit: Needs direct service metadata verification before becoming
+        contract field.
+      time_extent: Temporal extent claim must be regenerated from service metadata
+        or official documentation.
+    needs_human_verification:
+    - service metadata values: maxImageWidth, maxImageHeight, maxDownloadSizeLimit,
+        nodata, pixel type, timeInfo
+    - whether time parameter or mosaicRule is the preferred year selection strategy
+    conflicts_with_current_runtime: []
+    suitable_for_future_adapter: false
+    suitable_for_bounded_probe: true
+    unsafe_probe_reasons: []
+    citations_to_verify:
+    - https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer?f=pjson
+    - https://www.nass.usda.gov/Research_and_Science/Cropland/SARS1a.php
+    unresolved_questions:
+    - Should CDL runtime add optional service-info health check before exportImage
+      planning?
+    - Should CDL nodata be represented as 0 in service-aware draft or remain null
+      until verified?
+    reviewer_notes: Closest to runtime support because current adapter and bounded
+      probe already work. Treat proposed metadata enrichments as docs/probe backlog,
+      not registry patch.
+  usgs_annual_nlcd_landcover_service_aware:
+    review_status: candidate_reviewed
+    runtime_promotion: add_probe
+    current_access_pattern: service_discovered
+    proposed_access_pattern:
+    - service_discovered
+    - credential_gated
+    accepted_fields:
+      discovery_mechanism: MRLC/USGS service catalog, EarthExplorer, ScienceBase,
+        MRLC direct download, WMS, or requester-pays S3
+      deterministic_url_generation_direct: false
+      deterministic_asset_resolution_after_discovery: true
+      bounded_stream_probes_appropriate: Only through requester-pays-aware S3 adapter
+        or service-specific capability probe.
+    rejected_fields:
+      direct_static_template_promotion: Anonymous HTTPS probes returned 403 and must
+        not become runtime-ready.
+      exact_s3_filenames: Not fully specified by the model patch; object names remain
+        product/version-specific.
+      nodata_metadata: unknown remains correct.
+    needs_human_verification:
+    - official current collection/version object layout
+    - requester-pays behavior and required client configuration
+    - whether a STAC/catalog endpoint can resolve object keys
+    - categorical land-cover legend/nodata/checksum metadata
+    conflicts_with_current_runtime:
+    - Existing generic_https_template fixtures are not enough to prove runtime NLCD
+      support.
+    suitable_for_future_adapter: true
+    suitable_for_bounded_probe: true
+    unsafe_probe_reasons:
+    - Anonymous HTTPS object probes are insufficient and currently fail with 403.
+    citations_to_verify:
+    - https://www.usgs.gov/centers/eros/science/annual-nlcd-data-access
+    - https://www.mrlc.gov/data-services-page
+    - https://data.usgs.gov/datacatalog/data/USGS%3A664e0d2bd34e702fe8744536
+    unresolved_questions:
+    - Should NLCD be a requester-pays S3 adapter, a STAC/catalog resolver, or both?
+    - What is the current high-fidelity categorical land-cover asset naming and metadata
+      source?
+    reviewer_notes: Model patch correctly moves away from static anonymous HTTPS.
+      Keep as future service/catalog-aware source.
+  prism_daily_static_range_existing:
+    review_status: candidate_reviewed
+    runtime_promotion: keep_docs_only
+    current_access_pattern: static_verified
+    proposed_access_pattern: static_verified
+    accepted_fields:
+      discovery_mechanism: STATIC_TEMPLATE_OR_PRISM_WEB_SERVICE
+      credential_requirements: none_public
+      deterministic_url_generation_direct: true
+      bounded_stream_probes_appropriate: true
+      update_stability_warning: Preliminary daily grids may be revised.
+    rejected_fields:
+      crs_projection_assumptions: unknown remains correct until official PRISM metadata
+        is checked.
+      nodata_metadata: unknown remains correct until official format metadata is checked.
+      COG_transition_runtime_change: Do not alter registry without versioned official
+        examples and probes.
+    needs_human_verification:
+    - 2025+ COG/800m transition implications
+    - supported variables/resolutions/date ranges
+    - nodata and CRS metadata by format
+    - whether range probing zip is recommended or just tolerated
+    conflicts_with_current_runtime: []
+    suitable_for_future_adapter: false
+    suitable_for_bounded_probe: true
+    unsafe_probe_reasons: []
+    citations_to_verify:
+    - https://prism.oregonstate.edu/data/
+    - https://www.prism.oregonstate.edu/formats/
+    - https://prism.oregonstate.edu/downloads/
+    - https://www.prism.oregonstate.edu/notices/notice_20250327.php
+    unresolved_questions:
+    - Should PRISM registry support versioned path families for legacy ZIP/BIL and
+      newer COG products?
+    reviewer_notes: Current verified example remains valid; enrichment suggests future
+      version guards rather than immediate runtime change.
+  ornl_daymet_daily_ncss_service_aware:
+    review_status: candidate_reviewed
+    runtime_promotion: add_adapter_stub
+    current_access_pattern: credential_or_session_gated_research
+    proposed_access_pattern: credential_or_session_gated_research
+    accepted_fields:
+      discovery_mechanism: THREDDS_NCSS_QUERY
+      asset_resolution_strategy: NCSS_DYNAMIC_SUBSET
+      stream_download_strategy: GDAL_NETCDF
+      deterministic_url_generation_direct: false
+      deterministic_asset_resolution_after_discovery: true
+      source_side_subset_focus: variables_time_bbox
+      access_surface_classification: credential_or_session_gated_research
+    rejected_fields:
+      exact_ncss_params: Do not treat as confirmed until current endpoint metadata
+        is checked.
+      credential_requirements: public_or_earthdata_session remains ambiguous; do not
+        hardcode.
+      proj4: Needs official metadata verification before registry storage.
+      date_range_claims: Need official product/version confirmation.
+      public_metadata_access: Access-surface probe found no public 200 metadata endpoint.
+    needs_human_verification:
+    - exact current THREDDS/NCSS endpoint and dataset id
+    - auth requirement for metadata and subset responses
+    - NCSS parameter names and accepted output formats
+    - max query size and timeout policy
+    - credential/session behavior for THREDDS NCSS metadata and subset endpoints
+    conflicts_with_current_runtime:
+    - Current generic_https_template cannot represent Daymet NCSS.
+    suitable_for_future_adapter: true
+    suitable_for_bounded_probe: true
+    unsafe_probe_reasons:
+    - Avoid arbitrary static HEAD/range probes; use metadata and tiny subset probes
+      only.
+    - Access-surface probe returned 401 for dataset catalog, NCSS form, and raw NCSS
+      endpoint.
+    citations_to_verify:
+    - https://daac.ornl.gov/DAYMET/guides/Daymet_Daily_V4.html
+    - https://daymet.ornl.gov/getdata
+    - https://daac.ornl.gov/DAYMET/guides/Daymet_Daily_V4R1.html
+    unresolved_questions:
+    - What credential/session strategy is required for ORNL DAAC THREDDS today?
+    reviewer_notes: NCSS remains research/future-adapter work. Pivot first public
+      Daymet service proof to the documented single-pixel REST API.
+  landsat_collection2_stac_future:
+    review_status: candidate_reviewed
+    runtime_promotion: add_adapter_stub
+    current_access_pattern: api_discovered
+    proposed_access_pattern:
+    - api_discovered
+    - credential_gated
+    accepted_fields:
+      discovery_mechanism: STAC_API_OR_USGS_M2M_API
+      asset_resolution_strategy: STAC_ASSET_ID_OR_M2M_DOWNLOAD_URL
+      deterministic_url_generation_direct: false
+      deterministic_asset_resolution_after_discovery: true
+    rejected_fields:
+      direct_s3_streaming: Requires requester-pays/session configuration and catalog
+        resolution before probe.
+      endpoint_selection: No specific STAC endpoint selected in runtime draft.
+    needs_human_verification:
+    - chosen official STAC endpoint or USGS M2M workflow
+    - credential requirements for M2M and direct S3
+    - band asset keys and metadata mapping
+    conflicts_with_current_runtime: []
+    suitable_for_future_adapter: true
+    suitable_for_bounded_probe: true
+    unsafe_probe_reasons:
+    - Do not probe direct assets until catalog resolution and credential handling
+      are defined.
+    citations_to_verify:
+    - https://www.usgs.gov/landsat-missions/landsat-collection-2
+    - https://www.usgs.gov/landsat-missions/landsat-commercial-cloud-data-access
+    - https://m2m.cr.usgs.gov/
+    - https://www.usgs.gov/landsat-missions/landsat-data-access
+    unresolved_questions:
+    - Should first Landsat support be STAC-first or M2M-first?
+    reviewer_notes: Keep as future STAC/API source.
+  sentinel_copernicus_dataspace_future:
+    review_status: candidate_reviewed
+    runtime_promotion: add_adapter_stub
+    current_access_pattern: future_unverified
+    proposed_access_pattern:
+    - api_discovered
+    - credential_gated
+    accepted_fields:
+      discovery_mechanism: STAC_API_OR_ODATA
+      deterministic_url_generation_direct: false
+      deterministic_asset_resolution_after_discovery: true
+    rejected_fields:
+      direct_product_download_template: Requires authenticated product ID resolution;
+        not a static runtime URL.
+    needs_human_verification:
+    - CDSE STAC/OData endpoint behavior
+    - auth and token lifecycle
+    - asset-level streaming availability versus native product download
+    conflicts_with_current_runtime: []
+    suitable_for_future_adapter: true
+    suitable_for_bounded_probe: true
+    unsafe_probe_reasons:
+    - Authenticated product URLs only after discovery; native archives may not be
+      range-probe useful.
+    citations_to_verify:
+    - https://documentation.dataspace.copernicus.eu/APIs/STAC.html
+    - https://documentation.dataspace.copernicus.eu/APIs/OData.html
+    - https://dataspace.copernicus.eu/analyse/apis
+    unresolved_questions:
+    - Should Sentinel support prioritize STAC asset references or OData product packages?
+    reviewer_notes: Future adapter candidate only.
+  modis_nasa_earthdata_cmr_future:
+    review_status: candidate_reviewed
+    runtime_promotion: add_adapter_stub
+    current_access_pattern: api_discovered
+    proposed_access_pattern:
+    - api_discovered
+    - credential_gated
+    accepted_fields:
+      discovery_mechanism: CMR_API_OR_CMR_STAC
+      credential_requirements: NASA_EARTHDATA
+      deterministic_url_generation_direct: false
+      deterministic_asset_resolution_after_discovery: true
+    rejected_fields:
+      product_specific_formats: Need product-level registry entries before asserting
+        HDF/NetCDF/GeoTIFF behavior.
+    needs_human_verification:
+    - product short names and collection IDs
+    - Earthdata credential handling
+    - CMR granule link asset semantics
+    conflicts_with_current_runtime: []
+    suitable_for_future_adapter: true
+    suitable_for_bounded_probe: true
+    unsafe_probe_reasons:
+    - Metadata probes first; byte probes only after authenticated link resolution.
+    citations_to_verify:
+    - https://www.earthdata.nasa.gov/about/esdis/eosdis/cmr
+    - https://cmr.earthdata.nasa.gov/stac/docs/index.html
+    - https://urs.earthdata.nasa.gov/documentation/for_users/data_access/curl_and_wget
+    - https://www.earthdata.nasa.gov/centers/lp-daac
+    unresolved_questions:
+    - Which MODIS product should be the first fixture?
+    reviewer_notes: Future CMR/STAC adapter candidate.
+  usgs_3dep_dem_service_aware:
+    review_status: candidate_reviewed
+    runtime_promotion: add_probe
+    current_access_pattern: service_discovered
+    proposed_access_pattern:
+    - service_discovered
+    - api_discovered
+    accepted_fields:
+      discovery_mechanism: TNM_API_OR_USGS_SERVICE_DISCOVERY
+      deterministic_url_generation_direct: false
+      deterministic_asset_resolution_after_discovery: true
+      credential_requirements: none_public
+    rejected_fields:
+      exact_asset_paths: No exact runtime-safe URL template provided.
+      nodata_metadata: unknown remains correct.
+    needs_human_verification:
+    - selected TNM endpoint/API
+    - product tile URL layout or ImageServer export behavior
+    - CRS/nodata/format by resolution
+    conflicts_with_current_runtime: []
+    suitable_for_future_adapter: true
+    suitable_for_bounded_probe: true
+    unsafe_probe_reasons:
+    - Probe only after official endpoint and product family are selected.
+    citations_to_verify:
+    - https://www.usgs.gov/3d-elevation-program/about-3dep-products-services
+    - https://www.usgs.gov/faqs/what-types-elevation-datasets-are-available-what-formats-do-they-come-and-where-can-i-download
+    - https://data.usgs.gov/datacatalog/data/USGS%3A35f9c4d4-b113-4c8d-8691-47c428c29a5b
+    - https://data.usgs.gov/datacatalog/data/USGS%3A3a81321b-c153-416f-98b7-cc8e5f0e17c3
+    unresolved_questions:
+    - Should 3DEP use TNM API, ImageServer, static object URLs, or mixed source registry
+      entries?
+    reviewer_notes: Good next bounded-probe design candidate, not runtime-ready.
+  noaa_ncei_thredds_raster_future:
+    review_status: candidate_reviewed
+    runtime_promotion: add_adapter_stub
+    current_access_pattern: service_discovered
+    proposed_access_pattern: service_discovered
+    accepted_fields:
+      discovery_mechanism: THREDDS_NCSS_QUERY_OR_OPENDAP
+      deterministic_url_generation_direct: false
+      deterministic_asset_resolution_after_discovery: true
+      stream_download_strategy: GDAL_NETCDF_OR_GRIB2_PARTIAL_HTTP
+    rejected_fields:
+      dataset_specific_assumptions: No single NOAA registry entry should generalize
+        across NCEI/NOMADS datasets.
+    needs_human_verification:
+    - first NOAA product selection
+    - THREDDS/NCSS/NOMADS endpoint and variable semantics
+    - rate limits and subset parameters
+    conflicts_with_current_runtime: []
+    suitable_for_future_adapter: true
+    suitable_for_bounded_probe: true
+    unsafe_probe_reasons:
+    - Prefer metadata/capability probes and tiny subset probes over full-file byte
+      reads.
+    citations_to_verify:
+    - https://www.ncei.noaa.gov/index.php/access/thredds-user-guide
+    - https://nomads.ncep.noaa.gov/
+    - https://nomads.ncep.noaa.gov/info.php?page=gribfilter
+    - https://www.ncei.noaa.gov/support/access-data-service-api-user-documentation
+    unresolved_questions:
+    - Which NOAA dataset should anchor the first adapter fixture?
+    reviewer_notes: Future adapter family; source-specific entries required.
+  nasa_earthdata_raster_sources_future:
+    review_status: candidate_reviewed
+    runtime_promotion: add_adapter_stub
+    current_access_pattern: api_discovered
+    proposed_access_pattern:
+    - api_discovered
+    - credential_gated
+    accepted_fields:
+      discovery_mechanism: CMR_API_OR_CMR_STAC
+      credential_requirements: NASA_EARTHDATA
+      deterministic_url_generation_direct: false
+      deterministic_asset_resolution_after_discovery: true
+    rejected_fields:
+      generic_runtime_source: Too broad for runtime; needs product-specific entries.
+    needs_human_verification:
+    - product family selection
+    - CMR/STAC query fields and credential flow
+    - granule link semantics and checksums
+    conflicts_with_current_runtime: []
+    suitable_for_future_adapter: true
+    suitable_for_bounded_probe: true
+    unsafe_probe_reasons:
+    - Authenticated link resolution before byte probing.
+    citations_to_verify:
+    - https://www.earthdata.nasa.gov/about/esdis/eosdis/cmr
+    - https://cmr.earthdata.nasa.gov/search/site/docs/search/api.html
+    - https://cmr.earthdata.nasa.gov/stac/docs/index.html
+    - https://urs.earthdata.nasa.gov/documentation/for_users/data_access
+    - https://urs.earthdata.nasa.gov/documentation/for_users/user_token
+    unresolved_questions:
+    - Which NASA Earthdata product should be used for first credentialed probe design?
+    reviewer_notes: Future CMR/STAC credentialed adapter family.
+  usgs_raster_services_generic_future:
+    review_status: candidate_reviewed
+    runtime_promotion: keep_docs_only
+    current_access_pattern: future_unverified
+    proposed_access_pattern:
+    - service_discovered
+    - api_discovered
+    - future_unverified
+    accepted_fields:
+      discovery_mechanism: USGS_API_OR_SERVICE_METADATA
+      deterministic_url_generation_direct: false
+      deterministic_asset_resolution_after_discovery: true
+    rejected_fields:
+      generic_usgs_runtime_entry: Do not create one generic USGS source; encode product-specific
+        services.
+    needs_human_verification:
+    - product-by-product official access documentation
+    - adapter mapping per USGS product family
+    conflicts_with_current_runtime: []
+    suitable_for_future_adapter: true
+    suitable_for_bounded_probe: false
+    unsafe_probe_reasons:
+    - Too generic; bounded probes require a concrete product endpoint.
+    citations_to_verify:
+    - https://www.usgs.gov/landsat-missions/landsat-data-access
+    - https://www.usgs.gov/3d-elevation-program/about-3dep-products-services
+    - https://www.usgs.gov/centers/eros/science/annual-nlcd-data-access
+    unresolved_questions:
+    - Should this remain a documentation pattern rather than a source entry?
+    reviewer_notes: Keep as taxonomy guidance only.
+  ornl_daymet_single_pixel_rest_public_probe_candidate:
+    review_status: candidate_reviewed
+    runtime_promotion: add_probe
+    current_access_pattern: public_service_probe_candidate
+    proposed_access_pattern: public_service_probe_candidate
+    accepted_fields:
+      discovery_mechanism: DAYMET_SINGLE_PIXEL_REST
+      deterministic_url_generation_direct: true
+      credential_requirements: none_public
+      bounded_stream_probes_appropriate: true
+    rejected_fields: {}
+    needs_human_verification:
+    - response schema and CSV/text content type for bounded proof
+    - variable/date support matrix for production use
+    conflicts_with_current_runtime: []
+    suitable_for_future_adapter: true
+    suitable_for_bounded_probe: true
+    unsafe_probe_reasons: []
+    citations_to_verify:
+    - https://daymet.ornl.gov/web_services
+    unresolved_questions:
+    - Should single-pixel REST become a service adapter or remain a proof-only access
+      mode?
+    reviewer_notes: Use as first public Daymet service proof. It is point data, not
+      raster/NCSS subset support.

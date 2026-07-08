@@ -1,0 +1,60 @@
+mode_default: mixed
+terms:
+  pantry: source atlas
+  sauce: source / dataset
+  sauces: sources / datasets
+  reign: source domain/family/category
+  reigns: grouped source families
+  bucket: classification group
+  buckets: status groups
+  flavor: variable/layer/measurement
+  flavors: available variables/layers
+  size: resolution / file-size / request-size context
+  crop-cookie: AOI/bounds/bbox
+  bt: bake time / expected time / budgeted timeout
+  at: actual time / observed elapsed seconds
+  ingred: selected source inputs / ingredients
+  recipe: saved stack spec or acquisition plan
+  recipes: available stack plans
+  batcher: stack planner / execution package planner
+  goods: verified/executable sources
+  bads: blocked/gated/failing sources
+  dips: bounded probes
+  dip: one bounded probe
+  flip: CRS/format/resampling transform
+  flips: harmonization transforms
+  drips: downloads/streams
+  oven: execution environment/package
+  tray: output stack/package
+  menu: CLI help/explorer
+  locks: credential gates
+  crumbs: metadata/provenance/checksum traces
+titles:
+  sources_list:
+    standard: Source Atlas
+    mixed: Pantry / Source Atlas
+    kitchen: 'Pantry: sauces ready for stacking'
+  source_detail:
+    standard: Source Detail
+    mixed: Sauce Card / Source Detail
+    kitchen: Sauce Card
+  stack_summary:
+    standard: Stack Summary
+    mixed: Recipe / Stack Summary
+    kitchen: Recipe Board
+  probe_dry_run:
+    standard: Atlas Probe Dry Run
+    mixed: Dip Check / Probe Dry Run
+    kitchen: Dip Check
+  verified:
+    standard: Verified
+    mixed: Goods / Verified
+    kitchen: Goods
+  credential_gated:
+    standard: Credential gated
+    mixed: Locks / Credential gated
+    kitchen: Locks
+  blocked:
+    standard: Blocked
+    mixed: Bads / Blocked
+    kitchen: Bads

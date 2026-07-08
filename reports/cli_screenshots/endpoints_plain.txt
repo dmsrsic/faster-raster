@@ -1,0 +1,13 @@
+Endpoint readiness pack
+source_id                    status                          probe              max_bytes  score  next_action                     
+---------------------------  ------------------------------  -----------------  ---------  -----  --------------------------------
+gridmet_daily                verified_docs_only              docs_only          65536      92     verify exact official THREDDS/O?
+terraclimate_monthly         verified_docs_only              docs_only          65536      88     verify exact official THREDDS/O?
+chirps_daily_precipitation   verified_docs_only              docs_only          65536      82     verify official daily TIFF dire?
+noaa_gfs_nomads_grib_filter  verified_catalog_candidate      metadata_http_dip  65536      86     choose dynamic date/run/file an?
+noaa_ncei_service_class      verified_catalog_candidate      catalog_http_dip   65536      78     choose concrete NCEI dataset ca?
+usgs_3dep_dem                blocked_by_adapter_design       docs_only          65536      74     design TNM/API metadata adapter?
+noaa_hrrr_public_cloud       blocked_by_adapter_design       docs_only          65536      70     define public-cloud object path?
+noaa_mrms_precipitation      blocked_by_endpoint_uncertain?  docs_only          65536      64     verify official endpoint/access?
+worldclim_bioclim_normals    blocked_by_endpoint_uncertain?  docs_only          65536      62     verify official static URL temp?
+

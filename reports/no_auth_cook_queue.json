@@ -1,0 +1,74 @@
+{
+  "cook_queue": [
+    {
+      "access_mode": "opendap",
+      "bounded_probe_appropriate": true,
+      "cook_status": "blocked_by_endpoint_uncertainty",
+      "credential_requirement": "none",
+      "display_name": "gridMET daily meteorology",
+      "endpoint_present": false,
+      "provenance_class": "official_primary",
+      "provider": "University of Idaho / gridMET",
+      "recommended_action": "write metadata-only adapter/probe design",
+      "score": 200,
+      "source_id": "gridmet_daily",
+      "unlock_class": "adapter_next"
+    },
+    {
+      "access_mode": "grib_filter",
+      "bounded_probe_appropriate": true,
+      "cook_status": "blocked_by_endpoint_uncertainty",
+      "credential_requirement": "none",
+      "display_name": "NOAA GFS NOMADS GRIB filter",
+      "endpoint_present": false,
+      "provenance_class": "official_primary",
+      "provider": "NOAA/NCEP",
+      "recommended_action": "write metadata-only adapter/probe design",
+      "score": 199,
+      "source_id": "noaa_gfs_nomads_grib_filter",
+      "unlock_class": "adapter_next"
+    },
+    {
+      "access_mode": "thredds_catalog",
+      "bounded_probe_appropriate": true,
+      "cook_status": "blocked_by_endpoint_uncertainty",
+      "credential_requirement": "none",
+      "display_name": "NOAA/NCEI service class",
+      "endpoint_present": false,
+      "provenance_class": "official_primary",
+      "provider": "NOAA/NCEI",
+      "recommended_action": "write metadata-only adapter/probe design",
+      "score": 198,
+      "source_id": "noaa_ncei_service_class",
+      "unlock_class": "adapter_next"
+    },
+    {
+      "access_mode": "opendap",
+      "bounded_probe_appropriate": true,
+      "cook_status": "blocked_by_endpoint_uncertainty",
+      "credential_requirement": "none",
+      "display_name": "TerraClimate monthly climate grids",
+      "endpoint_present": false,
+      "provenance_class": "official_primary",
+      "provider": "University of Idaho / TerraClimate",
+      "recommended_action": "write metadata-only adapter/probe design",
+      "score": 197,
+      "source_id": "terraclimate_monthly",
+      "unlock_class": "adapter_next"
+    },
+    {
+      "access_mode": "unknown_future",
+      "bounded_probe_appropriate": true,
+      "cook_status": "blocked_by_endpoint_uncertainty",
+      "credential_requirement": "none",
+      "display_name": "USGS 3DEP DEM",
+      "endpoint_present": false,
+      "provenance_class": "official_primary",
+      "provider": "USGS",
+      "recommended_action": "write metadata-only adapter/probe design",
+      "score": 196,
+      "source_id": "usgs_3dep_dem",
+      "unlock_class": "adapter_next"
+    }
+  ]
+}

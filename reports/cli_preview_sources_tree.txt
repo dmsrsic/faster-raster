@@ -1,0 +1,38 @@
+Verified now
+  - prism_daily_ppt_static_zip (PRISM Climate Group)
+  - daymet_single_pixel_prcp_rest (ORNL DAAC)
+  - cdl_arcgis_tiny_export (USDA_NASS)
+  - daymet_single_pixel_rest_duplicate_guard (ORNL DAAC)
+
+Credential gated
+  - daymet_ncss (ORNL DAAC)
+  - nlcd_annual_landcover (USGS/MRLC)
+  - sentinel_copernicus_dataspace (Copernicus)
+  - modis_nasa_earthdata_cmr (NASA Earthdata)
+  - era5_cds (ECMWF Copernicus Climate Data Store)
+  - nldas_gldas_gesdisc (NASA GES DISC)
+  - cmip6_esgf (ESGF)
+  - microsoft_planetary_computer_stac (Microsoft Planetary Computer)
+  - opentopography_dem (OpenTopography)
+  - eobs_european_climate (ECA&D / Copernicus-adjacent)
+  - ecmwf_copernicus_mirror_candidate (ECMWF/Copernicus)
+
+Adapter needed
+  - usgs_3dep_dem (USGS)
+  - landsat_collection2 (USGS)
+  - noaa_ncei_service_class (NOAA/NCEI)
+  - terraclimate_monthly (University of Idaho / TerraClimate)
+  - gridmet_daily (University of Idaho / gridMET)
+  - noaa_gfs_nomads_grib_filter (NOAA/NCEP)
+  - noaa_hrrr_public_cloud (NOAA)
+  - noaa_mrms_precipitation (NOAA)
+
+Mirror candidates
+  - pangeo_climate_zarr_catalogs (Pangeo community)
+
+Future/unverified
+
+Blocked/research only
+  - chirps_daily_precipitation (UCSB CHC)
+  - worldclim_bioclim_normals (WorldClim)
+

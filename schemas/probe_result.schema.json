@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "bytes_read": {
+      "type": "integer"
+    },
+    "http_status": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "result_class": {
+      "enum": [
+        "pass_verified",
+        "fail_http",
+        "fail_endpoint",
+        "credential_gated",
+        "adapter_needed",
+        "skipped_policy",
+        "existing_result_reused",
+        "unsupported_temporal_key",
+        "unsupported_spatial_key"
+      ]
+    },
+    "sha256": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "source_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "source_id",
+    "result_class",
+    "bytes_read"
+  ],
+  "title": "FasterRaster bounded probe result",
+  "type": "object"
+}

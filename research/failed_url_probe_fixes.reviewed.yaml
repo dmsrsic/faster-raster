@@ -1,0 +1,116 @@
+metadata:
+  purpose: "Reviewed fixes for failed live URL structure probes."
+  source: "User-provided Gemini clarification output, reviewed against current FasterRaster probe results and official docs."
+  runtime_registry_updated: false
+  reason_runtime_not_updated: "The output still does not provide working NLCD example URLs, and Daymet requires a future authenticated NCSS adapter. Runtime source_registry.yaml was not changed."
+  live_probe_context:
+    max_bytes: 65536
+    range_header: "bytes=0-65535"
+    previous_report: "reports/live_url_structure_probe_64k.json"
+
+source_url_probe_fixes:
+  - source_family: "Annual NLCD"
+    current_probe_id: "nlcd_aws_tile"
+    review_status: "not_ready_for_runtime"
+    diagnosis:
+      likely_failure_reason: "The tested S3 HTTPS object returned 403. Official USGS docs state Annual NLCD AWS access is available through USGS AWS S3 in Oregon us-west-2 and describes a nested s3://usgs-landcover/annual-nlcd/c1/v0/... structure, but also describes it as requester-pays AWS access. Plain anonymous HTTPS object probing is therefore not sufficient proof of a valid runtime fetch path."
+      confirmed_or_inferred: "partly_confirmed_docs_plus_inferred_failure_reason"
+      official_citations:
+        - "https://www.usgs.gov/centers/eros/science/annual-nlcd-data-access"
+        - "https://www.mrlc.gov/sites/default/files/docs/LSDS-2103%20Annual%20National%20Land%20Cover%20Database%20%28NLCD%29%20Collection%201%20Science%20Product%20User%20Guide%20-v1.0%202024_10_15.pdf"
+    corrected_access:
+      base_url: "s3://usgs-landcover"
+      https_base_url_candidate: "https://usgs-landcover.s3.us-west-2.amazonaws.com"
+      url_template_candidate: "s3://usgs-landcover/annual-nlcd/{collection}/{version}/{region}/tile/{tile_id}/Annual_NLCD_{h}{v}_{product_code}_{year}_CU_{collection_tag}.tif"
+      example_url: null
+      placeholders: [collection, version, region, tile_id, h, v, product_code, year, collection_tag]
+      allowed_values:
+        collection: ["c1", "unknown_newer_collections_need_verification"]
+        version: ["v0", "unknown_newer_versions_need_verification"]
+        region: ["cu", "ak", "hi"]
+        product_code: ["FctImp", "LndCov", "LndChg", "unknown_full_product_list_needs_verification"]
+        year: "1985-current_annual_release_needs_verification"
+      requires_auth: "unknown_for_https; requester_pays_for_s3"
+      supports_range_requests: "unknown_until_valid_object_url_or_s3_client_access_is_confirmed"
+      recommended_probe_method: "First resolve a confirmed object key from official USGS/MRLC docs or catalog. Then test with an S3-aware requester-pays client or an officially documented HTTPS URL. Do not rely on anonymous HTTPS alone."
+    adapter_recommendation: "future_s3_requester_pays_or_generic_https_template_after_confirmed_https_url"
+    fasterraster_change_recommendation:
+      update_runtime_registry: false
+      add_new_adapter: true
+      add_docs_only: true
+      reason: "The current generic_https_template can represent a URL string, but validated access likely needs requester-pays S3 semantics or a catalog resolution step. No working exact URL was supplied."
+    confidence: "medium_for_s3_prefix; low_for_exact_object_template"
+    unresolved_questions:
+      - "What exact Collection/version/object key layout is current for Annual NLCD Collection 1.2 or later?"
+      - "Is there a public HTTPS object URL that works anonymously, or is requester-pays S3 client support required?"
+      - "Does USGS provide STAC/catalog metadata for resolving valid object keys?"
+
+  - source_family: "Annual NLCD"
+    current_probe_id: "nlcd_aws_mosaic"
+    review_status: "not_ready_for_runtime"
+    diagnosis:
+      likely_failure_reason: "The tested mosaic S3 HTTPS object returned 403. Official docs confirm an annual-nlcd/c1/v0/[region]/mosaic/ S3 prefix exists, but the exact object key and access mode still need verification."
+      confirmed_or_inferred: "partly_confirmed_docs_plus_inferred_failure_reason"
+      official_citations:
+        - "https://www.usgs.gov/centers/eros/science/annual-nlcd-data-access"
+        - "https://www.mrlc.gov/sites/default/files/docs/LSDS-2103%20Annual%20National%20Land%20Cover%20Database%20%28NLCD%29%20Collection%201%20Science%20Product%20User%20Guide%20-v1.0%202024_10_15.pdf"
+    corrected_access:
+      base_url: "s3://usgs-landcover"
+      https_base_url_candidate: "https://usgs-landcover.s3.us-west-2.amazonaws.com"
+      url_template_candidate: "s3://usgs-landcover/annual-nlcd/{collection}/{version}/{region}/mosaic/Annual_NLCD_{product_code}_{year}_CU_{collection_tag}.tif"
+      example_url: null
+      placeholders: [collection, version, region, product_code, year, collection_tag]
+      allowed_values:
+        collection: ["c1", "unknown_newer_collections_need_verification"]
+        version: ["v0", "unknown_newer_versions_need_verification"]
+        region: ["cu", "ak", "hi"]
+        product_code: ["FctImp", "LndCov", "unknown_full_product_list_needs_verification"]
+        year: "1985-current_annual_release_needs_verification"
+      requires_auth: "unknown_for_https; requester_pays_for_s3"
+      supports_range_requests: "unknown_until_valid_object_url_or_s3_client_access_is_confirmed"
+      recommended_probe_method: "Resolve a confirmed mosaic object key first, then test bounded access through S3 requester-pays or an official HTTPS URL."
+    adapter_recommendation: "future_s3_requester_pays_or_generic_https_template_after_confirmed_https_url"
+    fasterraster_change_recommendation:
+      update_runtime_registry: false
+      add_new_adapter: true
+      add_docs_only: true
+      reason: "Static mosaic URLs may be deterministic once object keys are confirmed, but anonymous HTTPS failed and no working exact example was provided."
+    confidence: "medium_for_s3_prefix; low_for_exact_object_template"
+    unresolved_questions:
+      - "Are NLCD mosaics available through anonymous HTTPS, requester-pays S3 only, MRLC direct download, or ScienceBase?"
+      - "Do categorical land cover and fractional impervious mosaic filenames differ?"
+
+  - source_family: "Daymet"
+    current_probe_id: "daymet_ncss_tiny_query_experimental"
+    review_status: "future_adapter_required"
+    diagnosis:
+      likely_failure_reason: "The tested NCSS query returned 401. Official Daymet docs describe Daymet V4/V4R1 files and access through ORNL DAAC / Earthdata-style services. The current experimental NCSS URL should not be treated as a static deterministic file URL."
+      confirmed_or_inferred: "confirmed_that_static_template_is_wrong; exact_auth_requirement_needs_verification"
+      official_citations:
+        - "https://daymet.ornl.gov/getdata"
+        - "https://daymet.ornl.gov/static/files/NCSS_Daymet_Subset_Guide_v3.pdf"
+        - "https://daac.ornl.gov/DAYMET/guides/Daymet_Daily_V4.html"
+        - "https://www.earthdata.nasa.gov/data/catalog/ornl-cloud-daymet-daily-v4r1-2129-4.1"
+    corrected_access:
+      base_url: "https://thredds.daac.ornl.gov/thredds/ncss/grid/ornldaac/2129/"
+      url_template_candidate: "https://thredds.daac.ornl.gov/thredds/ncss/grid/ornldaac/2129/daymet_v4_daily_{region}_{variable}_{year}.nc?var={variable}&north={north}&west={west}&east={east}&south={south}&disableProjSubset=on&horizStride=1&time_start={time_start}&time_end={time_end}&timeStride=1&accept=netcdf"
+      example_url: null
+      placeholders: [region, variable, year, north, west, east, south, time_start, time_end]
+      allowed_values:
+        region: ["na", "hi", "pr"]
+        variable: ["prcp", "tmax", "tmin", "srad", "vp", "swe", "dayl"]
+        year: "1980-current_full_year_for_na_hi; puerto_rico_start_needs_verification"
+      requires_auth: "likely_for_some_ORNL_DAAC_access_paths; exact NCSS auth behavior needs verification"
+      supports_range_requests: false
+      recommended_probe_method: "Do not use Range headers for NCSS dynamic subset responses. Implement future NCSS preflight using small bbox/time query, finite timeout, and optional Earthdata credential detection."
+    adapter_recommendation: "future_ncss_or_thredds_ncss_template"
+    fasterraster_change_recommendation:
+      update_runtime_registry: false
+      add_new_adapter: true
+      add_docs_only: true
+      reason: "Daymet needs query construction, query-size validation, and possibly credential handling. It is not suitable for generic_https_template."
+    confidence: "medium_for_future_adapter_need; low_for_exact_query_template"
+    unresolved_questions:
+      - "What is the exact current ORNL DAAC NCSS dataset path for Daymet V4R1 daily files?"
+      - "Which Daymet access paths require Earthdata credentials?"
+      - "What are NCSS server-side query size and timeout limits?"

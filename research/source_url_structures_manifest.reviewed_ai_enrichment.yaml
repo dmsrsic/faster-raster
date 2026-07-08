@@ -1,0 +1,339 @@
+metadata:
+  purpose: "Reviewed external-AI enrichment candidates for FasterRaster source URL structures."
+  source: "User-pasted Gemini-style YAML enrichment"
+  review_policy: "Do not promote to runtime source_registry.yaml until official documentation is checked manually."
+  runtime_changes_made: false
+  notes:
+    - "Removed unusable [cite:*] artifacts from the pasted response."
+    - "Fields not already confirmed by FasterRaster fixtures or docs are marked proposed_unverified."
+    - "Potentially high-risk values such as nodata, auth requirements, checksums, and exact URL templates remain review candidates."
+
+sources:
+  - source_family: "CDL / USDA Cropland Data Layer"
+    source_id: usda_cdl_imageserver
+    review_status: needs_official_verification
+    current_fasterraster_status: implemented
+    adapter_recommendation: arcgis_imageserver
+    candidate_access:
+      base_url: "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer"
+      url_templates:
+        - name: export_image_query
+          template: "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?bbox={bbox}&bboxSR={bboxSR}&imageSR={imageSR}&size={size}&format={format}&f={f}&time={time}"
+          example_url: "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?bbox=-10000000,4000000,-9900000,4100000&bboxSR=3857&imageSR=5070&size=1000,1000&format=tiff&f=image&time=2023"
+          confirmed_or_inferred: partially_confirmed_by_current_fixture
+          placeholders: [bbox, bboxSR, imageSR, size, format, f, time]
+    deterministic_url_generation:
+      suitable: true
+      caveat: "Query URL generation is deterministic from semantic inputs, but it is not a static object URL template."
+    proposed_unverified:
+      nodata: 0
+      metadata_endpoint: "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer?f=json"
+      bounded_probe_safe: true
+      suggested_max_bytes: 1048576
+      max_image_dimensions: "around 4096 or 4097 pixels per request"
+    official_citations_to_check:
+      - "https://www.nass.usda.gov/Research_and_Science/Cropland/SARS1a.php"
+      - "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer"
+    open_questions:
+      - "Confirm time/year parameter behavior and whether mosaicRule is safer."
+      - "Confirm nodata, pixel type, legend/category metadata, and max image dimensions."
+    confidence_after_review: medium
+
+  - source_family: "Annual NLCD AWS tile"
+    source_id: annual_nlcd_aws_tile
+    review_status: needs_official_verification
+    current_fasterraster_status: implemented
+    adapter_recommendation: generic_https_template
+    candidate_access:
+      base_url: "https://usgs-landcover.s3.us-west-2.amazonaws.com"
+      url_templates:
+        - name: s3_tile_template
+          template: "https://usgs-landcover.s3.us-west-2.amazonaws.com/annual-nlcd/{collection}/{version}/{region}/tile/{tile_id}/Annual_NLCD_{h}{v}_{product_code}_{year}_CU_C1V0.tif"
+          example_url: "https://usgs-landcover.s3.us-west-2.amazonaws.com/annual-nlcd/c1/v0/cu/tile/h14v15/Annual_NLCD_H14V15_FctImp_1985_CU_C1V0.tif"
+          confirmed_or_inferred: confirmed_by_current_fixture_pending_official_recheck
+          placeholders: [collection, version, region, tile_id, h, v, product_code, year]
+    deterministic_url_generation:
+      suitable: true
+      caveat: "Only for products/tile keys whose object naming is confirmed."
+    proposed_unverified:
+      product_code_values: [FctImp, LndCov, LndChg]
+      year_range: "1985-2023"
+      nodata: 250
+      bounded_probe_safe: true
+      suggested_max_bytes: 1048576
+    official_citations_to_check:
+      - "https://www.usgs.gov/centers/eros/science/annual-nlcd-data-access"
+      - "https://www.mrlc.gov/sites/default/files/docs/LSDS-2103%20Annual%20National%20Land%20Cover%20Database%20%28NLCD%29%20Collection%201%20Science%20Product%20User%20Guide%20-v1.0%202024_10_15.pdf"
+    open_questions:
+      - "Confirm current Collection/version paths, especially any Collection 1.2 changes."
+      - "Confirm categorical land-cover file naming, product codes, nodata, and tile ranges."
+    confidence_after_review: medium
+
+  - source_family: "Annual NLCD AWS mosaic"
+    source_id: annual_nlcd_aws_mosaic
+    review_status: needs_official_verification
+    current_fasterraster_status: implemented
+    adapter_recommendation: generic_https_template
+    candidate_access:
+      base_url: "https://usgs-landcover.s3.us-west-2.amazonaws.com"
+      url_templates:
+        - name: s3_mosaic_template
+          template: "https://usgs-landcover.s3.us-west-2.amazonaws.com/annual-nlcd/{collection}/{version}/{region}/mosaic/Annual_NLCD_{product_code}_{year}_CU_C1V0.tif"
+          example_url: "https://usgs-landcover.s3.us-west-2.amazonaws.com/annual-nlcd/c1/v0/cu/mosaic/Annual_NLCD_FctImp_1985_CU_C1V0.tif"
+          confirmed_or_inferred: confirmed_by_current_fixture_pending_official_recheck
+          placeholders: [collection, version, region, product_code, year]
+    deterministic_url_generation:
+      suitable: true
+      caveat: "Mosaics may be very large; URL planning is safe, but fetch execution needs size controls."
+    proposed_unverified:
+      product_code_values: [FctImp, LndCov]
+      year_range: "1985-2023"
+      bounded_probe_safe: true
+      suggested_max_bytes: 1048576
+    official_citations_to_check:
+      - "https://www.usgs.gov/centers/eros/science/annual-nlcd-data-access"
+    open_questions:
+      - "Confirm current mosaic paths for all product codes and versions."
+      - "Confirm metadata and checksum availability."
+    confidence_after_review: medium
+
+  - source_family: PRISM
+    source_id: prism_time_series_daily_zip
+    review_status: needs_official_verification
+    current_fasterraster_status: implemented
+    adapter_recommendation: generic_https_template
+    candidate_access:
+      base_url: "https://data.prism.oregonstate.edu"
+      url_templates:
+        - name: daily_zip_template
+          template: "https://data.prism.oregonstate.edu/time_series/{region}/an/{resolution}/{variable}/{temporal_frequency}/{year}/prism_{variable}_{region}_25m_{yyyymmdd}.zip"
+          example_url: "https://data.prism.oregonstate.edu/time_series/us/an/4km/ppt/daily/2026/prism_ppt_us_25m_20260101.zip"
+          confirmed_or_inferred: confirmed_by_current_fixture_and_bounded_probe_for_example
+          placeholders: [region, resolution, variable, temporal_frequency, year, yyyymmdd]
+    deterministic_url_generation:
+      suitable: true
+      caveat: "Confirmed for the encoded daily ppt example; broader variable/frequency matrix needs official verification."
+    proposed_unverified:
+      variable_values: [ppt, tmax, tmin, tmean, tdmean, vpdmin, vpdmax]
+      resolution_values: [4km, 800m]
+      nodata: -9999
+      sidecar_files: [.txt, .prj, .xml]
+      bounded_probe_safe: "review_needed; previous bounded full-zip probe succeeded for one small file"
+    official_citations_to_check:
+      - "https://prism.oregonstate.edu/recent/"
+      - "https://prism.oregonstate.edu/"
+    open_questions:
+      - "Confirm valid variable/frequency/resolution combinations and filename token 25m."
+      - "Confirm nodata, CRS, checksum, and rate-limit guidance."
+    confidence_after_review: medium_high_for_example_low_for_full_matrix
+
+  - source_family: Daymet
+    source_id: daymet_ncss
+    review_status: candidate_for_future_adapter
+    current_fasterraster_status: documented_experimental
+    adapter_recommendation: future_ncss
+    candidate_access:
+      base_url: "https://thredds.daac.ornl.gov/thredds/ncss/grid/ornldaac/1328/"
+      url_templates:
+        - name: ncss_query_concept
+          template: "https://thredds.daac.ornl.gov/thredds/ncss/grid/ornldaac/1328/{year}/daymet_v3_{variable}_{year}_{region}.nc4?var={variable}&north={north}&west={west}&east={east}&south={south}&disableProjSubset=on&horizStride=1&time_start={time_start}&time_end={time_end}&timeStride=1&accept=netcdf"
+          example_url: "https://thredds.daac.ornl.gov/thredds/ncss/grid/ornldaac/1328/2020/daymet_v3_tmax_2020_na.nc4?var=tmax&north=40&west=-100&east=-90&south=30&disableProjSubset=on&horizStride=1&time_start=2020-01-01T12:00:00Z&time_end=2020-01-02T12:00:00Z&accept=netcdf"
+          confirmed_or_inferred: inferred_unverified
+          placeholders: [year, variable, region, north, west, east, south, time_start, time_end]
+    deterministic_url_generation:
+      suitable: true_for_query_compilation_not_static_objects
+      caveat: "Needs a dedicated NCSS adapter with query-size validation."
+    proposed_unverified:
+      variables: [tmax, tmin, prcp, srad, vp, swe, dayl]
+      regions: [na, hi, pr]
+      nodata: -9999.0
+      bounded_probe_safe: true
+      suggested_max_bytes: 524288
+    official_citations_to_check:
+      - "https://daymet.ornl.gov/getdata"
+      - "https://daymet.ornl.gov/static/files/NCSS_Daymet_Subset_Guide_v3.pdf"
+    open_questions:
+      - "Confirm exact NCSS path/version, query parameters, region codes, projection, and limits."
+    confidence_after_review: low
+
+  - source_family: "DEM / elevation"
+    source_id: usgs_3dep_dem
+    review_status: external_candidate_unverified
+    current_fasterraster_status: missing
+    adapter_recommendation: generic_https_template_or_future_api
+    candidate_access:
+      base_url: "https://prd-tnm.s3.amazonaws.com"
+      url_templates:
+        - name: 3dep_s3_cog_template
+          template: "https://prd-tnm.s3.amazonaws.com/StagedProducts/Elevation/{resolution}/TIFF/{grid_id}/USGS_{resolution}_{grid_id}.tif"
+          example_url: "https://prd-tnm.s3.amazonaws.com/StagedProducts/Elevation/13/TIFF/n40w100/USGS_13_n40w100.tif"
+          confirmed_or_inferred: inferred_unverified
+          placeholders: [resolution, grid_id]
+    deterministic_url_generation:
+      suitable: unknown
+      caveat: "Needs official National Map object naming verification."
+    proposed_unverified:
+      nodata: -999999.0
+      metadata_endpoint: "https://tnmaccess.nationalmap.gov/api/v1/products"
+      bounded_probe_safe: true
+    official_citations_to_check:
+      - "https://www.usgs.gov/3d-elevation-program"
+    open_questions:
+      - "Confirm exact bucket paths, grid naming, formats, CRS, nodata, and metadata sidecars."
+    confidence_after_review: low
+
+  - source_family: MODIS
+    source_id: nasa_modis_earthdata
+    review_status: external_candidate_unverified
+    current_fasterraster_status: missing
+    adapter_recommendation: future_api
+    candidate_access:
+      base_url: "https://e4ftl01.cr.usgs.gov"
+      url_templates:
+        - name: lpdaac_http_template
+          template: "https://e4ftl01.cr.usgs.gov/{sensor}/{product}.{version}/{yyyy}.{mm}.{dd}/{product}.{version}.{tile}.{timestamp}.hdf"
+          example_url: "https://e4ftl01.cr.usgs.gov/MOLT/MOD13Q1.061/2023.01.01/MOD13Q1.A2023001.h08v05.061.2023017123456.hdf"
+          confirmed_or_inferred: inferred_unverified
+          placeholders: [sensor, product, version, yyyy, mm, dd, tile, timestamp]
+    deterministic_url_generation:
+      suitable: likely_requires_catalog_resolution
+      caveat: "Timestamp/granule IDs likely require CMR/Earthdata query."
+    proposed_unverified:
+      checksum_available: true
+      metadata_endpoint: "https://cmr.earthdata.nasa.gov/search/granules.json"
+      auth_required: true
+    official_citations_to_check:
+      - "https://lpdaac.usgs.gov/data/"
+    open_questions:
+      - "Confirm current access method, auth, filename tokens, and catalog requirements."
+    confidence_after_review: low
+
+  - source_family: Landsat
+    source_id: usgs_landsat_c2
+    review_status: external_candidate_unverified
+    current_fasterraster_status: missing
+    adapter_recommendation: future_stac
+    candidate_access:
+      base_url: "https://landsatlook.usgs.gov/data"
+      url_templates:
+        - name: landsatlook_template
+          template: "https://landsatlook.usgs.gov/data/collection02/{level}/{sensor}/{path}/{row}/{granule_id}/{granule_id}_{band}.TIF"
+          example_url: "https://landsatlook.usgs.gov/data/collection02/level-2/standard/oli-tirs/2023/045/033/LC08_L2SP_045033_20230501_20230509_02_T1/LC08_L2SP_045033_20230501_20230509_02_T1_SR_B4.TIF"
+          confirmed_or_inferred: inferred_unverified
+          placeholders: [level, sensor, path, row, granule_id, band]
+    deterministic_url_generation:
+      suitable: likely_requires_stac_or_api_resolution
+      caveat: "Granule ID and processing date usually must be resolved through catalog/search."
+    official_citations_to_check:
+      - "https://www.usgs.gov/landsat-missions/landsat-collection-2"
+    open_questions:
+      - "Confirm public cloud URL structures, STAC endpoint, auth requirements, and band assets."
+    confidence_after_review: low
+
+  - source_family: Sentinel
+    source_id: copernicus_sentinel_2
+    review_status: external_candidate_unverified
+    current_fasterraster_status: missing
+    adapter_recommendation: future_stac
+    candidate_access:
+      base_url: "https://catalogue.dataspace.copernicus.eu/odata/v1"
+      url_templates:
+        - name: cdse_odata_template
+          template: "https://catalogue.dataspace.copernicus.eu/odata/v1/Products({product_id})/Nodes({filename})/Nodes('GRANULE')/Nodes({granule_name})/Nodes('IMG_DATA')/Nodes('R10m')/Nodes({band_file})/$value"
+          example_url: "https://catalogue.dataspace.copernicus.eu/odata/v1/Products(12345678-abcd-1234-ef00-1234567890ab)/$value"
+          confirmed_or_inferred: inferred_unverified
+          placeholders: [product_id, filename, granule_name, band_file]
+    deterministic_url_generation:
+      suitable: likely_requires_stac_or_api_resolution
+      caveat: "Product IDs and granule paths must be resolved through CDSE APIs."
+    official_citations_to_check:
+      - "https://dataspace.copernicus.eu/"
+    open_questions:
+      - "Confirm current CDSE STAC/OData paths, auth, and deterministic asset URLs."
+    confidence_after_review: low
+
+  - source_family: "NOAA climate/ocean/coastal rasters"
+    source_id: noaa_ncei_oisst
+    review_status: external_candidate_unverified
+    current_fasterraster_status: missing
+    adapter_recommendation: generic_https_template_or_future_ncss
+    candidate_access:
+      base_url: "https://www.ncei.noaa.gov/data"
+      url_templates:
+        - name: ncei_oisst_template
+          template: "https://www.ncei.noaa.gov/data/sea-surface-temperature-optimum-interpolation/v2.1/access/avhrr/{year}{month}/oisst-avhrr-v02r01.{year}{month}{day}.nc"
+          example_url: "https://www.ncei.noaa.gov/data/sea-surface-temperature-optimum-interpolation/v2.1/access/avhrr/202301/oisst-avhrr-v02r01.20230101.nc"
+          confirmed_or_inferred: inferred_unverified
+          placeholders: [year, month, day]
+    deterministic_url_generation:
+      suitable: candidate
+      caveat: "Needs official NCEI path confirmation and dataset-specific schema."
+    official_citations_to_check:
+      - "https://www.ncei.noaa.gov/products/optimum-interpolation-sst"
+    open_questions:
+      - "Confirm static paths, checksums, THREDDS/OPeNDAP alternatives, CRS, and nodata."
+    confidence_after_review: low
+
+  - source_family: "NASA Earthdata-style rasters"
+    source_id: nasa_earthdata_generic
+    review_status: external_candidate_unverified
+    current_fasterraster_status: missing
+    adapter_recommendation: future_api
+    candidate_access:
+      base_url: "https://cmr.earthdata.nasa.gov"
+      url_templates:
+        - name: cmr_granule_search_template
+          template: "https://cmr.earthdata.nasa.gov/search/granules.json?short_name={short_name}&version={version}&temporal={start_date},{end_date}&bounding_box={west},{south},{east},{north}"
+          example_url: "https://cmr.earthdata.nasa.gov/search/granules.json?short_name=MOD13Q1&version=061&temporal=2023-01-01T00:00:00Z,2023-01-10T23:59:59Z&bounding_box=-100,30,-90,40"
+          confirmed_or_inferred: candidate_api_pattern_unverified
+          placeholders: [short_name, version, start_date, end_date, west, south, east, north]
+    deterministic_url_generation:
+      suitable: suitable_for_search_request_plans_not_static_urls
+      caveat: "Needs CMR/Earthdata adapter with authentication-aware execution later."
+    official_citations_to_check:
+      - "https://earthdata.nasa.gov/"
+    open_questions:
+      - "Determine product-specific auth, granule links, metadata, and checksum policies."
+    confidence_after_review: low
+
+  - source_family: "USGS raster services"
+    source_id: usgs_national_map_services
+    review_status: external_candidate_unverified
+    current_fasterraster_status: missing
+    adapter_recommendation: arcgis_imageserver
+    candidate_access:
+      base_url: "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer"
+      url_templates:
+        - name: usgs_imageserver_export
+          template: "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox={bbox}&bboxSR={bboxSR}&size={size}&imageSR={imageSR}&format={format}&f=json"
+          example_url: "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=-10000000,4000000,-9900000,4100000&bboxSR=3857&size=1024,1024&imageSR=5070&format=tiff&f=json"
+          confirmed_or_inferred: inferred_unverified
+          placeholders: [bbox, bboxSR, size, imageSR, format]
+    deterministic_url_generation:
+      suitable: true_for_query_compilation_not_static_objects
+      caveat: "Needs ImageServer capability inspection and service-specific max dimensions."
+    official_citations_to_check:
+      - "https://apps.nationalmap.gov/services/"
+    open_questions:
+      - "Confirm service URL, export formats, nodata, native CRS, and max dimensions."
+    confidence_after_review: low
+
+  - source_family: "state/local ArcGIS ImageServer sources"
+    source_id: generic_state_local_imageserver
+    review_status: template_guidance_only
+    current_fasterraster_status: missing
+    adapter_recommendation: arcgis_imageserver
+    candidate_access:
+      base_url: "https://{host}/arcgis/rest/services/{folder}/{service_name}/ImageServer"
+      url_templates:
+        - name: generic_imageserver_export
+          template: "https://{host}/arcgis/rest/services/{folder}/{service_name}/ImageServer/exportImage?bbox={bbox}&bboxSR={bboxSR}&size={size}&imageSR={imageSR}&format={format}&f=image"
+          example_url: "https://gis.example.gov/arcgis/rest/services/Elevation/DEM_2020/ImageServer/exportImage?bbox=500000,100000,505000,105000&bboxSR=2264&size=1000,1000&imageSR=2264&format=tiff&f=image"
+          confirmed_or_inferred: generic_pattern_only
+          placeholders: [host, folder, service_name, bbox, bboxSR, size, imageSR, format]
+    deterministic_url_generation:
+      suitable: true_after_service_registry_entry_is_verified
+      caveat: "Every state/local source must have a verified service URL and capability metadata."
+    open_questions:
+      - "Identify concrete services and verify max dimensions, formats, time support, access restrictions, and CRS behavior."
+    confidence_after_review: low

@@ -1,0 +1,32 @@
+profile_id: default_hpc
+default_retry_count: 2
+default_timeout_seconds: 3600
+stage_timeout_seconds:
+  fetch: 3600
+  validate_download: 600
+  harmonize: 7200
+  inspect_output: 300
+stage_retry_count:
+  fetch: 2
+  validate_download: 1
+  harmonize: 1
+  inspect_output: 1
+max_parallel_jobs_hint: 100
+failure_mode: fail_fast
+scheduler:
+  partition: null
+  account: null
+  qos: null
+resources:
+  fetch:
+    cpus: 1
+    memory_mb: 1024
+  validate_download:
+    cpus: 1
+    memory_mb: 1024
+  harmonize:
+    cpus: 2
+    memory_mb: 4096
+  inspect_output:
+    cpus: 1
+    memory_mb: 1024

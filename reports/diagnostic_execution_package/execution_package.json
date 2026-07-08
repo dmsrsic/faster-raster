@@ -1,0 +1,121 @@
+{
+  "adapter_counts": {
+    "arcgis_imageserver": 2
+  },
+  "created_by": "FasterRaster 0.3.1",
+  "dag_validation": {
+    "dependency_count": 6,
+    "error_count": 0,
+    "errors": [],
+    "job_count": 8,
+    "request_count": 2,
+    "stage_counts": {
+      "fetch": 2,
+      "harmonize": 2,
+      "inspect_output": 2,
+      "validate_download": 2
+    },
+    "status": "PASS"
+  },
+  "dependency_count": 6,
+  "estimated_stages": [
+    "fetch",
+    "validate_download",
+    "harmonize",
+    "inspect_output"
+  ],
+  "execution_profile": {
+    "default_retry_count": 2,
+    "default_timeout_seconds": 3600,
+    "failure_mode": "fail_fast",
+    "max_parallel_jobs_hint": 100,
+    "profile_id": "builtin_default_hpc",
+    "resources": {
+      "fetch": {
+        "cpus": 1,
+        "memory_mb": 1024
+      },
+      "harmonize": {
+        "cpus": 2,
+        "memory_mb": 4096
+      },
+      "inspect_output": {
+        "cpus": 1,
+        "memory_mb": 1024
+      },
+      "validate_download": {
+        "cpus": 1,
+        "memory_mb": 1024
+      }
+    },
+    "scheduler": {
+      "account": null,
+      "partition": null,
+      "qos": null
+    },
+    "stage_retry_count": {
+      "fetch": 2,
+      "harmonize": 1,
+      "inspect_output": 1,
+      "validate_download": 1
+    },
+    "stage_timeout_seconds": {
+      "fetch": 3600,
+      "harmonize": 7200,
+      "inspect_output": 300,
+      "validate_download": 600
+    }
+  },
+  "execution_profile_path": null,
+  "harmonization_plan_path": "/home/dmsrsic/raster-work/projects/ohio_cdl_edges/plans/harmonization_plan.json",
+  "harmonization_plan_sha256": "4493ea4f494d589fc098bdb7744e07caef4bb15141a1877d12c9044205e4e2c6",
+  "manifest_path": "/home/dmsrsic/raster-work/projects/ohio_cdl_edges/manifests/acquisition_manifest.jsonl",
+  "manifest_sha256": "fd46106cde9e8c51b0aae26296b46a48ec75d65ca47ed4e911329723693151cc",
+  "outputs": {
+    "cache_plan": "cache_plan.json",
+    "failure_policy": "failure_policy.json",
+    "jobs": "jobs.jsonl",
+    "summary": "execution_summary.md"
+  },
+  "package_id": "fr_exec_51438d1287b43021",
+  "package_version": "0.3.1",
+  "request_count": 2,
+  "scheduler_compatibility_notes": [
+    "jobs.jsonl is deterministic and can be mapped to Slurm arrays, Snakemake rules, Nextflow processes, Prefect tasks, AWS Batch jobs, or Ray tasks.",
+    "This package is a preflight orchestration artifact only; it does not download, validate bytes, or harmonize rasters.",
+    "Stage dependencies are represented as job_id strings and can be translated into scheduler-native dependency syntax."
+  ],
+  "source_counts": {
+    "cdl": 2
+  },
+  "stage_counts": {
+    "fetch": 2,
+    "harmonize": 2,
+    "inspect_output": 2,
+    "validate_download": 2
+  },
+  "total_job_count": 8,
+  "validation_status": {
+    "harmonization": {
+      "error_count": 0,
+      "errors": [],
+      "input_count": 2,
+      "manifest_path": "/home/dmsrsic/raster-work/projects/ohio_cdl_edges/manifests/acquisition_manifest.jsonl",
+      "manifest_row_count": 2,
+      "path": "/home/dmsrsic/raster-work/projects/ohio_cdl_edges/plans/harmonization_plan.json",
+      "status": "PASS",
+      "warning_count": 0,
+      "warnings": []
+    },
+    "manifest": {
+      "error_count": 0,
+      "errors": [],
+      "path": "/home/dmsrsic/raster-work/projects/ohio_cdl_edges/manifests/acquisition_manifest.jsonl",
+      "row_count": 2,
+      "status": "PASS",
+      "warning_count": 0,
+      "warnings": []
+    },
+    "overall": "PASS"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "live_test_candidates": [
+    {
+      "candidate_result_class": "docs_ready_endpoint_needed",
+      "endpoint_status": "verified_docs_only",
+      "live_test_safety": "needs_endpoint_first",
+      "max_bytes_recommended": 65536,
+      "next_exact_action": "verify exact official THREDDS/OPeNDAP catalog endpoint",
+      "recommended_probe_type": "docs_only",
+      "score": 92,
+      "source_id": "gridmet_daily"
+    },
+    {
+      "candidate_result_class": "docs_ready_endpoint_needed",
+      "endpoint_status": "verified_docs_only",
+      "live_test_safety": "needs_endpoint_first",
+      "max_bytes_recommended": 65536,
+      "next_exact_action": "verify exact official THREDDS/OPeNDAP/NCSS endpoint",
+      "recommended_probe_type": "docs_only",
+      "score": 88,
+      "source_id": "terraclimate_monthly"
+    },
+    {
+      "candidate_result_class": "docs_ready_endpoint_needed",
+      "endpoint_status": "verified_docs_only",
+      "live_test_safety": "needs_endpoint_first",
+      "max_bytes_recommended": 65536,
+      "next_exact_action": "verify official daily TIFF directory/object semantics",
+      "recommended_probe_type": "docs_only",
+      "score": 82,
+      "source_id": "chirps_daily_precipitation"
+    }
+  ]
+}

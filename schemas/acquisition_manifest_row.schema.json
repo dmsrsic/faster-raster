@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "adapter": {
+      "enum": [
+        "arcgis_imageserver",
+        "generic_https_template"
+      ],
+      "type": "string"
+    },
+    "aoi_path": {
+      "type": "string"
+    },
+    "bbox": {
+      "items": {
+        "type": "number"
+      },
+      "maxItems": 4,
+      "minItems": 4,
+      "type": "array"
+    },
+    "bbox_crs": {
+      "type": "string"
+    },
+    "export_image_crs": {
+      "type": "string"
+    },
+    "product": {
+      "type": "string"
+    },
+    "provider": {
+      "type": "string"
+    },
+    "registry_key": {
+      "type": "string"
+    },
+    "request_id": {
+      "type": "string"
+    },
+    "resampling": {
+      "enum": [
+        "nearest",
+        "mode",
+        "bilinear",
+        "cubic",
+        "lanczos",
+        "average"
+      ],
+      "type": "string"
+    },
+    "semantic_type": {
+      "enum": [
+        "categorical",
+        "continuous"
+      ],
+      "type": "string"
+    },
+    "source_aoi_bbox": {
+      "items": {
+        "type": "number"
+      },
+      "maxItems": 4,
+      "minItems": 4,
+      "type": "array"
+    },
+    "source_aoi_crs": {
+      "type": "string"
+    },
+    "source_id": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "planned"
+      ],
+      "type": "string"
+    },
+    "target_grid_crs": {
+      "type": "string"
+    },
+    "target_resolution_m": {
+      "type": "number"
+    },
+    "thematic_layer": {
+      "type": "string"
+    },
+    "tile_col": {
+      "type": "integer"
+    },
+    "tile_height_pixels": {
+      "type": "integer"
+    },
+    "tile_id": {
+      "type": "string"
+    },
+    "tile_planning_crs": {
+      "type": "string"
+    },
+    "tile_row": {
+      "type": "integer"
+    },
+    "tile_width_pixels": {
+      "type": "integer"
+    },
+    "url": {
+      "type": "string"
+    },
+    "year": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "request_id",
+    "source_id",
+    "registry_key",
+    "adapter",
+    "provider",
+    "product",
+    "year",
+    "thematic_layer",
+    "tile_id",
+    "tile_row",
+    "tile_col",
+    "aoi_path",
+    "source_aoi_bbox",
+    "source_aoi_crs",
+    "bbox",
+    "bbox_crs",
+    "export_image_crs",
+    "target_grid_crs",
+    "target_resolution_m",
+    "tile_width_pixels",
+    "tile_height_pixels",
+    "tile_planning_crs",
+    "semantic_type",
+    "resampling",
+    "url",
+    "status"
+  ],
+  "title": "FasterRaster acquisition_manifest.jsonl row",
+  "type": "object"
+}

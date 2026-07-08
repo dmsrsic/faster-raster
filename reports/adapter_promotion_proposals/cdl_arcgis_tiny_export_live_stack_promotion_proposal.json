@@ -1,0 +1,18 @@
+{
+  "adapter_wave": "wave_1_arcgis_imageserver_fixture",
+  "endpoint_id": "cdl_tiny_imageserver_export",
+  "evidence": {
+    "bytes_read": 17190,
+    "content_type": "image/tiff",
+    "http_status": 200,
+    "result_class": "pass_verified",
+    "selected_url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?bbox=-83.20,39.80,-83.19,39.81&bboxSR=4326&imageSR=4326&size=64,64&format=tiff&f=image",
+    "sha256": "29472f6c99f246c3dc8492f4357e769e7c486df446b30c264944f9626ef9099b"
+  },
+  "experimental_adapter_candidate": false,
+  "live_source_id": "usda_cdl",
+  "promotion_decision": "preserve_as_contract_fixture",
+  "required_next_step": "preserve_as_contract_fixture",
+  "runtime_promotion_allowed_now": false,
+  "source_id": "cdl_arcgis_tiny_export"
+}

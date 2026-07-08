@@ -1,0 +1,43 @@
+╭──────────────────────────────────────────────────── Kitchen Mode ────────────────────────────────────────────────────╮
+│ Pantry / Source Atlas                                                                                                │
+│ 26 sauces, buckets, locks, goods, and bads                                                                           │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+                                          Pantry: 26 sauces ready for stacking                                          
+┏━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ sauce                   ┃ provider                ┃ bucket            ┃ locks              ┃ next                    ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ prism_daily_ppt_static… │ PRISM Climate Group     │ verified_now      │ none               │ preserve proof and add  │
+│                         │                         │                   │                    │ contract fixture        │
+│ daymet_single_pixel_pr… │ ORNL DAAC               │ verified_now      │ none               │ preserve proof and add  │
+│                         │                         │                   │                    │ contract fixture        │
+│ cdl_arcgis_tiny_export  │ USDA_NASS               │ verified_now      │ none               │ preserve proof and add  │
+│                         │                         │                   │                    │ contract fixture        │
+│ daymet_ncss             │ ORNL DAAC               │ credential_gated  │ earthdata_login    │ complete                │
+│                         │                         │                   │                    │ credential/session      │
+│                         │                         │                   │                    │ scaffold before live    │
+│                         │                         │                   │                    │ probe                   │
+│ nlcd_annual_landcover   │ USGS/MRLC               │ credential_gated  │ aws_requester_pays │ complete                │
+│                         │                         │                   │                    │ credential/session      │
+│                         │                         │                   │                    │ scaffold before live    │
+│                         │                         │                   │                    │ probe                   │
+│ usgs_3dep_dem           │ USGS                    │ adapter_needed    │ none               │ write metadata-only     │
+│                         │                         │                   │                    │ adapter/probe design    │
+│ landsat_collection2     │ USGS                    │ adapter_needed    │ usgs_m2m_token     │ complete                │
+│                         │                         │                   │                    │ credential/session      │
+│                         │                         │                   │                    │ scaffold before live    │
+│                         │                         │                   │                    │ probe                   │
+│ sentinel_copernicus_da… │ Copernicus              │ credential_gated  │ copernicus_token   │ complete                │
+│                         │                         │                   │                    │ credential/session      │
+│                         │                         │                   │                    │ scaffold before live    │
+│                         │                         │                   │                    │ probe                   │
+│ modis_nasa_earthdata_c… │ NASA Earthdata          │ credential_gated  │ earthdata_login    │ complete                │
+│                         │                         │                   │                    │ credential/session      │
+│                         │                         │                   │                    │ scaffold before live    │
+│                         │                         │                   │                    │ probe                   │
+│ noaa_ncei_service_class │ NOAA/NCEI               │ adapter_needed    │ none               │ write metadata-only     │
+│                         │                         │                   │                    │ adapter/probe design    │
+│ chirps_daily_precipita… │ UCSB CHC                │ future_unverified │ none               │ verify official docs    │
+│                         │                         │                   │                    │ and endpoint semantics  │
+│ terraclimate_monthly    │ University of Idaho /   │ adapter_needed    │ none               │ write metadata-only     │
+│                         │ TerraClimate            │                   │                    │ adapter/probe design    │
+└─────────────────────────┴─────────────────────────┴───────────────────┴────────────────────┴─────────────────────────┘

@@ -1,0 +1,155 @@
+{
+  "analysis_id": "live_stack_cook_analysis_v0_5_3",
+  "direct_data_candidate_count": 7,
+  "discovery_metadata_candidate_count": 4,
+  "endpoint_fail_count": 0,
+  "endpoint_pass_count": 13,
+  "index_or_filter_candidate_count": 2,
+  "rows": [
+    {
+      "bytes_read": 65536,
+      "content_type": "application/zip",
+      "endpoint_id": "prism_daily_zip",
+      "http_status": 206,
+      "maturity": "adapter_candidate_direct_data",
+      "next_action": "preserve existing proof and convert to contract fixture",
+      "result_class": "pass_range_limited",
+      "sha256_short": "cc89306d4d5b",
+      "source_id": "prism_daily_ppt"
+    },
+    {
+      "bytes_read": 474,
+      "content_type": "text/csv; charset=utf-8",
+      "endpoint_id": "daymet_single_pixel_csv",
+      "http_status": 200,
+      "maturity": "adapter_candidate_direct_data",
+      "next_action": "preserve existing proof and convert to contract fixture",
+      "result_class": "pass_verified",
+      "sha256_short": "e182dfb0db67",
+      "source_id": "daymet_single_pixel"
+    },
+    {
+      "bytes_read": 17190,
+      "content_type": "image/tiff",
+      "endpoint_id": "cdl_tiny_imageserver_export",
+      "http_status": 200,
+      "maturity": "adapter_candidate_direct_data",
+      "next_action": "preserve existing proof and convert to contract fixture",
+      "result_class": "pass_verified",
+      "sha256_short": "29472f6c99f2",
+      "source_id": "usda_cdl"
+    },
+    {
+      "bytes_read": 65536,
+      "content_type": "application/octet-stream",
+      "endpoint_id": "chirps_20230101_tif_gz",
+      "http_status": 206,
+      "maturity": "adapter_candidate_direct_data",
+      "next_action": "add static TIF.GZ range adapter proposal",
+      "result_class": "pass_range_limited",
+      "sha256_short": "fa6755981504",
+      "source_id": "chirps_daily"
+    },
+    {
+      "bytes_read": 65536,
+      "content_type": "application/x-netcdf",
+      "endpoint_id": "gridmet_pr_2023_nc",
+      "http_status": 206,
+      "maturity": "adapter_candidate_direct_data",
+      "next_action": "add static/range NetCDF metadata adapter proposal",
+      "result_class": "pass_range_limited",
+      "sha256_short": "b1a8ed52034a",
+      "source_id": "gridmet_daily"
+    },
+    {
+      "bytes_read": 65536,
+      "content_type": "application/x-netcdf",
+      "endpoint_id": "terraclimate_ppt_2023_nc",
+      "http_status": 206,
+      "maturity": "adapter_candidate_direct_data",
+      "next_action": "add static/range NetCDF metadata adapter proposal",
+      "result_class": "pass_range_limited",
+      "sha256_short": "6f90094fe5e7",
+      "source_id": "terraclimate_monthly"
+    },
+    {
+      "bytes_read": 65536,
+      "content_type": "application/zip",
+      "endpoint_id": "worldclim_10m_prec_zip",
+      "http_status": 206,
+      "maturity": "adapter_candidate_direct_data",
+      "next_action": "add static ZIP bundle adapter proposal",
+      "result_class": "pass_range_limited",
+      "sha256_short": "9c647f5f3380",
+      "source_id": "worldclim_normals"
+    },
+    {
+      "bytes_read": 65536,
+      "content_type": "application/octet-stream",
+      "endpoint_id": "gfs_prate_tiny_bbox_or_filter_page",
+      "http_status": 200,
+      "maturity": "adapter_candidate_index_or_filter",
+      "next_action": "run magic-byte/content validation before adapter proposal",
+      "result_class": "pass_bounded_truncated",
+      "sha256_short": "044438752f7b",
+      "source_id": "noaa_gfs_nomads"
+    },
+    {
+      "bytes_read": 9108,
+      "content_type": "binary/octet-stream",
+      "endpoint_id": "hrrr_20230101_idx",
+      "http_status": 206,
+      "maturity": "adapter_candidate_index_or_filter",
+      "next_action": "add GRIB index probe adapter proposal",
+      "result_class": "pass_range_limited",
+      "sha256_short": "0ee1558a9e2a",
+      "source_id": "noaa_hrrr_open_data"
+    },
+    {
+      "bytes_read": 36822,
+      "content_type": "text/html",
+      "endpoint_id": "mrms_bucket_index",
+      "http_status": 206,
+      "maturity": "adapter_candidate_discovery_metadata",
+      "next_action": "resolve product-specific MRMS key before adapter proposal",
+      "result_class": "pass_range_limited",
+      "sha256_short": "48661c476a2b",
+      "source_id": "noaa_mrms_open_data"
+    },
+    {
+      "bytes_read": 8232,
+      "content_type": "application/json",
+      "endpoint_id": "tnm_products_bbox_json",
+      "http_status": 200,
+      "maturity": "adapter_candidate_discovery_metadata",
+      "next_action": "add TNM JSON discovery adapter proposal",
+      "result_class": "pass_verified",
+      "sha256_short": "23f88b2f3196",
+      "source_id": "usgs_3dep_tnm"
+    },
+    {
+      "bytes_read": 65536,
+      "content_type": "application/json;charset=utf-8",
+      "endpoint_id": "cmr_modis_collections_json",
+      "http_status": 200,
+      "maturity": "adapter_candidate_discovery_metadata",
+      "next_action": "keep as metadata discovery only; verify auth status for assets later",
+      "result_class": "pass_bounded_truncated",
+      "sha256_short": "f9094076d7aa",
+      "source_id": "nasa_cmr_metadata"
+    },
+    {
+      "bytes_read": 850,
+      "content_type": "application/xml;charset=UTF-8",
+      "endpoint_id": "ncei_thredds_catalog_xml",
+      "http_status": 200,
+      "maturity": "adapter_candidate_discovery_metadata",
+      "next_action": "descend from root THREDDS catalog to dataset-specific catalog",
+      "result_class": "pass_verified",
+      "sha256_short": "6b2d17e0d0a4",
+      "source_id": "noaa_ncei_thredds"
+    }
+  ],
+  "source_success_count": 13,
+  "total_bytes_read": 531428
+}

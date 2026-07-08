@@ -1,0 +1,18 @@
+{
+  "adapter_wave": "wave_2_thredds_catalog_discovery",
+  "endpoint_id": "ncei_thredds_catalog_xml",
+  "evidence": {
+    "bytes_read": 850,
+    "content_type": "application/xml;charset=UTF-8",
+    "http_status": 200,
+    "result_class": "pass_verified",
+    "selected_url": "https://www.ncei.noaa.gov/thredds/catalog.xml",
+    "sha256": "6b2d17e0d0a4db8d6f320cc2a72f569af1f6136213a7f49b9da8538b4d9068f7"
+  },
+  "experimental_adapter_candidate": true,
+  "live_source_id": "noaa_ncei_thredds",
+  "promotion_decision": "ready_for_experimental_thredds_catalog_adapter",
+  "required_next_step": "ready_for_experimental_thredds_catalog_adapter",
+  "runtime_promotion_allowed_now": false,
+  "source_id": "noaa_ncei_service_class"
+}

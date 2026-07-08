@@ -1,0 +1,18 @@
+{
+  "adapter_wave": "wave_3_nomads_filter_validation",
+  "endpoint_id": "gfs_prate_tiny_bbox_or_filter_page",
+  "evidence": {
+    "bytes_read": 65536,
+    "content_type": "application/octet-stream",
+    "http_status": 200,
+    "result_class": "pass_bounded_truncated",
+    "selected_url": "https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl?dir=/gfs.20260708/12/atmos&file=gfs.t12z.pgrb2.0p25.f000&lev_surface=on&var_PRATE=on&subregion=&leftlon=-83.20&rightlon=-83.19&toplat=39.81&bottomlat=39.80",
+    "sha256": "044438752f7bf31076f7bbfe85cc388ad166a5302194d663ea6983ea629079c3"
+  },
+  "experimental_adapter_candidate": false,
+  "live_source_id": "noaa_gfs_nomads",
+  "promotion_decision": "needs_magic_byte_and_parameter_validation",
+  "required_next_step": "needs_magic_byte_and_parameter_validation",
+  "runtime_promotion_allowed_now": false,
+  "source_id": "noaa_gfs_nomads_grib_filter"
+}

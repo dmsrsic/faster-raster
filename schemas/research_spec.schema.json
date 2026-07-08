@@ -1,0 +1,162 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "aoi": {
+      "additionalProperties": false,
+      "properties": {
+        "bbox_policy": {
+          "description": "AOI-to-bbox policy.",
+          "type": "string"
+        },
+        "input_crs": {
+          "description": "CRS of AOI coordinates.",
+          "type": "string"
+        },
+        "path": {
+          "description": "Path to AOI GeoJSON.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path"
+      ],
+      "type": "object"
+    },
+    "outputs": {
+      "additionalProperties": false,
+      "properties": {
+        "manifest_dir": {
+          "type": "string"
+        },
+        "plan_dir": {
+          "type": "string"
+        },
+        "raster_format": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "manifest_dir",
+        "plan_dir",
+        "raster_format"
+      ],
+      "type": "object"
+    },
+    "project": {
+      "additionalProperties": false,
+      "properties": {
+        "created": {
+          "description": "Creation date or timestamp.",
+          "type": "string"
+        },
+        "id": {
+          "description": "Stable project identifier.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "type": "object"
+    },
+    "sources": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "acquisition_mode": {
+            "enum": [
+              "arcgis_export_image",
+              "https_template"
+            ],
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "registry_key": {
+            "type": "string"
+          },
+          "resampling": {
+            "enum": [
+              "nearest",
+              "mode",
+              "bilinear",
+              "cubic",
+              "lanczos",
+              "average"
+            ],
+            "type": "string"
+          },
+          "semantic_type": {
+            "enum": [
+              "categorical",
+              "continuous"
+            ],
+            "type": "string"
+          },
+          "thematic_layers": {
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "years": {
+            "items": {
+              "type": "integer"
+            },
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "registry_key",
+          "years",
+          "thematic_layers",
+          "acquisition_mode",
+          "semantic_type",
+          "resampling"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "target_grid": {
+      "additionalProperties": false,
+      "properties": {
+        "crs": {
+          "description": "Target harmonization CRS.",
+          "type": "string"
+        },
+        "nodata": {
+          "type": "number"
+        },
+        "resolution_m": {
+          "type": "number"
+        },
+        "snap": {
+          "description": "Target grid snap policy.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "crs",
+        "resolution_m",
+        "nodata"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "project",
+    "aoi",
+    "target_grid",
+    "sources",
+    "outputs"
+  ],
+  "title": "FasterRaster research_spec.json",
+  "type": "object"
+}

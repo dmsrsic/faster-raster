@@ -1,0 +1,523 @@
+{
+  "adapter_counts": {
+    "arcgis_imageserver": 2
+  },
+  "capability_validation_eval": {
+    "failed": 0,
+    "passed": 5,
+    "scenario_count": 5,
+    "scenarios": [
+      {
+        "errors": [],
+        "expected_substring": null,
+        "name": "valid_registry",
+        "passed": true,
+        "time_seconds": 5e-06
+      },
+      {
+        "errors": [
+          "Unsupported adapter for v0: stac"
+        ],
+        "expected_substring": "Unsupported adapter for v0: stac",
+        "name": "unsupported_adapter",
+        "passed": true,
+        "time_seconds": 3e-06
+      },
+      {
+        "errors": [
+          "Source cdl must support bbox CRS parameter for v0 ArcGIS planning"
+        ],
+        "expected_substring": "must support bbox CRS parameter",
+        "name": "missing_bboxsr_support",
+        "passed": true,
+        "time_seconds": 2e-06
+      },
+      {
+        "errors": [
+          "Unsupported year_parameter_strategy for source cdl: mosaic_rule_by_attribute"
+        ],
+        "expected_substring": "Unsupported year_parameter_strategy",
+        "name": "unsupported_year_strategy",
+        "passed": true,
+        "time_seconds": 2e-06
+      },
+      {
+        "errors": [
+          "UnsupportedCRSTransform: EPSG:5070 -> EPSG:3857; install pyproj-backed transform support in a later milestone."
+        ],
+        "expected_substring": "UnsupportedCRSTransform: EPSG:5070 -> EPSG:3857",
+        "name": "unsupported_bbox_transform",
+        "passed": true,
+        "time_seconds": 9e-06
+      }
+    ]
+  },
+  "compile_execution_package_time_seconds": 0.008521,
+  "docs_presence_check": {
+    "expected": 5,
+    "items": [
+      {
+        "path": "docs/CONTRACT.md",
+        "present": true
+      },
+      {
+        "path": "docs/ADAPTERS.md",
+        "present": true
+      },
+      {
+        "path": "docs/GENERIC_HTTPS_TEMPLATE.md",
+        "present": true
+      },
+      {
+        "path": "docs/REAL_RASTER_URL_STRUCTURES.md",
+        "present": true
+      },
+      {
+        "path": "docs/SCHEMAS.md",
+        "present": true
+      }
+    ],
+    "missing": [],
+    "present": 5
+  },
+  "execution_package_eval": {
+    "adapter_counts": {
+      "arcgis_imageserver": 2
+    },
+    "cache_extension_counts": {
+      ".tiff": 2
+    },
+    "dag_validation_status": "PASS",
+    "dependency_count": 6,
+    "hashes": {
+      "cache_plan_sha256": "1d3a4241ef9e8ca7c3c83b2150b97a17ba54dd2796f5f659b0133a5a5e310490",
+      "execution_package_sha256": "44d1fe803ab88deb31497a66443815b16605e4bf1a5d3eb0c4eb2e39389489a3",
+      "failure_policy_sha256": "a2102a8f82112f044e027d2dcc82fd5d6ed13dc676848154306ddfe54f5d7cc5",
+      "jobs_sha256": "29c814e3fedbb69c80295e90b5c04e61df7aed04ffa56e115cce3a37230a339f"
+    },
+    "package_id": "fr_exec_51438d1287b43021",
+    "request_count": 2,
+    "source_counts": {
+      "cdl": 2
+    },
+    "stage_counts": {
+      "fetch": 2,
+      "harmonize": 2,
+      "inspect_output": 2,
+      "validate_download": 2
+    },
+    "total_job_count": 8,
+    "validation_status": "PASS"
+  },
+  "export_local_dry_run_scheduler_time_seconds": 0.002389,
+  "export_slurm_scheduler_time_seconds": 0.002526,
+  "golden_fixture_check": {
+    "expected": 23,
+    "items": [
+      {
+        "path": "tests/golden/source_registry_cdl.yaml",
+        "present": true
+      },
+      {
+        "path": "tests/golden/research_spec_preserve_bbox.json",
+        "present": true
+      },
+      {
+        "path": "tests/golden/research_spec_project_bbox.json",
+        "present": true
+      },
+      {
+        "path": "tests/golden/acquisition_manifest_preserve_bbox.jsonl",
+        "present": true
+      },
+      {
+        "path": "tests/golden/acquisition_manifest_project_bbox.jsonl",
+        "present": true
+      },
+      {
+        "path": "tests/golden/harmonization_plan_preserve_bbox.json",
+        "present": true
+      },
+      {
+        "path": "tests/golden/harmonization_plan_project_bbox.json",
+        "present": true
+      },
+      {
+        "path": "tests/golden/source_registry_generic.yaml",
+        "present": true
+      },
+      {
+        "path": "tests/golden/research_spec_generic_https.json",
+        "present": true
+      },
+      {
+        "path": "tests/golden/acquisition_manifest_generic_https.jsonl",
+        "present": true
+      },
+      {
+        "path": "tests/golden/harmonization_plan_generic_https.json",
+        "present": true
+      },
+      {
+        "path": "tests/golden/source_registry_annual_nlcd_aws_tile.yaml",
+        "present": true
+      },
+      {
+        "path": "tests/golden/source_registry_annual_nlcd_aws_mosaic.yaml",
+        "present": true
+      },
+      {
+        "path": "tests/golden/source_registry_prism_time_series_daily_zip.yaml",
+        "present": true
+      },
+      {
+        "path": "tests/golden/research_spec_nlcd_aws_tile.json",
+        "present": true
+      },
+      {
+        "path": "tests/golden/research_spec_nlcd_aws_mosaic.json",
+        "present": true
+      },
+      {
+        "path": "tests/golden/research_spec_prism_daily_zip.json",
+        "present": true
+      },
+      {
+        "path": "tests/golden/acquisition_manifest_nlcd_aws_tile.jsonl",
+        "present": true
+      },
+      {
+        "path": "tests/golden/acquisition_manifest_nlcd_aws_mosaic.jsonl",
+        "present": true
+      },
+      {
+        "path": "tests/golden/acquisition_manifest_prism_daily_zip.jsonl",
+        "present": true
+      },
+      {
+        "path": "tests/golden/harmonization_plan_nlcd_aws_tile.json",
+        "present": true
+      },
+      {
+        "path": "tests/golden/harmonization_plan_nlcd_aws_mosaic.json",
+        "present": true
+      },
+      {
+        "path": "tests/golden/harmonization_plan_prism_daily_zip.json",
+        "present": true
+      }
+    ],
+    "missing": [],
+    "present": 23
+  },
+  "harmonization_plan_path": "/home/dmsrsic/raster-work/projects/ohio_cdl_edges/plans/harmonization_plan.json",
+  "harmonization_plan_sha256": "4493ea4f494d589fc098bdb7744e07caef4bb15141a1877d12c9044205e4e2c6",
+  "harmonization_summary": {
+    "inputs": 2,
+    "project_id": "ohio_cdl_edge_dynamics_v001",
+    "resolution_m": 30,
+    "target_crs": "EPSG:5070",
+    "validation_checks": 7
+  },
+  "inspect_contract_golden_status": "PASS",
+  "inspect_contract_json_sane": true,
+  "inspect_contract_report": {
+    "errors": [],
+    "golden_check": {
+      "comparisons": [
+        {
+          "fixture": "acquisition_manifest_preserve_bbox.jsonl",
+          "matches": true
+        },
+        {
+          "fixture": "harmonization_plan_preserve_bbox.json",
+          "matches": true
+        },
+        {
+          "fixture": "acquisition_manifest_project_bbox.jsonl",
+          "matches": true
+        },
+        {
+          "fixture": "harmonization_plan_project_bbox.json",
+          "matches": true
+        },
+        {
+          "fixture": "acquisition_manifest_generic_https.jsonl",
+          "matches": true
+        },
+        {
+          "fixture": "harmonization_plan_generic_https.json",
+          "matches": true
+        },
+        {
+          "fixture": "acquisition_manifest_nlcd_aws_tile.jsonl",
+          "matches": true
+        },
+        {
+          "fixture": "harmonization_plan_nlcd_aws_tile.json",
+          "matches": true
+        },
+        {
+          "fixture": "acquisition_manifest_nlcd_aws_mosaic.jsonl",
+          "matches": true
+        },
+        {
+          "fixture": "harmonization_plan_nlcd_aws_mosaic.json",
+          "matches": true
+        },
+        {
+          "fixture": "acquisition_manifest_prism_daily_zip.jsonl",
+          "matches": true
+        },
+        {
+          "fixture": "harmonization_plan_prism_daily_zip.json",
+          "matches": true
+        }
+      ],
+      "drift": [],
+      "expected": 23,
+      "matches": 12,
+      "missing": [],
+      "present": 23,
+      "status": "PASS"
+    },
+    "overall_status": "PASS",
+    "package_version": "0.3.1",
+    "project_id": "ohio_cdl_edge_dynamics_v001",
+    "source_count": 1,
+    "sources": [
+      {
+        "acquisition_mode": "arcgis_export_image",
+        "adapter": "arcgis_imageserver",
+        "bbox_request_policy": "preserve_input_bbox_with_bboxsr",
+        "capability_status": "PASS",
+        "default_export_image_crs": "EPSG:3857",
+        "errors": [],
+        "max_height": 4097,
+        "max_width": 4097,
+        "product": "Cropland Data Layer",
+        "provider": "USDA_NASS",
+        "registry_key": "usda_nass_cdl_imageserver",
+        "resampling": "nearest",
+        "semantic_type": "categorical",
+        "service_crs": "EPSG:3857",
+        "source_id": "cdl",
+        "supported_crs_transform_status": "not_required",
+        "supports_bbox_crs_param": true,
+        "target_grid_crs": "EPSG:5070",
+        "year_parameter_strategy": "time_value"
+      }
+    ]
+  },
+  "inspect_contract_status": "PASS",
+  "inspect_contract_time_seconds": 0.07758,
+  "inspect_time_seconds": 0.000265,
+  "manifest_file_size_bytes": 1798,
+  "manifest_path": "/home/dmsrsic/raster-work/projects/ohio_cdl_edges/manifests/acquisition_manifest.jsonl",
+  "manifest_row_count": 2,
+  "manifest_sha256": "fd46106cde9e8c51b0aae26296b46a48ec75d65ca47ed4e911329723693151cc",
+  "manifest_summary": {
+    "by_source": {
+      "cdl": 2
+    },
+    "by_thematic_layer": {
+      "crop_type": 2
+    },
+    "by_year": {
+      "2023": 1,
+      "2024": 1
+    },
+    "records": 2,
+    "statuses": {
+      "planned": 2
+    }
+  },
+  "mixed_planning_benchmark": {
+    "adapter_counts": {
+      "arcgis_imageserver": 2,
+      "generic_https_template": 6
+    },
+    "peak_memory_mb": 0.016,
+    "planned_rows": 8,
+    "rows_per_second": 5910.336,
+    "time_seconds": 0.001354
+  },
+  "output_validation_eval": {
+    "example_failure_messages": [
+      "line 1: malformed JSONL: Expecting property name enclosed in double quotes",
+      "malformed JSON: Expecting property name enclosed in double quotes"
+    ],
+    "fail_count": 2,
+    "harmonization_inputs_checked": 2,
+    "harmonization_status": "PASS",
+    "manifest_rows_checked": 2,
+    "manifest_status": "PASS",
+    "pass_count": 2
+  },
+  "package_version": "0.3.1",
+  "peak_memory_mb": 1.202,
+  "plan_harmonization_time_seconds": 0.000187,
+  "plan_urls_time_seconds": 0.000702,
+  "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+  "pytest_durations": {
+    "exit_code": 0,
+    "output": "........................................................................ [ 56%]\n.......................................................                  [100%]\n============================= slowest 20 durations =============================\n0.03s call     tests/test_cli_integration.py::test_cli_inspect_contract_check_goldens_detects_drift\n0.02s call     tests/test_cli_integration.py::test_cli_inspect_contract_check_goldens_detects_present_goldens\n0.01s call     tests/test_cli_integration.py::test_cli_inspect_contract_no_network_access\n0.01s call     tests/test_cli_integration.py::test_cli_inspect_harmonization_prints_summary\n0.01s call     tests/test_cli_integration.py::test_cli_plan_harmonization_writes_plan_and_summary\n0.01s call     tests/test_cli_integration.py::test_cli_inspect_manifest_prints_summary\n0.01s call     tests/test_cli_integration.py::test_cli_plan_urls_writes_manifest_and_summary\n0.01s call     tests/test_cli_integration.py::test_cli_resolve_sources_summary\n0.01s call     tests/test_cli_integration.py::test_cli_validate_success\n0.01s call     tests/test_real_raster_url_structures.py::test_real_url_golden_byte_stability\n0.01s call     tests/test_cli_integration.py::test_cli_inspect_contract_passes_for_example\n0.01s call     tests/test_cli_integration.py::test_cli_inspect_contract_invalid_capability_returns_nonzero\n0.01s call     tests/test_cli_integration.py::test_cli_inspect_contract_json_emits_expected_fields\n0.01s call     tests/test_cli_integration.py::test_cli_inspect_contract_does_not_create_manifests\n0.01s setup    tests/test_harmonization_planning.py::test_golden_harmonization_plan_bytes_are_stable\n0.01s call     tests/test_generic_https_template.py::test_generic_url_template_byte_stability\n0.01s call     tests/test_generic_https_template.py::test_generic_missing_url_template_fails_clearly\n0.01s setup    tests/test_harmonization_planning.py::test_harmonization_plan_is_deterministic\n\n(2 durations < 0.005s hidden.  Use -vv to show these durations.)\n127 passed in 0.54s\n",
+    "time_seconds": 0.779646
+  },
+  "python_version": "3.12.13 | packaged by conda-forge | (main, Mar  5 2026, 16:50:00) [GCC 14.3.0]",
+  "resolve_time_seconds": 2.7e-05,
+  "rows_planned_per_second": 2849.003,
+  "scheduler_export_eval": {
+    "local_dry_run": {
+      "dag_validation_status": "PASS",
+      "dependency_count": 6,
+      "hashes": {
+        "README.md": "6de6ed731f41141536e09b8fcdfe126054b38ea942e68d94dba75890d6813f48",
+        "job_index.tsv": "998fa40833ef03617028868cf179597f2791ac4fcbf9e2644ae19cbf69c11e59",
+        "run_local_dry_run.sh": "a0d19c4e6adf87085406dbb480eaafc14a131b5ca0fe72f7e5559b73eb86b0c5",
+        "scheduler_summary.json": "ee937073fda84ffde3db6aee4a0ce34591f9ad83c57b1042dd99d25994316234"
+      },
+      "job_count": 8,
+      "notes": "Scheduler exports are dry-run artifacts only; no downloads are executed.",
+      "output_directory": "/home/dmsrsic/raster-work/faster-raster/reports/diagnostic_scheduler_local_dry_run",
+      "package_id": "fr_exec_51438d1287b43021",
+      "request_count": 2,
+      "scheduler": "local-dry-run",
+      "stage_counts": {
+        "fetch": 2,
+        "harmonize": 2,
+        "inspect_output": 2,
+        "validate_download": 2
+      }
+    },
+    "slurm": {
+      "dag_validation_status": "PASS",
+      "dependency_count": 6,
+      "hashes": {
+        "README.md": "1de9231a46e4b00d24b1c6a5484fe82ca1cae757b16eafb65e09cc7c43a9b3ce",
+        "job_index.tsv": "998fa40833ef03617028868cf179597f2791ac4fcbf9e2644ae19cbf69c11e59",
+        "scheduler_summary.json": "d42208cc0bc8aba9fdfd39021edb80ebbdb1239499e1fb222451f1b929a8a371",
+        "slurm_array.sh": "957222eaa6ea9396d461402078a7b0b26e362d9bb980b5ab9bb2dcd7af8e447a"
+      },
+      "job_count": 8,
+      "notes": "Scheduler exports are dry-run artifacts only; no downloads are executed.",
+      "output_directory": "/home/dmsrsic/raster-work/faster-raster/reports/diagnostic_scheduler_slurm",
+      "package_id": "fr_exec_51438d1287b43021",
+      "request_count": 2,
+      "scheduler": "slurm",
+      "stage_counts": {
+        "fetch": 2,
+        "harmonize": 2,
+        "inspect_output": 2,
+        "validate_download": 2
+      }
+    }
+  },
+  "schema_export_time_seconds": 0.006014,
+  "schema_hashes": {
+    "acquisition_manifest_row.schema.json": "c62e8ad4c19fa36dba0aa6aad07e2f05b9c47ba0e913a91b2eb7aa192d45172a",
+    "harmonization_plan.schema.json": "d2191bb2d806ee7a8131f347f4ae3cf0e38c9589f2c7d80cc6012dbcab598525",
+    "inspect_contract_report.schema.json": "745d35a53c866a501dfa8c7e131f5870a09cd159a24be556b4475fb35daca9db",
+    "research_spec.schema.json": "e423b213b5a7924d038bd76c42ef4eca38988b1b32757789aee8473fbd3daa86",
+    "source_registry.schema.json": "c3363bb9b0488af226a347828a6e5ecb01f2abf4ced46f75ecff6896257e4828"
+  },
+  "schema_presence_check": {
+    "expected": 5,
+    "items": [
+      {
+        "path": "schemas/research_spec.schema.json",
+        "present": true
+      },
+      {
+        "path": "schemas/source_registry.schema.json",
+        "present": true
+      },
+      {
+        "path": "schemas/acquisition_manifest_row.schema.json",
+        "present": true
+      },
+      {
+        "path": "schemas/harmonization_plan.schema.json",
+        "present": true
+      },
+      {
+        "path": "schemas/inspect_contract_report.schema.json",
+        "present": true
+      }
+    ],
+    "missing": [],
+    "present": 5
+  },
+  "schema_structural_status": {
+    "expected": 5,
+    "items": [
+      {
+        "path": "/home/dmsrsic/raster-work/faster-raster/schemas/research_spec.schema.json",
+        "present": true,
+        "required_count": 5,
+        "valid": true
+      },
+      {
+        "path": "/home/dmsrsic/raster-work/faster-raster/schemas/source_registry.schema.json",
+        "present": true,
+        "required_count": 1,
+        "valid": true
+      },
+      {
+        "path": "/home/dmsrsic/raster-work/faster-raster/schemas/acquisition_manifest_row.schema.json",
+        "present": true,
+        "required_count": 26,
+        "valid": true
+      },
+      {
+        "path": "/home/dmsrsic/raster-work/faster-raster/schemas/harmonization_plan.schema.json",
+        "present": true,
+        "required_count": 4,
+        "valid": true
+      },
+      {
+        "path": "/home/dmsrsic/raster-work/faster-raster/schemas/inspect_contract_report.schema.json",
+        "present": true,
+        "required_count": 6,
+        "valid": true
+      }
+    ],
+    "present": 5,
+    "valid": 5
+  },
+  "schema_structural_validation_status": "PASS",
+  "spec_path": "/home/dmsrsic/raster-work/projects/ohio_cdl_edges/research_spec.json",
+  "synthetic_performance": [
+    {
+      "first_request_id": "cdl_2023_crop_type_00000_tile_000001",
+      "last_request_id": "cdl_2024_crop_type_00049_tile_000001",
+      "peak_memory_mb": 0.115,
+      "planned_rows": 100,
+      "rows_per_second": 13126.908,
+      "target_rows": 100,
+      "time_seconds": 0.007618
+    },
+    {
+      "first_request_id": "cdl_2023_crop_type_00000_tile_000001",
+      "last_request_id": "cdl_2024_crop_type_00499_tile_000001",
+      "peak_memory_mb": 1.191,
+      "planned_rows": 1000,
+      "rows_per_second": 15050.866,
+      "target_rows": 1000,
+      "time_seconds": 0.066441
+    },
+    {
+      "first_request_id": "cdl_2023_crop_type_00000_tile_000001",
+      "last_request_id": "cdl_2024_crop_type_04999_tile_000001",
+      "peak_memory_mb": 11.915,
+      "planned_rows": 10000,
+      "rows_per_second": 17310.834,
+      "target_rows": 10000,
+      "time_seconds": 0.577673
+    }
+  ],
+  "total_time_seconds": 0.125365,
+  "validate_outputs_time_seconds": 0.001049,
+  "validate_time_seconds": 0.000312,
+  "working_directory": "/home/dmsrsic/raster-work/faster-raster"
+}

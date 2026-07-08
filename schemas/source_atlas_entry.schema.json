@@ -1,0 +1,224 @@
+{
+  "$id": "https://fasterraster.local/schemas/source_atlas_entry.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "access_mode": {
+      "enum": [
+        "static_https",
+        "parameterized_rest",
+        "arcgis_imageserver",
+        "thredds_ncss",
+        "thredds_catalog",
+        "opendap",
+        "grib_filter",
+        "stac_api",
+        "cmr_api",
+        "odata_api",
+        "s3_public",
+        "s3_requester_pays",
+        "authenticated_https",
+        "mirror_https",
+        "unknown_future"
+      ]
+    },
+    "access_pattern_category": {
+      "enum": [
+        "static_verified",
+        "service_discovered",
+        "api_discovered",
+        "credential_gated",
+        "mirror_candidate",
+        "future_unverified"
+      ]
+    },
+    "auth_not_implemented_reason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "bounded_probe_appropriate": {
+      "type": "boolean"
+    },
+    "checksum_metadata": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "credential_profile_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "credential_requirement": {
+      "enum": [
+        "none",
+        "bearer_token",
+        "earthdata_login",
+        "copernicus_token",
+        "usgs_m2m_token",
+        "aws_requester_pays",
+        "cookie_session",
+        "unknown"
+      ]
+    },
+    "deterministic_asset_resolution_after_discovery": {
+      "type": "boolean"
+    },
+    "deterministic_url_generation_direct": {
+      "type": "boolean"
+    },
+    "display_name": {
+      "type": "string"
+    },
+    "endpoint_or_catalog_url": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "expected_formats": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "last_probe_report": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "license_or_terms_url": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "native_crs_or_grid": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "nodata_metadata": {},
+    "notes": {
+      "type": "string"
+    },
+    "official_docs": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "promotion_status": {
+      "enum": [
+        "runtime_supported",
+        "experimental_probe_supported",
+        "research_only",
+        "blocked_by_auth",
+        "blocked_by_adapter"
+      ]
+    },
+    "provenance_class": {
+      "enum": [
+        "official_primary",
+        "official_cloud_mirror",
+        "institutional_mirror",
+        "community_mirror",
+        "rescued_archive_unverified",
+        "unknown"
+      ]
+    },
+    "provider": {
+      "type": "string"
+    },
+    "query_pattern": {
+      "type": "string"
+    },
+    "rate_limit_caveats": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "source_family": {
+      "type": "string"
+    },
+    "source_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "source_kind": {
+      "enum": [
+        "raster_grid",
+        "raster_service",
+        "climate_grid",
+        "weather_model",
+        "elevation",
+        "landcover",
+        "satellite_scene",
+        "station_or_point_service",
+        "catalog_only"
+      ]
+    },
+    "spatial_key_structure": {
+      "type": "string"
+    },
+    "target_crs_assumption": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "temporal_key_structure": {
+      "type": "string"
+    },
+    "trust_level": {
+      "enum": [
+        "verified_live",
+        "documented_official",
+        "documented_unverified",
+        "mirror_needs_validation",
+        "speculative"
+      ]
+    }
+  },
+  "required": [
+    "source_id",
+    "display_name",
+    "provider",
+    "source_family",
+    "source_kind",
+    "access_mode",
+    "access_pattern_category",
+    "provenance_class",
+    "trust_level",
+    "endpoint_or_catalog_url",
+    "query_pattern",
+    "deterministic_url_generation_direct",
+    "deterministic_asset_resolution_after_discovery",
+    "bounded_probe_appropriate",
+    "credential_profile_id",
+    "credential_requirement",
+    "auth_not_implemented_reason",
+    "expected_formats",
+    "native_crs_or_grid",
+    "target_crs_assumption",
+    "temporal_key_structure",
+    "spatial_key_structure",
+    "nodata_metadata",
+    "checksum_metadata",
+    "rate_limit_caveats",
+    "license_or_terms_url",
+    "official_docs",
+    "promotion_status",
+    "last_probe_report",
+    "notes"
+  ],
+  "title": "FasterRaster source atlas entry",
+  "type": "object"
+}

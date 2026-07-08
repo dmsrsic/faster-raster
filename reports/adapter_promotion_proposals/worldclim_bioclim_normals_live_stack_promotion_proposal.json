@@ -1,0 +1,18 @@
+{
+  "adapter_wave": "wave_1_static_range_http",
+  "endpoint_id": "worldclim_10m_prec_zip",
+  "evidence": {
+    "bytes_read": 65536,
+    "content_type": "application/zip",
+    "http_status": 206,
+    "result_class": "pass_range_limited",
+    "selected_url": "https://geodata.ucdavis.edu/climate/worldclim/2_1/base/wc2.1_10m_prec.zip",
+    "sha256": "9c647f5f3380f060ae1b599571ba6a4a703caf1453621d4cad3d443421fd5c09"
+  },
+  "experimental_adapter_candidate": true,
+  "live_source_id": "worldclim_normals",
+  "promotion_decision": "ready_for_experimental_static_range_adapter",
+  "required_next_step": "ready_for_experimental_static_range_adapter",
+  "runtime_promotion_allowed_now": false,
+  "source_id": "worldclim_bioclim_normals"
+}

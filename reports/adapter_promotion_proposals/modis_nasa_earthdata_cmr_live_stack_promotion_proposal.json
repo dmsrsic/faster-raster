@@ -1,0 +1,18 @@
+{
+  "adapter_wave": "wave_2_metadata_json_discovery_auth_caution",
+  "endpoint_id": "cmr_modis_collections_json",
+  "evidence": {
+    "bytes_read": 65536,
+    "content_type": "application/json;charset=utf-8",
+    "http_status": 200,
+    "result_class": "pass_bounded_truncated",
+    "selected_url": "https://cmr.earthdata.nasa.gov/search/collections.json?keyword=MODIS&page_size=5",
+    "sha256": "f9094076d7aab15eab90c82cf954aa9281ee6c8fb21fe3a801f527dfd812063e"
+  },
+  "experimental_adapter_candidate": false,
+  "live_source_id": "nasa_cmr_metadata",
+  "promotion_decision": "metadata_only_keep_auth_caution",
+  "required_next_step": "metadata_only_keep_auth_caution",
+  "runtime_promotion_allowed_now": false,
+  "source_id": "modis_nasa_earthdata_cmr"
+}

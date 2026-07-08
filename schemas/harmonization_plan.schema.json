@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "inputs": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "bbox_crs": {
+            "type": "string"
+          },
+          "export_image_crs": {
+            "type": "string"
+          },
+          "forbidden_resampling": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "planned_output": {
+            "type": "string"
+          },
+          "request_id": {
+            "type": "string"
+          },
+          "resampling": {
+            "enum": [
+              "nearest",
+              "mode",
+              "bilinear",
+              "cubic",
+              "lanczos",
+              "average"
+            ],
+            "type": "string"
+          },
+          "semantic_type": {
+            "enum": [
+              "categorical",
+              "continuous"
+            ],
+            "type": "string"
+          },
+          "source_bbox": {
+            "items": {
+              "type": "number"
+            },
+            "maxItems": 4,
+            "minItems": 4,
+            "type": "array"
+          },
+          "source_crs": {
+            "type": "string"
+          },
+          "target_crs": {
+            "type": "string"
+          },
+          "target_grid_crs": {
+            "type": "string"
+          },
+          "tile_height_pixels": {
+            "type": "integer"
+          },
+          "tile_planning_crs": {
+            "type": "string"
+          },
+          "tile_width_pixels": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "request_id",
+          "source_bbox",
+          "bbox_crs",
+          "source_crs",
+          "export_image_crs",
+          "target_crs",
+          "target_grid_crs",
+          "tile_width_pixels",
+          "tile_height_pixels",
+          "tile_planning_crs",
+          "semantic_type",
+          "resampling",
+          "forbidden_resampling",
+          "planned_output"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "project_id": {
+      "type": "string"
+    },
+    "target_grid": {
+      "additionalProperties": false,
+      "properties": {
+        "crs": {
+          "type": "string"
+        },
+        "nodata": {
+          "type": "number"
+        },
+        "resolution_m": {
+          "type": "number"
+        },
+        "snap": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "crs",
+        "resolution_m",
+        "nodata",
+        "snap"
+      ],
+      "type": "object"
+    },
+    "validation_checks": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "project_id",
+    "target_grid",
+    "inputs",
+    "validation_checks"
+  ],
+  "title": "FasterRaster harmonization_plan.json",
+  "type": "object"
+}

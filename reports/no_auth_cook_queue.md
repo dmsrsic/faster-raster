@@ -1,0 +1,9 @@
+# No-Auth Cook Queue
+
+| Rank | Sauce | Status | Score | Action |
+| ---: | --- | --- | ---: | --- |
+| 1 | `gridmet_daily` | `blocked_by_endpoint_uncertainty` | 200 | write metadata-only adapter/probe design |
+| 2 | `noaa_gfs_nomads_grib_filter` | `blocked_by_endpoint_uncertainty` | 199 | write metadata-only adapter/probe design |
+| 3 | `noaa_ncei_service_class` | `blocked_by_endpoint_uncertainty` | 198 | write metadata-only adapter/probe design |
+| 4 | `terraclimate_monthly` | `blocked_by_endpoint_uncertainty` | 197 | write metadata-only adapter/probe design |
+| 5 | `usgs_3dep_dem` | `blocked_by_endpoint_uncertainty` | 196 | write metadata-only adapter/probe design |

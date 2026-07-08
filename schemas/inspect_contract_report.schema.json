@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "errors": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "overall_status": {
+      "enum": [
+        "PASS",
+        "FAIL"
+      ],
+      "type": "string"
+    },
+    "package_version": {
+      "type": "string"
+    },
+    "project_id": {
+      "type": "string"
+    },
+    "source_count": {
+      "type": "integer"
+    },
+    "sources": {
+      "items": {
+        "additionalProperties": true,
+        "properties": {
+          "acquisition_mode": {
+            "type": "string"
+          },
+          "adapter": {
+            "enum": [
+              "arcgis_imageserver",
+              "generic_https_template"
+            ],
+            "type": "string"
+          },
+          "bbox_request_policy": {
+            "enum": [
+              "preserve_input_bbox_with_bboxsr",
+              "project_bbox_to_service_crs",
+              "no_bbox_url_template"
+            ],
+            "type": "string"
+          },
+          "capability_status": {
+            "enum": [
+              "PASS",
+              "FAIL"
+            ],
+            "type": "string"
+          },
+          "default_export_image_crs": {
+            "type": "string"
+          },
+          "errors": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "max_height": {
+            "type": "integer"
+          },
+          "max_width": {
+            "type": "integer"
+          },
+          "product": {
+            "type": "string"
+          },
+          "provider": {
+            "type": "string"
+          },
+          "registry_key": {
+            "type": "string"
+          },
+          "resampling": {
+            "enum": [
+              "nearest",
+              "mode",
+              "bilinear",
+              "cubic",
+              "lanczos",
+              "average"
+            ],
+            "type": "string"
+          },
+          "semantic_type": {
+            "enum": [
+              "categorical",
+              "continuous"
+            ],
+            "type": "string"
+          },
+          "service_crs": {
+            "type": "string"
+          },
+          "source_id": {
+            "type": "string"
+          },
+          "supported_crs_transform_status": {
+            "type": "string"
+          },
+          "supports_bbox_crs_param": {
+            "type": "boolean"
+          },
+          "target_grid_crs": {
+            "type": "string"
+          },
+          "year_parameter_strategy": {
+            "enum": [
+              "time_value",
+              "mosaic_rule_by_attribute"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "source_id",
+          "registry_key",
+          "capability_status",
+          "errors"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "package_version",
+    "project_id",
+    "source_count",
+    "sources",
+    "overall_status",
+    "errors"
+  ],
+  "title": "FasterRaster inspect-contract report",
+  "type": "object"
+}

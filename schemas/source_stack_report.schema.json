@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "candidate_source_count": {
+      "type": "integer"
+    },
+    "source_results": {
+      "type": "array"
+    },
+    "stack_status": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "stack_status",
+    "candidate_source_count",
+    "source_results"
+  ],
+  "title": "FasterRaster source stack report",
+  "type": "object"
+}
