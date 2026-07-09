@@ -44,3 +44,10 @@ faster-raster task preview-real example_corn_belt_water_balance --allow-network 
 ```
 
 Dry-run remains the default when `--allow-network` is omitted.
+
+
+## v0.5.8 Credential-Gated Sentinel Planning
+
+Tasks may include `copernicus_sentinel2_l2a_cdse_stac` as a credential-gated source. The example `example_corn_belt_water_balance_plus_sentinel` keeps PRISM, CDL, USGS 3DEP, and Sentinel-2 together for semantic planning without requiring credentials.
+
+Preview commands remain dry-run by default. Sentinel-2 CDSE is represented as a planned credential-gated layer; no live STAC search or product download is performed by task preview.

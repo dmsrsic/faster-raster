@@ -1,0 +1,39 @@
+{
+  "active_visual_layer_count": 3,
+  "adapter_needed_layer_count": 1,
+  "compositing_formula": "opacity = clamp(0.18, 0.92, base_opacity / log2(n + 1)); first meaningful real raster base >= 0.72",
+  "fallback_layer_count": 2,
+  "layer_opacity_plan": [
+    {
+      "base_opacity": 0.5,
+      "opacity": 0.25,
+      "render_kind": "semantic_fallback",
+      "role": "semantic_overlay",
+      "source_id": "prism_daily_ppt_static_zip",
+      "status": "semantic_fallback",
+      "transparency_pct": 75
+    },
+    {
+      "base_opacity": 0.92,
+      "opacity": 0.72,
+      "render_kind": "real_raster",
+      "role": "real_raster_base",
+      "source_id": "cdl_arcgis_tiny_export",
+      "status": "real_raster_rendered",
+      "transparency_pct": 28
+    },
+    {
+      "base_opacity": 0.5,
+      "opacity": 0.25,
+      "render_kind": "semantic_fallback",
+      "role": "semantic_overlay",
+      "source_id": "usgs_3dep_dem",
+      "status": "adapter_needed",
+      "transparency_pct": 75
+    }
+  ],
+  "real_layer_count": 1,
+  "semantic_layer_count": 2,
+  "stack_compositor_version": "0.5.8",
+  "task_id": "example_corn_belt_water_balance"
+}

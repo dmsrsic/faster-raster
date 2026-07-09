@@ -121,3 +121,12 @@ Options:
 - `--sample-grid-size` sets a 1..7 sample grid; `--grid-size` is an alias.
 - `--preview-expand-factor` expands only the preview fetch bbox around the task AOI centroid. It does not mutate task YAML.
 - `--cdl-render-mode` accepts `auto`, `service_png`, `manual_samples`, or `service_tiff`.
+
+
+## Copernicus/CDSE Commands
+
+`faster-raster copernicus auth-check --plain` checks whether CDSE environment variables are present without printing token values.
+
+`faster-raster copernicus sentinel search-plan TASK_ID --plain` writes a dry-run STAC search plan to `reports/copernicus/`. Use `--json` for the same plan as JSON output. The command does not make a network request.
+
+Supported local environment variables are `CDSE_ACCESS_TOKEN`, `CDSE_REFRESH_TOKEN`, `CDSE_USERNAME`, `CDSE_PASSWORD`, and `CDSE_CLIENT_ID`. Keep them in your shell or an ignored local file such as `configs/auth_profiles.local.yaml`; do not commit credentials.

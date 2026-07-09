@@ -14,6 +14,7 @@ from typing import Any
 from urllib.parse import urlencode
 
 from faster_raster import stack_preview
+from faster_raster import preview_compositor
 from faster_raster.task_builder import TASK_PREVIEWS_DIR, validate_task
 
 CACHE_DIR = TASK_PREVIEWS_DIR / "cache"
@@ -26,6 +27,18 @@ DEFAULT_PREVIEW_EXPAND_FACTOR = 1.0
 ALLOWED_CDL_RENDER_MODES = {"auto", "service_png", "manual_samples", "service_tiff"}
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
 SUPPORTED_REAL_SOURCES = {"cdl_arcgis_tiny_export", "daymet_single_pixel_prcp_rest"}
+CDL_EXPORT_CANDIDATE_ORDER = [
+    ("no_time", "png32"),
+    ("no_time", "png"),
+    ("time_mid_year_epoch", "png32"),
+    ("time_mid_year_epoch", "png"),
+    ("time_year_interval", "png32"),
+    ("time_year_interval", "png"),
+    ("mosaic_year_eq", "png32"),
+    ("mosaic_year_eq", "png"),
+    ("time_year_string", "png32"),
+    ("time_year_string", "png"),
+]
 
 
 def _utc_now() -> str:
@@ -110,7 +123,15 @@ def sample_points_for_bbox(bbox: list[float], grid_size: int) -> list[tuple[floa
     return points
 
 
-def cdl_preview_url(task: dict[str, Any], *, max_pixels: int, preview_size: int = DEFAULT_PREVIEW_SIZE, image_format: str = "png32", preview_fetch_bbox: list[float] | None = None) -> str:
+def cdl_preview_url(
+    task: dict[str, Any],
+    *,
+    max_pixels: int,
+    preview_size: int = DEFAULT_PREVIEW_SIZE,
+    image_format: str = "png32",
+    preview_fetch_bbox: list[float] | None = None,
+    time_strategy: str = "time_year_string",
+) -> str:
     width = effective_preview_size(preview_size, max_pixels)
     height = width
     bbox_values = preview_fetch_bbox or task["aoi"]["bbox"]
@@ -124,16 +145,63 @@ def cdl_preview_url(task: dict[str, Any], *, max_pixels: int, preview_size: int 
         "format": image_format,
         "transparent": "false",
         "f": "image",
-        "time": str(year),
     }
+    if time_strategy == "time_year_string":
+        params["time"] = str(year)
+    elif time_strategy == "time_mid_year_epoch":
+        params["time"] = str(int(datetime(year, 7, 1, tzinfo=timezone.utc).timestamp() * 1000))
+    elif time_strategy == "time_year_interval":
+        start = int(datetime(year, 1, 1, tzinfo=timezone.utc).timestamp() * 1000)
+        end = int(datetime(year + 1, 1, 1, tzinfo=timezone.utc).timestamp() * 1000) - 1
+        params["time"] = f"{start},{end}"
+    elif time_strategy == "mosaic_year_eq":
+        params["mosaicRule"] = json.dumps(
+            {
+                "mosaicMethod": "esriMosaicAttribute",
+                "where": f"Year = {year}",
+                "sortField": "Year",
+                "sortValue": str(year),
+            },
+            separators=(",", ":"),
+        )
+    elif time_strategy != "no_time":
+        raise ValueError(f"invalid CDL time strategy: {time_strategy}")
     return "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?" + urlencode(sorted(params.items()))
+
+
+def cdl_export_candidates(
+    task: dict[str, Any],
+    *,
+    max_pixels: int,
+    preview_size: int = DEFAULT_PREVIEW_SIZE,
+    preview_fetch_bbox: list[float] | None = None,
+) -> list[dict[str, Any]]:
+    candidates: list[dict[str, Any]] = []
+    for index, (time_strategy, image_format) in enumerate(CDL_EXPORT_CANDIDATE_ORDER, start=1):
+        url = cdl_preview_url(
+            task,
+            max_pixels=max_pixels,
+            preview_size=preview_size,
+            image_format=image_format,
+            preview_fetch_bbox=preview_fetch_bbox,
+            time_strategy=time_strategy,
+        )
+        candidates.append({
+            "candidate_index": index,
+            "candidate_id": f"{time_strategy}_{image_format}",
+            "time_strategy": time_strategy,
+            "format": image_format,
+            "url": url,
+            "url_redacted": redact_url(url),
+        })
+    return candidates
 
 
 def cdl_attempt_urls(task: dict[str, Any], *, max_pixels: int, preview_size: int = DEFAULT_PREVIEW_SIZE, preview_fetch_bbox: list[float] | None = None, cdl_render_mode: str = "auto") -> list[str]:
     mode = normalize_cdl_render_mode(cdl_render_mode)
-    formats = ["png32", "png"] if mode == "auto" else ["png32"] if mode in {"service_png", "manual_samples"} else ["tiff"]
-    return [cdl_preview_url(task, max_pixels=max_pixels, preview_size=preview_size, image_format=fmt, preview_fetch_bbox=preview_fetch_bbox) for fmt in formats]
-
+    if mode == "service_tiff":
+        return [cdl_preview_url(task, max_pixels=max_pixels, preview_size=preview_size, image_format="tiff", preview_fetch_bbox=preview_fetch_bbox)]
+    return [candidate["url"] for candidate in cdl_export_candidates(task, max_pixels=max_pixels, preview_size=preview_size, preview_fetch_bbox=preview_fetch_bbox)]
 
 
 def cdl_identify_url(task: dict[str, Any], point: tuple[float, float], *, preview_fetch_bbox: list[float]) -> str:
@@ -335,10 +403,21 @@ def diagnose_image(data: bytes, *, content_type: str | None = None, bytes_read: 
         "nontransparent_pixel_count": nontransparent,
         "transparent_pixel_fraction": transparent_fraction,
         "diversity_score": diversity_score,
-        "is_probably_placeholder": mostly_single or tiny,
+        "is_probably_placeholder": mostly_single or (tiny and not pixels),
         "is_mostly_single_class": mostly_single,
         "diagnostic_notes": notes,
     }
+
+
+def is_meaningful_export_image(diagnostics: dict[str, Any]) -> bool:
+    dominant = diagnostics.get("dominant_color_fraction")
+    return (
+        (diagnostics.get("unique_color_count") or 0) > 2
+        and (diagnostics.get("nontransparent_pixel_count") or 0) > 0
+        and dominant is not None
+        and dominant < 0.95
+        and not diagnostics.get("is_probably_placeholder")
+    )
 
 
 def cache_response(task_id: str, source_id: str, data: bytes, content_type: str | None) -> Path:
@@ -391,6 +470,14 @@ def empty_source_result(source_id: str, theme: str | None = None) -> dict[str, A
         "preview_fetch_bbox": None,
         "error": None,
         "warning": None,
+        "export_candidate_count": 0,
+        "selected_export_candidate": None,
+        "selected_export_time_strategy": None,
+        "selected_export_format": None,
+        "export_candidates": [],
+        "export_cascade_run": False,
+        "export_cascade_success": False,
+        "export_cascade_reason": None,
     }
 
 
@@ -402,6 +489,8 @@ def plan_source(task: dict[str, Any], source_id: str, *, max_pixels: int, includ
             "render_kind": "real_raster",
             "url_redacted": redact_url(cdl_attempt_urls(task, max_pixels=max_pixels, preview_size=preview_size, preview_fetch_bbox=preview_fetch_bbox, cdl_render_mode=cdl_render_mode)[0]),
             "attempted_urls_redacted": [redact_url(url) for url in cdl_attempt_urls(task, max_pixels=max_pixels, preview_size=preview_size, preview_fetch_bbox=preview_fetch_bbox, cdl_render_mode=cdl_render_mode)],
+            "export_candidate_count": len(cdl_export_candidates(task, max_pixels=max_pixels, preview_size=preview_size, preview_fetch_bbox=preview_fetch_bbox)),
+            "export_candidates": [{k: v for k, v in candidate.items() if k != "url"} for candidate in cdl_export_candidates(task, max_pixels=max_pixels, preview_size=preview_size, preview_fetch_bbox=preview_fetch_bbox)],
             "warning": "requires --allow-network to fetch tiny CDL preview",
             "sample_grid_size": sample_grid_size,
             "preview_fetch_bbox": preview_fetch_bbox or task["aoi"]["bbox"],
@@ -426,6 +515,112 @@ def plan_source(task: dict[str, Any], source_id: str, *, max_pixels: int, includ
     return result
 
 
+def fetch_cdl_source(
+    task: dict[str, Any],
+    result: dict[str, Any],
+    *,
+    max_bytes_per_source: int,
+    max_pixels: int,
+    timeout_seconds: int,
+    cache_raw: bool,
+    preview_size: int,
+    preview_fetch_bbox: list[float] | None,
+    cdl_verify_samples: bool,
+    sample_grid_size: int,
+) -> dict[str, Any]:
+    candidates = cdl_export_candidates(task, max_pixels=max_pixels, preview_size=preview_size, preview_fetch_bbox=preview_fetch_bbox)
+    result["export_cascade_run"] = True
+    result["export_candidate_count"] = len(candidates)
+    result["export_candidates"] = []
+    result["attempted_urls_redacted"] = []
+    result["preview_fetch_bbox"] = preview_fetch_bbox or task["aoi"]["bbox"]
+    result["sample_grid_size"] = normalize_sample_grid_size(sample_grid_size)
+    last_error: Exception | None = None
+    last_diagnostics: dict[str, Any] | None = None
+
+    for candidate in candidates:
+        result["url_redacted"] = candidate["url_redacted"]
+        result["attempted_urls_redacted"].append(candidate["url_redacted"])
+        candidate_report = {k: v for k, v in candidate.items() if k != "url"}
+        try:
+            fetched = read_bounded_url(candidate["url"], max_bytes=max_bytes_per_source, timeout_seconds=timeout_seconds)
+            diagnostics = diagnose_image(fetched["data"], content_type=fetched["content_type"], bytes_read=fetched["bytes_read"])
+            last_diagnostics = diagnostics
+            meaningful = is_meaningful_export_image(diagnostics)
+            candidate_report.update({
+                "http_status": fetched["http_status"],
+                "content_type": fetched["content_type"],
+                "bytes_read": fetched["bytes_read"],
+                "sha256": fetched["sha256"],
+                "meaningful": meaningful,
+                **diagnostics,
+            })
+            result["export_candidates"].append(candidate_report)
+            if meaningful:
+                result.update({k: fetched[k] for k in ["http_status", "content_type", "bytes_read", "sha256"]})
+                if cache_raw:
+                    result["cache_path"] = str(cache_response(task["task_id"], result["source_id"], fetched["data"], fetched["content_type"]))
+                result.update(diagnostics)
+                result["service_png_diagnostics"] = diagnostics
+                result["rendered"] = True
+                result["real_raster_rendered"] = True
+                result["render_kind"] = "real_raster"
+                result["status"] = "real_raster_rendered"
+                result["cdl_meaningful"] = True
+                result["warning"] = None
+                result["selected_export_candidate"] = candidate["candidate_id"]
+                result["selected_export_time_strategy"] = candidate["time_strategy"]
+                result["selected_export_format"] = candidate["format"]
+                result["export_cascade_success"] = True
+                result["export_cascade_reason"] = "selected_first_meaningful_export_image"
+                return result
+        except Exception as exc:
+            last_error = exc
+            candidate_report.update({"meaningful": False, "error": str(exc)})
+            result["export_candidates"].append(candidate_report)
+            continue
+
+    result["export_cascade_success"] = False
+    result["export_cascade_reason"] = "no_candidate_passed_meaningful_image_gate"
+    if last_diagnostics:
+        result.update(last_diagnostics)
+        result["service_png_diagnostics"] = last_diagnostics
+
+    if cdl_verify_samples and last_diagnostics is not None:
+        verification = verify_cdl_samples(task, preview_fetch_bbox=result["preview_fetch_bbox"], sample_grid_size=sample_grid_size, max_bytes_per_source=max_bytes_per_source, timeout_seconds=timeout_seconds)
+        result.update(verification)
+        result["attempted_urls_redacted"] = (result.get("attempted_urls_redacted") or []) + verification["attempted_urls_redacted"]
+        if verification["cdl_meaningful"]:
+            result["rendered"] = True
+            result["status"] = "real_data_verified_manual_samples"
+            result["render_kind"] = "real_categorical_samples"
+            result["real_raster_rendered"] = False
+            result["real_point_or_sample_data_rendered"] = True
+            result["renderer_problem_suspected"] = True
+            result["no_data_suspected"] = False
+            result["warning"] = "CDL export cascade found no meaningful image; identify samples found meaningful class values"
+            return result
+
+    if result.get("sample_verification_attempted") and not result.get("cdl_meaningful"):
+        result["warning"] = "CDL preview response was single-color and identify returned no meaningful class values"
+
+    if last_error and last_diagnostics is None:
+        result["status"] = "fetch_failed"
+        result["error"] = str(last_error)
+        result["warning"] = "real fetch failed; semantic fallback used"
+        return result
+
+    result["rendered"] = False
+    result["status"] = "no_data_or_placeholder"
+    result["render_kind"] = "no_data_or_placeholder"
+    result["real_raster_rendered"] = False
+    result["cdl_meaningful"] = False
+    result["renderer_problem_suspected"] = False
+    result["no_data_suspected"] = True
+    result["warning"] = result.get("warning") or "CDL export cascade found no meaningful image candidate"
+    return result
+
+
 def fetch_source(
     task: dict[str, Any],
     source_id: str,
@@ -447,6 +642,19 @@ def fetch_source(
         return result
     urls = result.get("attempted_urls_redacted") or [result["url_redacted"]]
     result["attempted"] = True
+    if source_id == "cdl_arcgis_tiny_export" and cdl_render_mode != "service_tiff":
+        return fetch_cdl_source(
+            task,
+            result,
+            max_bytes_per_source=max_bytes_per_source,
+            max_pixels=max_pixels,
+            timeout_seconds=timeout_seconds,
+            cache_raw=cache_raw,
+            preview_size=preview_size,
+            preview_fetch_bbox=preview_fetch_bbox,
+            cdl_verify_samples=cdl_verify_samples,
+            sample_grid_size=sample_grid_size,
+        )
     last_error: Exception | None = None
     for url in urls:
         result["url_redacted"] = url
@@ -540,6 +748,10 @@ def recommended_next_action(source_results: list[dict[str, Any]]) -> str:
     return "real_preview_ok"
 
 
+def stack_compositor_fields(source_results: list[dict[str, Any]]) -> dict[str, Any]:
+    return preview_compositor.compute_stack_opacity_plan(source_results)
+
+
 def build_real_preview_plan(
     task: dict[str, Any],
     *,
@@ -565,6 +777,7 @@ def build_real_preview_plan(
     warnings = list(summary["warnings"])
     warnings.extend(result["warning"] for result in source_results if result.get("warning"))
     counts = _counts(source_results)
+    stack_fields = stack_compositor_fields(source_results)
     return {
         "task_id": task["task_id"],
         "generated_at_utc": _utc_now(),
@@ -577,6 +790,10 @@ def build_real_preview_plan(
         "max_pixels": max_pixels,
         "preview_size": effective_preview_size(preview_size, max_pixels),
         "cdl_verification_run": False,
+        "cdl_export_cascade_run": any(result.get("export_cascade_run") for result in source_results),
+        "cdl_export_cascade_success": any(result.get("export_cascade_success") for result in source_results),
+        "cdl_selected_time_strategy": next((result.get("selected_export_time_strategy") for result in source_results if result.get("selected_export_time_strategy")), None),
+        "cdl_selected_candidate": next((result.get("selected_export_candidate") for result in source_results if result.get("selected_export_candidate")), None),
         "cdl_verify_samples_planned": bool(cdl_verify_samples),
         "sample_grid_size": sample_grid_size,
         "preview_expand_factor": preview_expand_factor,
@@ -594,6 +811,7 @@ def build_real_preview_plan(
         "cdl_meaningful_preview": False,
         "recommended_next_action": "no_real_raster_rendered",
         **counts,
+        **stack_fields,
         "png_path": None,
         "md_path": str(TASK_PREVIEWS_DIR / f"{task['task_id']}_real_preview_plan.md"),
     }
@@ -650,6 +868,36 @@ def _write_png(path: Path, width: int, height: int, img: bytearray) -> None:
     path.write_bytes(png)
 
 
+def _blend_px(img: bytearray, width: int, height: int, x: int, y: int, color: list[int], opacity: float) -> None:
+    if 0 <= x < width and 0 <= y < height:
+        i = (y * width + x) * 3
+        current = img[i:i + 3]
+        blended = [int(current[j] * (1 - opacity) + color[j] * opacity) for j in range(3)]
+        img[i:i + 3] = bytes(blended)
+
+
+def overlay_semantic_pattern(img: bytearray, width: int, height: int, x: int, y: int, w: int, h: int, result: dict[str, Any], opacity: float) -> None:
+    source_id = result.get("source_id", "")
+    if source_id == "prism_daily_ppt_static_zip":
+        color = [40, 170, 210]
+        for yy in range(h):
+            for xx in range(w):
+                if (xx + yy) % 18 < 4:
+                    _blend_px(img, width, height, x + xx, y + yy, color, opacity)
+    elif source_id == "usgs_3dep_dem":
+        color = [100, 115, 130]
+        for yy in range(0, h, 28):
+            for xx in range(w):
+                wave = int(8 * math.sin(xx / 28.0))
+                for t in range(2):
+                    _blend_px(img, width, height, x + xx, y + min(h - 1, yy + wave + t), color, opacity)
+    else:
+        color = [185, 145, 75]
+        for yy in range(0, h, 16):
+            for xx in range(0, w, 16):
+                _blend_px(img, width, height, x + xx, y + yy, color, opacity)
+
+
 def draw_cached_raster(img: bytearray, width: int, height: int, result: dict[str, Any], x: int, y: int, w: int, h: int) -> None:
     pixels = []
     if result.get("cache_path"):
@@ -685,6 +933,12 @@ def render_real_preview_png(task: dict[str, Any], report: dict[str, Any], png_pa
     else:
         _rect(img, width, height, 58, 142, 540, 340, [210, 215, 222])
         _text(img, width, height, 150, 298, "NO REAL RASTER LAYER RENDERED", [92, 70, 70], 2)
+    opacity_by_source = {item["source_id"]: item["opacity"] for item in report.get("layer_opacity_plan", [])}
+    for result in report["source_results"]:
+        if result is raster_result:
+            continue
+        if result.get("render_kind") == "semantic_fallback" or result.get("status") == "adapter_needed":
+            overlay_semantic_pattern(img, width, height, 58, 142, 540, 340, result, opacity_by_source.get(result.get("source_id"), 0.3))
     for gx in range(58, 599, 90):
         _rect(img, width, height, gx, 142, 1, 340, [70, 92, 112])
     for gy in range(142, 483, 68):
@@ -720,7 +974,9 @@ def render_real_preview_png(task: dict[str, Any], report: dict[str, Any], png_pa
     for result in report["source_results"][:8]:
         color = [67, 150, 91] if result["rendered"] else [175, 135, 69] if result["attempted"] else [128, 135, 145]
         _rect(img, width, height, side_x, y, 18, 18, color)
-        label = f"{result['source_id']} {result['status']} {result['bytes_read']}B"
+        opacity = opacity_by_source.get(result.get("source_id"))
+        opacity_text = "" if opacity is None else f" OP {opacity}"
+        label = f"{result['source_id']} {result['status']} {result['bytes_read']}B{opacity_text}"
         _text(img, width, height, side_x + 28, y + 2, label, [35, 52, 72], 1)
         y += 26
     y += 8
@@ -795,6 +1051,7 @@ def create_real_preview(
     warnings = list(summary["warnings"])
     warnings.extend(result["warning"] for result in source_results if result.get("warning"))
     counts = _counts(source_results)
+    stack_fields = stack_compositor_fields(source_results)
     generated_at_utc = _utc_now()
     TASK_PREVIEWS_DIR.mkdir(parents=True, exist_ok=True)
     png_path = TASK_PREVIEWS_DIR / f"{task['task_id']}_real_stack_preview.png"
@@ -812,6 +1069,10 @@ def create_real_preview(
         "max_pixels": max_pixels,
         "preview_size": effective_preview_size(preview_size, max_pixels),
         "cdl_verification_run": any(result.get("sample_verification_attempted") for result in source_results),
+        "cdl_export_cascade_run": any(result.get("export_cascade_run") for result in source_results),
+        "cdl_export_cascade_success": any(result.get("export_cascade_success") for result in source_results),
+        "cdl_selected_time_strategy": next((result.get("selected_export_time_strategy") for result in source_results if result.get("selected_export_time_strategy")), None),
+        "cdl_selected_candidate": next((result.get("selected_export_candidate") for result in source_results if result.get("selected_export_candidate")), None),
         "cdl_verify_samples_planned": bool(cdl_verify_samples),
         "sample_grid_size": sample_grid_size,
         "preview_expand_factor": preview_expand_factor,
@@ -832,8 +1093,10 @@ def create_real_preview(
         "md_path": str(md_path),
         "preview_json": str(json_path),
         **counts,
+        **stack_fields,
     }
     render_real_preview_png(task, report, png_path)
+    preview_compositor.write_stack_transparency_ledger(report, TASK_PREVIEWS_DIR / f"{task['task_id']}_stack_transparency_ledger.json")
     json_path.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     lines = [
         f"# Real Data Stack Preview {task['task_id']}",

@@ -85,3 +85,14 @@ Options:
 - `--sample-grid-size` sets a 1..7 sample grid; `--grid-size` is an alias.
 - `--preview-expand-factor` expands only the preview fetch bbox around the task AOI centroid. It does not mutate task YAML.
 - `--cdl-render-mode` accepts `auto`, `service_png`, `manual_samples`, or `service_tiff`.
+
+
+## v0.5.8 CDL Export Cascade and Stacked Preview
+
+CDL real preview no longer assumes `time=2023` is the only valid exportImage path. The preview runner now tries a bounded candidate cascade in this order: `no_time png32`, `no_time png`, mid-year epoch time, year interval time, mosaic-rule year equality, and finally year string time, each in `png32` then `png` where applicable.
+
+The first response with more than two unique colors, nontransparent pixels, dominant color below 95%, and no placeholder diagnosis becomes the selected real raster. This reflects the manual audit where the task-expanded AOI rendered meaningful CDL pixels only when the `time` parameter was omitted. Identify/sample verification is still retained as fallback evidence when exportImage does not produce meaningful image pixels.
+
+Stacked real-preview rendering now records a transparency ledger. The formula is `opacity = clamp(0.18, 0.92, base_opacity / log2(n + 1))`; the first meaningful real raster base is held at least `0.72` opacity so CDL remains readable, while semantic and warning overlays stay translucent.
+
+Credential-gated layers such as Copernicus Sentinel-2 CDSE appear as planned/credential-gated semantic layers unless explicit auth and future opt-in live commands are added. No preview run mutates task YAML.

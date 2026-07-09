@@ -13,3 +13,5 @@ htmlcov/
 venv/
 configs/user_toggles.live-cook-local.yaml
 configs/*local*.yaml
+configs/auth_profiles.local.yaml
+configs/*secret*.yaml

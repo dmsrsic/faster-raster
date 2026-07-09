@@ -1,6 +1,6 @@
 # Source Atlas Lint
 
 - Status: `PASS`
-- Source count: `26`
+- Source count: `27`
 - Findings: `0`
 

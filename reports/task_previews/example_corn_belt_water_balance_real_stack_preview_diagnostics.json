@@ -1,7 +1,5 @@
 {
-  "diagnostic_summary": [
-    "cdl_arcgis_tiny_export: mostly single class/color; AOI may be too small or uniform"
-  ],
+  "diagnostic_summary": [],
   "source_results": [
     {
       "attempted": false,
@@ -15,6 +13,11 @@
       "dominant_color": null,
       "dominant_color_fraction": null,
       "error": null,
+      "export_candidate_count": 0,
+      "export_candidates": [],
+      "export_cascade_reason": null,
+      "export_cascade_run": false,
+      "export_cascade_success": false,
       "http_status": null,
       "image_height": null,
       "image_mode": null,
@@ -33,6 +36,9 @@
       "sample_results": [],
       "sample_values_count": 0,
       "sample_verification_attempted": false,
+      "selected_export_candidate": null,
+      "selected_export_format": null,
+      "selected_export_time_strategy": null,
       "service_png_diagnostics": null,
       "sha256": null,
       "source_id": "prism_daily_ppt_static_zip",
@@ -47,403 +53,112 @@
     {
       "attempted": true,
       "attempted_urls_redacted": [
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.24500000%2C39.75500000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.22000000%2C39.75500000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.19500000%2C39.75500000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.17000000%2C39.75500000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.14500000%2C39.75500000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.24500000%2C39.78000000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.22000000%2C39.78000000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.19500000%2C39.78000000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.17000000%2C39.78000000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.14500000%2C39.78000000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.24500000%2C39.80500000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.22000000%2C39.80500000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.19500000%2C39.80500000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.17000000%2C39.80500000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.14500000%2C39.80500000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.24500000%2C39.83000000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.22000000%2C39.83000000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.19500000%2C39.83000000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.17000000%2C39.83000000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.14500000%2C39.83000000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.24500000%2C39.85500000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.22000000%2C39.85500000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.19500000%2C39.85500000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.17000000%2C39.85500000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.14500000%2C39.85500000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.24500000%2C39.75500000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.22000000%2C39.75500000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.19500000%2C39.75500000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.17000000%2C39.75500000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.14500000%2C39.75500000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.24500000%2C39.78000000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.22000000%2C39.78000000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.19500000%2C39.78000000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.17000000%2C39.78000000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.14500000%2C39.78000000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.24500000%2C39.80500000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.22000000%2C39.80500000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.19500000%2C39.80500000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.17000000%2C39.80500000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.14500000%2C39.80500000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.24500000%2C39.83000000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.22000000%2C39.83000000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.19500000%2C39.83000000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.17000000%2C39.83000000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.14500000%2C39.83000000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.24500000%2C39.85500000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.22000000%2C39.85500000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.19500000%2C39.85500000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.17000000%2C39.85500000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.14500000%2C39.85500000&geometryType=esriGeometryPoint&imageDisplay=512%2C512%2C96&mapExtent=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&returnCatalogItems=false&returnGeometry=false&sr=4326&time=2023&tolerance=1"
+        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?bbox=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&bboxSR=4326&f=image&format=png32&imageSR=4326&size=512%2C512&transparent=false"
       ],
-      "bytes_read": 1097,
-      "cache_path": "reports/task_previews/cache/example_corn_belt_water_balance_cdl_arcgis_tiny_export_b262bd68d44f9363.png",
-      "cdl_meaningful": false,
+      "bytes_read": 74523,
+      "cache_path": "reports/task_previews/cache/example_corn_belt_water_balance_cdl_arcgis_tiny_export_1cb4875beee09d2f.png",
+      "cdl_meaningful": true,
       "content_type": "image/png",
-      "diagnostic_notes": [
-        "mostly single class/color; AOI may be too small or uniform"
-      ],
-      "diversity_score": 0.03125,
+      "diagnostic_notes": [],
+      "diversity_score": 0.8125,
       "dominant_color": [
+        38,
+        112,
         0,
-        0,
-        0,
-        0
+        255
       ],
-      "dominant_color_fraction": 1.0,
+      "dominant_color_fraction": 0.256500244140625,
       "error": null,
+      "export_candidate_count": 10,
+      "export_candidates": [
+        {
+          "bytes_read": 74523,
+          "candidate_id": "no_time_png32",
+          "candidate_index": 1,
+          "content_type": "image/png",
+          "diagnostic_notes": [],
+          "diversity_score": 0.8125,
+          "dominant_color": [
+            38,
+            112,
+            0,
+            255
+          ],
+          "dominant_color_fraction": 0.256500244140625,
+          "format": "png32",
+          "http_status": 200,
+          "image_height": 512,
+          "image_mode": "RGBA",
+          "image_width": 512,
+          "is_mostly_single_class": false,
+          "is_probably_placeholder": false,
+          "meaningful": true,
+          "nontransparent_pixel_count": 65536,
+          "sha256": "1cb4875beee09d2f17442208982f4e16e010369e7bfec90e65415439e17e19a5",
+          "time_strategy": "no_time",
+          "transparent_pixel_fraction": 0.0,
+          "unique_color_count": 26,
+          "url_redacted": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?bbox=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&bboxSR=4326&f=image&format=png32&imageSR=4326&size=512%2C512&transparent=false"
+        }
+      ],
+      "export_cascade_reason": "selected_first_meaningful_export_image",
+      "export_cascade_run": true,
+      "export_cascade_success": true,
       "http_status": 200,
       "image_height": 512,
       "image_mode": "RGBA",
       "image_width": 512,
-      "is_mostly_single_class": true,
-      "is_probably_placeholder": true,
-      "no_data_suspected": true,
-      "nontransparent_pixel_count": 0,
+      "is_mostly_single_class": false,
+      "is_probably_placeholder": false,
+      "no_data_suspected": false,
+      "nontransparent_pixel_count": 65536,
       "preview_fetch_bbox": [
         -83.245,
         39.755,
         -83.145,
         39.855
       ],
-      "real_raster_rendered": false,
-      "render_kind": "no_data_or_placeholder",
-      "rendered": false,
+      "real_raster_rendered": true,
+      "render_kind": "real_raster",
+      "rendered": true,
       "renderer_problem_suspected": false,
       "sample_class_names": [],
       "sample_grid_size": 5,
-      "sample_points_count": 25,
-      "sample_results": [
-        {
-          "bytes_read": 226,
-          "class_name": "Pixel",
-          "http_status": 200,
-          "meaningful": false,
-          "point": [
-            -83.245,
-            39.755
-          ],
-          "value": "NoData"
-        },
-        {
-          "bytes_read": 226,
-          "class_name": "Pixel",
-          "http_status": 200,
-          "meaningful": false,
-          "point": [
-            -83.22,
-            39.755
-          ],
-          "value": "NoData"
-        },
-        {
-          "bytes_read": 226,
-          "class_name": "Pixel",
-          "http_status": 200,
-          "meaningful": false,
-          "point": [
-            -83.195,
-            39.755
-          ],
-          "value": "NoData"
-        },
-        {
-          "bytes_read": 226,
-          "class_name": "Pixel",
-          "http_status": 200,
-          "meaningful": false,
-          "point": [
-            -83.17,
-            39.755
-          ],
-          "value": "NoData"
-        },
-        {
-          "bytes_read": 226,
-          "class_name": "Pixel",
-          "http_status": 200,
-          "meaningful": false,
-          "point": [
-            -83.145,
-            39.755
-          ],
-          "value": "NoData"
-        },
-        {
-          "bytes_read": 226,
-          "class_name": "Pixel",
-          "http_status": 200,
-          "meaningful": false,
-          "point": [
-            -83.245,
-            39.78
-          ],
-          "value": "NoData"
-        },
-        {
-          "bytes_read": 226,
-          "class_name": "Pixel",
-          "http_status": 200,
-          "meaningful": false,
-          "point": [
-            -83.22,
-            39.78
-          ],
-          "value": "NoData"
-        },
-        {
-          "bytes_read": 226,
-          "class_name": "Pixel",
-          "http_status": 200,
-          "meaningful": false,
-          "point": [
-            -83.195,
-            39.78
-          ],
-          "value": "NoData"
-        },
-        {
-          "bytes_read": 226,
-          "class_name": "Pixel",
-          "http_status": 200,
-          "meaningful": false,
-          "point": [
-            -83.17,
-            39.78
-          ],
-          "value": "NoData"
-        },
-        {
-          "bytes_read": 226,
-          "class_name": "Pixel",
-          "http_status": 200,
-          "meaningful": false,
-          "point": [
-            -83.145,
-            39.78
-          ],
-          "value": "NoData"
-        },
-        {
-          "bytes_read": 214,
-          "class_name": "Pixel",
-          "http_status": 200,
-          "meaningful": false,
-          "point": [
-            -83.245,
-            39.805
-          ],
-          "value": "NoData"
-        },
-        {
-          "bytes_read": 214,
-          "class_name": "Pixel",
-          "http_status": 200,
-          "meaningful": false,
-          "point": [
-            -83.22,
-            39.805
-          ],
-          "value": "NoData"
-        },
-        {
-          "bytes_read": 214,
-          "class_name": "Pixel",
-          "http_status": 200,
-          "meaningful": false,
-          "point": [
-            -83.195,
-            39.805
-          ],
-          "value": "NoData"
-        },
-        {
-          "bytes_read": 214,
-          "class_name": "Pixel",
-          "http_status": 200,
-          "meaningful": false,
-          "point": [
-            -83.17,
-            39.805
-          ],
-          "value": "NoData"
-        },
-        {
-          "bytes_read": 214,
-          "class_name": "Pixel",
-          "http_status": 200,
-          "meaningful": false,
-          "point": [
-            -83.145,
-            39.805
-          ],
-          "value": "NoData"
-        },
-        {
-          "bytes_read": 226,
-          "class_name": "Pixel",
-          "http_status": 200,
-          "meaningful": false,
-          "point": [
-            -83.245,
-            39.83
-          ],
-          "value": "NoData"
-        },
-        {
-          "bytes_read": 226,
-          "class_name": "Pixel",
-          "http_status": 200,
-          "meaningful": false,
-          "point": [
-            -83.22,
-            39.83
-          ],
-          "value": "NoData"
-        },
-        {
-          "bytes_read": 226,
-          "class_name": "Pixel",
-          "http_status": 200,
-          "meaningful": false,
-          "point": [
-            -83.195,
-            39.83
-          ],
-          "value": "NoData"
-        },
-        {
-          "bytes_read": 226,
-          "class_name": "Pixel",
-          "http_status": 200,
-          "meaningful": false,
-          "point": [
-            -83.17,
-            39.83
-          ],
-          "value": "NoData"
-        },
-        {
-          "bytes_read": 226,
-          "class_name": "Pixel",
-          "http_status": 200,
-          "meaningful": false,
-          "point": [
-            -83.145,
-            39.83
-          ],
-          "value": "NoData"
-        },
-        {
-          "bytes_read": 226,
-          "class_name": "Pixel",
-          "http_status": 200,
-          "meaningful": false,
-          "point": [
-            -83.245,
-            39.855
-          ],
-          "value": "NoData"
-        },
-        {
-          "bytes_read": 226,
-          "class_name": "Pixel",
-          "http_status": 200,
-          "meaningful": false,
-          "point": [
-            -83.22,
-            39.855
-          ],
-          "value": "NoData"
-        },
-        {
-          "bytes_read": 226,
-          "class_name": "Pixel",
-          "http_status": 200,
-          "meaningful": false,
-          "point": [
-            -83.195,
-            39.855
-          ],
-          "value": "NoData"
-        },
-        {
-          "bytes_read": 226,
-          "class_name": "Pixel",
-          "http_status": 200,
-          "meaningful": false,
-          "point": [
-            -83.17,
-            39.855
-          ],
-          "value": "NoData"
-        },
-        {
-          "bytes_read": 226,
-          "class_name": "Pixel",
-          "http_status": 200,
-          "meaningful": false,
-          "point": [
-            -83.145,
-            39.855
-          ],
-          "value": "NoData"
-        }
-      ],
+      "sample_points_count": 0,
+      "sample_results": [],
       "sample_values_count": 0,
-      "sample_verification_attempted": true,
+      "sample_verification_attempted": false,
+      "selected_export_candidate": "no_time_png32",
+      "selected_export_format": "png32",
+      "selected_export_time_strategy": "no_time",
       "service_png_diagnostics": {
-        "diagnostic_notes": [
-          "mostly single class/color; AOI may be too small or uniform"
-        ],
-        "diversity_score": 0.03125,
+        "diagnostic_notes": [],
+        "diversity_score": 0.8125,
         "dominant_color": [
+          38,
+          112,
           0,
-          0,
-          0,
-          0
+          255
         ],
-        "dominant_color_fraction": 1.0,
+        "dominant_color_fraction": 0.256500244140625,
         "image_height": 512,
         "image_mode": "RGBA",
         "image_width": 512,
-        "is_mostly_single_class": true,
-        "is_probably_placeholder": true,
-        "nontransparent_pixel_count": 0,
-        "transparent_pixel_fraction": 1.0,
-        "unique_color_count": 1
+        "is_mostly_single_class": false,
+        "is_probably_placeholder": false,
+        "nontransparent_pixel_count": 65536,
+        "transparent_pixel_fraction": 0.0,
+        "unique_color_count": 26
       },
-      "sha256": "b262bd68d44f93637b9949caf7ff7ce0b6b6ed839c3a2468681952b215ec4d95",
+      "sha256": "1cb4875beee09d2f17442208982f4e16e010369e7bfec90e65415439e17e19a5",
       "source_id": "cdl_arcgis_tiny_export",
-      "status": "no_data_or_placeholder",
+      "status": "real_raster_rendered",
       "theme": null,
-      "transparent_pixel_fraction": 1.0,
-      "unique_color_count": 1,
+      "transparent_pixel_fraction": 0.0,
+      "unique_color_count": 26,
       "unique_sample_values": [],
-      "url_redacted": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?bbox=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&bboxSR=4326&f=image&format=png32&imageSR=4326&size=512%2C512&time=2023&transparent=false",
-      "warning": "CDL preview response was single-color and identify returned no meaningful class values"
+      "url_redacted": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?bbox=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&bboxSR=4326&f=image&format=png32&imageSR=4326&size=512%2C512&transparent=false",
+      "warning": null
     },
     {
       "attempted": false,
@@ -457,6 +172,11 @@
       "dominant_color": null,
       "dominant_color_fraction": null,
       "error": null,
+      "export_candidate_count": 0,
+      "export_candidates": [],
+      "export_cascade_reason": null,
+      "export_cascade_run": false,
+      "export_cascade_success": false,
       "http_status": null,
       "image_height": null,
       "image_mode": null,
@@ -475,6 +195,9 @@
       "sample_results": [],
       "sample_values_count": 0,
       "sample_verification_attempted": false,
+      "selected_export_candidate": null,
+      "selected_export_format": null,
+      "selected_export_time_strategy": null,
       "service_png_diagnostics": null,
       "sha256": null,
       "source_id": "usgs_3dep_dem",

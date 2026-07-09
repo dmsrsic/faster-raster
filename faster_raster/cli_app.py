@@ -14,6 +14,8 @@ from faster_raster import cli_lingo
 from faster_raster import user_toggles
 from faster_raster import task_builder
 from faster_raster import real_preview
+from faster_raster import copernicus_auth
+from faster_raster.adapters import copernicus_cdse
 
 sources_app = typer.Typer(no_args_is_help=True)
 stack_app = typer.Typer(no_args_is_help=True)
@@ -25,6 +27,8 @@ toggles_app = typer.Typer(no_args_is_help=True)
 cook_app = typer.Typer(no_args_is_help=True)
 knobs_app = typer.Typer(no_args_is_help=False, invoke_without_command=True)
 task_app = typer.Typer(no_args_is_help=True)
+copernicus_app = typer.Typer(no_args_is_help=True)
+copernicus_sentinel_app = typer.Typer(no_args_is_help=True)
 
 
 def emit(value, *, json_output: bool = False, plain: bool = False, no_color: bool = False, plain_text: str | None = None, table: tuple[str, list[str], list[list]] | None = None) -> None:
@@ -539,6 +543,39 @@ def task_preview_real(
     emit(report, json_output=json_output, plain=True, plain_text=text)
 
 
+@copernicus_app.command("auth-check")
+def copernicus_auth_check(json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
+    report = copernicus_auth.validate_cdse_auth_presence()
+    report["network_run"] = False
+    text = (
+        f"auth_present: {report['auth_present']}\n"
+        f"auth_method: {report['auth_method']}\n"
+        f"token_present: {report['token_present']}\n"
+        f"username_present: {report['username_present']}\n"
+        "network_run: False\n"
+    )
+    emit(report, json_output=json_output, plain=True, plain_text=text)
+
+
+@copernicus_sentinel_app.command("search-plan")
+def copernicus_sentinel_search_plan(
+    task_id: str,
+    cloud_cover_max: int = typer.Option(30, "--cloud-cover-max"),
+    json_output: bool = typer.Option(False, "--json"),
+    plain: bool = typer.Option(False, "--plain"),
+) -> None:
+    plan = copernicus_cdse.create_search_plan(task_id, cloud_cover_max=cloud_cover_max)
+    text = (
+        f"search_plan_json: {plan['json_path']}\n"
+        f"search_plan_md: {plan['md_path']}\n"
+        f"source_id: {plan['source_id']}\n"
+        f"collection: {plan['collection']}\n"
+        f"auth_present: {plan['auth_present']}\n"
+        "network_run: False\n"
+    )
+    emit(plan, json_output=json_output, plain=True, plain_text=text)
+
+
 @stack_app.command("preview")
 def stack_preview(task_id: str, open_after_create: bool = typer.Option(False, "--open"), json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
     task_preview(task_id, open_after_create=open_after_create, json_output=json_output, plain=plain)
@@ -591,6 +628,8 @@ def register_product_commands(app: typer.Typer) -> None:
     app.add_typer(sources_app, name="sources")
     app.add_typer(stack_app, name="stack")
     app.add_typer(task_app, name="task")
+    copernicus_app.add_typer(copernicus_sentinel_app, name="sentinel")
+    app.add_typer(copernicus_app, name="copernicus")
     app.add_typer(unlocks_app, name="unlocks")
     app.add_typer(auth_app, name="auth")
     app.add_typer(probe_app, name="probe")

@@ -4,14 +4,15 @@ build-backend = "hatchling.build"
 
 [project]
 name = "faster-raster"
-version = "0.5.7"
+version = "0.5.8"
 description = "Deterministic raster URL planning and harmonization planning."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
   "pydantic>=2.7",
   "typer>=0.12",
-  "PyYAML>=6.0"
+  "PyYAML>=6.0",
+  "Pillow>=10.0"
 ]
 
 [project.optional-dependencies]

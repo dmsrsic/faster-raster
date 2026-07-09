@@ -104,3 +104,28 @@ sources:
     temporal_frequency: daily
     max_width: 4097
     max_height: 4097
+
+  copernicus_sentinel2_l2a_cdse_stac:
+    adapter: copernicus_cdse_stac
+    provider: COPERNICUS_CDSE
+    product: Sentinel-2 L2A
+    base_url: https://stac.dataspace.copernicus.eu/v1/
+    collection: sentinel-2-l2a
+    discovery: CDSE STAC API
+    access_pattern: api_discovered_credential_gated
+    credential_requirement: bearer_token
+    auth: CDSE bearer token / OAuth token
+    preview_download: credential-gated; no default download
+    status: scaffolded_credential_gated
+    bounded_probes: dry-run only unless --allow-network and --auth-profile provided
+    deterministic_asset_resolution: after_stac_discovery
+    real_raster_preview: future Sentinel Hub Process API or bounded asset thumbnail path
+    semantic_type: continuous
+    native_crs: UTM tile CRS
+    default_export_image_crs: EPSG:4326
+    bbox_request_policy: no_bbox_url_template
+    supports_bbox_crs_param: false
+    supports_tiling: false
+    default_format: SAFE/COG assets
+    max_width: 0
+    max_height: 0

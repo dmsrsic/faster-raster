@@ -273,3 +273,61 @@ def test_multicolor_cdl_png_remains_real_raster_rendered(tmp_path, monkeypatch):
     assert result["render_kind"] == "real_raster"
     assert result["sample_verification_attempted"] is False
     assert report["real_raster_layer_count"] == 1
+
+
+
+def test_cdl_candidate_cascade_selects_no_time_and_records_attempts(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    meaningful = png_bytes([[10, 80, 20], [220, 210, 30], [40, 40, 200], [180, 70, 90]])
+
+    seen_urls = []
+    def fake_urlopen(request, timeout=0):
+        url = getattr(request, "full_url", str(request))
+        seen_urls.append(url)
+        assert "time=" not in url
+        return FakeResponse(meaningful, "image/png")
+
+    monkeypatch.setattr(real_preview.urllib.request, "urlopen", fake_urlopen)
+    report = real_preview.create_real_preview(task_with_sources(["cdl_arcgis_tiny_export"]), allow_network=True, max_bytes_per_source=2000)
+    result = report["source_results"][0]
+    assert result["export_cascade_run"] is True
+    assert result["export_cascade_success"] is True
+    assert result["selected_export_time_strategy"] == "no_time"
+    assert result["selected_export_format"] == "png32"
+    assert result["selected_export_candidate"] == "no_time_png32"
+    assert len(result["export_candidates"]) == 1
+    assert report["cdl_selected_time_strategy"] == "no_time"
+    assert report["cdl_selected_candidate"] == "no_time_png32"
+    assert report["real_raster_data_rendered"] is True
+    assert report["cdl_meaningful_preview"] is True
+    assert seen_urls
+
+
+def test_cdl_candidate_cascade_tries_until_meaningful(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    placeholder = png_bytes([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
+    meaningful = png_bytes([[10, 80, 20], [220, 210, 30], [40, 40, 200], [180, 70, 90]])
+    calls = {"count": 0}
+
+    def fake_urlopen(request, timeout=0):
+        calls["count"] += 1
+        return FakeResponse(placeholder if calls["count"] == 1 else meaningful, "image/png")
+
+    monkeypatch.setattr(real_preview.urllib.request, "urlopen", fake_urlopen)
+    report = real_preview.create_real_preview(task_with_sources(["cdl_arcgis_tiny_export"]), allow_network=True, max_bytes_per_source=2000)
+    result = report["source_results"][0]
+    assert calls["count"] == 2
+    assert len(result["export_candidates"]) == 2
+    assert result["selected_export_candidate"] == "no_time_png"
+
+
+def test_cdl_black_png_no_candidate_becomes_no_data_without_samples(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    black = png_bytes([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
+    monkeypatch.setattr(real_preview.urllib.request, "urlopen", lambda *a, **k: FakeResponse(black, "image/png"))
+    report = real_preview.create_real_preview(task_with_sources(["cdl_arcgis_tiny_export"]), allow_network=True, cdl_verify_samples=False)
+    result = report["source_results"][0]
+    assert result["export_cascade_run"] is True
+    assert result["export_cascade_success"] is False
+    assert result["status"] == "no_data_or_placeholder"
+    assert result["rendered"] is False

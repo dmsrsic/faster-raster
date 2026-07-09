@@ -1,0 +1,32 @@
+task_id: example_corn_belt_water_balance_plus_sentinel
+name: Corn Belt water balance demo plus Sentinel-2
+description: Local planning task for precipitation, landcover, elevation, and credential-gated Sentinel-2 planning.
+aoi:
+  bbox:
+  - -83.2
+  - 39.8
+  - -83.19
+  - 39.81
+  bbox_crs: EPSG:4326
+target_grid:
+  crs: EPSG:5070
+  resolution_m: 30
+time:
+  years:
+  - 2023
+  dates: []
+themes:
+- precipitation
+- landcover
+- elevation
+- sentinel2
+sources:
+- prism_daily_ppt_static_zip
+- cdl_arcgis_tiny_export
+- usgs_3dep_dem
+- copernicus_sentinel2_l2a_cdse_stac
+preview:
+  color_scheme: default
+  open_after_create: false
+notes:
+- Sentinel-2 CDSE source is credential-gated and dry-run planned only in v0.5.8.

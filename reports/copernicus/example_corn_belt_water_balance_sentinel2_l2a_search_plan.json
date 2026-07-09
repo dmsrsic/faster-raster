@@ -1,0 +1,50 @@
+{
+  "auth_method": "none",
+  "auth_present": false,
+  "bbox": [
+    -83.2,
+    39.8,
+    -83.19,
+    39.81
+  ],
+  "cloud_cover_max": 30,
+  "collection": "sentinel-2-l2a",
+  "credential_required": true,
+  "datetime_range": "2023-01-01T00:00:00Z/2023-12-31T23:59:59Z",
+  "endpoint": "https://stac.dataspace.copernicus.eu/v1/",
+  "headers_preview": {
+    "User-Agent": "FasterRaster-CDSE-scaffold/0.5.8"
+  },
+  "network_run": false,
+  "next_live_command": "faster-raster copernicus sentinel search example_corn_belt_water_balance --allow-network --auth-profile cdse_local --plain",
+  "query_payload": {
+    "bbox": [
+      -83.2,
+      39.8,
+      -83.19,
+      39.81
+    ],
+    "collections": [
+      "sentinel-2-l2a"
+    ],
+    "datetime": "2023-01-01T00:00:00Z/2023-12-31T23:59:59Z",
+    "limit": 10,
+    "query": {
+      "eo:cloud_cover": {
+        "lte": 30
+      }
+    },
+    "sortby": [
+      {
+        "direction": "asc",
+        "field": "properties.eo:cloud_cover"
+      }
+    ]
+  },
+  "search_url": "https://stac.dataspace.copernicus.eu/v1/search",
+  "source_id": "copernicus_sentinel2_l2a_cdse_stac",
+  "task_id": "example_corn_belt_water_balance",
+  "warnings": [
+    "Dry-run search plan only; no live CDSE STAC request was made."
+  ]
+}

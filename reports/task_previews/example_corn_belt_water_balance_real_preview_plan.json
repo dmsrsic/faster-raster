@@ -1,4 +1,6 @@
 {
+  "active_visual_layer_count": 3,
+  "adapter_needed_layer_count": 1,
   "bbox": [
     -83.2,
     39.8,
@@ -6,13 +8,48 @@
     39.81
   ],
   "bbox_crs": "EPSG:4326",
+  "cdl_export_cascade_run": false,
+  "cdl_export_cascade_success": false,
   "cdl_meaningful_preview": false,
   "cdl_render_mode": "auto",
+  "cdl_selected_candidate": null,
+  "cdl_selected_time_strategy": null,
   "cdl_verification_run": false,
   "cdl_verify_samples_planned": true,
+  "compositing_formula": "opacity = clamp(0.18, 0.92, base_opacity / log2(n + 1)); first meaningful real raster base >= 0.72",
   "diagnostic_summary": [],
-  "generated_at_utc": "2026-07-09T03:17:15Z",
+  "fallback_layer_count": 3,
+  "generated_at_utc": "2026-07-09T15:01:49Z",
   "json_path": "reports/task_previews/example_corn_belt_water_balance_real_preview_plan.json",
+  "layer_opacity_plan": [
+    {
+      "base_opacity": 0.5,
+      "opacity": 0.25,
+      "render_kind": "semantic_fallback",
+      "role": "semantic_overlay",
+      "source_id": "prism_daily_ppt_static_zip",
+      "status": "semantic_fallback",
+      "transparency_pct": 75
+    },
+    {
+      "base_opacity": 0.92,
+      "opacity": 0.46,
+      "render_kind": "real_raster",
+      "role": "real_raster_base",
+      "source_id": "cdl_arcgis_tiny_export",
+      "status": "supported_real_preview",
+      "transparency_pct": 54
+    },
+    {
+      "base_opacity": 0.5,
+      "opacity": 0.25,
+      "render_kind": "semantic_fallback",
+      "role": "semantic_overlay",
+      "source_id": "usgs_3dep_dem",
+      "status": "adapter_needed",
+      "transparency_pct": 75
+    }
+  ],
   "layers": [
     {
       "color": [
@@ -53,23 +90,25 @@
   "md_path": "reports/task_previews/example_corn_belt_water_balance_real_preview_plan.md",
   "network_run": false,
   "png_path": null,
-  "preview_expand_factor": 10.0,
+  "preview_expand_factor": 1.0,
   "preview_fetch_bbox": [
-    -83.245,
-    39.755,
-    -83.145,
-    39.855
+    -83.2,
+    39.8,
+    -83.19,
+    39.81
   ],
   "preview_size": 512,
   "real_data_preview": true,
   "real_fetch_attempted": false,
+  "real_layer_count": 0,
   "real_point_layer_count": 0,
   "real_raster_data_rendered": false,
   "real_raster_layer_count": 0,
   "real_sample_layer_count": 0,
   "recommended_next_action": "no_real_raster_rendered",
-  "sample_grid_size": 5,
+  "sample_grid_size": 3,
   "semantic_fallback_count": 3,
+  "semantic_layer_count": 2,
   "semantic_preview": true,
   "skipped_count": 3,
   "source_count": 3,
@@ -86,6 +125,11 @@
       "dominant_color": null,
       "dominant_color_fraction": null,
       "error": null,
+      "export_candidate_count": 0,
+      "export_candidates": [],
+      "export_cascade_reason": null,
+      "export_cascade_run": false,
+      "export_cascade_success": false,
       "http_status": null,
       "image_height": null,
       "image_mode": null,
@@ -104,6 +148,9 @@
       "sample_results": [],
       "sample_values_count": 0,
       "sample_verification_attempted": false,
+      "selected_export_candidate": null,
+      "selected_export_format": null,
+      "selected_export_time_strategy": null,
       "service_png_diagnostics": null,
       "sha256": null,
       "source_id": "prism_daily_ppt_static_zip",
@@ -118,8 +165,16 @@
     {
       "attempted": false,
       "attempted_urls_redacted": [
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?bbox=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&bboxSR=4326&f=image&format=png32&imageSR=4326&size=512%2C512&time=2023&transparent=false",
-        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?bbox=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&bboxSR=4326&f=image&format=png&imageSR=4326&size=512%2C512&time=2023&transparent=false"
+        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?bbox=-83.20000000%2C39.80000000%2C-83.19000000%2C39.81000000&bboxSR=4326&f=image&format=png32&imageSR=4326&size=512%2C512&transparent=false",
+        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?bbox=-83.20000000%2C39.80000000%2C-83.19000000%2C39.81000000&bboxSR=4326&f=image&format=png&imageSR=4326&size=512%2C512&transparent=false",
+        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?bbox=-83.20000000%2C39.80000000%2C-83.19000000%2C39.81000000&bboxSR=4326&f=image&format=png32&imageSR=4326&size=512%2C512&time=1688169600000&transparent=false",
+        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?bbox=-83.20000000%2C39.80000000%2C-83.19000000%2C39.81000000&bboxSR=4326&f=image&format=png&imageSR=4326&size=512%2C512&time=1688169600000&transparent=false",
+        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?bbox=-83.20000000%2C39.80000000%2C-83.19000000%2C39.81000000&bboxSR=4326&f=image&format=png32&imageSR=4326&size=512%2C512&time=1672531200000%2C1704067199999&transparent=false",
+        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?bbox=-83.20000000%2C39.80000000%2C-83.19000000%2C39.81000000&bboxSR=4326&f=image&format=png&imageSR=4326&size=512%2C512&time=1672531200000%2C1704067199999&transparent=false",
+        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?bbox=-83.20000000%2C39.80000000%2C-83.19000000%2C39.81000000&bboxSR=4326&f=image&format=png32&imageSR=4326&mosaicRule=%7B%22mosaicMethod%22%3A%22esriMosaicAttribute%22%2C%22where%22%3A%22Year+%3D+2023%22%2C%22sortField%22%3A%22Year%22%2C%22sortValue%22%3A%222023%22%7D&size=512%2C512&transparent=false",
+        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?bbox=-83.20000000%2C39.80000000%2C-83.19000000%2C39.81000000&bboxSR=4326&f=image&format=png&imageSR=4326&mosaicRule=%7B%22mosaicMethod%22%3A%22esriMosaicAttribute%22%2C%22where%22%3A%22Year+%3D+2023%22%2C%22sortField%22%3A%22Year%22%2C%22sortValue%22%3A%222023%22%7D&size=512%2C512&transparent=false",
+        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?bbox=-83.20000000%2C39.80000000%2C-83.19000000%2C39.81000000&bboxSR=4326&f=image&format=png32&imageSR=4326&size=512%2C512&time=2023&transparent=false",
+        "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?bbox=-83.20000000%2C39.80000000%2C-83.19000000%2C39.81000000&bboxSR=4326&f=image&format=png&imageSR=4326&size=512%2C512&time=2023&transparent=false"
       ],
       "bytes_read": 0,
       "cache_path": null,
@@ -130,6 +185,82 @@
       "dominant_color": null,
       "dominant_color_fraction": null,
       "error": null,
+      "export_candidate_count": 10,
+      "export_candidates": [
+        {
+          "candidate_id": "no_time_png32",
+          "candidate_index": 1,
+          "format": "png32",
+          "time_strategy": "no_time",
+          "url_redacted": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?bbox=-83.20000000%2C39.80000000%2C-83.19000000%2C39.81000000&bboxSR=4326&f=image&format=png32&imageSR=4326&size=512%2C512&transparent=false"
+        },
+        {
+          "candidate_id": "no_time_png",
+          "candidate_index": 2,
+          "format": "png",
+          "time_strategy": "no_time",
+          "url_redacted": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?bbox=-83.20000000%2C39.80000000%2C-83.19000000%2C39.81000000&bboxSR=4326&f=image&format=png&imageSR=4326&size=512%2C512&transparent=false"
+        },
+        {
+          "candidate_id": "time_mid_year_epoch_png32",
+          "candidate_index": 3,
+          "format": "png32",
+          "time_strategy": "time_mid_year_epoch",
+          "url_redacted": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?bbox=-83.20000000%2C39.80000000%2C-83.19000000%2C39.81000000&bboxSR=4326&f=image&format=png32&imageSR=4326&size=512%2C512&time=1688169600000&transparent=false"
+        },
+        {
+          "candidate_id": "time_mid_year_epoch_png",
+          "candidate_index": 4,
+          "format": "png",
+          "time_strategy": "time_mid_year_epoch",
+          "url_redacted": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?bbox=-83.20000000%2C39.80000000%2C-83.19000000%2C39.81000000&bboxSR=4326&f=image&format=png&imageSR=4326&size=512%2C512&time=1688169600000&transparent=false"
+        },
+        {
+          "candidate_id": "time_year_interval_png32",
+          "candidate_index": 5,
+          "format": "png32",
+          "time_strategy": "time_year_interval",
+          "url_redacted": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?bbox=-83.20000000%2C39.80000000%2C-83.19000000%2C39.81000000&bboxSR=4326&f=image&format=png32&imageSR=4326&size=512%2C512&time=1672531200000%2C1704067199999&transparent=false"
+        },
+        {
+          "candidate_id": "time_year_interval_png",
+          "candidate_index": 6,
+          "format": "png",
+          "time_strategy": "time_year_interval",
+          "url_redacted": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?bbox=-83.20000000%2C39.80000000%2C-83.19000000%2C39.81000000&bboxSR=4326&f=image&format=png&imageSR=4326&size=512%2C512&time=1672531200000%2C1704067199999&transparent=false"
+        },
+        {
+          "candidate_id": "mosaic_year_eq_png32",
+          "candidate_index": 7,
+          "format": "png32",
+          "time_strategy": "mosaic_year_eq",
+          "url_redacted": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?bbox=-83.20000000%2C39.80000000%2C-83.19000000%2C39.81000000&bboxSR=4326&f=image&format=png32&imageSR=4326&mosaicRule=%7B%22mosaicMethod%22%3A%22esriMosaicAttribute%22%2C%22where%22%3A%22Year+%3D+2023%22%2C%22sortField%22%3A%22Year%22%2C%22sortValue%22%3A%222023%22%7D&size=512%2C512&transparent=false"
+        },
+        {
+          "candidate_id": "mosaic_year_eq_png",
+          "candidate_index": 8,
+          "format": "png",
+          "time_strategy": "mosaic_year_eq",
+          "url_redacted": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?bbox=-83.20000000%2C39.80000000%2C-83.19000000%2C39.81000000&bboxSR=4326&f=image&format=png&imageSR=4326&mosaicRule=%7B%22mosaicMethod%22%3A%22esriMosaicAttribute%22%2C%22where%22%3A%22Year+%3D+2023%22%2C%22sortField%22%3A%22Year%22%2C%22sortValue%22%3A%222023%22%7D&size=512%2C512&transparent=false"
+        },
+        {
+          "candidate_id": "time_year_string_png32",
+          "candidate_index": 9,
+          "format": "png32",
+          "time_strategy": "time_year_string",
+          "url_redacted": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?bbox=-83.20000000%2C39.80000000%2C-83.19000000%2C39.81000000&bboxSR=4326&f=image&format=png32&imageSR=4326&size=512%2C512&time=2023&transparent=false"
+        },
+        {
+          "candidate_id": "time_year_string_png",
+          "candidate_index": 10,
+          "format": "png",
+          "time_strategy": "time_year_string",
+          "url_redacted": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?bbox=-83.20000000%2C39.80000000%2C-83.19000000%2C39.81000000&bboxSR=4326&f=image&format=png&imageSR=4326&size=512%2C512&time=2023&transparent=false"
+        }
+      ],
+      "export_cascade_reason": null,
+      "export_cascade_run": false,
+      "export_cascade_success": false,
       "http_status": null,
       "image_height": null,
       "image_mode": null,
@@ -139,20 +270,23 @@
       "no_data_suspected": false,
       "nontransparent_pixel_count": null,
       "preview_fetch_bbox": [
-        -83.245,
-        39.755,
-        -83.145,
-        39.855
+        -83.2,
+        39.8,
+        -83.19,
+        39.81
       ],
       "render_kind": "real_raster",
       "rendered": false,
       "renderer_problem_suspected": false,
       "sample_class_names": [],
-      "sample_grid_size": 5,
+      "sample_grid_size": 3,
       "sample_points_count": 0,
       "sample_results": [],
       "sample_values_count": 0,
       "sample_verification_attempted": false,
+      "selected_export_candidate": null,
+      "selected_export_format": null,
+      "selected_export_time_strategy": null,
       "service_png_diagnostics": null,
       "sha256": null,
       "source_id": "cdl_arcgis_tiny_export",
@@ -161,7 +295,7 @@
       "transparent_pixel_fraction": null,
       "unique_color_count": null,
       "unique_sample_values": [],
-      "url_redacted": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?bbox=-83.24500000%2C39.75500000%2C-83.14500000%2C39.85500000&bboxSR=4326&f=image&format=png32&imageSR=4326&size=512%2C512&time=2023&transparent=false",
+      "url_redacted": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?bbox=-83.20000000%2C39.80000000%2C-83.19000000%2C39.81000000&bboxSR=4326&f=image&format=png32&imageSR=4326&size=512%2C512&transparent=false",
       "warning": "requires --allow-network to fetch tiny CDL preview"
     },
     {
@@ -176,6 +310,11 @@
       "dominant_color": null,
       "dominant_color_fraction": null,
       "error": null,
+      "export_candidate_count": 0,
+      "export_candidates": [],
+      "export_cascade_reason": null,
+      "export_cascade_run": false,
+      "export_cascade_success": false,
       "http_status": null,
       "image_height": null,
       "image_mode": null,
@@ -194,6 +333,9 @@
       "sample_results": [],
       "sample_values_count": 0,
       "sample_verification_attempted": false,
+      "selected_export_candidate": null,
+      "selected_export_format": null,
+      "selected_export_time_strategy": null,
       "service_png_diagnostics": null,
       "sha256": null,
       "source_id": "usgs_3dep_dem",
@@ -206,6 +348,7 @@
       "warning": "no_safe_tiny_dem_endpoint_yet"
     }
   ],
+  "stack_compositor_version": "0.5.8",
   "target_crs": "EPSG:5070",
   "task_id": "example_corn_belt_water_balance",
   "theme_count": 3,
