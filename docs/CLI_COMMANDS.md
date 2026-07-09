@@ -153,3 +153,15 @@ faster-raster copernicus sentinel search-live example_corn_belt_water_balance --
 ```
 
 `search-live` performs only a bounded STAC JSON search. It does not download OData products, asset files, Sentinel Hub Process API imagery, or Sentinel pixels. Authorization headers are redacted in reports.
+
+
+## v0.5.10 Visibility and Auth Readiness
+
+```bash
+faster-raster task preview-real example_corn_belt_water_balance --visibility-mode typed-log --plain
+faster-raster task preview-real example_corn_belt_water_balance --visibility-mode base-dominant --overlay-strength 0.75 --plain
+faster-raster stack preview-real example_corn_belt_water_balance --visibility-mode equal --plain
+faster-raster copernicus auth-check --live --allow-network --plain
+```
+
+`auth-check --live` probes only the CDSE/STAC root and records `no_downloads: true`. It does not run a Sentinel search. Sentinel search-live remains an explicit separate command and still downloads no products or assets.

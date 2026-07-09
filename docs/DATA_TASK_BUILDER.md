@@ -58,3 +58,10 @@ Preview commands remain dry-run by default. Sentinel-2 CDSE is represented as a 
 `task preview-real` accepts `--layout clean`, `--layout cockpit`, and `--layout report`. Layout changes only the visual report. Task YAML is not mutated during preview runs, and JSON keeps canonical source ids even when the image uses short labels like PRISM, CDL, 3DEP, and Sentinel-2.
 
 Sentinel-2 CDSE remains a credential-gated planning source. A task can include `copernicus_sentinel2_l2a_cdse_stac`; preview may show local STAC search-live metadata if a report already exists, but it does not fetch or render Sentinel pixels.
+
+
+## v0.5.10 Visibility Options
+
+`task preview-real` and `stack preview-real` accept `--visibility-mode typed-log|equal|base-dominant` and `--overlay-strength FLOAT`. These options affect only preview rendering and report metadata; task YAML is not changed.
+
+The typed stack assigns different base visibility to categorical rasters, climate overlays, terrain context, point samples, warning masks, and credential-gated Sentinel context. This keeps mixed data types readable in one preview.

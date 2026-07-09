@@ -26,7 +26,7 @@ DEFAULT_SAMPLE_GRID_SIZE = 3
 DEFAULT_PREVIEW_EXPAND_FACTOR = 1.0
 DEFAULT_PREVIEW_LAYOUT = "clean"
 ALLOWED_PREVIEW_LAYOUTS = {"clean", "cockpit", "report"}
-PREVIEW_UX_VERSION = "0.5.9"
+PREVIEW_UX_VERSION = "0.5.10"
 ALLOWED_CDL_RENDER_MODES = {"auto", "service_png", "manual_samples", "service_tiff"}
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
 SUPPORTED_REAL_SOURCES = {"cdl_arcgis_tiny_export", "daymet_single_pixel_prcp_rest"}
@@ -108,6 +108,14 @@ def normalize_preview_layout(value: str | None) -> str:
     if value not in ALLOWED_PREVIEW_LAYOUTS:
         raise ValueError(f"invalid preview layout: {value}")
     return value
+
+
+def normalize_visibility_mode(value: str | None) -> str:
+    return preview_compositor.normalize_visibility_mode(value)
+
+
+def normalize_overlay_strength(value: float | int | None) -> float:
+    return preview_compositor.normalize_overlay_strength(value)
 
 
 def expanded_bbox(bbox: list[float], expand_factor: float) -> list[float]:
@@ -646,6 +654,8 @@ def fetch_source(
     sample_grid_size: int = DEFAULT_SAMPLE_GRID_SIZE,
     cdl_render_mode: str = "auto",
     preview_layout: str = DEFAULT_PREVIEW_LAYOUT,
+    visibility_mode: str = "typed-log",
+    overlay_strength: float = 1.0,
 ) -> dict[str, Any]:
     result = plan_source(task, source_id, max_pixels=max_pixels, include_archives=include_archives, preview_size=preview_size, preview_fetch_bbox=preview_fetch_bbox, sample_grid_size=sample_grid_size, cdl_render_mode=cdl_render_mode)
     if source_id not in SUPPORTED_REAL_SOURCES:
@@ -788,6 +798,17 @@ def sentinel_live_report_path(task_id: str) -> Path:
     return Path("reports/copernicus") / f"{task_id}_sentinel2_l2a_search_live.json"
 
 
+def _sentinel_sort_key(item: dict[str, Any]) -> tuple[float, str]:
+    cloud = item.get("eo_cloud_cover")
+    if cloud is None:
+        cloud = item.get("cloud_cover")
+    try:
+        cloud_value = float(cloud)
+    except (TypeError, ValueError):
+        cloud_value = 999.0
+    return (cloud_value, str(item.get("datetime") or ""))
+
+
 def sentinel_live_summary(task_id: str) -> dict[str, Any]:
     path = sentinel_live_report_path(task_id)
     if not path.exists():
@@ -795,6 +816,8 @@ def sentinel_live_summary(task_id: str) -> dict[str, Any]:
             "sentinel_stac_live_result_present": False,
             "sentinel_stac_item_count": 0,
             "sentinel_best_cloud_cover": None,
+            "sentinel_best_item_id": None,
+            "sentinel_best_item_asset_keys": [],
             "sentinel_auth_present": None,
             "sentinel_pixels_rendered": False,
         }
@@ -805,37 +828,61 @@ def sentinel_live_summary(task_id: str) -> dict[str, Any]:
             "sentinel_stac_live_result_present": True,
             "sentinel_stac_item_count": 0,
             "sentinel_best_cloud_cover": None,
+            "sentinel_best_item_id": None,
+            "sentinel_best_item_asset_keys": [],
             "sentinel_auth_present": None,
             "sentinel_pixels_rendered": False,
             "sentinel_live_result_error": "could not parse local Sentinel search-live JSON",
         }
-    items = payload.get("items") or []
-    cloud_values = [item.get("eo_cloud_cover") for item in items if item.get("eo_cloud_cover") is not None]
+    items = [item for item in payload.get("items") or [] if isinstance(item, dict)]
+    best = sorted(items, key=lambda item: (_sentinel_sort_key(item)[0], _sentinel_sort_key(item)[1]), reverse=False)[0] if items else None
     return {
         "sentinel_stac_live_result_present": True,
         "sentinel_stac_item_count": int(payload.get("item_count", len(items)) or 0),
-        "sentinel_best_cloud_cover": min(cloud_values) if cloud_values else None,
+        "sentinel_best_cloud_cover": (best or {}).get("eo_cloud_cover", (best or {}).get("cloud_cover")) if best else None,
+        "sentinel_best_item_id": (best or {}).get("id") if best else None,
+        "sentinel_best_item_asset_keys": (best or {}).get("asset_keys", []) if best else [],
         "sentinel_auth_present": payload.get("auth_present"),
         "sentinel_pixels_rendered": False,
     }
 
 
-def preview_ux_fields(task_id: str, source_results: list[dict[str, Any]], layout: str) -> dict[str, Any]:
-    labels = visual_source_labels(source_results)
+def source_results_for_visual_stack(source_results: list[dict[str, Any]], sentinel_summary: dict[str, Any]) -> list[dict[str, Any]]:
+    has_sentinel = any(result.get("source_id") == "copernicus_sentinel2_l2a_cdse_stac" for result in source_results)
+    if has_sentinel or not sentinel_summary.get("sentinel_stac_live_result_present"):
+        return source_results
+    sentinel = empty_source_result("copernicus_sentinel2_l2a_cdse_stac")
+    sentinel.update({
+        "status": "stac_discovered_no_pixels",
+        "render_kind": "stac_metadata_context",
+        "warning": "Sentinel STAC metadata discovered locally; no Sentinel pixels downloaded",
+    })
+    return [*source_results, sentinel]
+
+
+def preview_ux_fields(task_id: str, source_results: list[dict[str, Any]], layout: str, sentinel_summary: dict[str, Any]) -> dict[str, Any]:
+    labels = visual_source_labels(source_results_for_visual_stack(source_results, sentinel_summary))
     return {
         "preview_layout": layout,
         "visual_source_labels": labels,
-        "map_panel_render_mode": "selected_base_raster_with_translucent_semantic_overlays",
+        "map_panel_render_mode": "selected_base_raster_with_typed_visibility_overlays",
         "base_raster_fit_mode": "nearest_neighbor_contain",
         "base_raster_was_tiled": False,
         "preview_ux_version": PREVIEW_UX_VERSION,
         "selected_cdl_candidate_summary": selected_cdl_candidate_summary(source_results),
-        **sentinel_live_summary(task_id),
+        **sentinel_summary,
     }
 
 
-def stack_compositor_fields(source_results: list[dict[str, Any]]) -> dict[str, Any]:
-    return preview_compositor.compute_stack_opacity_plan(source_results, visual_source_labels(source_results))
+def stack_compositor_fields(source_results: list[dict[str, Any]], *, task_id: str, visibility_mode: str, overlay_strength: float, sentinel_summary: dict[str, Any]) -> dict[str, Any]:
+    visual_source_results = source_results_for_visual_stack(source_results, sentinel_summary)
+    return preview_compositor.compute_stack_opacity_plan(
+        visual_source_results,
+        visual_source_labels(visual_source_results),
+        visibility_mode=visibility_mode,
+        overlay_strength=overlay_strength,
+        sentinel_live_summary=sentinel_summary,
+    )
 
 
 def build_real_preview_plan(
@@ -851,11 +898,15 @@ def build_real_preview_plan(
     preview_expand_factor: float = DEFAULT_PREVIEW_EXPAND_FACTOR,
     cdl_render_mode: str = "auto",
     preview_layout: str = DEFAULT_PREVIEW_LAYOUT,
+    visibility_mode: str = "typed-log",
+    overlay_strength: float = 1.0,
 ) -> dict[str, Any]:
     sample_grid_size = normalize_sample_grid_size(grid_size if grid_size is not None else sample_grid_size)
     preview_expand_factor = normalize_preview_expand_factor(preview_expand_factor)
     cdl_render_mode = normalize_cdl_render_mode(cdl_render_mode)
     preview_layout = normalize_preview_layout(preview_layout)
+    visibility_mode = normalize_visibility_mode(visibility_mode)
+    overlay_strength = normalize_overlay_strength(overlay_strength)
     preview_fetch_bbox = expanded_bbox(task["aoi"]["bbox"], preview_expand_factor)
     summary = stack_preview.build_preview_summary(task)
     source_results = [
@@ -865,8 +916,9 @@ def build_real_preview_plan(
     warnings = list(summary["warnings"])
     warnings.extend(result["warning"] for result in source_results if result.get("warning"))
     counts = _counts(source_results)
-    stack_fields = stack_compositor_fields(source_results)
-    ux_fields = preview_ux_fields(task["task_id"], source_results, preview_layout)
+    sentinel_summary = sentinel_live_summary(task["task_id"])
+    stack_fields = stack_compositor_fields(source_results, task_id=task["task_id"], visibility_mode=visibility_mode, overlay_strength=overlay_strength, sentinel_summary=sentinel_summary)
+    ux_fields = preview_ux_fields(task["task_id"], source_results, preview_layout, sentinel_summary)
     return {
         "task_id": task["task_id"],
         "generated_at_utc": _utc_now(),
@@ -922,6 +974,11 @@ def _write_plan_reports(plan: dict[str, Any]) -> dict[str, Any]:
         "",
         "## Source plan",
         "Canonical source ids are preserved in JSON; visual labels are display-only.",
+        "",
+        "## Typed visibility ledger",
+        "| Source | Role | Visible | Transparent | Status |",
+        "| --- | --- | ---: | ---: | --- |",
+        *[f"| `{layer['source_id']}` | `{layer['visual_role']}` | {layer['visibility_pct']}% | {layer['transparency_pct']}% | `{layer['status']}` |" for layer in plan.get("visual_layers", [])],
         "",
         "| Source | Status | Render kind | Warning |",
         "| --- | --- | --- | --- |",
@@ -1077,11 +1134,12 @@ def render_real_preview_png(task: dict[str, Any], report: dict[str, Any], png_pa
         _rect(img, width, height, map_x + 24, map_y + 28, map_w - 48, map_h - 72, [210, 215, 222])
         _text(img, width, height, map_x + 210, map_y + 260, "NO REAL RASTER LAYER RENDERED", [92, 70, 70], 2)
 
-    opacity_by_source = {item["source_id"]: item["opacity"] for item in report.get("layer_opacity_plan", [])}
-    for result in report["source_results"]:
+    opacity_by_source = {item["source_id"]: item["opacity"] for item in report.get("visual_layers", report.get("layer_opacity_plan", []))}
+    overlay_results = source_results_for_visual_stack(report["source_results"], {k: report.get(k) for k in ["sentinel_stac_live_result_present", "sentinel_stac_item_count", "sentinel_best_cloud_cover", "sentinel_best_item_id", "sentinel_auth_present", "sentinel_pixels_rendered"]})
+    for result in overlay_results:
         if result is raster_result:
             continue
-        if result.get("render_kind") == "semantic_fallback" or result.get("status") in {"adapter_needed", "planned"}:
+        if result.get("render_kind") in {"semantic_fallback", "stac_metadata_context"} or result.get("status") in {"adapter_needed", "planned", "stac_discovered_no_pixels"}:
             overlay_semantic_pattern(img, width, height, map_x + 24, map_y + 28, map_w - 48, map_h - 72, result, opacity_by_source.get(result.get("source_id"), 0.25))
     for gx in range(map_x + 24, map_x + map_w - 20, 112):
         _rect(img, width, height, gx, map_y + 28, 1, map_h - 72, [190, 200, 210])
@@ -1119,13 +1177,11 @@ def render_real_preview_png(task: dict[str, Any], report: dict[str, Any], png_pa
         y += 21
 
     y = _section_title(img, width, height, side_x, y + 12, "Source stack", ink)
-    for result in report["source_results"][:8]:
-        label = labels.get(result["source_id"], result["source_id"])
-        color = [67, 150, 91] if result["rendered"] else [175, 135, 69] if result["attempted"] else [128, 135, 145]
+    for layer in report.get("visual_layers", [])[:8]:
+        label = layer.get("short_label") or labels.get(layer["source_id"], layer["source_id"])
+        color = [67, 150, 91] if layer["visual_role"] == "real_base" else [95, 145, 175] if layer["visual_role"] == "credential_gated_context" else [175, 135, 69]
         _rect(img, width, height, side_x, y + 2, 14, 14, color)
-        opacity = opacity_by_source.get(result.get("source_id"))
-        op = "" if opacity is None else f" op {opacity}"
-        _text(img, width, height, side_x + 22, y, f"{label} {result['status']}{op}", ink, 1)
+        _text(img, width, height, side_x + 22, y, f"{label} {layer['visual_role']} visible {layer['visibility_pct']}% transparent {layer['transparency_pct']}% {layer['status']}", ink, 1)
         y += 22
 
     if report.get("sentinel_stac_live_result_present"):
@@ -1134,8 +1190,8 @@ def render_real_preview_png(task: dict[str, Any], report: dict[str, Any], png_pa
         _text(img, width, height, side_x + 22, y, f"auth {report.get('sentinel_auth_present')} no Sentinel pixels downloaded", muted, 1)
         y += 24
 
-    y = _section_title(img, width, height, side_x, y + 8, "Opacity ledger", ink)
-    for line in (report.get("opacity_ledger_text") or [])[:7]:
+    y = _section_title(img, width, height, side_x, y + 8, "Visibility ledger", ink)
+    for line in (report.get("visibility_ledger") or report.get("opacity_ledger_text") or [])[:7]:
         _text(img, width, height, side_x, y, line, ink, 1)
         y += 20
 
@@ -1179,6 +1235,8 @@ def create_real_preview(
     preview_expand_factor: float = DEFAULT_PREVIEW_EXPAND_FACTOR,
     cdl_render_mode: str = "auto",
     preview_layout: str = DEFAULT_PREVIEW_LAYOUT,
+    visibility_mode: str = "typed-log",
+    overlay_strength: float = 1.0,
 ) -> dict[str, Any]:
     errors = validate_task(task)
     if errors:
@@ -1187,9 +1245,11 @@ def create_real_preview(
     preview_expand_factor = normalize_preview_expand_factor(preview_expand_factor)
     cdl_render_mode = normalize_cdl_render_mode(cdl_render_mode)
     preview_layout = normalize_preview_layout(preview_layout)
+    visibility_mode = normalize_visibility_mode(visibility_mode)
+    overlay_strength = normalize_overlay_strength(overlay_strength)
     preview_fetch_bbox = expanded_bbox(task["aoi"]["bbox"], preview_expand_factor)
     if not allow_network:
-        return _write_plan_reports(build_real_preview_plan(task, max_bytes_per_source=max_bytes_per_source, max_pixels=max_pixels, include_archives=include_archives, preview_size=preview_size, cdl_verify_samples=cdl_verify_samples, sample_grid_size=sample_grid_size, preview_expand_factor=preview_expand_factor, cdl_render_mode=cdl_render_mode, preview_layout=preview_layout))
+        return _write_plan_reports(build_real_preview_plan(task, max_bytes_per_source=max_bytes_per_source, max_pixels=max_pixels, include_archives=include_archives, preview_size=preview_size, cdl_verify_samples=cdl_verify_samples, sample_grid_size=sample_grid_size, preview_expand_factor=preview_expand_factor, cdl_render_mode=cdl_render_mode, preview_layout=preview_layout, visibility_mode=visibility_mode, overlay_strength=overlay_strength))
 
     summary = stack_preview.build_preview_summary(task)
     source_results = [
@@ -1212,8 +1272,9 @@ def create_real_preview(
     warnings = list(summary["warnings"])
     warnings.extend(result["warning"] for result in source_results if result.get("warning"))
     counts = _counts(source_results)
-    stack_fields = stack_compositor_fields(source_results)
-    ux_fields = preview_ux_fields(task["task_id"], source_results, preview_layout)
+    sentinel_summary = sentinel_live_summary(task["task_id"])
+    stack_fields = stack_compositor_fields(source_results, task_id=task["task_id"], visibility_mode=visibility_mode, overlay_strength=overlay_strength, sentinel_summary=sentinel_summary)
+    ux_fields = preview_ux_fields(task["task_id"], source_results, preview_layout, sentinel_summary)
     generated_at_utc = _utc_now()
     TASK_PREVIEWS_DIR.mkdir(parents=True, exist_ok=True)
     png_path = TASK_PREVIEWS_DIR / f"{task['task_id']}_real_stack_preview.png"
@@ -1270,6 +1331,12 @@ def create_real_preview(
         f"- Preview layout: `{report['preview_layout']}`",
         f"- Recommended next action: `{report['recommended_next_action']}`",
         "",
+        "## Typed visibility ledger",
+        "| Source | Role | Visible | Transparent | Status |",
+        "| --- | --- | ---: | ---: | --- |",
+        *[f"| `{layer['source_id']}` | `{layer['visual_role']}` | {layer['visibility_pct']}% | {layer['transparency_pct']}% | `{layer['status']}` |" for layer in report.get("visual_layers", [])],
+        "",
+        *(["Sentinel STAC metadata discovered; no Sentinel pixels downloaded.", ""] if report.get("sentinel_stac_live_result_present") else []),
         "## Source results",
         "| Source | Attempted | Rendered | Kind | Bytes | Unique | Dominant | Status | Warning |",
         "| --- | --- | --- | --- | ---: | ---: | ---: | --- | --- |",
@@ -1282,3 +1349,4 @@ def create_real_preview(
     if open_after_create:
         stack_preview.open_preview(png_path)
     return report
+

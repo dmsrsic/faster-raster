@@ -500,6 +500,8 @@ def task_preview_real(
     preview_expand_factor: float = typer.Option(real_preview.DEFAULT_PREVIEW_EXPAND_FACTOR, "--preview-expand-factor", min=1.0, max=25.0, help="--preview-expand-factor"),
     cdl_render_mode: str = typer.Option("auto", "--cdl-render-mode", help="--cdl-render-mode: auto, service_png, manual_samples, service_tiff"),
     layout: str = typer.Option(real_preview.DEFAULT_PREVIEW_LAYOUT, "--layout", help="--layout: clean, cockpit, report"),
+    visibility_mode: str = typer.Option("typed-log", "--visibility-mode", help="--visibility-mode: typed-log, equal, base-dominant"),
+    overlay_strength: float = typer.Option(1.0, "--overlay-strength", min=0.25, max=2.0),
     debug_artifacts: bool = typer.Option(False, "--debug-artifacts"),
     no_cache_raw: bool = typer.Option(False, "--no-cache-raw"),
     include_archives: bool = typer.Option(False, "--include-archives"),
@@ -524,6 +526,8 @@ def task_preview_real(
         preview_expand_factor=preview_expand_factor,
         cdl_render_mode=cdl_render_mode,
         preview_layout=layout,
+        visibility_mode=visibility_mode,
+        overlay_strength=overlay_strength,
     )
     if report["network_run"]:
         text = (
@@ -546,15 +550,37 @@ def task_preview_real(
 
 
 @copernicus_app.command("auth-check")
-def copernicus_auth_check(json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
-    report = copernicus_auth.validate_cdse_auth_presence()
-    report["network_run"] = False
+def copernicus_auth_check(
+    live: bool = typer.Option(False, "--live"),
+    allow_network: bool = typer.Option(False, "--allow-network"),
+    json_output: bool = typer.Option(False, "--json"),
+    plain: bool = typer.Option(False, "--plain"),
+) -> None:
+    if live and not allow_network:
+        raise typer.BadParameter("--live requires --allow-network")
+    if live:
+        report = copernicus_auth.live_auth_readiness_check()
+    else:
+        report = copernicus_auth.validate_cdse_auth_presence()
+        report.update({
+            "network_run": False,
+            "live_probe_attempted": False,
+            "endpoint": None,
+            "http_status": None,
+            "bytes_read": 0,
+            "token_redacted": bool(report.get("token_present")),
+            "no_downloads": True,
+        })
     text = (
         f"auth_present: {report['auth_present']}\n"
         f"auth_method: {report['auth_method']}\n"
-        f"token_present: {report['token_present']}\n"
-        f"username_present: {report['username_present']}\n"
-        "network_run: False\n"
+        f"network_run: {report['network_run']}\n"
+        f"live_probe_attempted: {report['live_probe_attempted']}\n"
+        f"endpoint: {report['endpoint']}\n"
+        f"http_status: {report['http_status']}\n"
+        f"bytes_read: {report['bytes_read']}\n"
+        f"token_redacted: {report['token_redacted']}\n"
+        "no_downloads: True\n"
     )
     emit(report, json_output=json_output, plain=True, plain_text=text)
 
@@ -633,6 +659,8 @@ def stack_preview_real(
     preview_expand_factor: float = typer.Option(real_preview.DEFAULT_PREVIEW_EXPAND_FACTOR, "--preview-expand-factor", min=1.0, max=25.0, help="--preview-expand-factor"),
     cdl_render_mode: str = typer.Option("auto", "--cdl-render-mode", help="--cdl-render-mode: auto, service_png, manual_samples, service_tiff"),
     layout: str = typer.Option(real_preview.DEFAULT_PREVIEW_LAYOUT, "--layout", help="--layout: clean, cockpit, report"),
+    visibility_mode: str = typer.Option("typed-log", "--visibility-mode", help="--visibility-mode: typed-log, equal, base-dominant"),
+    overlay_strength: float = typer.Option(1.0, "--overlay-strength", min=0.25, max=2.0),
     debug_artifacts: bool = typer.Option(False, "--debug-artifacts"),
     no_cache_raw: bool = typer.Option(False, "--no-cache-raw"),
     include_archives: bool = typer.Option(False, "--include-archives"),
@@ -658,6 +686,8 @@ def stack_preview_real(
         preview_expand_factor=preview_expand_factor,
         cdl_render_mode=cdl_render_mode,
         layout=layout,
+        visibility_mode=visibility_mode,
+        overlay_strength=overlay_strength,
         json_output=json_output,
         plain=plain,
     )

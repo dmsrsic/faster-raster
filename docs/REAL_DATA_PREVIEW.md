@@ -107,3 +107,12 @@ The selected CDL export is rendered once as the base raster, fitted into the map
 The CDL cascade is production preview logic. For the current task, the manual audit showed `no_time png32` worked while `time=2023` could return NoData; the cascade therefore tries `no_time png32` first and selects the first candidate whose diagnostics show real pixel evidence: more than two unique colors, nontransparent pixels, dominant fraction below 0.95, and no placeholder flag.
 
 If a local Sentinel search-live report exists, real preview reads it without network access and reports item count, best cloud cover, auth presence, and `sentinel_pixels_rendered: false`.
+
+
+## v0.5.10 Typed Visibility Stack
+
+Real preview now uses a typed visibility stack by default: `--visibility-mode typed-log`. Each visual layer is classified by data type and visual role before opacity is calculated. The formula is `visibility = clamp(min_visibility, max_visibility, base_visibility / log2(log_depth + 2))`; non-base overlays are scaled by `--overlay-strength` from 0.25 to 2.0.
+
+`visibility_pct` is the rendered alpha percentage. `transparency_pct` is `100 - visibility_pct`. Real CDL base layers stay readable, while climate, terrain, quality, adapter-needed, and credential-gated context layers are staggered to lower visibility so multiple sources can appear together without hiding the base.
+
+Supported visibility modes are `typed-log`, `equal`, and `base-dominant`. `base-dominant` strengthens the real base and makes overlays subtler. Sentinel STAC metadata can appear as a credential-gated context layer when a local `search-live` JSON exists, but `sentinel_pixels_rendered` remains `false` and no Sentinel assets are downloaded.

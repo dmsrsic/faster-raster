@@ -71,3 +71,54 @@ def test_preview_real_layout_cli_json(tmp_path, monkeypatch):
     payload = json.loads(ok(["task", "preview-real", "layout_task", "--layout", "report", "--json"]))
     assert payload["preview_layout"] == "report"
     assert payload["base_raster_was_tiled"] is False
+
+
+
+def test_auth_check_help_includes_live_and_allow_network():
+    result = runner.invoke(app, ["copernicus", "auth-check", "--help"])
+    assert result.exit_code == 0
+    assert "--live" in result.output
+    assert "--allow-network" in result.output
+
+
+def test_auth_check_live_requires_allow_network(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    result = runner.invoke(app, ["copernicus", "auth-check", "--live", "--plain"])
+    assert result.exit_code != 0
+    assert "allow-network" in result.output
+
+
+def test_auth_check_live_mocked_redacts_token(tmp_path, monkeypatch):
+    from faster_raster import copernicus_auth
+
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("CDSE_ACCESS_TOKEN", "fake-token-value")
+    class FakeHeaders(dict):
+        def get(self, key, default=None):
+            return super().get(key, default)
+    class FakeResponse:
+        def __init__(self):
+            self.data = b'{"type":"Catalog"}'
+            self.headers = FakeHeaders({"Content-Type": "application/json"})
+            self.status = 200
+            self.code = 200
+        def __enter__(self):
+            return self
+        def __exit__(self, exc_type, exc, tb):
+            return False
+        def read(self, size=-1):
+            return self.data if size < 0 else self.data[:size]
+    monkeypatch.setattr(copernicus_auth.urllib.request, "urlopen", lambda *a, **k: FakeResponse())
+    payload = json.loads(ok(["copernicus", "auth-check", "--live", "--allow-network", "--json"]))
+    assert payload["network_run"] is True
+    assert payload["live_probe_attempted"] is True
+    assert payload["token_redacted"] is True
+    assert payload["no_downloads"] is True
+    assert "fake-token-value" not in json.dumps(payload)
+
+
+def test_preview_real_help_contains_visibility_options():
+    result = runner.invoke(app, ["task", "preview-real", "--help"])
+    assert result.exit_code == 0
+    assert "--visibility-mode" in result.output
+    assert "--overlay-streng" in result.output

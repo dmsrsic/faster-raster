@@ -53,7 +53,7 @@ def redact_token(value: str | None) -> str | None:
 
 def build_cdse_headers(auth: CdseAuth | None = None) -> dict[str, str]:
     auth = auth or load_cdse_auth_from_env()
-    headers = {"User-Agent": "FasterRaster-CDSE-scaffold/0.5.9"}
+    headers = {"User-Agent": "FasterRaster-CDSE-scaffold/0.5.10"}
     if auth.access_token:
         headers["Authorization"] = f"Bearer {auth.access_token}"
     return headers
@@ -112,11 +112,14 @@ def live_auth_readiness_check(*, endpoint: str = "https://stac.dataspace.coperni
     return {
         **validate_cdse_auth_presence(auth),
         "network_run": True,
+        "live_probe_attempted": True,
         "endpoint": endpoint,
         "http_status": status,
         "bytes_read": bytes_read,
         "response_sha256": response_sha256,
         "authorization_header_redacted": "Bearer <REDACTED>" if auth.access_token else None,
+        "token_redacted": bool(auth.access_token),
+        "no_downloads": True,
         "warnings": warnings,
         "errors": errors,
     }

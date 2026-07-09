@@ -338,7 +338,7 @@ def test_preview_layout_metadata_for_dry_run(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     report = real_preview.create_real_preview(task_with_sources(["prism_daily_ppt_static_zip", "cdl_arcgis_tiny_export", "usgs_3dep_dem"]), preview_layout="clean")
     assert report["preview_layout"] == "clean"
-    assert report["preview_ux_version"] == "0.5.9"
+    assert report["preview_ux_version"] == "0.5.10"
     assert report["base_raster_was_tiled"] is False
     assert report["base_raster_fit_mode"] == "nearest_neighbor_contain"
     assert report["visual_source_labels"]["cdl_arcgis_tiny_export"] == "CDL"
@@ -374,3 +374,43 @@ def test_preview_reads_existing_sentinel_search_live_json(tmp_path, monkeypatch)
     assert report["sentinel_auth_present"] is True
     assert report["sentinel_pixels_rendered"] is False
     assert report["real_fetch_attempted"] is False
+
+
+
+def test_preview_reads_best_sentinel_item_and_adds_visual_layer_without_network(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(real_preview.urllib.request, "urlopen", lambda *a, **k: (_ for _ in ()).throw(AssertionError("network called")))
+    path = Path("reports/copernicus")
+    path.mkdir(parents=True)
+    (path / "real_preview_task_sentinel2_l2a_search_live.json").write_text(json.dumps({
+        "auth_present": False,
+        "item_count": 3,
+        "items": [
+            {"id": "older_cloudy", "eo_cloud_cover": 12.0, "datetime": "2023-01-01T00:00:00Z", "asset_keys": ["B02"]},
+            {"id": "best_old", "eo_cloud_cover": 0.0, "datetime": "2023-04-01T00:00:00Z", "asset_keys": ["B02", "B03", "B04", "B08"]},
+            {"id": "best_new", "eo_cloud_cover": 0.0, "datetime": "2023-08-01T00:00:00Z", "asset_keys": ["B02", "B03", "B04", "B08", "TCI"]},
+        ],
+    }), encoding="utf-8")
+    report = real_preview.create_real_preview(task_with_sources(["cdl_arcgis_tiny_export", "prism_daily_ppt_static_zip"]))
+    assert report["network_run"] is False
+    assert report["sentinel_stac_live_result_present"] is True
+    assert report["sentinel_stac_item_count"] == 3
+    assert report["sentinel_best_cloud_cover"] == 0.0
+    assert report["sentinel_best_item_id"] == "best_old"
+    assert report["sentinel_pixels_rendered"] is False
+    sentinel_layer = next(layer for layer in report["visual_layers"] if layer["source_id"] == "copernicus_sentinel2_l2a_cdse_stac")
+    assert sentinel_layer["status"] == "stac_discovered_no_pixels"
+    assert sentinel_layer["data_type"] == "credential_gated_scene"
+
+
+def test_preview_visibility_mode_and_overlay_strength_are_recorded(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    report = real_preview.create_real_preview(
+        task_with_sources(["cdl_arcgis_tiny_export", "prism_daily_ppt_static_zip"]),
+        visibility_mode="base-dominant",
+        overlay_strength=0.75,
+    )
+    assert report["visibility_mode"] == "base-dominant"
+    assert report["overlay_strength"] == 0.75
+    assert report["typed_visibility_model_version"] == "0.5.10"
+    assert report["visibility_ledger"]

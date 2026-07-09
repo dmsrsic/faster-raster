@@ -47,3 +47,10 @@ The search plan contains bbox, datetime range, cloud-cover filter, auth presence
 Search-live reports contain item summaries only: id, collection, datetime, cloud cover, platform, constellation, instruments, MGRS tile if available, bbox, asset keys, band-presence booleans, and `hrefs_redacted: true`. They also record `no_downloads: true`. OData product download, Sentinel product acquisition, and Sentinel Hub Process API imagery remain future gated work.
 
 Credentials are read only from environment variables: `CDSE_ACCESS_TOKEN`, `CDSE_REFRESH_TOKEN`, `CDSE_USERNAME`, `CDSE_PASSWORD`, and `CDSE_CLIENT_ID`. Do not commit credentials. `.env`, `configs/auth_profiles.local.yaml`, `configs/*secret*.yaml`, and `configs/*credentials*.yaml` are ignored.
+
+
+## v0.5.10 Auth-Check and Local STAC Preview Integration
+
+`faster-raster copernicus auth-check --live --allow-network --plain` is wired as a bounded STAC-root readiness probe. Without `--live`, auth-check reads environment presence only and performs no network operation. `--live` without `--allow-network` fails closed.
+
+If `reports/copernicus/TASK_ID_sentinel2_l2a_search_live.json` exists, `task preview-real` reads it locally. The preview reports item count, best cloud cover, best item id, asset keys, auth presence, and `sentinel_pixels_rendered: false`. Sentinel appears as credential-gated STAC context only; no product, asset, OData, Sentinel Hub Process API, or Sentinel imagery pixels are downloaded.

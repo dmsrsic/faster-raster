@@ -6,6 +6,16 @@
 - Preview layout: `clean`
 - Recommended next action: `inspect_cache_image`
 
+## Typed visibility ledger
+| Source | Role | Visible | Transparent | Status |
+| --- | --- | ---: | ---: | --- |
+| `cdl_arcgis_tiny_export` | `real_base` | 86% | 14% | `real_raster_rendered` |
+| `prism_daily_ppt_static_zip` | `climate_signal` | 20% | 80% | `semantic_fallback` |
+| `usgs_3dep_dem` | `terrain_context` | 18% | 82% | `adapter_needed` |
+| `copernicus_sentinel2_l2a_cdse_stac` | `credential_gated_context` | 16% | 84% | `stac_discovered_no_pixels` |
+
+Sentinel STAC metadata discovered; no Sentinel pixels downloaded.
+
 ## Source results
 | Source | Attempted | Rendered | Kind | Bytes | Unique | Dominant | Status | Warning |
 | --- | --- | --- | --- | ---: | ---: | ---: | --- | --- |
