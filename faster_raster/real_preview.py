@@ -24,6 +24,9 @@ DEFAULT_TIMEOUT_SECONDS = 25
 DEFAULT_PREVIEW_SIZE = 512
 DEFAULT_SAMPLE_GRID_SIZE = 3
 DEFAULT_PREVIEW_EXPAND_FACTOR = 1.0
+DEFAULT_PREVIEW_LAYOUT = "clean"
+ALLOWED_PREVIEW_LAYOUTS = {"clean", "cockpit", "report"}
+PREVIEW_UX_VERSION = "0.5.9"
 ALLOWED_CDL_RENDER_MODES = {"auto", "service_png", "manual_samples", "service_tiff"}
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
 SUPPORTED_REAL_SOURCES = {"cdl_arcgis_tiny_export", "daymet_single_pixel_prcp_rest"}
@@ -97,6 +100,13 @@ def normalize_cdl_render_mode(value: str | None) -> str:
     value = (value or "auto").strip().lower()
     if value not in ALLOWED_CDL_RENDER_MODES:
         raise ValueError(f"invalid cdl_render_mode: {value}")
+    return value
+
+
+def normalize_preview_layout(value: str | None) -> str:
+    value = (value or DEFAULT_PREVIEW_LAYOUT).strip().lower()
+    if value not in ALLOWED_PREVIEW_LAYOUTS:
+        raise ValueError(f"invalid preview layout: {value}")
     return value
 
 
@@ -635,6 +645,7 @@ def fetch_source(
     cdl_verify_samples: bool = True,
     sample_grid_size: int = DEFAULT_SAMPLE_GRID_SIZE,
     cdl_render_mode: str = "auto",
+    preview_layout: str = DEFAULT_PREVIEW_LAYOUT,
 ) -> dict[str, Any]:
     result = plan_source(task, source_id, max_pixels=max_pixels, include_archives=include_archives, preview_size=preview_size, preview_fetch_bbox=preview_fetch_bbox, sample_grid_size=sample_grid_size, cdl_render_mode=cdl_render_mode)
     if source_id not in SUPPORTED_REAL_SOURCES:
@@ -748,8 +759,83 @@ def recommended_next_action(source_results: list[dict[str, Any]]) -> str:
     return "real_preview_ok"
 
 
+def visual_source_labels(source_results: list[dict[str, Any]]) -> dict[str, str]:
+    labels = {
+        "prism_daily_ppt_static_zip": "PRISM",
+        "cdl_arcgis_tiny_export": "CDL",
+        "usgs_3dep_dem": "3DEP",
+        "copernicus_sentinel2_l2a_cdse_stac": "Sentinel-2",
+    }
+    return {result["source_id"]: labels.get(result["source_id"], result["source_id"]) for result in source_results if result.get("source_id")}
+
+
+def selected_cdl_candidate_summary(source_results: list[dict[str, Any]]) -> dict[str, Any] | None:
+    result = next((item for item in source_results if item.get("source_id") == "cdl_arcgis_tiny_export"), None)
+    if not result or not result.get("selected_export_candidate"):
+        return None
+    return {
+        "selected_candidate": result.get("selected_export_candidate"),
+        "selected_time_strategy": result.get("selected_export_time_strategy"),
+        "selected_format": result.get("selected_export_format"),
+        "bytes": result.get("bytes_read"),
+        "unique_colors": result.get("unique_color_count"),
+        "dominant_fraction": result.get("dominant_color_fraction"),
+        "sha_short": (result.get("sha256") or "")[:12],
+    }
+
+
+def sentinel_live_report_path(task_id: str) -> Path:
+    return Path("reports/copernicus") / f"{task_id}_sentinel2_l2a_search_live.json"
+
+
+def sentinel_live_summary(task_id: str) -> dict[str, Any]:
+    path = sentinel_live_report_path(task_id)
+    if not path.exists():
+        return {
+            "sentinel_stac_live_result_present": False,
+            "sentinel_stac_item_count": 0,
+            "sentinel_best_cloud_cover": None,
+            "sentinel_auth_present": None,
+            "sentinel_pixels_rendered": False,
+        }
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return {
+            "sentinel_stac_live_result_present": True,
+            "sentinel_stac_item_count": 0,
+            "sentinel_best_cloud_cover": None,
+            "sentinel_auth_present": None,
+            "sentinel_pixels_rendered": False,
+            "sentinel_live_result_error": "could not parse local Sentinel search-live JSON",
+        }
+    items = payload.get("items") or []
+    cloud_values = [item.get("eo_cloud_cover") for item in items if item.get("eo_cloud_cover") is not None]
+    return {
+        "sentinel_stac_live_result_present": True,
+        "sentinel_stac_item_count": int(payload.get("item_count", len(items)) or 0),
+        "sentinel_best_cloud_cover": min(cloud_values) if cloud_values else None,
+        "sentinel_auth_present": payload.get("auth_present"),
+        "sentinel_pixels_rendered": False,
+    }
+
+
+def preview_ux_fields(task_id: str, source_results: list[dict[str, Any]], layout: str) -> dict[str, Any]:
+    labels = visual_source_labels(source_results)
+    return {
+        "preview_layout": layout,
+        "visual_source_labels": labels,
+        "map_panel_render_mode": "selected_base_raster_with_translucent_semantic_overlays",
+        "base_raster_fit_mode": "nearest_neighbor_contain",
+        "base_raster_was_tiled": False,
+        "preview_ux_version": PREVIEW_UX_VERSION,
+        "selected_cdl_candidate_summary": selected_cdl_candidate_summary(source_results),
+        **sentinel_live_summary(task_id),
+    }
+
+
 def stack_compositor_fields(source_results: list[dict[str, Any]]) -> dict[str, Any]:
-    return preview_compositor.compute_stack_opacity_plan(source_results)
+    return preview_compositor.compute_stack_opacity_plan(source_results, visual_source_labels(source_results))
 
 
 def build_real_preview_plan(
@@ -764,10 +850,12 @@ def build_real_preview_plan(
     grid_size: int | None = None,
     preview_expand_factor: float = DEFAULT_PREVIEW_EXPAND_FACTOR,
     cdl_render_mode: str = "auto",
+    preview_layout: str = DEFAULT_PREVIEW_LAYOUT,
 ) -> dict[str, Any]:
     sample_grid_size = normalize_sample_grid_size(grid_size if grid_size is not None else sample_grid_size)
     preview_expand_factor = normalize_preview_expand_factor(preview_expand_factor)
     cdl_render_mode = normalize_cdl_render_mode(cdl_render_mode)
+    preview_layout = normalize_preview_layout(preview_layout)
     preview_fetch_bbox = expanded_bbox(task["aoi"]["bbox"], preview_expand_factor)
     summary = stack_preview.build_preview_summary(task)
     source_results = [
@@ -778,6 +866,7 @@ def build_real_preview_plan(
     warnings.extend(result["warning"] for result in source_results if result.get("warning"))
     counts = _counts(source_results)
     stack_fields = stack_compositor_fields(source_results)
+    ux_fields = preview_ux_fields(task["task_id"], source_results, preview_layout)
     return {
         "task_id": task["task_id"],
         "generated_at_utc": _utc_now(),
@@ -812,6 +901,7 @@ def build_real_preview_plan(
         "recommended_next_action": "no_real_raster_rendered",
         **counts,
         **stack_fields,
+        **ux_fields,
         "png_path": None,
         "md_path": str(TASK_PREVIEWS_DIR / f"{task['task_id']}_real_preview_plan.md"),
     }
@@ -831,6 +921,8 @@ def _write_plan_reports(plan: dict[str, Any]) -> dict[str, Any]:
         f"- Max bytes/source: `{plan['max_bytes_per_source']}`",
         "",
         "## Source plan",
+        "Canonical source ids are preserved in JSON; visual labels are display-only.",
+        "",
         "| Source | Status | Render kind | Warning |",
         "| --- | --- | --- | --- |",
     ]
@@ -899,95 +991,162 @@ def overlay_semantic_pattern(img: bytearray, width: int, height: int, x: int, y:
 
 
 def draw_cached_raster(img: bytearray, width: int, height: int, result: dict[str, Any], x: int, y: int, w: int, h: int) -> None:
-    pixels = []
+    decoded: dict[str, Any] = {}
     if result.get("cache_path"):
         try:
-            pixels = decode_png_pixels(Path(result["cache_path"]).read_bytes()).get("pixels") or []
+            decoded = decode_png_pixels(Path(result["cache_path"]).read_bytes(), max_sample_pixels=1048576)
         except Exception:
-            pixels = []
-    if not pixels:
+            decoded = {}
+    pixels = decoded.get("pixels") or []
+    src_w = int(decoded.get("width") or 0)
+    src_h = int(decoded.get("height") or 0)
+    if not pixels or src_w <= 0 or src_h <= 0 or len(pixels) < src_w * src_h:
         _rect(img, width, height, x, y, w, h, [180, 205, 175])
         return
-    side = max(1, int(math.sqrt(len(pixels))))
-    for yy in range(h):
-        src_y = min(side - 1, int(yy / h * side))
-        for xx in range(w):
-            src_x = min(side - 1, int(xx / w * side))
-            r, g, b, _a = pixels[min(len(pixels) - 1, src_y * side + src_x)]
-            _set_px(img, width, height, x + xx, y + yy, [r, g, b])
+    scale = max(1, min(w // src_w if src_w else 1, h // src_h if src_h else 1))
+    fit_w = min(w, src_w * scale)
+    fit_h = min(h, src_h * scale)
+    if fit_w < w and fit_h < h:
+        # Very small rasters get a larger pixel-art fit while preserving aspect ratio.
+        scale = max(1, min(w // src_w, h // src_h))
+        fit_w = min(w, src_w * scale)
+        fit_h = min(h, src_h * scale)
+    if fit_w <= 0 or fit_h <= 0:
+        fit_w, fit_h = w, h
+    x0 = x + max(0, (w - fit_w) // 2)
+    y0 = y + max(0, (h - fit_h) // 2)
+    _rect(img, width, height, x, y, w, h, [226, 232, 239])
+    for yy in range(fit_h):
+        src_y = min(src_h - 1, int(yy / fit_h * src_h))
+        for xx in range(fit_w):
+            src_x = min(src_w - 1, int(xx / fit_w * src_w))
+            r, g, b, _a = pixels[src_y * src_w + src_x]
+            _set_px(img, width, height, x0 + xx, y0 + yy, [r, g, b])
+
+
+def _wrap_lines(text: str, limit: int) -> list[str]:
+    words = str(text).split()
+    lines: list[str] = []
+    current = ""
+    for word in words:
+        if not current:
+            current = word
+        elif len(current) + 1 + len(word) <= limit:
+            current += " " + word
+        else:
+            lines.append(current)
+            current = word
+    if current:
+        lines.append(current)
+    return lines or [""]
+
+
+def _section_title(img: bytearray, width: int, height: int, x: int, y: int, title: str, color: list[int]) -> int:
+    _text(img, width, height, x, y, title.upper(), color, 1)
+    return y + 22
 
 
 def render_real_preview_png(task: dict[str, Any], report: dict[str, Any], png_path: Path) -> None:
-    width, height = 1240, 820
-    img = _blank(width, height, [245, 247, 250])
-    _rect(img, width, height, 0, 0, width, 84, [74, 36, 86])
-    _text(img, width, height, 28, 18, "FASTER RASTER REAL DATA PREVIEW", [255, 255, 255], 2)
-    _text(img, width, height, 28, 52, "TINY BOUNDED LIVE PREVIEW", [225, 210, 235], 1)
-    _rect(img, width, height, 30, 112, 600, 450, [226, 232, 239])
+    layout = normalize_preview_layout(report.get("preview_layout"))
+    width, height = 1320, 860
+    if layout == "cockpit":
+        bg, header, header_text, panel, ink, muted, accent = [245, 247, 250], [74, 36, 86], [255, 255, 255], [226, 232, 239], [35, 52, 72], [75, 88, 105], [74, 36, 86]
+        title = "FASTER RASTER REAL DATA PREVIEW"
+        subtitle = "TINY BOUNDED LIVE PREVIEW"
+    elif layout == "report":
+        bg, header, header_text, panel, ink, muted, accent = [250, 250, 248], [255, 255, 255], [28, 37, 48], [238, 241, 244], [28, 37, 48], [84, 96, 110], [36, 105, 138]
+        title = "FasterRaster Real Preview Report"
+        subtitle = "Bounded evidence preview, not production acquisition"
+    else:
+        bg, header, header_text, panel, ink, muted, accent = [247, 249, 251], [232, 238, 244], [24, 37, 54], [226, 232, 239], [30, 45, 65], [84, 96, 110], [41, 116, 145]
+        title = "FasterRaster Real Preview"
+        subtitle = "Clean bounded preview with CDL base and semantic overlays"
+
+    img = _blank(width, height, bg)
+    _rect(img, width, height, 0, 0, width, 78, header)
+    _text(img, width, height, 32, 18, title, header_text, 2)
+    _text(img, width, height, 34, 52, subtitle, muted if layout != "cockpit" else [225, 210, 235], 1)
+
+    map_x, map_y, map_w, map_h = 34, 106, 790, 560
+    _rect(img, width, height, map_x, map_y, map_w, map_h, panel)
     raster_result = next((r for r in report["source_results"] if r.get("real_raster_rendered")), None)
     if raster_result:
-        draw_cached_raster(img, width, height, raster_result, 58, 142, 540, 340)
-        _text(img, width, height, 76, 150, "REAL CDL PIXELS", [255, 255, 255], 1)
-        if raster_result.get("is_mostly_single_class"):
-            _text(img, width, height, 88, 455, "MOSTLY SINGLE CDL CLASS IN TINY AOI", [90, 55, 40], 1)
+        draw_cached_raster(img, width, height, raster_result, map_x + 24, map_y + 28, map_w - 48, map_h - 72)
+        _text(img, width, height, map_x + 34, map_y + 40, "CDL REAL BASE", [255, 255, 255] if layout == "cockpit" else ink, 1)
     else:
-        _rect(img, width, height, 58, 142, 540, 340, [210, 215, 222])
-        _text(img, width, height, 150, 298, "NO REAL RASTER LAYER RENDERED", [92, 70, 70], 2)
+        _rect(img, width, height, map_x + 24, map_y + 28, map_w - 48, map_h - 72, [210, 215, 222])
+        _text(img, width, height, map_x + 210, map_y + 260, "NO REAL RASTER LAYER RENDERED", [92, 70, 70], 2)
+
     opacity_by_source = {item["source_id"]: item["opacity"] for item in report.get("layer_opacity_plan", [])}
     for result in report["source_results"]:
         if result is raster_result:
             continue
-        if result.get("render_kind") == "semantic_fallback" or result.get("status") == "adapter_needed":
-            overlay_semantic_pattern(img, width, height, 58, 142, 540, 340, result, opacity_by_source.get(result.get("source_id"), 0.3))
-    for gx in range(58, 599, 90):
-        _rect(img, width, height, gx, 142, 1, 340, [70, 92, 112])
-    for gy in range(142, 483, 68):
-        _rect(img, width, height, 58, gy, 540, 1, [70, 92, 112])
-    stack_preview._border(img, width, height, 58, 142, 540, 340, [30, 45, 65], 3)
-    _text(img, width, height, 58, 500, "PIXEL ZOOM", [35, 52, 72], 1)
+        if result.get("render_kind") == "semantic_fallback" or result.get("status") in {"adapter_needed", "planned"}:
+            overlay_semantic_pattern(img, width, height, map_x + 24, map_y + 28, map_w - 48, map_h - 72, result, opacity_by_source.get(result.get("source_id"), 0.25))
+    for gx in range(map_x + 24, map_x + map_w - 20, 112):
+        _rect(img, width, height, gx, map_y + 28, 1, map_h - 72, [190, 200, 210])
+    for gy in range(map_y + 28, map_y + map_h - 40, 86):
+        _rect(img, width, height, map_x + 24, gy, map_w - 48, 1, [190, 200, 210])
+    stack_preview._border(img, width, height, map_x + 24, map_y + 28, map_w - 48, map_h - 72, ink, 2)
+
+    _text(img, width, height, map_x + 24, map_y + map_h - 32, "bounded preview | no fake basemap | Sentinel pixels not downloaded", muted, 1)
+    inset_x, inset_y = 58, 694
+    _text(img, width, height, inset_x, inset_y - 22, "PIXEL ZOOM", ink, 1)
     if raster_result:
-        draw_cached_raster(img, width, height, raster_result, 58, 522, 130, 130)
-        stack_preview._border(img, width, height, 58, 522, 130, 130, [30, 45, 65], 2)
-    side_x, y = 662, 112
-    badges = [f"NETWORK: {str(report['network_run']).upper()}", f"MAX BYTES/SOURCE: {report['max_bytes_per_source']}", "REAL DATA WHERE SUPPORTED"]
-    for badge in badges:
-        _rect(img, width, height, side_x, y, 500, 28, [235, 226, 242])
-        _text(img, width, height, side_x + 10, y + 7, badge, [74, 36, 86], 1)
-        y += 38
-    _text(img, width, height, side_x, y + 8, "DIAGNOSTICS", [35, 52, 72], 2)
-    y += 46
-    diag_lines = ["NO REAL RASTER DIAGNOSTICS"]
+        draw_cached_raster(img, width, height, raster_result, inset_x, inset_y, 112, 112)
+        stack_preview._border(img, width, height, inset_x, inset_y, 112, 112, ink, 2)
+
+    side_x, y = 858, 106
+    labels = report.get("visual_source_labels") or {}
+    badge_color = [238, 244, 248] if layout != "cockpit" else [235, 226, 242]
+    for badge in [f"NETWORK {str(report['network_run']).upper()}", f"MAX BYTES {report['max_bytes_per_source']}", "REAL DATA WHERE SUPPORTED", "NOT FULL ACQUISITION"]:
+        _rect(img, width, height, side_x, y, 410, 28, badge_color)
+        _text(img, width, height, side_x + 10, y + 7, badge, accent, 1)
+        y += 34
+
+    y = _section_title(img, width, height, side_x, y + 8, "Raster diagnostics", ink)
     if raster_result:
+        summary = report.get("selected_cdl_candidate_summary") or {}
         diag_lines = [
-            f"DIM: {raster_result.get('image_width')}x{raster_result.get('image_height')} MODE {raster_result.get('image_mode')}",
-            f"BYTES: {raster_result.get('bytes_read')} TYPE {raster_result.get('content_type')}",
-            f"UNIQUE: {raster_result.get('unique_color_count')} DOM {raster_result.get('dominant_color_fraction')}",
-            f"SHA: {(raster_result.get('sha256') or '')[:12]}",
-            f"CACHE: {Path(raster_result.get('cache_path') or '').name}",
+            f"CDL candidate {summary.get('selected_time_strategy')} {summary.get('selected_format')}",
+            f"bytes {summary.get('bytes')} unique {summary.get('unique_colors')} dom {summary.get('dominant_fraction')}",
+            f"sha {summary.get('sha_short')}",
         ]
+    else:
+        diag_lines = ["No real raster diagnostics yet"]
     for line in diag_lines:
-        _text(img, width, height, side_x, y, line, [35, 52, 72], 1)
-        y += 24
-    y += 12
-    _text(img, width, height, side_x, y, "SOURCE STATUS", [35, 52, 72], 2)
-    y += 32
+        _text(img, width, height, side_x, y, line, ink, 1)
+        y += 21
+
+    y = _section_title(img, width, height, side_x, y + 12, "Source stack", ink)
     for result in report["source_results"][:8]:
+        label = labels.get(result["source_id"], result["source_id"])
         color = [67, 150, 91] if result["rendered"] else [175, 135, 69] if result["attempted"] else [128, 135, 145]
-        _rect(img, width, height, side_x, y, 18, 18, color)
+        _rect(img, width, height, side_x, y + 2, 14, 14, color)
         opacity = opacity_by_source.get(result.get("source_id"))
-        opacity_text = "" if opacity is None else f" OP {opacity}"
-        label = f"{result['source_id']} {result['status']} {result['bytes_read']}B{opacity_text}"
-        _text(img, width, height, side_x + 28, y + 2, label, [35, 52, 72], 1)
-        y += 26
-    y += 8
-    _text(img, width, height, side_x, y, "WARNINGS", [150, 70, 54], 2)
-    y += 30
-    for warning in report["warnings"][:8]:
-        _text(img, width, height, side_x, y, warning, [150, 70, 54], 1)
+        op = "" if opacity is None else f" op {opacity}"
+        _text(img, width, height, side_x + 22, y, f"{label} {result['status']}{op}", ink, 1)
         y += 22
-    generated = report["generated_at_utc"]
-    _text(img, width, height, 34, 746, f"BBOX {task['aoi']['bbox']} CRS {task['aoi']['bbox_crs']} TARGET {task['target_grid']['crs']}", [35, 52, 72], 1)
-    _text(img, width, height, 34, 774, f"GENERATED {generated} BOUNDED PREVIEW NOT FULL PRODUCTION ACQUISITION NO SOURCE REGISTRY MUTATION", [35, 52, 72], 1)
+
+    if report.get("sentinel_stac_live_result_present"):
+        _text(img, width, height, side_x + 22, y, f"Sentinel-2 STAC items {report.get('sentinel_stac_item_count')} best cloud {report.get('sentinel_best_cloud_cover')}", ink, 1)
+        y += 22
+        _text(img, width, height, side_x + 22, y, f"auth {report.get('sentinel_auth_present')} no Sentinel pixels downloaded", muted, 1)
+        y += 24
+
+    y = _section_title(img, width, height, side_x, y + 8, "Opacity ledger", ink)
+    for line in (report.get("opacity_ledger_text") or [])[:7]:
+        _text(img, width, height, side_x, y, line, ink, 1)
+        y += 20
+
+    y = _section_title(img, width, height, side_x, y + 8, "Warnings", [150, 70, 54])
+    for warning in report["warnings"][:7]:
+        for line in _wrap_lines(warning, 58)[:2]:
+            _text(img, width, height, side_x, y, line, [150, 70, 54], 1)
+            y += 18
+
+    footer = f"BBOX {task['aoi']['bbox']} | TARGET {task['target_grid']['crs']} | GENERATED {report['generated_at_utc']}"
+    _text(img, width, height, 206, 738, footer, muted, 1)
     _write_png(png_path, width, height, img)
 
 
@@ -1019,6 +1178,7 @@ def create_real_preview(
     grid_size: int | None = None,
     preview_expand_factor: float = DEFAULT_PREVIEW_EXPAND_FACTOR,
     cdl_render_mode: str = "auto",
+    preview_layout: str = DEFAULT_PREVIEW_LAYOUT,
 ) -> dict[str, Any]:
     errors = validate_task(task)
     if errors:
@@ -1026,9 +1186,10 @@ def create_real_preview(
     sample_grid_size = normalize_sample_grid_size(grid_size if grid_size is not None else sample_grid_size)
     preview_expand_factor = normalize_preview_expand_factor(preview_expand_factor)
     cdl_render_mode = normalize_cdl_render_mode(cdl_render_mode)
+    preview_layout = normalize_preview_layout(preview_layout)
     preview_fetch_bbox = expanded_bbox(task["aoi"]["bbox"], preview_expand_factor)
     if not allow_network:
-        return _write_plan_reports(build_real_preview_plan(task, max_bytes_per_source=max_bytes_per_source, max_pixels=max_pixels, include_archives=include_archives, preview_size=preview_size, cdl_verify_samples=cdl_verify_samples, sample_grid_size=sample_grid_size, preview_expand_factor=preview_expand_factor, cdl_render_mode=cdl_render_mode))
+        return _write_plan_reports(build_real_preview_plan(task, max_bytes_per_source=max_bytes_per_source, max_pixels=max_pixels, include_archives=include_archives, preview_size=preview_size, cdl_verify_samples=cdl_verify_samples, sample_grid_size=sample_grid_size, preview_expand_factor=preview_expand_factor, cdl_render_mode=cdl_render_mode, preview_layout=preview_layout))
 
     summary = stack_preview.build_preview_summary(task)
     source_results = [
@@ -1052,6 +1213,7 @@ def create_real_preview(
     warnings.extend(result["warning"] for result in source_results if result.get("warning"))
     counts = _counts(source_results)
     stack_fields = stack_compositor_fields(source_results)
+    ux_fields = preview_ux_fields(task["task_id"], source_results, preview_layout)
     generated_at_utc = _utc_now()
     TASK_PREVIEWS_DIR.mkdir(parents=True, exist_ok=True)
     png_path = TASK_PREVIEWS_DIR / f"{task['task_id']}_real_stack_preview.png"
@@ -1094,6 +1256,7 @@ def create_real_preview(
         "preview_json": str(json_path),
         **counts,
         **stack_fields,
+        **ux_fields,
     }
     render_real_preview_png(task, report, png_path)
     preview_compositor.write_stack_transparency_ledger(report, TASK_PREVIEWS_DIR / f"{task['task_id']}_stack_transparency_ledger.json")
@@ -1104,6 +1267,7 @@ def create_real_preview(
         f"- PNG: `{png_path}`",
         f"- Network run: `{report['network_run']}`",
         f"- Real raster data rendered: `{report['real_raster_data_rendered']}`",
+        f"- Preview layout: `{report['preview_layout']}`",
         f"- Recommended next action: `{report['recommended_next_action']}`",
         "",
         "## Source results",

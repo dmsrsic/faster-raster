@@ -8,32 +8,45 @@
       "base_opacity": 0.5,
       "opacity": 0.25,
       "render_kind": "semantic_fallback",
-      "role": "semantic_overlay",
+      "role": "semantic_precip_overlay",
       "source_id": "prism_daily_ppt_static_zip",
       "status": "semantic_fallback",
-      "transparency_pct": 75
+      "transparency_pct": 75,
+      "visual_label": "PRISM"
     },
     {
       "base_opacity": 0.92,
       "opacity": 0.72,
       "render_kind": "real_raster",
-      "role": "real_raster_base",
+      "role": "real_base",
       "source_id": "cdl_arcgis_tiny_export",
       "status": "real_raster_rendered",
-      "transparency_pct": 28
+      "transparency_pct": 28,
+      "visual_label": "CDL"
     },
     {
       "base_opacity": 0.5,
       "opacity": 0.25,
       "render_kind": "semantic_fallback",
-      "role": "semantic_overlay",
+      "role": "semantic_elevation_overlay",
       "source_id": "usgs_3dep_dem",
       "status": "adapter_needed",
-      "transparency_pct": 75
+      "transparency_pct": 75,
+      "visual_label": "3DEP"
     }
+  ],
+  "layer_roles": {
+    "cdl_arcgis_tiny_export": "real_base",
+    "prism_daily_ppt_static_zip": "semantic_precip_overlay",
+    "usgs_3dep_dem": "semantic_elevation_overlay"
+  },
+  "opacity_ledger_text": [
+    "PRISM semantic_precip_overlay op 0.25 transparent 75% status semantic_fallback",
+    "CDL real_base op 0.72 transparent 28% status real_raster_rendered",
+    "3DEP semantic_elevation_overlay op 0.25 transparent 75% status adapter_needed"
   ],
   "real_layer_count": 1,
   "semantic_layer_count": 2,
-  "stack_compositor_version": "0.5.8",
+  "stack_compositor_version": "0.5.9",
   "task_id": "example_corn_belt_water_balance"
 }

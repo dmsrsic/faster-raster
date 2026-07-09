@@ -499,6 +499,7 @@ def task_preview_real(
     grid_size: Optional[int] = typer.Option(None, "--grid-size", min=1, max=7, help="--grid-size alias for --sample-grid-size"),
     preview_expand_factor: float = typer.Option(real_preview.DEFAULT_PREVIEW_EXPAND_FACTOR, "--preview-expand-factor", min=1.0, max=25.0, help="--preview-expand-factor"),
     cdl_render_mode: str = typer.Option("auto", "--cdl-render-mode", help="--cdl-render-mode: auto, service_png, manual_samples, service_tiff"),
+    layout: str = typer.Option(real_preview.DEFAULT_PREVIEW_LAYOUT, "--layout", help="--layout: clean, cockpit, report"),
     debug_artifacts: bool = typer.Option(False, "--debug-artifacts"),
     no_cache_raw: bool = typer.Option(False, "--no-cache-raw"),
     include_archives: bool = typer.Option(False, "--include-archives"),
@@ -522,6 +523,7 @@ def task_preview_real(
         sample_grid_size=grid_size if grid_size is not None else sample_grid_size,
         preview_expand_factor=preview_expand_factor,
         cdl_render_mode=cdl_render_mode,
+        preview_layout=layout,
     )
     if report["network_run"]:
         text = (
@@ -576,6 +578,42 @@ def copernicus_sentinel_search_plan(
     emit(plan, json_output=json_output, plain=True, plain_text=text)
 
 
+@copernicus_sentinel_app.command("search-live")
+def copernicus_sentinel_search_live(
+    task_id: str,
+    allow_network: bool = typer.Option(False, "--allow-network"),
+    collection: str = typer.Option(copernicus_cdse.SENTINEL2_L2A_COLLECTION, "--collection"),
+    cloud_cover_max: int = typer.Option(30, "--cloud-cover-max"),
+    max_items: int = typer.Option(5, "--max-items"),
+    timeout_seconds: int = typer.Option(25, "--timeout-seconds"),
+    max_bytes: int = typer.Option(1_000_000, "--max-bytes"),
+    fields_minimal: bool = typer.Option(False, "--fields-minimal"),
+    json_output: bool = typer.Option(False, "--json"),
+    plain: bool = typer.Option(False, "--plain"),
+) -> None:
+    if not allow_network:
+        raise typer.BadParameter("search-live requires --allow-network")
+    report = copernicus_cdse.create_search_live(
+        task_id,
+        collection=collection,
+        cloud_cover_max=cloud_cover_max,
+        max_items=max_items,
+        timeout_seconds=timeout_seconds,
+        max_bytes=max_bytes,
+        fields_minimal=fields_minimal,
+    )
+    text = (
+        f"search_live_json: {report['json_path']}\n"
+        f"search_live_md: {report['md_path']}\n"
+        f"source_id: {report['source_id']}\n"
+        f"collection: {report['collection']}\n"
+        f"http_status: {report['http_status']}\n"
+        f"item_count: {report['item_count']}\n"
+        "no_downloads: True\n"
+    )
+    emit(report, json_output=json_output, plain=True, plain_text=text)
+
+
 @stack_app.command("preview")
 def stack_preview(task_id: str, open_after_create: bool = typer.Option(False, "--open"), json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
     task_preview(task_id, open_after_create=open_after_create, json_output=json_output, plain=plain)
@@ -594,6 +632,7 @@ def stack_preview_real(
     grid_size: Optional[int] = typer.Option(None, "--grid-size", min=1, max=7, help="--grid-size alias for --sample-grid-size"),
     preview_expand_factor: float = typer.Option(real_preview.DEFAULT_PREVIEW_EXPAND_FACTOR, "--preview-expand-factor", min=1.0, max=25.0, help="--preview-expand-factor"),
     cdl_render_mode: str = typer.Option("auto", "--cdl-render-mode", help="--cdl-render-mode: auto, service_png, manual_samples, service_tiff"),
+    layout: str = typer.Option(real_preview.DEFAULT_PREVIEW_LAYOUT, "--layout", help="--layout: clean, cockpit, report"),
     debug_artifacts: bool = typer.Option(False, "--debug-artifacts"),
     no_cache_raw: bool = typer.Option(False, "--no-cache-raw"),
     include_archives: bool = typer.Option(False, "--include-archives"),
@@ -618,6 +657,7 @@ def stack_preview_real(
         grid_size=grid_size,
         preview_expand_factor=preview_expand_factor,
         cdl_render_mode=cdl_render_mode,
+        layout=layout,
         json_output=json_output,
         plain=plain,
     )

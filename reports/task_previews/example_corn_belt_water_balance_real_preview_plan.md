@@ -5,6 +5,8 @@
 - Max bytes/source: `65536`
 
 ## Source plan
+Canonical source ids are preserved in JSON; visual labels are display-only.
+
 | Source | Status | Render kind | Warning |
 | --- | --- | --- | --- |
 | `prism_daily_ppt_static_zip` | `semantic_fallback` | `semantic_fallback` | `archive_requires_explicit_include_archives` |

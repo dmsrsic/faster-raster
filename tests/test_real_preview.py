@@ -331,3 +331,46 @@ def test_cdl_black_png_no_candidate_becomes_no_data_without_samples(tmp_path, mo
     assert result["export_cascade_success"] is False
     assert result["status"] == "no_data_or_placeholder"
     assert result["rendered"] is False
+
+
+
+def test_preview_layout_metadata_for_dry_run(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    report = real_preview.create_real_preview(task_with_sources(["prism_daily_ppt_static_zip", "cdl_arcgis_tiny_export", "usgs_3dep_dem"]), preview_layout="clean")
+    assert report["preview_layout"] == "clean"
+    assert report["preview_ux_version"] == "0.5.9"
+    assert report["base_raster_was_tiled"] is False
+    assert report["base_raster_fit_mode"] == "nearest_neighbor_contain"
+    assert report["visual_source_labels"]["cdl_arcgis_tiny_export"] == "CDL"
+    assert report["source_results"][1]["source_id"] == "cdl_arcgis_tiny_export"
+
+
+def test_clean_cockpit_report_layouts_write_png_json_md(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    png = png_bytes([[10, 80, 20], [220, 210, 30], [40, 40, 200], [180, 70, 90]])
+    monkeypatch.setattr(real_preview.urllib.request, "urlopen", lambda *a, **k: FakeResponse(png, "image/png"))
+    for layout in ["clean", "cockpit", "report"]:
+        report = real_preview.create_real_preview(task_with_sources(["cdl_arcgis_tiny_export"]), allow_network=True, preview_layout=layout, max_bytes_per_source=2000)
+        assert report["preview_layout"] == layout
+        assert report["base_raster_was_tiled"] is False
+        assert Path(report["png_path"]).read_bytes().startswith(bytes([137]) + b"PNG")
+        assert Path(report["preview_json"]).exists()
+        assert Path(report["md_path"]).exists()
+
+
+def test_preview_reads_existing_sentinel_search_live_json(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    path = Path("reports/copernicus")
+    path.mkdir(parents=True)
+    (path / "real_preview_task_sentinel2_l2a_search_live.json").write_text(json.dumps({
+        "auth_present": True,
+        "item_count": 2,
+        "items": [{"eo_cloud_cover": 12.5}, {"eo_cloud_cover": 30.0}],
+    }), encoding="utf-8")
+    report = real_preview.create_real_preview(task_with_sources(["copernicus_sentinel2_l2a_cdse_stac"]))
+    assert report["sentinel_stac_live_result_present"] is True
+    assert report["sentinel_stac_item_count"] == 2
+    assert report["sentinel_best_cloud_cover"] == 12.5
+    assert report["sentinel_auth_present"] is True
+    assert report["sentinel_pixels_rendered"] is False
+    assert report["real_fetch_attempted"] is False

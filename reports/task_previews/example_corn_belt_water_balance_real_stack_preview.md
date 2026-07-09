@@ -3,6 +3,7 @@
 - PNG: `reports/task_previews/example_corn_belt_water_balance_real_stack_preview.png`
 - Network run: `True`
 - Real raster data rendered: `True`
+- Preview layout: `clean`
 - Recommended next action: `inspect_cache_image`
 
 ## Source results

@@ -1,6 +1,8 @@
 {
   "active_visual_layer_count": 3,
   "adapter_needed_layer_count": 1,
+  "base_raster_fit_mode": "nearest_neighbor_contain",
+  "base_raster_was_tiled": false,
   "bbox": [
     -83.2,
     39.8,
@@ -19,37 +21,45 @@
   "compositing_formula": "opacity = clamp(0.18, 0.92, base_opacity / log2(n + 1)); first meaningful real raster base >= 0.72",
   "diagnostic_summary": [],
   "fallback_layer_count": 3,
-  "generated_at_utc": "2026-07-09T15:01:49Z",
+  "generated_at_utc": "2026-07-09T15:29:44Z",
   "json_path": "reports/task_previews/example_corn_belt_water_balance_real_preview_plan.json",
   "layer_opacity_plan": [
     {
       "base_opacity": 0.5,
       "opacity": 0.25,
       "render_kind": "semantic_fallback",
-      "role": "semantic_overlay",
+      "role": "semantic_precip_overlay",
       "source_id": "prism_daily_ppt_static_zip",
       "status": "semantic_fallback",
-      "transparency_pct": 75
+      "transparency_pct": 75,
+      "visual_label": "PRISM"
     },
     {
       "base_opacity": 0.92,
       "opacity": 0.46,
       "render_kind": "real_raster",
-      "role": "real_raster_base",
+      "role": "real_base",
       "source_id": "cdl_arcgis_tiny_export",
       "status": "supported_real_preview",
-      "transparency_pct": 54
+      "transparency_pct": 54,
+      "visual_label": "CDL"
     },
     {
       "base_opacity": 0.5,
       "opacity": 0.25,
       "render_kind": "semantic_fallback",
-      "role": "semantic_overlay",
+      "role": "semantic_elevation_overlay",
       "source_id": "usgs_3dep_dem",
       "status": "adapter_needed",
-      "transparency_pct": 75
+      "transparency_pct": 75,
+      "visual_label": "3DEP"
     }
   ],
+  "layer_roles": {
+    "cdl_arcgis_tiny_export": "real_base",
+    "prism_daily_ppt_static_zip": "semantic_precip_overlay",
+    "usgs_3dep_dem": "semantic_elevation_overlay"
+  },
   "layers": [
     {
       "color": [
@@ -85,10 +95,16 @@
       "status": "adapter_needed"
     }
   ],
+  "map_panel_render_mode": "selected_base_raster_with_translucent_semantic_overlays",
   "max_bytes_per_source": 65536,
   "max_pixels": 262144,
   "md_path": "reports/task_previews/example_corn_belt_water_balance_real_preview_plan.md",
   "network_run": false,
+  "opacity_ledger_text": [
+    "PRISM semantic_precip_overlay op 0.25 transparent 75% status semantic_fallback",
+    "CDL real_base op 0.46 transparent 54% status supported_real_preview",
+    "3DEP semantic_elevation_overlay op 0.25 transparent 75% status adapter_needed"
+  ],
   "png_path": null,
   "preview_expand_factor": 1.0,
   "preview_fetch_bbox": [
@@ -97,7 +113,9 @@
     -83.19,
     39.81
   ],
+  "preview_layout": "clean",
   "preview_size": 512,
+  "preview_ux_version": "0.5.9",
   "real_data_preview": true,
   "real_fetch_attempted": false,
   "real_layer_count": 0,
@@ -107,9 +125,15 @@
   "real_sample_layer_count": 0,
   "recommended_next_action": "no_real_raster_rendered",
   "sample_grid_size": 3,
+  "selected_cdl_candidate_summary": null,
   "semantic_fallback_count": 3,
   "semantic_layer_count": 2,
   "semantic_preview": true,
+  "sentinel_auth_present": null,
+  "sentinel_best_cloud_cover": null,
+  "sentinel_pixels_rendered": false,
+  "sentinel_stac_item_count": 0,
+  "sentinel_stac_live_result_present": false,
   "skipped_count": 3,
   "source_count": 3,
   "source_results": [
@@ -348,10 +372,15 @@
       "warning": "no_safe_tiny_dem_endpoint_yet"
     }
   ],
-  "stack_compositor_version": "0.5.8",
+  "stack_compositor_version": "0.5.9",
   "target_crs": "EPSG:5070",
   "task_id": "example_corn_belt_water_balance",
   "theme_count": 3,
+  "visual_source_labels": {
+    "cdl_arcgis_tiny_export": "CDL",
+    "prism_daily_ppt_static_zip": "PRISM",
+    "usgs_3dep_dem": "3DEP"
+  },
   "warnings": [
     "usgs_3dep_dem is adapter_needed",
     "archive_requires_explicit_include_archives",

@@ -51,3 +51,10 @@ Dry-run remains the default when `--allow-network` is omitted.
 Tasks may include `copernicus_sentinel2_l2a_cdse_stac` as a credential-gated source. The example `example_corn_belt_water_balance_plus_sentinel` keeps PRISM, CDL, USGS 3DEP, and Sentinel-2 together for semantic planning without requiring credentials.
 
 Preview commands remain dry-run by default. Sentinel-2 CDSE is represented as a planned credential-gated layer; no live STAC search or product download is performed by task preview.
+
+
+## v0.5.9 Preview Layouts and Sentinel Readiness
+
+`task preview-real` accepts `--layout clean`, `--layout cockpit`, and `--layout report`. Layout changes only the visual report. Task YAML is not mutated during preview runs, and JSON keeps canonical source ids even when the image uses short labels like PRISM, CDL, 3DEP, and Sentinel-2.
+
+Sentinel-2 CDSE remains a credential-gated planning source. A task can include `copernicus_sentinel2_l2a_cdse_stac`; preview may show local STAC search-live metadata if a report already exists, but it does not fetch or render Sentinel pixels.

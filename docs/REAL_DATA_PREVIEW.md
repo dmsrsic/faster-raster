@@ -96,3 +96,14 @@ The first response with more than two unique colors, nontransparent pixels, domi
 Stacked real-preview rendering now records a transparency ledger. The formula is `opacity = clamp(0.18, 0.92, base_opacity / log2(n + 1))`; the first meaningful real raster base is held at least `0.72` opacity so CDL remains readable, while semantic and warning overlays stay translucent.
 
 Credential-gated layers such as Copernicus Sentinel-2 CDSE appear as planned/credential-gated semantic layers unless explicit auth and future opt-in live commands are added. No preview run mutates task YAML.
+
+
+## v0.5.9 Preview UX Polish
+
+Real preview now supports three layouts through `--layout clean`, `--layout cockpit`, and `--layout report`. The default is `clean`. `cockpit` preserves the earlier purple terminal-style view, while `report` uses a lighter README/demo-friendly presentation.
+
+The selected CDL export is rendered once as the base raster, fitted into the map panel with nearest-neighbor scaling so it keeps a pixelated raster feel without visual tiling. The preview JSON records `preview_layout`, `base_raster_fit_mode`, `base_raster_was_tiled: false`, `visual_source_labels`, `preview_ux_version`, and `selected_cdl_candidate_summary`.
+
+The CDL cascade is production preview logic. For the current task, the manual audit showed `no_time png32` worked while `time=2023` could return NoData; the cascade therefore tries `no_time png32` first and selects the first candidate whose diagnostics show real pixel evidence: more than two unique colors, nontransparent pixels, dominant fraction below 0.95, and no placeholder flag.
+
+If a local Sentinel search-live report exists, real preview reads it without network access and reports item count, best cloud cover, auth presence, and `sentinel_pixels_rendered: false`.

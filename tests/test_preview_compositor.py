@@ -37,3 +37,20 @@ def test_composite_rgba_layers_writes_png(tmp_path):
     path = tmp_path / "stack.png"
     image.save(path)
     assert path.read_bytes().startswith(bytes([137]) + b"PNG")
+
+
+
+def test_opacity_ledger_is_deterministic_and_uses_visual_roles():
+    results = [
+        {"source_id": "cdl_arcgis_tiny_export", "status": "real_raster_rendered", "render_kind": "real_raster", "rendered": True, "real_raster_rendered": True},
+        {"source_id": "prism_daily_ppt_static_zip", "status": "semantic_fallback", "render_kind": "semantic_fallback", "rendered": False},
+        {"source_id": "copernicus_sentinel2_l2a_cdse_stac", "status": "planned", "render_kind": "semantic_fallback", "rendered": False},
+    ]
+    labels = {"cdl_arcgis_tiny_export": "CDL", "prism_daily_ppt_static_zip": "PRISM", "copernicus_sentinel2_l2a_cdse_stac": "Sentinel-2"}
+    first = preview_compositor.compute_stack_opacity_plan(results, labels)
+    second = preview_compositor.compute_stack_opacity_plan(results, labels)
+    assert first["opacity_ledger_text"] == second["opacity_ledger_text"]
+    assert first["layer_roles"]["cdl_arcgis_tiny_export"] == "real_base"
+    assert first["layer_roles"]["prism_daily_ppt_static_zip"] == "semantic_precip_overlay"
+    assert first["layer_roles"]["copernicus_sentinel2_l2a_cdse_stac"] == "credential_gated_scene_overlay"
+    assert "CDL real_base op" in first["opacity_ledger_text"][0]

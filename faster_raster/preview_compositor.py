@@ -6,14 +6,18 @@ from typing import Any
 
 from PIL import Image, ImageDraw
 
-STACK_COMPOSITOR_VERSION = "0.5.8"
+STACK_COMPOSITOR_VERSION = "0.5.9"
 MIN_OPACITY = 0.18
 MAX_OPACITY = 0.92
 BASE_OPACITY_BY_ROLE = {
     "real_raster_base": 0.92,
+    "real_base": 0.92,
     "categorical_raster": 0.78,
     "continuous_overlay": 0.62,
     "semantic_overlay": 0.50,
+    "semantic_precip_overlay": 0.50,
+    "semantic_elevation_overlay": 0.50,
+    "credential_gated_scene_overlay": 0.50,
     "point_or_sample": 0.90,
     "warning_mask": 0.35,
 }
@@ -30,8 +34,8 @@ def compute_layer_opacity(role: str, active_layer_count: int, *, first_meaningfu
     opacity = clamp(base / math.log2(n + 1))
     if first_meaningful_real_base:
         opacity = max(opacity, 0.72)
-    if role in {"semantic_overlay", "warning_mask"}:
-        opacity = min(opacity, 0.50 if role == "semantic_overlay" else 0.35)
+    if role in {"semantic_overlay", "semantic_precip_overlay", "semantic_elevation_overlay", "credential_gated_scene_overlay", "warning_mask"}:
+        opacity = min(opacity, 0.50 if role != "warning_mask" else 0.35)
     opacity = round(opacity, 3)
     return {
         "role": role,
@@ -42,14 +46,21 @@ def compute_layer_opacity(role: str, active_layer_count: int, *, first_meaningfu
 
 
 def role_for_result(result: dict[str, Any]) -> str:
+    source_id = result.get("source_id")
     render_kind = result.get("render_kind")
     status = result.get("status")
     if result.get("real_raster_rendered") or render_kind == "real_raster":
-        return "real_raster_base"
+        return "real_base"
     if render_kind == "real_categorical_samples":
         return "point_or_sample"
     if render_kind == "real_point":
         return "point_or_sample"
+    if source_id == "prism_daily_ppt_static_zip":
+        return "semantic_precip_overlay"
+    if source_id == "usgs_3dep_dem":
+        return "semantic_elevation_overlay"
+    if source_id == "copernicus_sentinel2_l2a_cdse_stac":
+        return "credential_gated_scene_overlay"
     if status == "adapter_needed":
         return "semantic_overlay"
     if status in {"no_data_or_placeholder", "fetch_failed"}:
@@ -61,19 +72,30 @@ def visible_layer_results(source_results: list[dict[str, Any]]) -> list[dict[str
     return [result for result in source_results if result.get("source_id")]
 
 
-def compute_stack_opacity_plan(source_results: list[dict[str, Any]]) -> dict[str, Any]:
+def opacity_ledger_lines(plan: list[dict[str, Any]]) -> list[str]:
+    lines = []
+    for item in plan:
+        label = item.get("visual_label") or item.get("source_id")
+        lines.append(f"{label} {item['role']} op {item['opacity']} transparent {item['transparency_pct']}% status {item['status']}")
+    return lines
+
+
+def compute_stack_opacity_plan(source_results: list[dict[str, Any]], visual_labels: dict[str, str] | None = None) -> dict[str, Any]:
+    visual_labels = visual_labels or {}
     layers = visible_layer_results(source_results)
     active_count = len(layers)
     first_real_seen = False
     plan = []
     for result in layers:
         role = role_for_result(result)
-        first_real = role == "real_raster_base" and not first_real_seen and bool(result.get("rendered"))
+        first_real = role in {"real_raster_base", "real_base"} and not first_real_seen and bool(result.get("rendered"))
         if first_real:
             first_real_seen = True
         opacity = compute_layer_opacity(role, active_count, first_meaningful_real_base=first_real)
+        source_id = result.get("source_id")
         plan.append({
-            "source_id": result.get("source_id"),
+            "source_id": source_id,
+            "visual_label": visual_labels.get(source_id, source_id),
             "status": result.get("status"),
             "render_kind": result.get("render_kind"),
             **opacity,
@@ -82,9 +104,11 @@ def compute_stack_opacity_plan(source_results: list[dict[str, Any]]) -> dict[str
         "stack_compositor_version": STACK_COMPOSITOR_VERSION,
         "active_visual_layer_count": active_count,
         "layer_opacity_plan": plan,
+        "layer_roles": {item["source_id"]: item["role"] for item in plan},
+        "opacity_ledger_text": opacity_ledger_lines(plan),
         "compositing_formula": COMPOSITING_FORMULA,
-        "real_layer_count": sum(1 for item in plan if item["role"] in {"real_raster_base", "categorical_raster", "continuous_overlay", "point_or_sample"} and next((r for r in layers if r.get("source_id") == item["source_id"]), {}).get("rendered")),
-        "semantic_layer_count": sum(1 for item in plan if item["role"] == "semantic_overlay"),
+        "real_layer_count": sum(1 for item in plan if item["role"] in {"real_raster_base", "real_base", "categorical_raster", "continuous_overlay", "point_or_sample"} and next((r for r in layers if r.get("source_id") == item["source_id"]), {}).get("rendered")),
+        "semantic_layer_count": sum(1 for item in plan if item["role"] in {"semantic_overlay", "semantic_precip_overlay", "semantic_elevation_overlay", "credential_gated_scene_overlay"}),
         "fallback_layer_count": sum(1 for result in layers if result.get("render_kind") == "semantic_fallback" or not result.get("rendered")),
         "adapter_needed_layer_count": sum(1 for result in layers if result.get("status") == "adapter_needed"),
     }
@@ -113,5 +137,5 @@ def render_stack_legend(draw: ImageDraw.ImageDraw, opacity_plan: list[dict[str, 
 
 def write_stack_transparency_ledger(report: dict[str, Any], path: Path) -> None:
     import json
-    payload = {key: report[key] for key in ["task_id", "stack_compositor_version", "active_visual_layer_count", "layer_opacity_plan", "compositing_formula", "real_layer_count", "semantic_layer_count", "fallback_layer_count", "adapter_needed_layer_count"] if key in report}
+    payload = {key: report[key] for key in ["task_id", "stack_compositor_version", "active_visual_layer_count", "layer_opacity_plan", "layer_roles", "opacity_ledger_text", "compositing_formula", "real_layer_count", "semantic_layer_count", "fallback_layer_count", "adapter_needed_layer_count"] if key in report}
     path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")

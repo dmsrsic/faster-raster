@@ -1,6 +1,8 @@
 {
   "active_visual_layer_count": 3,
   "adapter_needed_layer_count": 1,
+  "base_raster_fit_mode": "nearest_neighbor_contain",
+  "base_raster_was_tiled": false,
   "bbox": [
     -83.2,
     39.8,
@@ -19,36 +21,44 @@
   "compositing_formula": "opacity = clamp(0.18, 0.92, base_opacity / log2(n + 1)); first meaningful real raster base >= 0.72",
   "diagnostic_summary": [],
   "fallback_layer_count": 2,
-  "generated_at_utc": "2026-07-09T15:12:35Z",
+  "generated_at_utc": "2026-07-09T15:50:11Z",
   "layer_opacity_plan": [
     {
       "base_opacity": 0.5,
       "opacity": 0.25,
       "render_kind": "semantic_fallback",
-      "role": "semantic_overlay",
+      "role": "semantic_precip_overlay",
       "source_id": "prism_daily_ppt_static_zip",
       "status": "semantic_fallback",
-      "transparency_pct": 75
+      "transparency_pct": 75,
+      "visual_label": "PRISM"
     },
     {
       "base_opacity": 0.92,
       "opacity": 0.72,
       "render_kind": "real_raster",
-      "role": "real_raster_base",
+      "role": "real_base",
       "source_id": "cdl_arcgis_tiny_export",
       "status": "real_raster_rendered",
-      "transparency_pct": 28
+      "transparency_pct": 28,
+      "visual_label": "CDL"
     },
     {
       "base_opacity": 0.5,
       "opacity": 0.25,
       "render_kind": "semantic_fallback",
-      "role": "semantic_overlay",
+      "role": "semantic_elevation_overlay",
       "source_id": "usgs_3dep_dem",
       "status": "adapter_needed",
-      "transparency_pct": 75
+      "transparency_pct": 75,
+      "visual_label": "3DEP"
     }
   ],
+  "layer_roles": {
+    "cdl_arcgis_tiny_export": "real_base",
+    "prism_daily_ppt_static_zip": "semantic_precip_overlay",
+    "usgs_3dep_dem": "semantic_elevation_overlay"
+  },
   "layers": [
     {
       "color": [
@@ -84,10 +94,16 @@
       "status": "adapter_needed"
     }
   ],
+  "map_panel_render_mode": "selected_base_raster_with_translucent_semantic_overlays",
   "max_bytes_per_source": 2500000,
   "max_pixels": 262144,
   "md_path": "reports/task_previews/example_corn_belt_water_balance_real_stack_preview.md",
   "network_run": true,
+  "opacity_ledger_text": [
+    "PRISM semantic_precip_overlay op 0.25 transparent 75% status semantic_fallback",
+    "CDL real_base op 0.72 transparent 28% status real_raster_rendered",
+    "3DEP semantic_elevation_overlay op 0.25 transparent 75% status adapter_needed"
+  ],
   "png_path": "reports/task_previews/example_corn_belt_water_balance_real_stack_preview.png",
   "preview_expand_factor": 10.0,
   "preview_fetch_bbox": [
@@ -97,7 +113,9 @@
     39.855
   ],
   "preview_json": "reports/task_previews/example_corn_belt_water_balance_real_stack_preview.json",
+  "preview_layout": "clean",
   "preview_size": 512,
+  "preview_ux_version": "0.5.9",
   "real_data_preview": true,
   "real_fetch_attempted": true,
   "real_layer_count": 1,
@@ -107,9 +125,23 @@
   "real_sample_layer_count": 0,
   "recommended_next_action": "inspect_cache_image",
   "sample_grid_size": 5,
+  "selected_cdl_candidate_summary": {
+    "bytes": 74523,
+    "dominant_fraction": 0.256500244140625,
+    "selected_candidate": "no_time_png32",
+    "selected_format": "png32",
+    "selected_time_strategy": "no_time",
+    "sha_short": "1cb4875beee0",
+    "unique_colors": 26
+  },
   "semantic_fallback_count": 2,
   "semantic_layer_count": 2,
   "semantic_preview": true,
+  "sentinel_auth_present": null,
+  "sentinel_best_cloud_cover": null,
+  "sentinel_pixels_rendered": false,
+  "sentinel_stac_item_count": 0,
+  "sentinel_stac_live_result_present": false,
   "skipped_count": 2,
   "source_count": 3,
   "source_results": [
@@ -322,10 +354,15 @@
       "warning": "no_safe_tiny_dem_endpoint_yet"
     }
   ],
-  "stack_compositor_version": "0.5.8",
+  "stack_compositor_version": "0.5.9",
   "target_crs": "EPSG:5070",
   "task_id": "example_corn_belt_water_balance",
   "theme_count": 3,
+  "visual_source_labels": {
+    "cdl_arcgis_tiny_export": "CDL",
+    "prism_daily_ppt_static_zip": "PRISM",
+    "usgs_3dep_dem": "3DEP"
+  },
   "warnings": [
     "usgs_3dep_dem is adapter_needed",
     "archive_requires_explicit_include_archives",

@@ -13,7 +13,7 @@
   "datetime_range": "2023-01-01T00:00:00Z/2023-12-31T23:59:59Z",
   "endpoint": "https://stac.dataspace.copernicus.eu/v1/",
   "headers_preview": {
-    "User-Agent": "FasterRaster-CDSE-scaffold/0.5.8"
+    "User-Agent": "FasterRaster-CDSE-scaffold/0.5.9"
   },
   "network_run": false,
   "next_live_command": "faster-raster copernicus sentinel search example_corn_belt_water_balance --allow-network --auth-profile cdse_local --plain",

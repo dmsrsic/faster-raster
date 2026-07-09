@@ -130,3 +130,26 @@ Options:
 `faster-raster copernicus sentinel search-plan TASK_ID --plain` writes a dry-run STAC search plan to `reports/copernicus/`. Use `--json` for the same plan as JSON output. The command does not make a network request.
 
 Supported local environment variables are `CDSE_ACCESS_TOKEN`, `CDSE_REFRESH_TOKEN`, `CDSE_USERNAME`, `CDSE_PASSWORD`, and `CDSE_CLIENT_ID`. Keep them in your shell or an ignored local file such as `configs/auth_profiles.local.yaml`; do not commit credentials.
+
+
+## v0.5.9 Commands
+
+Real preview layouts:
+
+```bash
+faster-raster task preview-real example_corn_belt_water_balance --layout clean --plain
+faster-raster task preview-real example_corn_belt_water_balance --layout cockpit --plain
+faster-raster task preview-real example_corn_belt_water_balance --layout report --plain
+```
+
+Copernicus/CDSE auth and Sentinel STAC readiness:
+
+```bash
+faster-raster copernicus auth-check --plain
+faster-raster copernicus auth-check --json
+faster-raster copernicus auth-check --live --allow-network --plain
+faster-raster copernicus sentinel search-plan example_corn_belt_water_balance --plain
+faster-raster copernicus sentinel search-live example_corn_belt_water_balance --allow-network --plain
+```
+
+`search-live` performs only a bounded STAC JSON search. It does not download OData products, asset files, Sentinel Hub Process API imagery, or Sentinel pixels. Authorization headers are redacted in reports.
