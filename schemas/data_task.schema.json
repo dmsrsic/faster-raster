@@ -1,0 +1,129 @@
+{
+  "$id": "https://fasterraster.local/schemas/data_task.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "aoi": {
+      "additionalProperties": false,
+      "properties": {
+        "bbox": {
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 4,
+          "minItems": 4,
+          "type": "array"
+        },
+        "bbox_crs": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "bbox",
+        "bbox_crs"
+      ],
+      "type": "object"
+    },
+    "description": {
+      "type": "string"
+    },
+    "name": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "notes": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "preview": {
+      "additionalProperties": false,
+      "properties": {
+        "color_scheme": {
+          "enum": [
+            "default"
+          ],
+          "type": "string"
+        },
+        "open_after_create": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "color_scheme",
+        "open_after_create"
+      ],
+      "type": "object"
+    },
+    "sources": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "target_grid": {
+      "additionalProperties": false,
+      "properties": {
+        "crs": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "resolution_m": {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        }
+      },
+      "required": [
+        "crs"
+      ],
+      "type": "object"
+    },
+    "task_id": {
+      "pattern": "^[a-z0-9][a-z0-9_-]*$",
+      "type": "string"
+    },
+    "themes": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "time": {
+      "additionalProperties": false,
+      "properties": {
+        "dates": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "years": {
+          "items": {
+            "type": "integer"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "years",
+        "dates"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "task_id",
+    "name",
+    "aoi",
+    "target_grid",
+    "time",
+    "themes",
+    "sources",
+    "preview",
+    "notes"
+  ],
+  "title": "FasterRaster Data Task",
+  "type": "object"
+}

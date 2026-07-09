@@ -12,6 +12,7 @@ from faster_raster import cli_models as models
 from faster_raster import cli_render as render
 from faster_raster import cli_lingo
 from faster_raster import user_toggles
+from faster_raster import task_builder
 
 sources_app = typer.Typer(no_args_is_help=True)
 stack_app = typer.Typer(no_args_is_help=True)
@@ -22,6 +23,7 @@ help_app = typer.Typer(no_args_is_help=True)
 toggles_app = typer.Typer(no_args_is_help=True)
 cook_app = typer.Typer(no_args_is_help=True)
 knobs_app = typer.Typer(no_args_is_help=False, invoke_without_command=True)
+task_app = typer.Typer(no_args_is_help=True)
 
 
 def emit(value, *, json_output: bool = False, plain: bool = False, no_color: bool = False, plain_text: str | None = None, table: tuple[str, list[str], list[list]] | None = None) -> None:
@@ -417,11 +419,78 @@ def cook_endpoints(json_output: bool = typer.Option(False, "--json"), plain: boo
 def endpoints(json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain"), wide: bool = typer.Option(False, "--wide"), ready_only: bool = typer.Option(False, "--ready-only")) -> None:
     cook_endpoints(json_output=json_output, plain=plain, wide=wide, ready_only=ready_only, pack=Path("reports/endpoint_readiness_pack_v0_5_3.json"))
 
+
+@task_app.command("new")
+def task_new(
+    task_id: str = typer.Option(..., "--id"),
+    name: str = typer.Option(..., "--name"),
+    bbox: str = typer.Option(..., "--bbox"),
+    bbox_crs: str = typer.Option(..., "--bbox-crs"),
+    target_crs: str = typer.Option(..., "--target-crs"),
+    resolution_m: float = typer.Option(30, "--resolution-m"),
+    years: str = typer.Option("", "--years"),
+    dates: str = typer.Option("", "--dates"),
+    theme: list[str] = typer.Option([], "--theme"),
+    source: list[str] = typer.Option([], "--source"),
+    description: str | None = typer.Option(None, "--description"),
+    json_output: bool = typer.Option(False, "--json"),
+    plain: bool = typer.Option(False, "--plain"),
+) -> None:
+    task = task_builder.default_task(task_id, name, task_builder.parse_bbox(bbox), bbox_crs, target_crs, task_builder.parse_years(years), list(theme), list(source), description, resolution_m=resolution_m, dates=task_builder.parse_dates(dates))
+    errors = task_builder.validate_task(task)
+    if errors:
+        raise typer.BadParameter("; ".join(errors))
+    path = task_builder.save_task(task)
+    summary = task_builder.write_task_reports(task)
+    payload = {"task_path": str(path), "summary": summary}
+    text = f"created task: {path}\njson: {summary['output_artifacts']['task_json']}\nmarkdown: {summary['output_artifacts']['task_md']}\n"
+    emit(payload, json_output=json_output, plain=True, plain_text=text)
+
+
+@task_app.command("list")
+def task_list(json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
+    rows = task_builder.list_tasks()
+    text = render.table_plain(["task_id", "name", "sources", "themes", "path"], [[r["task_id"], r["name"], r["sources"], r["themes"], r["path"]] for r in rows], max_widths=[36, 34, 7, 7, 46])
+    emit({"tasks": rows}, json_output=json_output, plain=True, plain_text=text)
+
+
+@task_app.command("show")
+def task_show(task_id: str, json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
+    task = task_builder.load_task(task_id)
+    summary = task_builder.task_summary(task)
+    emit(summary, json_output=json_output, plain=True, plain_text=task_builder.render_task_plain(summary))
+
+
+@task_app.command("validate")
+def task_validate(task_id: str, json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
+    task = task_builder.load_task(task_id)
+    errors = task_builder.validate_task(task)
+    payload = {"task_id": task_id, "status": "PASS" if not errors else "FAIL", "errors": errors, "network_needed": False}
+    text = f"task_id: {task_id}\nstatus: {payload['status']}\nnetwork_needed: False\n" + ("" if not errors else "errors:\n" + "\n".join(f"  - {e}" for e in errors) + "\n")
+    emit(payload, json_output=json_output, plain=True, plain_text=text)
+    if errors:
+        raise typer.Exit(code=1)
+
+
+@task_app.command("preview")
+def task_preview(task_id: str, open_after_create: bool = typer.Option(False, "--open"), json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
+    report = task_builder.create_preview(task_builder.load_task(task_id), open_after_create=open_after_create)
+    text = f"preview_png: {report['preview_png']}\npreview_json: {report['preview_json']}\npreview_md: {report['preview_md']}\nnetwork_run: False\n"
+    if open_after_create:
+        text += task_builder.open_preview(Path(report['preview_png'])) + "\n"
+    emit(report, json_output=json_output, plain=True, plain_text=text)
+
+
+@stack_app.command("preview")
+def stack_preview(task_id: str, open_after_create: bool = typer.Option(False, "--open"), json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
+    task_preview(task_id, open_after_create=open_after_create, json_output=json_output, plain=plain)
+
 def register_product_commands(app: typer.Typer) -> None:
     app.command("version")(version_command)
     app.command("doctor")(doctor_command)
     app.add_typer(sources_app, name="sources")
     app.add_typer(stack_app, name="stack")
+    app.add_typer(task_app, name="task")
     app.add_typer(unlocks_app, name="unlocks")
     app.add_typer(auth_app, name="auth")
     app.add_typer(probe_app, name="probe")

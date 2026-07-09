@@ -1,0 +1,32 @@
+{
+  "bbox": [
+    -83.2,
+    39.8,
+    -83.19,
+    39.81
+  ],
+  "bbox_crs": "EPSG:4326",
+  "dates": [],
+  "name": "Corn Belt water balance demo",
+  "output_artifacts": {
+    "preview_json": "reports/task_previews/example_corn_belt_water_balance_stack_preview.json",
+    "preview_md": "reports/task_previews/example_corn_belt_water_balance_stack_preview.md",
+    "preview_png": "reports/task_previews/example_corn_belt_water_balance_stack_preview.png",
+    "task_json": "reports/task_builder/example_corn_belt_water_balance_task.json",
+    "task_md": "reports/task_builder/example_corn_belt_water_balance_task.md",
+    "task_yaml": "tasks/example_corn_belt_water_balance.yaml"
+  },
+  "path": "tasks/example_corn_belt_water_balance.yaml",
+  "source_count": 3,
+  "target_crs": "EPSG:5070",
+  "task_id": "example_corn_belt_water_balance",
+  "theme_count": 3,
+  "validation_errors": [],
+  "validation_status": "PASS",
+  "warnings": [
+    "usgs_3dep_dem is adapter_needed"
+  ],
+  "years": [
+    2023
+  ]
+}

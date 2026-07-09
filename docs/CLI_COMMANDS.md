@@ -76,3 +76,18 @@ faster-raster endpoints --plain
 ```
 
 Use `python3 -m json.tool` for JSON validation in WSL environments.
+
+## Data task builder and stack preview
+
+```bash
+faster-raster task new --id example_corn_belt_water_balance --name "Corn Belt water balance demo" --bbox=-83.2,39.8,-83.19,39.81 --bbox-crs EPSG:4326 --target-crs EPSG:5070 --years 2023 --theme precipitation --theme landcover --source prism_daily_ppt_static_zip --source cdl_arcgis_tiny_export
+faster-raster task list --plain
+faster-raster task show example_corn_belt_water_balance --plain
+faster-raster task validate example_corn_belt_water_balance --plain
+faster-raster task preview example_corn_belt_water_balance --plain
+faster-raster stack preview example_corn_belt_water_balance --open
+```
+
+Task previews are static local PNG artifacts. They do not download rasters, contact endpoints, or render live data. For negative bbox coordinates, use Click's reliable `--bbox=-83.2,...` form.
+
+See `docs/DATA_TASK_BUILDER.md` for the local data task and semantic stack preview workflow.

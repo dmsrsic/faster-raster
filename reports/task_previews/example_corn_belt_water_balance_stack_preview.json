@@ -1,0 +1,63 @@
+{
+  "bbox": [
+    -83.2,
+    39.8,
+    -83.19,
+    39.81
+  ],
+  "bbox_crs": "EPSG:4326",
+  "dates": [],
+  "generated_at_utc": "2026-07-09T02:19:21Z",
+  "layers": [
+    {
+      "color": [
+        72,
+        136,
+        204
+      ],
+      "display_name": "PRISM daily precipitation",
+      "provider": "PRISM Climate Group",
+      "source_id": "prism_daily_ppt_static_zip",
+      "status": "verified_now"
+    },
+    {
+      "color": [
+        82,
+        168,
+        83
+      ],
+      "display_name": "USDA NASS CDL ImageServer",
+      "provider": "USDA_NASS",
+      "source_id": "cdl_arcgis_tiny_export",
+      "status": "verified_now"
+    },
+    {
+      "color": [
+        236,
+        174,
+        73
+      ],
+      "display_name": "USGS 3DEP DEM",
+      "provider": "USGS",
+      "source_id": "usgs_3dep_dem",
+      "status": "adapter_needed"
+    }
+  ],
+  "md_path": "reports/task_previews/example_corn_belt_water_balance_stack_preview.md",
+  "network_run": false,
+  "png_path": "reports/task_previews/example_corn_belt_water_balance_stack_preview.png",
+  "preview_json": "reports/task_previews/example_corn_belt_water_balance_stack_preview.json",
+  "preview_md": "reports/task_previews/example_corn_belt_water_balance_stack_preview.md",
+  "preview_png": "reports/task_previews/example_corn_belt_water_balance_stack_preview.png",
+  "resolution_m": 30,
+  "source_count": 3,
+  "target_crs": "EPSG:5070",
+  "task_id": "example_corn_belt_water_balance",
+  "theme_count": 3,
+  "warnings": [
+    "usgs_3dep_dem is adapter_needed"
+  ],
+  "years": [
+    2023
+  ]
+}
