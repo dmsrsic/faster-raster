@@ -91,3 +91,33 @@ faster-raster stack preview example_corn_belt_water_balance --open
 Task previews are static local PNG artifacts. They do not download rasters, contact endpoints, or render live data. For negative bbox coordinates, use Click's reliable `--bbox=-83.2,...` form.
 
 See `docs/DATA_TASK_BUILDER.md` for the local data task and semantic stack preview workflow.
+
+## Real-data preview dry run
+
+```bash
+faster-raster task preview-real example_corn_belt_water_balance --plain
+faster-raster stack preview-real example_corn_belt_water_balance --plain
+```
+
+Live real-data preview remains opt-in with `--allow-network`; see `docs/REAL_DATA_PREVIEW.md`.
+
+Real preview diagnostics example:
+
+```bash
+faster-raster task preview-real example_corn_belt_water_balance --allow-network --max-bytes-per-source 2500000 --preview-size 512 --debug-artifacts --plain
+```
+
+Dry-run remains the default when `--allow-network` is omitted.
+
+## CDL sample verification flags
+
+```bash
+faster-raster task preview-real example_corn_belt_water_balance --allow-network --max-bytes-per-source 2500000 --max-pixels 262144 --preview-size 512 --sample-grid-size 5 --preview-expand-factor 10 --cdl-render-mode auto --debug-artifacts --plain
+```
+
+Options:
+
+- `--cdl-verify-samples / --no-cdl-verify-samples` controls CDL identify sampling when the service PNG is single-color.
+- `--sample-grid-size` sets a 1..7 sample grid; `--grid-size` is an alias.
+- `--preview-expand-factor` expands only the preview fetch bbox around the task AOI centroid. It does not mutate task YAML.
+- `--cdl-render-mode` accepts `auto`, `service_png`, `manual_samples`, or `service_tiff`.

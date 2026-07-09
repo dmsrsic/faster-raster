@@ -1,0 +1,5125 @@
+{
+  "base": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer",
+  "bbox_candidates": {
+    "illinois_known_ag": [
+      -89.2,
+      40.0,
+      -89.05,
+      40.15
+    ],
+    "iowa_known_ag": [
+      -93.7,
+      41.95,
+      -93.55,
+      42.1
+    ],
+    "task_expand10": [
+      -83.245,
+      39.755,
+      -83.145,
+      39.855
+    ],
+    "task_original": [
+      -83.2,
+      39.8,
+      -83.19,
+      39.81
+    ]
+  },
+  "best_export_candidates": [
+    {
+      "bbox_name": "task_expand10",
+      "bytes": 74523,
+      "cache_path": "reports/task_previews/cdl_manual_audit/export_task_expand10_no_time_png32_1cb4875beee09d2f.png",
+      "content_type": "image/png",
+      "dominant_fraction": 0.2553863525390625,
+      "format": "png32",
+      "http_status": 200,
+      "meaningful_image": true,
+      "nontransparent_pixels": 262144,
+      "score": 138,
+      "time_variant": "no_time",
+      "unique_colors": 28,
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-83.24500000,39.75500000,-83.14500000,39.85500000&bboxSR=4326&imageSR=4326&size=512,512&format=png32&transparent=false"
+    },
+    {
+      "bbox_name": "task_expand10",
+      "bytes": 73652,
+      "cache_path": "reports/task_previews/cdl_manual_audit/export_task_expand10_no_time_png_bb9f867777f60cc3.png",
+      "content_type": "image/png",
+      "dominant_fraction": 0.2553863525390625,
+      "format": "png",
+      "http_status": 200,
+      "meaningful_image": true,
+      "nontransparent_pixels": 262144,
+      "score": 138,
+      "time_variant": "no_time",
+      "unique_colors": 28,
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-83.24500000,39.75500000,-83.14500000,39.85500000&bboxSR=4326&imageSR=4326&size=512,512&format=png&transparent=false"
+    },
+    {
+      "bbox_name": "iowa_known_ag",
+      "bytes": 73313,
+      "cache_path": "reports/task_previews/cdl_manual_audit/export_iowa_known_ag_time_mid_2023_epoch_png32_8fc93fe7ac58eccf.png",
+      "content_type": "image/png",
+      "dominant_fraction": 0.28385162353515625,
+      "format": "png32",
+      "http_status": 200,
+      "meaningful_image": true,
+      "nontransparent_pixels": 262144,
+      "score": 134,
+      "time_variant": "time_mid_2023_epoch",
+      "unique_colors": 24,
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-93.70000000,41.95000000,-93.55000000,42.10000000&bboxSR=4326&imageSR=4326&size=512,512&format=png32&transparent=false&time=1688169600000"
+    },
+    {
+      "bbox_name": "iowa_known_ag",
+      "bytes": 71737,
+      "cache_path": "reports/task_previews/cdl_manual_audit/export_iowa_known_ag_time_mid_2023_epoch_png_187136a253e49275.png",
+      "content_type": "image/png",
+      "dominant_fraction": 0.28385162353515625,
+      "format": "png",
+      "http_status": 200,
+      "meaningful_image": true,
+      "nontransparent_pixels": 262144,
+      "score": 134,
+      "time_variant": "time_mid_2023_epoch",
+      "unique_colors": 24,
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-93.70000000,41.95000000,-93.55000000,42.10000000&bboxSR=4326&imageSR=4326&size=512,512&format=png&transparent=false&time=1688169600000"
+    },
+    {
+      "bbox_name": "iowa_known_ag",
+      "bytes": 73313,
+      "cache_path": "reports/task_previews/cdl_manual_audit/export_iowa_known_ag_time_2023_interval_png32_8fc93fe7ac58eccf.png",
+      "content_type": "image/png",
+      "dominant_fraction": 0.28385162353515625,
+      "format": "png32",
+      "http_status": 200,
+      "meaningful_image": true,
+      "nontransparent_pixels": 262144,
+      "score": 134,
+      "time_variant": "time_2023_interval",
+      "unique_colors": 24,
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-93.70000000,41.95000000,-93.55000000,42.10000000&bboxSR=4326&imageSR=4326&size=512,512&format=png32&transparent=false&time=1672531200000,1703980800000"
+    },
+    {
+      "bbox_name": "iowa_known_ag",
+      "bytes": 71737,
+      "cache_path": "reports/task_previews/cdl_manual_audit/export_iowa_known_ag_time_2023_interval_png_187136a253e49275.png",
+      "content_type": "image/png",
+      "dominant_fraction": 0.28385162353515625,
+      "format": "png",
+      "http_status": 200,
+      "meaningful_image": true,
+      "nontransparent_pixels": 262144,
+      "score": 134,
+      "time_variant": "time_2023_interval",
+      "unique_colors": 24,
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-93.70000000,41.95000000,-93.55000000,42.10000000&bboxSR=4326&imageSR=4326&size=512,512&format=png&transparent=false&time=1672531200000,1703980800000"
+    },
+    {
+      "bbox_name": "iowa_known_ag",
+      "bytes": 73313,
+      "cache_path": "reports/task_previews/cdl_manual_audit/export_iowa_known_ag_mosaic_year_eq_2023_png32_8fc93fe7ac58eccf.png",
+      "content_type": "image/png",
+      "dominant_fraction": 0.28385162353515625,
+      "format": "png32",
+      "http_status": 200,
+      "meaningful_image": true,
+      "nontransparent_pixels": 262144,
+      "score": 134,
+      "time_variant": "mosaic_year_eq_2023",
+      "unique_colors": 24,
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-93.70000000,41.95000000,-93.55000000,42.10000000&bboxSR=4326&imageSR=4326&size=512,512&format=png32&transparent=false&mosaicRule={\"mosaicMethod\":+\"esriMosaicAttribute\",+\"where\":+\"Year+%3D+2023\",+\"sortField\":+\"Year\",+\"sortValue\":+\"2023\"}"
+    },
+    {
+      "bbox_name": "iowa_known_ag",
+      "bytes": 71737,
+      "cache_path": "reports/task_previews/cdl_manual_audit/export_iowa_known_ag_mosaic_year_eq_2023_png_187136a253e49275.png",
+      "content_type": "image/png",
+      "dominant_fraction": 0.28385162353515625,
+      "format": "png",
+      "http_status": 200,
+      "meaningful_image": true,
+      "nontransparent_pixels": 262144,
+      "score": 134,
+      "time_variant": "mosaic_year_eq_2023",
+      "unique_colors": 24,
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-93.70000000,41.95000000,-93.55000000,42.10000000&bboxSR=4326&imageSR=4326&size=512,512&format=png&transparent=false&mosaicRule={\"mosaicMethod\":+\"esriMosaicAttribute\",+\"where\":+\"Year+%3D+2023\",+\"sortField\":+\"Year\",+\"sortValue\":+\"2023\"}"
+    },
+    {
+      "bbox_name": "task_original",
+      "bytes": 8771,
+      "cache_path": "reports/task_previews/cdl_manual_audit/export_task_original_no_time_png32_001fad419cfab20e.png",
+      "content_type": "image/png",
+      "dominant_fraction": 0.4345207214355469,
+      "format": "png32",
+      "http_status": 200,
+      "meaningful_image": true,
+      "nontransparent_pixels": 262144,
+      "score": 130,
+      "time_variant": "no_time",
+      "unique_colors": 20,
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-83.20000000,39.80000000,-83.19000000,39.81000000&bboxSR=4326&imageSR=4326&size=512,512&format=png32&transparent=false"
+    },
+    {
+      "bbox_name": "task_original",
+      "bytes": 8377,
+      "cache_path": "reports/task_previews/cdl_manual_audit/export_task_original_no_time_png_458326671673b6cb.png",
+      "content_type": "image/png",
+      "dominant_fraction": 0.4345207214355469,
+      "format": "png",
+      "http_status": 200,
+      "meaningful_image": true,
+      "nontransparent_pixels": 262144,
+      "score": 130,
+      "time_variant": "no_time",
+      "unique_colors": 20,
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-83.20000000,39.80000000,-83.19000000,39.81000000&bboxSR=4326&imageSR=4326&size=512,512&format=png&transparent=false"
+    },
+    {
+      "bbox_name": "iowa_known_ag",
+      "bytes": 74332,
+      "cache_path": "reports/task_previews/cdl_manual_audit/export_iowa_known_ag_no_time_png32_4bf23978fe0d38ab.png",
+      "content_type": "image/png",
+      "dominant_fraction": 0.3098602294921875,
+      "format": "png32",
+      "http_status": 200,
+      "meaningful_image": true,
+      "nontransparent_pixels": 262144,
+      "score": 130,
+      "time_variant": "no_time",
+      "unique_colors": 20,
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-93.70000000,41.95000000,-93.55000000,42.10000000&bboxSR=4326&imageSR=4326&size=512,512&format=png32&transparent=false"
+    },
+    {
+      "bbox_name": "iowa_known_ag",
+      "bytes": 73396,
+      "cache_path": "reports/task_previews/cdl_manual_audit/export_iowa_known_ag_no_time_png_3c652394aa2f41ae.png",
+      "content_type": "image/png",
+      "dominant_fraction": 0.3098602294921875,
+      "format": "png",
+      "http_status": 200,
+      "meaningful_image": true,
+      "nontransparent_pixels": 262144,
+      "score": 130,
+      "time_variant": "no_time",
+      "unique_colors": 20,
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-93.70000000,41.95000000,-93.55000000,42.10000000&bboxSR=4326&imageSR=4326&size=512,512&format=png&transparent=false"
+    }
+  ],
+  "best_identify_candidates": [
+    {
+      "bbox_name": "task_original",
+      "bytes": 254,
+      "content_type": "application/json; charset=UTF-8",
+      "http_status": 200,
+      "keys": [
+        "objectId",
+        "name",
+        "value",
+        "location",
+        "properties",
+        "catalogItems",
+        "catalogItemVisibilities"
+      ],
+      "meaningful_count": 0,
+      "meaningful_values": [],
+      "score": 0,
+      "time_variant": "no_time",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.19500000,39.80500000&geometryType=esriGeometryPoint&sr=4326&mapExtent=-83.20000000,39.80000000,-83.19000000,39.81000000&imageDisplay=512,512,96&tolerance=3&returnGeometry=false&returnCatalogItems=true"
+    },
+    {
+      "bbox_name": "task_original",
+      "bytes": 254,
+      "content_type": "application/json; charset=UTF-8",
+      "http_status": 200,
+      "keys": [
+        "objectId",
+        "name",
+        "value",
+        "location",
+        "properties",
+        "catalogItems",
+        "catalogItemVisibilities"
+      ],
+      "meaningful_count": 0,
+      "meaningful_values": [],
+      "score": 0,
+      "time_variant": "time_year_string",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.19500000,39.80500000&geometryType=esriGeometryPoint&sr=4326&mapExtent=-83.20000000,39.80000000,-83.19000000,39.81000000&imageDisplay=512,512,96&tolerance=3&returnGeometry=false&returnCatalogItems=true&time=2023"
+    },
+    {
+      "bbox_name": "task_original",
+      "bytes": 254,
+      "content_type": "application/json; charset=UTF-8",
+      "http_status": 200,
+      "keys": [
+        "objectId",
+        "name",
+        "value",
+        "location",
+        "properties",
+        "catalogItems",
+        "catalogItemVisibilities"
+      ],
+      "meaningful_count": 0,
+      "meaningful_values": [],
+      "score": 0,
+      "time_variant": "time_mid_2023_epoch",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.19500000,39.80500000&geometryType=esriGeometryPoint&sr=4326&mapExtent=-83.20000000,39.80000000,-83.19000000,39.81000000&imageDisplay=512,512,96&tolerance=3&returnGeometry=false&returnCatalogItems=true&time=1688169600000"
+    },
+    {
+      "bbox_name": "task_original",
+      "bytes": 254,
+      "content_type": "application/json; charset=UTF-8",
+      "http_status": 200,
+      "keys": [
+        "objectId",
+        "name",
+        "value",
+        "location",
+        "properties",
+        "catalogItems",
+        "catalogItemVisibilities"
+      ],
+      "meaningful_count": 0,
+      "meaningful_values": [],
+      "score": 0,
+      "time_variant": "time_2023_interval",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.19500000,39.80500000&geometryType=esriGeometryPoint&sr=4326&mapExtent=-83.20000000,39.80000000,-83.19000000,39.81000000&imageDisplay=512,512,96&tolerance=3&returnGeometry=false&returnCatalogItems=true&time=1672531200000,1703980800000"
+    },
+    {
+      "bbox_name": "task_original",
+      "bytes": 254,
+      "content_type": "application/json; charset=UTF-8",
+      "http_status": 200,
+      "keys": [
+        "objectId",
+        "name",
+        "value",
+        "location",
+        "properties",
+        "catalogItems",
+        "catalogItemVisibilities"
+      ],
+      "meaningful_count": 0,
+      "meaningful_values": [],
+      "score": 0,
+      "time_variant": "mosaic_year_eq_2023",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.19500000,39.80500000&geometryType=esriGeometryPoint&sr=4326&mapExtent=-83.20000000,39.80000000,-83.19000000,39.81000000&imageDisplay=512,512,96&tolerance=3&returnGeometry=false&returnCatalogItems=true&mosaicRule={\"mosaicMethod\":+\"esriMosaicAttribute\",+\"where\":+\"Year+%3D+2023\",+\"sortField\":+\"Year\",+\"sortValue\":+\"2023\"}"
+    },
+    {
+      "bbox_name": "task_original",
+      "bytes": 214,
+      "content_type": "application/json; charset=UTF-8",
+      "http_status": 200,
+      "keys": [
+        "objectId",
+        "name",
+        "value",
+        "location",
+        "properties",
+        "catalogItems",
+        "catalogItemVisibilities"
+      ],
+      "meaningful_count": 0,
+      "meaningful_values": [],
+      "score": 0,
+      "time_variant": "mosaic_year_string_2023",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.19500000,39.80500000&geometryType=esriGeometryPoint&sr=4326&mapExtent=-83.20000000,39.80000000,-83.19000000,39.81000000&imageDisplay=512,512,96&tolerance=3&returnGeometry=false&returnCatalogItems=true&mosaicRule={\"mosaicMethod\":+\"esriMosaicAttribute\",+\"where\":+\"Year+%3D+%272023%27\",+\"sortField\":+\"Year\",+\"sortValue\":+\"2023\"}"
+    },
+    {
+      "bbox_name": "task_expand10",
+      "bytes": 254,
+      "content_type": "application/json; charset=UTF-8",
+      "http_status": 200,
+      "keys": [
+        "objectId",
+        "name",
+        "value",
+        "location",
+        "properties",
+        "catalogItems",
+        "catalogItemVisibilities"
+      ],
+      "meaningful_count": 0,
+      "meaningful_values": [],
+      "score": 0,
+      "time_variant": "no_time",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.19500000,39.80500000&geometryType=esriGeometryPoint&sr=4326&mapExtent=-83.24500000,39.75500000,-83.14500000,39.85500000&imageDisplay=512,512,96&tolerance=3&returnGeometry=false&returnCatalogItems=true"
+    },
+    {
+      "bbox_name": "task_expand10",
+      "bytes": 254,
+      "content_type": "application/json; charset=UTF-8",
+      "http_status": 200,
+      "keys": [
+        "objectId",
+        "name",
+        "value",
+        "location",
+        "properties",
+        "catalogItems",
+        "catalogItemVisibilities"
+      ],
+      "meaningful_count": 0,
+      "meaningful_values": [],
+      "score": 0,
+      "time_variant": "time_year_string",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.19500000,39.80500000&geometryType=esriGeometryPoint&sr=4326&mapExtent=-83.24500000,39.75500000,-83.14500000,39.85500000&imageDisplay=512,512,96&tolerance=3&returnGeometry=false&returnCatalogItems=true&time=2023"
+    },
+    {
+      "bbox_name": "task_expand10",
+      "bytes": 254,
+      "content_type": "application/json; charset=UTF-8",
+      "http_status": 200,
+      "keys": [
+        "objectId",
+        "name",
+        "value",
+        "location",
+        "properties",
+        "catalogItems",
+        "catalogItemVisibilities"
+      ],
+      "meaningful_count": 0,
+      "meaningful_values": [],
+      "score": 0,
+      "time_variant": "time_mid_2023_epoch",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.19500000,39.80500000&geometryType=esriGeometryPoint&sr=4326&mapExtent=-83.24500000,39.75500000,-83.14500000,39.85500000&imageDisplay=512,512,96&tolerance=3&returnGeometry=false&returnCatalogItems=true&time=1688169600000"
+    },
+    {
+      "bbox_name": "task_expand10",
+      "bytes": 254,
+      "content_type": "application/json; charset=UTF-8",
+      "http_status": 200,
+      "keys": [
+        "objectId",
+        "name",
+        "value",
+        "location",
+        "properties",
+        "catalogItems",
+        "catalogItemVisibilities"
+      ],
+      "meaningful_count": 0,
+      "meaningful_values": [],
+      "score": 0,
+      "time_variant": "time_2023_interval",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.19500000,39.80500000&geometryType=esriGeometryPoint&sr=4326&mapExtent=-83.24500000,39.75500000,-83.14500000,39.85500000&imageDisplay=512,512,96&tolerance=3&returnGeometry=false&returnCatalogItems=true&time=1672531200000,1703980800000"
+    },
+    {
+      "bbox_name": "task_expand10",
+      "bytes": 254,
+      "content_type": "application/json; charset=UTF-8",
+      "http_status": 200,
+      "keys": [
+        "objectId",
+        "name",
+        "value",
+        "location",
+        "properties",
+        "catalogItems",
+        "catalogItemVisibilities"
+      ],
+      "meaningful_count": 0,
+      "meaningful_values": [],
+      "score": 0,
+      "time_variant": "mosaic_year_eq_2023",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.19500000,39.80500000&geometryType=esriGeometryPoint&sr=4326&mapExtent=-83.24500000,39.75500000,-83.14500000,39.85500000&imageDisplay=512,512,96&tolerance=3&returnGeometry=false&returnCatalogItems=true&mosaicRule={\"mosaicMethod\":+\"esriMosaicAttribute\",+\"where\":+\"Year+%3D+2023\",+\"sortField\":+\"Year\",+\"sortValue\":+\"2023\"}"
+    },
+    {
+      "bbox_name": "task_expand10",
+      "bytes": 214,
+      "content_type": "application/json; charset=UTF-8",
+      "http_status": 200,
+      "keys": [
+        "objectId",
+        "name",
+        "value",
+        "location",
+        "properties",
+        "catalogItems",
+        "catalogItemVisibilities"
+      ],
+      "meaningful_count": 0,
+      "meaningful_values": [],
+      "score": 0,
+      "time_variant": "mosaic_year_string_2023",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.19500000,39.80500000&geometryType=esriGeometryPoint&sr=4326&mapExtent=-83.24500000,39.75500000,-83.14500000,39.85500000&imageDisplay=512,512,96&tolerance=3&returnGeometry=false&returnCatalogItems=true&mosaicRule={\"mosaicMethod\":+\"esriMosaicAttribute\",+\"where\":+\"Year+%3D+%272023%27\",+\"sortField\":+\"Year\",+\"sortValue\":+\"2023\"}"
+    }
+  ],
+  "export_probes": [
+    {
+      "bbox_name": "task_original",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 8771,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_task_original_no_time_png32_001fad419cfab20e.png",
+        "dominant_fraction": 0.4345207214355469,
+        "format": "PNG",
+        "height": 512,
+        "is_image": true,
+        "meaningful_image": true,
+        "mode": "RGBA",
+        "nontransparent_pixels": 262144,
+        "sha256": "001fad419cfab20edf682ad5c18bd77796f244f9fa5489e49d7ff3dbe10cd8c8",
+        "top_colors": [
+          {
+            "count": 113907,
+            "rgba": [
+              38,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 46706,
+            "rgba": [
+              112,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 42732,
+            "rgba": [
+              147,
+              204,
+              147,
+              255
+            ]
+          },
+          {
+            "count": 29775,
+            "rgba": [
+              154,
+              154,
+              154,
+              255
+            ]
+          },
+          {
+            "count": 16575,
+            "rgba": [
+              232,
+              255,
+              191,
+              255
+            ]
+          },
+          {
+            "count": 3902,
+            "rgba": [
+              191,
+              191,
+              119,
+              255
+            ]
+          },
+          {
+            "count": 2486,
+            "rgba": [
+              255,
+              211,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 2233,
+            "rgba": [
+              172,
+              0,
+              124,
+              255
+            ]
+          }
+        ],
+        "transparent_fraction": 0.0,
+        "unique_colors": 20,
+        "width": 512
+      },
+      "error": null,
+      "format": "png32",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "no_time",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-83.20000000,39.80000000,-83.19000000,39.81000000&bboxSR=4326&imageSR=4326&size=512,512&format=png32&transparent=false"
+    },
+    {
+      "bbox_name": "task_original",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 8377,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_task_original_no_time_png_458326671673b6cb.png",
+        "dominant_fraction": 0.4345207214355469,
+        "format": "PNG",
+        "height": 512,
+        "is_image": true,
+        "meaningful_image": true,
+        "mode": "RGB",
+        "nontransparent_pixels": 262144,
+        "sha256": "458326671673b6cb5f719b04637f8afdaac208be4bb8f369bbb35523ccef1603",
+        "top_colors": [
+          {
+            "count": 113907,
+            "rgba": [
+              38,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 46706,
+            "rgba": [
+              112,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 42732,
+            "rgba": [
+              147,
+              204,
+              147,
+              255
+            ]
+          },
+          {
+            "count": 29775,
+            "rgba": [
+              154,
+              154,
+              154,
+              255
+            ]
+          },
+          {
+            "count": 16575,
+            "rgba": [
+              232,
+              255,
+              191,
+              255
+            ]
+          },
+          {
+            "count": 3902,
+            "rgba": [
+              191,
+              191,
+              119,
+              255
+            ]
+          },
+          {
+            "count": 2486,
+            "rgba": [
+              255,
+              211,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 2233,
+            "rgba": [
+              172,
+              0,
+              124,
+              255
+            ]
+          }
+        ],
+        "transparent_fraction": 0.0,
+        "unique_colors": 20,
+        "width": 512
+      },
+      "error": null,
+      "format": "png",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "no_time",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-83.20000000,39.80000000,-83.19000000,39.81000000&bboxSR=4326&imageSR=4326&size=512,512&format=png&transparent=false"
+    },
+    {
+      "bbox_name": "task_original",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 1097,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_task_original_time_year_string_png32_b262bd68d44f9363.png",
+        "dominant_fraction": 1.0,
+        "format": "PNG",
+        "height": 512,
+        "is_image": true,
+        "meaningful_image": false,
+        "mode": "RGBA",
+        "nontransparent_pixels": 0,
+        "sha256": "b262bd68d44f93637b9949caf7ff7ce0b6b6ed839c3a2468681952b215ec4d95",
+        "top_colors": [
+          {
+            "count": 262144,
+            "rgba": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ],
+        "transparent_fraction": 1.0,
+        "unique_colors": 1,
+        "width": 512
+      },
+      "error": null,
+      "format": "png32",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "time_year_string",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-83.20000000,39.80000000,-83.19000000,39.81000000&bboxSR=4326&imageSR=4326&size=512,512&format=png32&transparent=false&time=2023"
+    },
+    {
+      "bbox_name": "task_original",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 861,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_task_original_time_year_string_png_f6dcc7b44dccaf6d.png",
+        "dominant_fraction": 1.0,
+        "format": "PNG",
+        "height": 512,
+        "is_image": true,
+        "meaningful_image": false,
+        "mode": "RGB",
+        "nontransparent_pixels": 262144,
+        "sha256": "f6dcc7b44dccaf6dd46d28067881c92ad27f0e2b802cd7dc6caa80f13cbdb167",
+        "top_colors": [
+          {
+            "count": 262144,
+            "rgba": [
+              0,
+              0,
+              0,
+              255
+            ]
+          }
+        ],
+        "transparent_fraction": 0.0,
+        "unique_colors": 1,
+        "width": 512
+      },
+      "error": null,
+      "format": "png",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "time_year_string",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-83.20000000,39.80000000,-83.19000000,39.81000000&bboxSR=4326&imageSR=4326&size=512,512&format=png&transparent=false&time=2023"
+    },
+    {
+      "bbox_name": "task_original",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 4983,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_task_original_time_mid_2023_epoch_png32_3ae8bbf0a1111c2e.png",
+        "dominant_fraction": 0.4299125671386719,
+        "format": "PNG",
+        "height": 512,
+        "is_image": true,
+        "meaningful_image": true,
+        "mode": "RGBA",
+        "nontransparent_pixels": 262144,
+        "sha256": "3ae8bbf0a1111c2e8b73b7952ac8a016d992f7f3e8d782c15db7c444f7c58ecc",
+        "top_colors": [
+          {
+            "count": 112699,
+            "rgba": [
+              38,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 56007,
+            "rgba": [
+              255,
+              211,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 47811,
+            "rgba": [
+              147,
+              204,
+              147,
+              255
+            ]
+          },
+          {
+            "count": 27501,
+            "rgba": [
+              154,
+              154,
+              154,
+              255
+            ]
+          },
+          {
+            "count": 17301,
+            "rgba": [
+              232,
+              255,
+              191,
+              255
+            ]
+          },
+          {
+            "count": 496,
+            "rgba": [
+              165,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 249,
+            "rgba": [
+              165,
+              242,
+              140,
+              255
+            ]
+          },
+          {
+            "count": 80,
+            "rgba": [
+              255,
+              165,
+              226,
+              255
+            ]
+          }
+        ],
+        "transparent_fraction": 0.0,
+        "unique_colors": 8,
+        "width": 512
+      },
+      "error": null,
+      "format": "png32",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "time_mid_2023_epoch",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-83.20000000,39.80000000,-83.19000000,39.81000000&bboxSR=4326&imageSR=4326&size=512,512&format=png32&transparent=false&time=1688169600000"
+    },
+    {
+      "bbox_name": "task_original",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 4652,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_task_original_time_mid_2023_epoch_png_e505feda2454f944.png",
+        "dominant_fraction": 0.4299125671386719,
+        "format": "PNG",
+        "height": 512,
+        "is_image": true,
+        "meaningful_image": true,
+        "mode": "RGB",
+        "nontransparent_pixels": 262144,
+        "sha256": "e505feda2454f944899ed66ed2270bf91583e8606336fe83c057c571f0f246e2",
+        "top_colors": [
+          {
+            "count": 112699,
+            "rgba": [
+              38,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 56007,
+            "rgba": [
+              255,
+              211,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 47811,
+            "rgba": [
+              147,
+              204,
+              147,
+              255
+            ]
+          },
+          {
+            "count": 27501,
+            "rgba": [
+              154,
+              154,
+              154,
+              255
+            ]
+          },
+          {
+            "count": 17301,
+            "rgba": [
+              232,
+              255,
+              191,
+              255
+            ]
+          },
+          {
+            "count": 496,
+            "rgba": [
+              165,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 249,
+            "rgba": [
+              165,
+              242,
+              140,
+              255
+            ]
+          },
+          {
+            "count": 80,
+            "rgba": [
+              255,
+              165,
+              226,
+              255
+            ]
+          }
+        ],
+        "transparent_fraction": 0.0,
+        "unique_colors": 8,
+        "width": 512
+      },
+      "error": null,
+      "format": "png",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "time_mid_2023_epoch",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-83.20000000,39.80000000,-83.19000000,39.81000000&bboxSR=4326&imageSR=4326&size=512,512&format=png&transparent=false&time=1688169600000"
+    },
+    {
+      "bbox_name": "task_original",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 4983,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_task_original_time_2023_interval_png32_3ae8bbf0a1111c2e.png",
+        "dominant_fraction": 0.4299125671386719,
+        "format": "PNG",
+        "height": 512,
+        "is_image": true,
+        "meaningful_image": true,
+        "mode": "RGBA",
+        "nontransparent_pixels": 262144,
+        "sha256": "3ae8bbf0a1111c2e8b73b7952ac8a016d992f7f3e8d782c15db7c444f7c58ecc",
+        "top_colors": [
+          {
+            "count": 112699,
+            "rgba": [
+              38,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 56007,
+            "rgba": [
+              255,
+              211,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 47811,
+            "rgba": [
+              147,
+              204,
+              147,
+              255
+            ]
+          },
+          {
+            "count": 27501,
+            "rgba": [
+              154,
+              154,
+              154,
+              255
+            ]
+          },
+          {
+            "count": 17301,
+            "rgba": [
+              232,
+              255,
+              191,
+              255
+            ]
+          },
+          {
+            "count": 496,
+            "rgba": [
+              165,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 249,
+            "rgba": [
+              165,
+              242,
+              140,
+              255
+            ]
+          },
+          {
+            "count": 80,
+            "rgba": [
+              255,
+              165,
+              226,
+              255
+            ]
+          }
+        ],
+        "transparent_fraction": 0.0,
+        "unique_colors": 8,
+        "width": 512
+      },
+      "error": null,
+      "format": "png32",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "time_2023_interval",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-83.20000000,39.80000000,-83.19000000,39.81000000&bboxSR=4326&imageSR=4326&size=512,512&format=png32&transparent=false&time=1672531200000,1703980800000"
+    },
+    {
+      "bbox_name": "task_original",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 4652,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_task_original_time_2023_interval_png_e505feda2454f944.png",
+        "dominant_fraction": 0.4299125671386719,
+        "format": "PNG",
+        "height": 512,
+        "is_image": true,
+        "meaningful_image": true,
+        "mode": "RGB",
+        "nontransparent_pixels": 262144,
+        "sha256": "e505feda2454f944899ed66ed2270bf91583e8606336fe83c057c571f0f246e2",
+        "top_colors": [
+          {
+            "count": 112699,
+            "rgba": [
+              38,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 56007,
+            "rgba": [
+              255,
+              211,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 47811,
+            "rgba": [
+              147,
+              204,
+              147,
+              255
+            ]
+          },
+          {
+            "count": 27501,
+            "rgba": [
+              154,
+              154,
+              154,
+              255
+            ]
+          },
+          {
+            "count": 17301,
+            "rgba": [
+              232,
+              255,
+              191,
+              255
+            ]
+          },
+          {
+            "count": 496,
+            "rgba": [
+              165,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 249,
+            "rgba": [
+              165,
+              242,
+              140,
+              255
+            ]
+          },
+          {
+            "count": 80,
+            "rgba": [
+              255,
+              165,
+              226,
+              255
+            ]
+          }
+        ],
+        "transparent_fraction": 0.0,
+        "unique_colors": 8,
+        "width": 512
+      },
+      "error": null,
+      "format": "png",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "time_2023_interval",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-83.20000000,39.80000000,-83.19000000,39.81000000&bboxSR=4326&imageSR=4326&size=512,512&format=png&transparent=false&time=1672531200000,1703980800000"
+    },
+    {
+      "bbox_name": "task_original",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 4983,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_task_original_mosaic_year_eq_2023_png32_3ae8bbf0a1111c2e.png",
+        "dominant_fraction": 0.4299125671386719,
+        "format": "PNG",
+        "height": 512,
+        "is_image": true,
+        "meaningful_image": true,
+        "mode": "RGBA",
+        "nontransparent_pixels": 262144,
+        "sha256": "3ae8bbf0a1111c2e8b73b7952ac8a016d992f7f3e8d782c15db7c444f7c58ecc",
+        "top_colors": [
+          {
+            "count": 112699,
+            "rgba": [
+              38,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 56007,
+            "rgba": [
+              255,
+              211,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 47811,
+            "rgba": [
+              147,
+              204,
+              147,
+              255
+            ]
+          },
+          {
+            "count": 27501,
+            "rgba": [
+              154,
+              154,
+              154,
+              255
+            ]
+          },
+          {
+            "count": 17301,
+            "rgba": [
+              232,
+              255,
+              191,
+              255
+            ]
+          },
+          {
+            "count": 496,
+            "rgba": [
+              165,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 249,
+            "rgba": [
+              165,
+              242,
+              140,
+              255
+            ]
+          },
+          {
+            "count": 80,
+            "rgba": [
+              255,
+              165,
+              226,
+              255
+            ]
+          }
+        ],
+        "transparent_fraction": 0.0,
+        "unique_colors": 8,
+        "width": 512
+      },
+      "error": null,
+      "format": "png32",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "mosaic_year_eq_2023",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-83.20000000,39.80000000,-83.19000000,39.81000000&bboxSR=4326&imageSR=4326&size=512,512&format=png32&transparent=false&mosaicRule={\"mosaicMethod\":+\"esriMosaicAttribute\",+\"where\":+\"Year+%3D+2023\",+\"sortField\":+\"Year\",+\"sortValue\":+\"2023\"}"
+    },
+    {
+      "bbox_name": "task_original",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 4652,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_task_original_mosaic_year_eq_2023_png_e505feda2454f944.png",
+        "dominant_fraction": 0.4299125671386719,
+        "format": "PNG",
+        "height": 512,
+        "is_image": true,
+        "meaningful_image": true,
+        "mode": "RGB",
+        "nontransparent_pixels": 262144,
+        "sha256": "e505feda2454f944899ed66ed2270bf91583e8606336fe83c057c571f0f246e2",
+        "top_colors": [
+          {
+            "count": 112699,
+            "rgba": [
+              38,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 56007,
+            "rgba": [
+              255,
+              211,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 47811,
+            "rgba": [
+              147,
+              204,
+              147,
+              255
+            ]
+          },
+          {
+            "count": 27501,
+            "rgba": [
+              154,
+              154,
+              154,
+              255
+            ]
+          },
+          {
+            "count": 17301,
+            "rgba": [
+              232,
+              255,
+              191,
+              255
+            ]
+          },
+          {
+            "count": 496,
+            "rgba": [
+              165,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 249,
+            "rgba": [
+              165,
+              242,
+              140,
+              255
+            ]
+          },
+          {
+            "count": 80,
+            "rgba": [
+              255,
+              165,
+              226,
+              255
+            ]
+          }
+        ],
+        "transparent_fraction": 0.0,
+        "unique_colors": 8,
+        "width": 512
+      },
+      "error": null,
+      "format": "png",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "mosaic_year_eq_2023",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-83.20000000,39.80000000,-83.19000000,39.81000000&bboxSR=4326&imageSR=4326&size=512,512&format=png&transparent=false&mosaicRule={\"mosaicMethod\":+\"esriMosaicAttribute\",+\"where\":+\"Year+%3D+2023\",+\"sortField\":+\"Year\",+\"sortValue\":+\"2023\"}"
+    },
+    {
+      "bbox_name": "task_original",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 158,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_task_original_mosaic_year_string_2023_png32_567987e96a1df41e.png",
+        "image_error": "UnidentifiedImageError(\"cannot identify image file '/home/dmsrsic/raster-work/faster-raster/reports/task_previews/cdl_manual_audit/export_task_original_mosaic_year_string_2023_png32_567987e96a1df41e.png'\")",
+        "is_image": false,
+        "sha256": "567987e96a1df41e984f92ea3790a379d6e581d7fbc606d1d0414500eb997671"
+      },
+      "error": null,
+      "format": "png32",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "mosaic_year_string_2023",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-83.20000000,39.80000000,-83.19000000,39.81000000&bboxSR=4326&imageSR=4326&size=512,512&format=png32&transparent=false&mosaicRule={\"mosaicMethod\":+\"esriMosaicAttribute\",+\"where\":+\"Year+%3D+%272023%27\",+\"sortField\":+\"Year\",+\"sortValue\":+\"2023\"}"
+    },
+    {
+      "bbox_name": "task_original",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 158,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_task_original_mosaic_year_string_2023_png_567987e96a1df41e.png",
+        "image_error": "UnidentifiedImageError(\"cannot identify image file '/home/dmsrsic/raster-work/faster-raster/reports/task_previews/cdl_manual_audit/export_task_original_mosaic_year_string_2023_png_567987e96a1df41e.png'\")",
+        "is_image": false,
+        "sha256": "567987e96a1df41e984f92ea3790a379d6e581d7fbc606d1d0414500eb997671"
+      },
+      "error": null,
+      "format": "png",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "mosaic_year_string_2023",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-83.20000000,39.80000000,-83.19000000,39.81000000&bboxSR=4326&imageSR=4326&size=512,512&format=png&transparent=false&mosaicRule={\"mosaicMethod\":+\"esriMosaicAttribute\",+\"where\":+\"Year+%3D+%272023%27\",+\"sortField\":+\"Year\",+\"sortValue\":+\"2023\"}"
+    },
+    {
+      "bbox_name": "task_expand10",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 74523,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_task_expand10_no_time_png32_1cb4875beee09d2f.png",
+        "dominant_fraction": 0.2553863525390625,
+        "format": "PNG",
+        "height": 512,
+        "is_image": true,
+        "meaningful_image": true,
+        "mode": "RGBA",
+        "nontransparent_pixels": 262144,
+        "sha256": "1cb4875beee09d2f17442208982f4e16e010369e7bfec90e65415439e17e19a5",
+        "top_colors": [
+          {
+            "count": 66948,
+            "rgba": [
+              38,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 49973,
+            "rgba": [
+              255,
+              211,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 41853,
+            "rgba": [
+              232,
+              255,
+              191,
+              255
+            ]
+          },
+          {
+            "count": 40463,
+            "rgba": [
+              147,
+              204,
+              147,
+              255
+            ]
+          },
+          {
+            "count": 33602,
+            "rgba": [
+              154,
+              154,
+              154,
+              255
+            ]
+          },
+          {
+            "count": 7650,
+            "rgba": [
+              112,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 5132,
+            "rgba": [
+              165,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 3493,
+            "rgba": [
+              126,
+              177,
+              177,
+              255
+            ]
+          }
+        ],
+        "transparent_fraction": 0.0,
+        "unique_colors": 28,
+        "width": 512
+      },
+      "error": null,
+      "format": "png32",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "no_time",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-83.24500000,39.75500000,-83.14500000,39.85500000&bboxSR=4326&imageSR=4326&size=512,512&format=png32&transparent=false"
+    },
+    {
+      "bbox_name": "task_expand10",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 73652,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_task_expand10_no_time_png_bb9f867777f60cc3.png",
+        "dominant_fraction": 0.2553863525390625,
+        "format": "PNG",
+        "height": 512,
+        "is_image": true,
+        "meaningful_image": true,
+        "mode": "RGB",
+        "nontransparent_pixels": 262144,
+        "sha256": "bb9f867777f60cc370aa60a82ad7acf7bdd85ef90fcf88f11c0b85b534347f25",
+        "top_colors": [
+          {
+            "count": 66948,
+            "rgba": [
+              38,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 49973,
+            "rgba": [
+              255,
+              211,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 41853,
+            "rgba": [
+              232,
+              255,
+              191,
+              255
+            ]
+          },
+          {
+            "count": 40463,
+            "rgba": [
+              147,
+              204,
+              147,
+              255
+            ]
+          },
+          {
+            "count": 33602,
+            "rgba": [
+              154,
+              154,
+              154,
+              255
+            ]
+          },
+          {
+            "count": 7650,
+            "rgba": [
+              112,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 5132,
+            "rgba": [
+              165,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 3493,
+            "rgba": [
+              126,
+              177,
+              177,
+              255
+            ]
+          }
+        ],
+        "transparent_fraction": 0.0,
+        "unique_colors": 28,
+        "width": 512
+      },
+      "error": null,
+      "format": "png",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "no_time",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-83.24500000,39.75500000,-83.14500000,39.85500000&bboxSR=4326&imageSR=4326&size=512,512&format=png&transparent=false"
+    },
+    {
+      "bbox_name": "task_expand10",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 1097,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_task_expand10_time_year_string_png32_b262bd68d44f9363.png",
+        "dominant_fraction": 1.0,
+        "format": "PNG",
+        "height": 512,
+        "is_image": true,
+        "meaningful_image": false,
+        "mode": "RGBA",
+        "nontransparent_pixels": 0,
+        "sha256": "b262bd68d44f93637b9949caf7ff7ce0b6b6ed839c3a2468681952b215ec4d95",
+        "top_colors": [
+          {
+            "count": 262144,
+            "rgba": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ],
+        "transparent_fraction": 1.0,
+        "unique_colors": 1,
+        "width": 512
+      },
+      "error": null,
+      "format": "png32",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "time_year_string",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-83.24500000,39.75500000,-83.14500000,39.85500000&bboxSR=4326&imageSR=4326&size=512,512&format=png32&transparent=false&time=2023"
+    },
+    {
+      "bbox_name": "task_expand10",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 861,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_task_expand10_time_year_string_png_f6dcc7b44dccaf6d.png",
+        "dominant_fraction": 1.0,
+        "format": "PNG",
+        "height": 512,
+        "is_image": true,
+        "meaningful_image": false,
+        "mode": "RGB",
+        "nontransparent_pixels": 262144,
+        "sha256": "f6dcc7b44dccaf6dd46d28067881c92ad27f0e2b802cd7dc6caa80f13cbdb167",
+        "top_colors": [
+          {
+            "count": 262144,
+            "rgba": [
+              0,
+              0,
+              0,
+              255
+            ]
+          }
+        ],
+        "transparent_fraction": 0.0,
+        "unique_colors": 1,
+        "width": 512
+      },
+      "error": null,
+      "format": "png",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "time_year_string",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-83.24500000,39.75500000,-83.14500000,39.85500000&bboxSR=4326&imageSR=4326&size=512,512&format=png&transparent=false&time=2023"
+    },
+    {
+      "bbox_name": "task_expand10",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 57752,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_task_expand10_time_mid_2023_epoch_png32_c07932c3df6dfe75.png",
+        "dominant_fraction": 0.24637603759765625,
+        "format": "PNG",
+        "height": 512,
+        "is_image": true,
+        "meaningful_image": true,
+        "mode": "RGBA",
+        "nontransparent_pixels": 262144,
+        "sha256": "c07932c3df6dfe7573b4b840696901982fbcdecf47d8f2e3d639f5e41d757bb2",
+        "top_colors": [
+          {
+            "count": 64586,
+            "rgba": [
+              38,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 63172,
+            "rgba": [
+              255,
+              211,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 49018,
+            "rgba": [
+              147,
+              204,
+              147,
+              255
+            ]
+          },
+          {
+            "count": 41694,
+            "rgba": [
+              232,
+              255,
+              191,
+              255
+            ]
+          },
+          {
+            "count": 30419,
+            "rgba": [
+              154,
+              154,
+              154,
+              255
+            ]
+          },
+          {
+            "count": 4035,
+            "rgba": [
+              165,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 4020,
+            "rgba": [
+              112,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 2957,
+            "rgba": [
+              75,
+              112,
+              163,
+              255
+            ]
+          }
+        ],
+        "transparent_fraction": 0.0,
+        "unique_colors": 19,
+        "width": 512
+      },
+      "error": null,
+      "format": "png32",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "time_mid_2023_epoch",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-83.24500000,39.75500000,-83.14500000,39.85500000&bboxSR=4326&imageSR=4326&size=512,512&format=png32&transparent=false&time=1688169600000"
+    },
+    {
+      "bbox_name": "task_expand10",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 55504,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_task_expand10_time_mid_2023_epoch_png_58169db61ce9182d.png",
+        "dominant_fraction": 0.24637603759765625,
+        "format": "PNG",
+        "height": 512,
+        "is_image": true,
+        "meaningful_image": true,
+        "mode": "RGB",
+        "nontransparent_pixels": 262144,
+        "sha256": "58169db61ce9182da85917fe517e4339b050c3a92dc5c7797ee7fd4f0238aad4",
+        "top_colors": [
+          {
+            "count": 64586,
+            "rgba": [
+              38,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 63172,
+            "rgba": [
+              255,
+              211,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 49018,
+            "rgba": [
+              147,
+              204,
+              147,
+              255
+            ]
+          },
+          {
+            "count": 41694,
+            "rgba": [
+              232,
+              255,
+              191,
+              255
+            ]
+          },
+          {
+            "count": 30419,
+            "rgba": [
+              154,
+              154,
+              154,
+              255
+            ]
+          },
+          {
+            "count": 4035,
+            "rgba": [
+              165,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 4020,
+            "rgba": [
+              112,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 2957,
+            "rgba": [
+              75,
+              112,
+              163,
+              255
+            ]
+          }
+        ],
+        "transparent_fraction": 0.0,
+        "unique_colors": 19,
+        "width": 512
+      },
+      "error": null,
+      "format": "png",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "time_mid_2023_epoch",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-83.24500000,39.75500000,-83.14500000,39.85500000&bboxSR=4326&imageSR=4326&size=512,512&format=png&transparent=false&time=1688169600000"
+    },
+    {
+      "bbox_name": "task_expand10",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 57752,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_task_expand10_time_2023_interval_png32_c07932c3df6dfe75.png",
+        "dominant_fraction": 0.24637603759765625,
+        "format": "PNG",
+        "height": 512,
+        "is_image": true,
+        "meaningful_image": true,
+        "mode": "RGBA",
+        "nontransparent_pixels": 262144,
+        "sha256": "c07932c3df6dfe7573b4b840696901982fbcdecf47d8f2e3d639f5e41d757bb2",
+        "top_colors": [
+          {
+            "count": 64586,
+            "rgba": [
+              38,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 63172,
+            "rgba": [
+              255,
+              211,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 49018,
+            "rgba": [
+              147,
+              204,
+              147,
+              255
+            ]
+          },
+          {
+            "count": 41694,
+            "rgba": [
+              232,
+              255,
+              191,
+              255
+            ]
+          },
+          {
+            "count": 30419,
+            "rgba": [
+              154,
+              154,
+              154,
+              255
+            ]
+          },
+          {
+            "count": 4035,
+            "rgba": [
+              165,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 4020,
+            "rgba": [
+              112,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 2957,
+            "rgba": [
+              75,
+              112,
+              163,
+              255
+            ]
+          }
+        ],
+        "transparent_fraction": 0.0,
+        "unique_colors": 19,
+        "width": 512
+      },
+      "error": null,
+      "format": "png32",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "time_2023_interval",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-83.24500000,39.75500000,-83.14500000,39.85500000&bboxSR=4326&imageSR=4326&size=512,512&format=png32&transparent=false&time=1672531200000,1703980800000"
+    },
+    {
+      "bbox_name": "task_expand10",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 55504,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_task_expand10_time_2023_interval_png_58169db61ce9182d.png",
+        "dominant_fraction": 0.24637603759765625,
+        "format": "PNG",
+        "height": 512,
+        "is_image": true,
+        "meaningful_image": true,
+        "mode": "RGB",
+        "nontransparent_pixels": 262144,
+        "sha256": "58169db61ce9182da85917fe517e4339b050c3a92dc5c7797ee7fd4f0238aad4",
+        "top_colors": [
+          {
+            "count": 64586,
+            "rgba": [
+              38,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 63172,
+            "rgba": [
+              255,
+              211,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 49018,
+            "rgba": [
+              147,
+              204,
+              147,
+              255
+            ]
+          },
+          {
+            "count": 41694,
+            "rgba": [
+              232,
+              255,
+              191,
+              255
+            ]
+          },
+          {
+            "count": 30419,
+            "rgba": [
+              154,
+              154,
+              154,
+              255
+            ]
+          },
+          {
+            "count": 4035,
+            "rgba": [
+              165,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 4020,
+            "rgba": [
+              112,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 2957,
+            "rgba": [
+              75,
+              112,
+              163,
+              255
+            ]
+          }
+        ],
+        "transparent_fraction": 0.0,
+        "unique_colors": 19,
+        "width": 512
+      },
+      "error": null,
+      "format": "png",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "time_2023_interval",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-83.24500000,39.75500000,-83.14500000,39.85500000&bboxSR=4326&imageSR=4326&size=512,512&format=png&transparent=false&time=1672531200000,1703980800000"
+    },
+    {
+      "bbox_name": "task_expand10",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 57752,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_task_expand10_mosaic_year_eq_2023_png32_c07932c3df6dfe75.png",
+        "dominant_fraction": 0.24637603759765625,
+        "format": "PNG",
+        "height": 512,
+        "is_image": true,
+        "meaningful_image": true,
+        "mode": "RGBA",
+        "nontransparent_pixels": 262144,
+        "sha256": "c07932c3df6dfe7573b4b840696901982fbcdecf47d8f2e3d639f5e41d757bb2",
+        "top_colors": [
+          {
+            "count": 64586,
+            "rgba": [
+              38,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 63172,
+            "rgba": [
+              255,
+              211,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 49018,
+            "rgba": [
+              147,
+              204,
+              147,
+              255
+            ]
+          },
+          {
+            "count": 41694,
+            "rgba": [
+              232,
+              255,
+              191,
+              255
+            ]
+          },
+          {
+            "count": 30419,
+            "rgba": [
+              154,
+              154,
+              154,
+              255
+            ]
+          },
+          {
+            "count": 4035,
+            "rgba": [
+              165,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 4020,
+            "rgba": [
+              112,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 2957,
+            "rgba": [
+              75,
+              112,
+              163,
+              255
+            ]
+          }
+        ],
+        "transparent_fraction": 0.0,
+        "unique_colors": 19,
+        "width": 512
+      },
+      "error": null,
+      "format": "png32",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "mosaic_year_eq_2023",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-83.24500000,39.75500000,-83.14500000,39.85500000&bboxSR=4326&imageSR=4326&size=512,512&format=png32&transparent=false&mosaicRule={\"mosaicMethod\":+\"esriMosaicAttribute\",+\"where\":+\"Year+%3D+2023\",+\"sortField\":+\"Year\",+\"sortValue\":+\"2023\"}"
+    },
+    {
+      "bbox_name": "task_expand10",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 55504,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_task_expand10_mosaic_year_eq_2023_png_58169db61ce9182d.png",
+        "dominant_fraction": 0.24637603759765625,
+        "format": "PNG",
+        "height": 512,
+        "is_image": true,
+        "meaningful_image": true,
+        "mode": "RGB",
+        "nontransparent_pixels": 262144,
+        "sha256": "58169db61ce9182da85917fe517e4339b050c3a92dc5c7797ee7fd4f0238aad4",
+        "top_colors": [
+          {
+            "count": 64586,
+            "rgba": [
+              38,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 63172,
+            "rgba": [
+              255,
+              211,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 49018,
+            "rgba": [
+              147,
+              204,
+              147,
+              255
+            ]
+          },
+          {
+            "count": 41694,
+            "rgba": [
+              232,
+              255,
+              191,
+              255
+            ]
+          },
+          {
+            "count": 30419,
+            "rgba": [
+              154,
+              154,
+              154,
+              255
+            ]
+          },
+          {
+            "count": 4035,
+            "rgba": [
+              165,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 4020,
+            "rgba": [
+              112,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 2957,
+            "rgba": [
+              75,
+              112,
+              163,
+              255
+            ]
+          }
+        ],
+        "transparent_fraction": 0.0,
+        "unique_colors": 19,
+        "width": 512
+      },
+      "error": null,
+      "format": "png",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "mosaic_year_eq_2023",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-83.24500000,39.75500000,-83.14500000,39.85500000&bboxSR=4326&imageSR=4326&size=512,512&format=png&transparent=false&mosaicRule={\"mosaicMethod\":+\"esriMosaicAttribute\",+\"where\":+\"Year+%3D+2023\",+\"sortField\":+\"Year\",+\"sortValue\":+\"2023\"}"
+    },
+    {
+      "bbox_name": "task_expand10",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 158,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_task_expand10_mosaic_year_string_2023_png32_567987e96a1df41e.png",
+        "image_error": "UnidentifiedImageError(\"cannot identify image file '/home/dmsrsic/raster-work/faster-raster/reports/task_previews/cdl_manual_audit/export_task_expand10_mosaic_year_string_2023_png32_567987e96a1df41e.png'\")",
+        "is_image": false,
+        "sha256": "567987e96a1df41e984f92ea3790a379d6e581d7fbc606d1d0414500eb997671"
+      },
+      "error": null,
+      "format": "png32",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "mosaic_year_string_2023",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-83.24500000,39.75500000,-83.14500000,39.85500000&bboxSR=4326&imageSR=4326&size=512,512&format=png32&transparent=false&mosaicRule={\"mosaicMethod\":+\"esriMosaicAttribute\",+\"where\":+\"Year+%3D+%272023%27\",+\"sortField\":+\"Year\",+\"sortValue\":+\"2023\"}"
+    },
+    {
+      "bbox_name": "task_expand10",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 158,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_task_expand10_mosaic_year_string_2023_png_567987e96a1df41e.png",
+        "image_error": "UnidentifiedImageError(\"cannot identify image file '/home/dmsrsic/raster-work/faster-raster/reports/task_previews/cdl_manual_audit/export_task_expand10_mosaic_year_string_2023_png_567987e96a1df41e.png'\")",
+        "is_image": false,
+        "sha256": "567987e96a1df41e984f92ea3790a379d6e581d7fbc606d1d0414500eb997671"
+      },
+      "error": null,
+      "format": "png",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "mosaic_year_string_2023",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-83.24500000,39.75500000,-83.14500000,39.85500000&bboxSR=4326&imageSR=4326&size=512,512&format=png&transparent=false&mosaicRule={\"mosaicMethod\":+\"esriMosaicAttribute\",+\"where\":+\"Year+%3D+%272023%27\",+\"sortField\":+\"Year\",+\"sortValue\":+\"2023\"}"
+    },
+    {
+      "bbox_name": "iowa_known_ag",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 74332,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_iowa_known_ag_no_time_png32_4bf23978fe0d38ab.png",
+        "dominant_fraction": 0.3098602294921875,
+        "format": "PNG",
+        "height": 512,
+        "is_image": true,
+        "meaningful_image": true,
+        "mode": "RGBA",
+        "nontransparent_pixels": 262144,
+        "sha256": "4bf23978fe0d38ab0d6272ae4c537d2beb7344fd96016f62c8d5eef2888e1428",
+        "top_colors": [
+          {
+            "count": 81228,
+            "rgba": [
+              154,
+              154,
+              154,
+              255
+            ]
+          },
+          {
+            "count": 65549,
+            "rgba": [
+              255,
+              211,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 40356,
+            "rgba": [
+              38,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 35326,
+            "rgba": [
+              232,
+              255,
+              191,
+              255
+            ]
+          },
+          {
+            "count": 20619,
+            "rgba": [
+              147,
+              204,
+              147,
+              255
+            ]
+          },
+          {
+            "count": 6208,
+            "rgba": [
+              126,
+              177,
+              177,
+              255
+            ]
+          },
+          {
+            "count": 3435,
+            "rgba": [
+              204,
+              191,
+              163,
+              255
+            ]
+          },
+          {
+            "count": 3413,
+            "rgba": [
+              75,
+              112,
+              163,
+              255
+            ]
+          }
+        ],
+        "transparent_fraction": 0.0,
+        "unique_colors": 20,
+        "width": 512
+      },
+      "error": null,
+      "format": "png32",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "no_time",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-93.70000000,41.95000000,-93.55000000,42.10000000&bboxSR=4326&imageSR=4326&size=512,512&format=png32&transparent=false"
+    },
+    {
+      "bbox_name": "iowa_known_ag",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 73396,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_iowa_known_ag_no_time_png_3c652394aa2f41ae.png",
+        "dominant_fraction": 0.3098602294921875,
+        "format": "PNG",
+        "height": 512,
+        "is_image": true,
+        "meaningful_image": true,
+        "mode": "RGB",
+        "nontransparent_pixels": 262144,
+        "sha256": "3c652394aa2f41aeef224daf1caf9036a9a331c1fac9744912ff027185d7a3e9",
+        "top_colors": [
+          {
+            "count": 81228,
+            "rgba": [
+              154,
+              154,
+              154,
+              255
+            ]
+          },
+          {
+            "count": 65549,
+            "rgba": [
+              255,
+              211,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 40356,
+            "rgba": [
+              38,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 35326,
+            "rgba": [
+              232,
+              255,
+              191,
+              255
+            ]
+          },
+          {
+            "count": 20619,
+            "rgba": [
+              147,
+              204,
+              147,
+              255
+            ]
+          },
+          {
+            "count": 6208,
+            "rgba": [
+              126,
+              177,
+              177,
+              255
+            ]
+          },
+          {
+            "count": 3435,
+            "rgba": [
+              204,
+              191,
+              163,
+              255
+            ]
+          },
+          {
+            "count": 3413,
+            "rgba": [
+              75,
+              112,
+              163,
+              255
+            ]
+          }
+        ],
+        "transparent_fraction": 0.0,
+        "unique_colors": 20,
+        "width": 512
+      },
+      "error": null,
+      "format": "png",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "no_time",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-93.70000000,41.95000000,-93.55000000,42.10000000&bboxSR=4326&imageSR=4326&size=512,512&format=png&transparent=false"
+    },
+    {
+      "bbox_name": "iowa_known_ag",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 1097,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_iowa_known_ag_time_year_string_png32_b262bd68d44f9363.png",
+        "dominant_fraction": 1.0,
+        "format": "PNG",
+        "height": 512,
+        "is_image": true,
+        "meaningful_image": false,
+        "mode": "RGBA",
+        "nontransparent_pixels": 0,
+        "sha256": "b262bd68d44f93637b9949caf7ff7ce0b6b6ed839c3a2468681952b215ec4d95",
+        "top_colors": [
+          {
+            "count": 262144,
+            "rgba": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ],
+        "transparent_fraction": 1.0,
+        "unique_colors": 1,
+        "width": 512
+      },
+      "error": null,
+      "format": "png32",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "time_year_string",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-93.70000000,41.95000000,-93.55000000,42.10000000&bboxSR=4326&imageSR=4326&size=512,512&format=png32&transparent=false&time=2023"
+    },
+    {
+      "bbox_name": "iowa_known_ag",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 861,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_iowa_known_ag_time_year_string_png_f6dcc7b44dccaf6d.png",
+        "dominant_fraction": 1.0,
+        "format": "PNG",
+        "height": 512,
+        "is_image": true,
+        "meaningful_image": false,
+        "mode": "RGB",
+        "nontransparent_pixels": 262144,
+        "sha256": "f6dcc7b44dccaf6dd46d28067881c92ad27f0e2b802cd7dc6caa80f13cbdb167",
+        "top_colors": [
+          {
+            "count": 262144,
+            "rgba": [
+              0,
+              0,
+              0,
+              255
+            ]
+          }
+        ],
+        "transparent_fraction": 0.0,
+        "unique_colors": 1,
+        "width": 512
+      },
+      "error": null,
+      "format": "png",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "time_year_string",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-93.70000000,41.95000000,-93.55000000,42.10000000&bboxSR=4326&imageSR=4326&size=512,512&format=png&transparent=false&time=2023"
+    },
+    {
+      "bbox_name": "iowa_known_ag",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 73313,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_iowa_known_ag_time_mid_2023_epoch_png32_8fc93fe7ac58eccf.png",
+        "dominant_fraction": 0.28385162353515625,
+        "format": "PNG",
+        "height": 512,
+        "is_image": true,
+        "meaningful_image": true,
+        "mode": "RGBA",
+        "nontransparent_pixels": 262144,
+        "sha256": "8fc93fe7ac58eccf4d524f5ecbe2dfca69b91bd34983a9fe40515c1caee28479",
+        "top_colors": [
+          {
+            "count": 74410,
+            "rgba": [
+              154,
+              154,
+              154,
+              255
+            ]
+          },
+          {
+            "count": 57998,
+            "rgba": [
+              255,
+              211,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 51469,
+            "rgba": [
+              38,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 44070,
+            "rgba": [
+              232,
+              255,
+              191,
+              255
+            ]
+          },
+          {
+            "count": 18961,
+            "rgba": [
+              147,
+              204,
+              147,
+              255
+            ]
+          },
+          {
+            "count": 7421,
+            "rgba": [
+              126,
+              177,
+              177,
+              255
+            ]
+          },
+          {
+            "count": 2559,
+            "rgba": [
+              75,
+              112,
+              163,
+              255
+            ]
+          },
+          {
+            "count": 2172,
+            "rgba": [
+              255,
+              165,
+              226,
+              255
+            ]
+          }
+        ],
+        "transparent_fraction": 0.0,
+        "unique_colors": 24,
+        "width": 512
+      },
+      "error": null,
+      "format": "png32",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "time_mid_2023_epoch",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-93.70000000,41.95000000,-93.55000000,42.10000000&bboxSR=4326&imageSR=4326&size=512,512&format=png32&transparent=false&time=1688169600000"
+    },
+    {
+      "bbox_name": "iowa_known_ag",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 71737,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_iowa_known_ag_time_mid_2023_epoch_png_187136a253e49275.png",
+        "dominant_fraction": 0.28385162353515625,
+        "format": "PNG",
+        "height": 512,
+        "is_image": true,
+        "meaningful_image": true,
+        "mode": "RGB",
+        "nontransparent_pixels": 262144,
+        "sha256": "187136a253e49275b6da144e3d87e95f1f863252a87be3964ad2d5da9f66c582",
+        "top_colors": [
+          {
+            "count": 74410,
+            "rgba": [
+              154,
+              154,
+              154,
+              255
+            ]
+          },
+          {
+            "count": 57998,
+            "rgba": [
+              255,
+              211,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 51469,
+            "rgba": [
+              38,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 44070,
+            "rgba": [
+              232,
+              255,
+              191,
+              255
+            ]
+          },
+          {
+            "count": 18961,
+            "rgba": [
+              147,
+              204,
+              147,
+              255
+            ]
+          },
+          {
+            "count": 7421,
+            "rgba": [
+              126,
+              177,
+              177,
+              255
+            ]
+          },
+          {
+            "count": 2559,
+            "rgba": [
+              75,
+              112,
+              163,
+              255
+            ]
+          },
+          {
+            "count": 2172,
+            "rgba": [
+              255,
+              165,
+              226,
+              255
+            ]
+          }
+        ],
+        "transparent_fraction": 0.0,
+        "unique_colors": 24,
+        "width": 512
+      },
+      "error": null,
+      "format": "png",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "time_mid_2023_epoch",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-93.70000000,41.95000000,-93.55000000,42.10000000&bboxSR=4326&imageSR=4326&size=512,512&format=png&transparent=false&time=1688169600000"
+    },
+    {
+      "bbox_name": "iowa_known_ag",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 73313,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_iowa_known_ag_time_2023_interval_png32_8fc93fe7ac58eccf.png",
+        "dominant_fraction": 0.28385162353515625,
+        "format": "PNG",
+        "height": 512,
+        "is_image": true,
+        "meaningful_image": true,
+        "mode": "RGBA",
+        "nontransparent_pixels": 262144,
+        "sha256": "8fc93fe7ac58eccf4d524f5ecbe2dfca69b91bd34983a9fe40515c1caee28479",
+        "top_colors": [
+          {
+            "count": 74410,
+            "rgba": [
+              154,
+              154,
+              154,
+              255
+            ]
+          },
+          {
+            "count": 57998,
+            "rgba": [
+              255,
+              211,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 51469,
+            "rgba": [
+              38,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 44070,
+            "rgba": [
+              232,
+              255,
+              191,
+              255
+            ]
+          },
+          {
+            "count": 18961,
+            "rgba": [
+              147,
+              204,
+              147,
+              255
+            ]
+          },
+          {
+            "count": 7421,
+            "rgba": [
+              126,
+              177,
+              177,
+              255
+            ]
+          },
+          {
+            "count": 2559,
+            "rgba": [
+              75,
+              112,
+              163,
+              255
+            ]
+          },
+          {
+            "count": 2172,
+            "rgba": [
+              255,
+              165,
+              226,
+              255
+            ]
+          }
+        ],
+        "transparent_fraction": 0.0,
+        "unique_colors": 24,
+        "width": 512
+      },
+      "error": null,
+      "format": "png32",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "time_2023_interval",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-93.70000000,41.95000000,-93.55000000,42.10000000&bboxSR=4326&imageSR=4326&size=512,512&format=png32&transparent=false&time=1672531200000,1703980800000"
+    },
+    {
+      "bbox_name": "iowa_known_ag",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 71737,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_iowa_known_ag_time_2023_interval_png_187136a253e49275.png",
+        "dominant_fraction": 0.28385162353515625,
+        "format": "PNG",
+        "height": 512,
+        "is_image": true,
+        "meaningful_image": true,
+        "mode": "RGB",
+        "nontransparent_pixels": 262144,
+        "sha256": "187136a253e49275b6da144e3d87e95f1f863252a87be3964ad2d5da9f66c582",
+        "top_colors": [
+          {
+            "count": 74410,
+            "rgba": [
+              154,
+              154,
+              154,
+              255
+            ]
+          },
+          {
+            "count": 57998,
+            "rgba": [
+              255,
+              211,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 51469,
+            "rgba": [
+              38,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 44070,
+            "rgba": [
+              232,
+              255,
+              191,
+              255
+            ]
+          },
+          {
+            "count": 18961,
+            "rgba": [
+              147,
+              204,
+              147,
+              255
+            ]
+          },
+          {
+            "count": 7421,
+            "rgba": [
+              126,
+              177,
+              177,
+              255
+            ]
+          },
+          {
+            "count": 2559,
+            "rgba": [
+              75,
+              112,
+              163,
+              255
+            ]
+          },
+          {
+            "count": 2172,
+            "rgba": [
+              255,
+              165,
+              226,
+              255
+            ]
+          }
+        ],
+        "transparent_fraction": 0.0,
+        "unique_colors": 24,
+        "width": 512
+      },
+      "error": null,
+      "format": "png",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "time_2023_interval",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-93.70000000,41.95000000,-93.55000000,42.10000000&bboxSR=4326&imageSR=4326&size=512,512&format=png&transparent=false&time=1672531200000,1703980800000"
+    },
+    {
+      "bbox_name": "iowa_known_ag",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 73313,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_iowa_known_ag_mosaic_year_eq_2023_png32_8fc93fe7ac58eccf.png",
+        "dominant_fraction": 0.28385162353515625,
+        "format": "PNG",
+        "height": 512,
+        "is_image": true,
+        "meaningful_image": true,
+        "mode": "RGBA",
+        "nontransparent_pixels": 262144,
+        "sha256": "8fc93fe7ac58eccf4d524f5ecbe2dfca69b91bd34983a9fe40515c1caee28479",
+        "top_colors": [
+          {
+            "count": 74410,
+            "rgba": [
+              154,
+              154,
+              154,
+              255
+            ]
+          },
+          {
+            "count": 57998,
+            "rgba": [
+              255,
+              211,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 51469,
+            "rgba": [
+              38,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 44070,
+            "rgba": [
+              232,
+              255,
+              191,
+              255
+            ]
+          },
+          {
+            "count": 18961,
+            "rgba": [
+              147,
+              204,
+              147,
+              255
+            ]
+          },
+          {
+            "count": 7421,
+            "rgba": [
+              126,
+              177,
+              177,
+              255
+            ]
+          },
+          {
+            "count": 2559,
+            "rgba": [
+              75,
+              112,
+              163,
+              255
+            ]
+          },
+          {
+            "count": 2172,
+            "rgba": [
+              255,
+              165,
+              226,
+              255
+            ]
+          }
+        ],
+        "transparent_fraction": 0.0,
+        "unique_colors": 24,
+        "width": 512
+      },
+      "error": null,
+      "format": "png32",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "mosaic_year_eq_2023",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-93.70000000,41.95000000,-93.55000000,42.10000000&bboxSR=4326&imageSR=4326&size=512,512&format=png32&transparent=false&mosaicRule={\"mosaicMethod\":+\"esriMosaicAttribute\",+\"where\":+\"Year+%3D+2023\",+\"sortField\":+\"Year\",+\"sortValue\":+\"2023\"}"
+    },
+    {
+      "bbox_name": "iowa_known_ag",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 71737,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_iowa_known_ag_mosaic_year_eq_2023_png_187136a253e49275.png",
+        "dominant_fraction": 0.28385162353515625,
+        "format": "PNG",
+        "height": 512,
+        "is_image": true,
+        "meaningful_image": true,
+        "mode": "RGB",
+        "nontransparent_pixels": 262144,
+        "sha256": "187136a253e49275b6da144e3d87e95f1f863252a87be3964ad2d5da9f66c582",
+        "top_colors": [
+          {
+            "count": 74410,
+            "rgba": [
+              154,
+              154,
+              154,
+              255
+            ]
+          },
+          {
+            "count": 57998,
+            "rgba": [
+              255,
+              211,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 51469,
+            "rgba": [
+              38,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 44070,
+            "rgba": [
+              232,
+              255,
+              191,
+              255
+            ]
+          },
+          {
+            "count": 18961,
+            "rgba": [
+              147,
+              204,
+              147,
+              255
+            ]
+          },
+          {
+            "count": 7421,
+            "rgba": [
+              126,
+              177,
+              177,
+              255
+            ]
+          },
+          {
+            "count": 2559,
+            "rgba": [
+              75,
+              112,
+              163,
+              255
+            ]
+          },
+          {
+            "count": 2172,
+            "rgba": [
+              255,
+              165,
+              226,
+              255
+            ]
+          }
+        ],
+        "transparent_fraction": 0.0,
+        "unique_colors": 24,
+        "width": 512
+      },
+      "error": null,
+      "format": "png",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "mosaic_year_eq_2023",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-93.70000000,41.95000000,-93.55000000,42.10000000&bboxSR=4326&imageSR=4326&size=512,512&format=png&transparent=false&mosaicRule={\"mosaicMethod\":+\"esriMosaicAttribute\",+\"where\":+\"Year+%3D+2023\",+\"sortField\":+\"Year\",+\"sortValue\":+\"2023\"}"
+    },
+    {
+      "bbox_name": "iowa_known_ag",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 158,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_iowa_known_ag_mosaic_year_string_2023_png32_567987e96a1df41e.png",
+        "image_error": "UnidentifiedImageError(\"cannot identify image file '/home/dmsrsic/raster-work/faster-raster/reports/task_previews/cdl_manual_audit/export_iowa_known_ag_mosaic_year_string_2023_png32_567987e96a1df41e.png'\")",
+        "is_image": false,
+        "sha256": "567987e96a1df41e984f92ea3790a379d6e581d7fbc606d1d0414500eb997671"
+      },
+      "error": null,
+      "format": "png32",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "mosaic_year_string_2023",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-93.70000000,41.95000000,-93.55000000,42.10000000&bboxSR=4326&imageSR=4326&size=512,512&format=png32&transparent=false&mosaicRule={\"mosaicMethod\":+\"esriMosaicAttribute\",+\"where\":+\"Year+%3D+%272023%27\",+\"sortField\":+\"Year\",+\"sortValue\":+\"2023\"}"
+    },
+    {
+      "bbox_name": "iowa_known_ag",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 158,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_iowa_known_ag_mosaic_year_string_2023_png_567987e96a1df41e.png",
+        "image_error": "UnidentifiedImageError(\"cannot identify image file '/home/dmsrsic/raster-work/faster-raster/reports/task_previews/cdl_manual_audit/export_iowa_known_ag_mosaic_year_string_2023_png_567987e96a1df41e.png'\")",
+        "is_image": false,
+        "sha256": "567987e96a1df41e984f92ea3790a379d6e581d7fbc606d1d0414500eb997671"
+      },
+      "error": null,
+      "format": "png",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "mosaic_year_string_2023",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-93.70000000,41.95000000,-93.55000000,42.10000000&bboxSR=4326&imageSR=4326&size=512,512&format=png&transparent=false&mosaicRule={\"mosaicMethod\":+\"esriMosaicAttribute\",+\"where\":+\"Year+%3D+%272023%27\",+\"sortField\":+\"Year\",+\"sortValue\":+\"2023\"}"
+    },
+    {
+      "bbox_name": "illinois_known_ag",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 50420,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_illinois_known_ag_no_time_png32_df89e2da2d216734.png",
+        "dominant_fraction": 0.44087982177734375,
+        "format": "PNG",
+        "height": 512,
+        "is_image": true,
+        "meaningful_image": true,
+        "mode": "RGBA",
+        "nontransparent_pixels": 262144,
+        "sha256": "df89e2da2d2167343646254549f6cbe4b93c19404968e1997126c2d7253766c0",
+        "top_colors": [
+          {
+            "count": 115574,
+            "rgba": [
+              38,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 108923,
+            "rgba": [
+              255,
+              211,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 12233,
+            "rgba": [
+              154,
+              154,
+              154,
+              255
+            ]
+          },
+          {
+            "count": 10915,
+            "rgba": [
+              232,
+              255,
+              191,
+              255
+            ]
+          },
+          {
+            "count": 6707,
+            "rgba": [
+              147,
+              204,
+              147,
+              255
+            ]
+          },
+          {
+            "count": 3557,
+            "rgba": [
+              126,
+              177,
+              177,
+              255
+            ]
+          },
+          {
+            "count": 1498,
+            "rgba": [
+              165,
+              242,
+              140,
+              255
+            ]
+          },
+          {
+            "count": 975,
+            "rgba": [
+              255,
+              165,
+              226,
+              255
+            ]
+          }
+        ],
+        "transparent_fraction": 0.0,
+        "unique_colors": 18,
+        "width": 512
+      },
+      "error": null,
+      "format": "png32",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "no_time",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-89.20000000,40.00000000,-89.05000000,40.15000000&bboxSR=4326&imageSR=4326&size=512,512&format=png32&transparent=false"
+    },
+    {
+      "bbox_name": "illinois_known_ag",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 49672,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_illinois_known_ag_no_time_png_1d02480a1d359dc1.png",
+        "dominant_fraction": 0.44087982177734375,
+        "format": "PNG",
+        "height": 512,
+        "is_image": true,
+        "meaningful_image": true,
+        "mode": "RGB",
+        "nontransparent_pixels": 262144,
+        "sha256": "1d02480a1d359dc1fdd42ccc0d87b3c548a2224012ffc4e7f685113772c7939d",
+        "top_colors": [
+          {
+            "count": 115574,
+            "rgba": [
+              38,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 108923,
+            "rgba": [
+              255,
+              211,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 12233,
+            "rgba": [
+              154,
+              154,
+              154,
+              255
+            ]
+          },
+          {
+            "count": 10915,
+            "rgba": [
+              232,
+              255,
+              191,
+              255
+            ]
+          },
+          {
+            "count": 6707,
+            "rgba": [
+              147,
+              204,
+              147,
+              255
+            ]
+          },
+          {
+            "count": 3557,
+            "rgba": [
+              126,
+              177,
+              177,
+              255
+            ]
+          },
+          {
+            "count": 1498,
+            "rgba": [
+              165,
+              242,
+              140,
+              255
+            ]
+          },
+          {
+            "count": 975,
+            "rgba": [
+              255,
+              165,
+              226,
+              255
+            ]
+          }
+        ],
+        "transparent_fraction": 0.0,
+        "unique_colors": 18,
+        "width": 512
+      },
+      "error": null,
+      "format": "png",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "no_time",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-89.20000000,40.00000000,-89.05000000,40.15000000&bboxSR=4326&imageSR=4326&size=512,512&format=png&transparent=false"
+    },
+    {
+      "bbox_name": "illinois_known_ag",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 1097,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_illinois_known_ag_time_year_string_png32_b262bd68d44f9363.png",
+        "dominant_fraction": 1.0,
+        "format": "PNG",
+        "height": 512,
+        "is_image": true,
+        "meaningful_image": false,
+        "mode": "RGBA",
+        "nontransparent_pixels": 0,
+        "sha256": "b262bd68d44f93637b9949caf7ff7ce0b6b6ed839c3a2468681952b215ec4d95",
+        "top_colors": [
+          {
+            "count": 262144,
+            "rgba": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ],
+        "transparent_fraction": 1.0,
+        "unique_colors": 1,
+        "width": 512
+      },
+      "error": null,
+      "format": "png32",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "time_year_string",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-89.20000000,40.00000000,-89.05000000,40.15000000&bboxSR=4326&imageSR=4326&size=512,512&format=png32&transparent=false&time=2023"
+    },
+    {
+      "bbox_name": "illinois_known_ag",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 861,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_illinois_known_ag_time_year_string_png_f6dcc7b44dccaf6d.png",
+        "dominant_fraction": 1.0,
+        "format": "PNG",
+        "height": 512,
+        "is_image": true,
+        "meaningful_image": false,
+        "mode": "RGB",
+        "nontransparent_pixels": 262144,
+        "sha256": "f6dcc7b44dccaf6dd46d28067881c92ad27f0e2b802cd7dc6caa80f13cbdb167",
+        "top_colors": [
+          {
+            "count": 262144,
+            "rgba": [
+              0,
+              0,
+              0,
+              255
+            ]
+          }
+        ],
+        "transparent_fraction": 0.0,
+        "unique_colors": 1,
+        "width": 512
+      },
+      "error": null,
+      "format": "png",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "time_year_string",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-89.20000000,40.00000000,-89.05000000,40.15000000&bboxSR=4326&imageSR=4326&size=512,512&format=png&transparent=false&time=2023"
+    },
+    {
+      "bbox_name": "illinois_known_ag",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 42666,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_illinois_known_ag_time_mid_2023_epoch_png32_5a5e139e51b4885b.png",
+        "dominant_fraction": 0.4322395324707031,
+        "format": "PNG",
+        "height": 512,
+        "is_image": true,
+        "meaningful_image": true,
+        "mode": "RGBA",
+        "nontransparent_pixels": 262144,
+        "sha256": "5a5e139e51b4885b1fdd179d1a459e0e71c03e442b8244afe6e77b1dd7f70c2e",
+        "top_colors": [
+          {
+            "count": 113309,
+            "rgba": [
+              38,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 109805,
+            "rgba": [
+              255,
+              211,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 12889,
+            "rgba": [
+              232,
+              255,
+              191,
+              255
+            ]
+          },
+          {
+            "count": 12887,
+            "rgba": [
+              154,
+              154,
+              154,
+              255
+            ]
+          },
+          {
+            "count": 9057,
+            "rgba": [
+              147,
+              204,
+              147,
+              255
+            ]
+          },
+          {
+            "count": 1865,
+            "rgba": [
+              126,
+              177,
+              177,
+              255
+            ]
+          },
+          {
+            "count": 782,
+            "rgba": [
+              255,
+              102,
+              102,
+              255
+            ]
+          },
+          {
+            "count": 596,
+            "rgba": [
+              165,
+              112,
+              0,
+              255
+            ]
+          }
+        ],
+        "transparent_fraction": 0.0,
+        "unique_colors": 18,
+        "width": 512
+      },
+      "error": null,
+      "format": "png32",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "time_mid_2023_epoch",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-89.20000000,40.00000000,-89.05000000,40.15000000&bboxSR=4326&imageSR=4326&size=512,512&format=png32&transparent=false&time=1688169600000"
+    },
+    {
+      "bbox_name": "illinois_known_ag",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 41327,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_illinois_known_ag_time_mid_2023_epoch_png_132e2f9aa73f8f6d.png",
+        "dominant_fraction": 0.4322395324707031,
+        "format": "PNG",
+        "height": 512,
+        "is_image": true,
+        "meaningful_image": true,
+        "mode": "RGB",
+        "nontransparent_pixels": 262144,
+        "sha256": "132e2f9aa73f8f6d57c04a1dd9b0606e320dbfbb29a3d3070c52b19a4740c89f",
+        "top_colors": [
+          {
+            "count": 113309,
+            "rgba": [
+              38,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 109805,
+            "rgba": [
+              255,
+              211,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 12889,
+            "rgba": [
+              232,
+              255,
+              191,
+              255
+            ]
+          },
+          {
+            "count": 12887,
+            "rgba": [
+              154,
+              154,
+              154,
+              255
+            ]
+          },
+          {
+            "count": 9057,
+            "rgba": [
+              147,
+              204,
+              147,
+              255
+            ]
+          },
+          {
+            "count": 1865,
+            "rgba": [
+              126,
+              177,
+              177,
+              255
+            ]
+          },
+          {
+            "count": 782,
+            "rgba": [
+              255,
+              102,
+              102,
+              255
+            ]
+          },
+          {
+            "count": 596,
+            "rgba": [
+              165,
+              112,
+              0,
+              255
+            ]
+          }
+        ],
+        "transparent_fraction": 0.0,
+        "unique_colors": 18,
+        "width": 512
+      },
+      "error": null,
+      "format": "png",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "time_mid_2023_epoch",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-89.20000000,40.00000000,-89.05000000,40.15000000&bboxSR=4326&imageSR=4326&size=512,512&format=png&transparent=false&time=1688169600000"
+    },
+    {
+      "bbox_name": "illinois_known_ag",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 42666,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_illinois_known_ag_time_2023_interval_png32_5a5e139e51b4885b.png",
+        "dominant_fraction": 0.4322395324707031,
+        "format": "PNG",
+        "height": 512,
+        "is_image": true,
+        "meaningful_image": true,
+        "mode": "RGBA",
+        "nontransparent_pixels": 262144,
+        "sha256": "5a5e139e51b4885b1fdd179d1a459e0e71c03e442b8244afe6e77b1dd7f70c2e",
+        "top_colors": [
+          {
+            "count": 113309,
+            "rgba": [
+              38,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 109805,
+            "rgba": [
+              255,
+              211,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 12889,
+            "rgba": [
+              232,
+              255,
+              191,
+              255
+            ]
+          },
+          {
+            "count": 12887,
+            "rgba": [
+              154,
+              154,
+              154,
+              255
+            ]
+          },
+          {
+            "count": 9057,
+            "rgba": [
+              147,
+              204,
+              147,
+              255
+            ]
+          },
+          {
+            "count": 1865,
+            "rgba": [
+              126,
+              177,
+              177,
+              255
+            ]
+          },
+          {
+            "count": 782,
+            "rgba": [
+              255,
+              102,
+              102,
+              255
+            ]
+          },
+          {
+            "count": 596,
+            "rgba": [
+              165,
+              112,
+              0,
+              255
+            ]
+          }
+        ],
+        "transparent_fraction": 0.0,
+        "unique_colors": 18,
+        "width": 512
+      },
+      "error": null,
+      "format": "png32",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "time_2023_interval",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-89.20000000,40.00000000,-89.05000000,40.15000000&bboxSR=4326&imageSR=4326&size=512,512&format=png32&transparent=false&time=1672531200000,1703980800000"
+    },
+    {
+      "bbox_name": "illinois_known_ag",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 41327,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_illinois_known_ag_time_2023_interval_png_132e2f9aa73f8f6d.png",
+        "dominant_fraction": 0.4322395324707031,
+        "format": "PNG",
+        "height": 512,
+        "is_image": true,
+        "meaningful_image": true,
+        "mode": "RGB",
+        "nontransparent_pixels": 262144,
+        "sha256": "132e2f9aa73f8f6d57c04a1dd9b0606e320dbfbb29a3d3070c52b19a4740c89f",
+        "top_colors": [
+          {
+            "count": 113309,
+            "rgba": [
+              38,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 109805,
+            "rgba": [
+              255,
+              211,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 12889,
+            "rgba": [
+              232,
+              255,
+              191,
+              255
+            ]
+          },
+          {
+            "count": 12887,
+            "rgba": [
+              154,
+              154,
+              154,
+              255
+            ]
+          },
+          {
+            "count": 9057,
+            "rgba": [
+              147,
+              204,
+              147,
+              255
+            ]
+          },
+          {
+            "count": 1865,
+            "rgba": [
+              126,
+              177,
+              177,
+              255
+            ]
+          },
+          {
+            "count": 782,
+            "rgba": [
+              255,
+              102,
+              102,
+              255
+            ]
+          },
+          {
+            "count": 596,
+            "rgba": [
+              165,
+              112,
+              0,
+              255
+            ]
+          }
+        ],
+        "transparent_fraction": 0.0,
+        "unique_colors": 18,
+        "width": 512
+      },
+      "error": null,
+      "format": "png",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "time_2023_interval",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-89.20000000,40.00000000,-89.05000000,40.15000000&bboxSR=4326&imageSR=4326&size=512,512&format=png&transparent=false&time=1672531200000,1703980800000"
+    },
+    {
+      "bbox_name": "illinois_known_ag",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 42666,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_illinois_known_ag_mosaic_year_eq_2023_png32_5a5e139e51b4885b.png",
+        "dominant_fraction": 0.4322395324707031,
+        "format": "PNG",
+        "height": 512,
+        "is_image": true,
+        "meaningful_image": true,
+        "mode": "RGBA",
+        "nontransparent_pixels": 262144,
+        "sha256": "5a5e139e51b4885b1fdd179d1a459e0e71c03e442b8244afe6e77b1dd7f70c2e",
+        "top_colors": [
+          {
+            "count": 113309,
+            "rgba": [
+              38,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 109805,
+            "rgba": [
+              255,
+              211,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 12889,
+            "rgba": [
+              232,
+              255,
+              191,
+              255
+            ]
+          },
+          {
+            "count": 12887,
+            "rgba": [
+              154,
+              154,
+              154,
+              255
+            ]
+          },
+          {
+            "count": 9057,
+            "rgba": [
+              147,
+              204,
+              147,
+              255
+            ]
+          },
+          {
+            "count": 1865,
+            "rgba": [
+              126,
+              177,
+              177,
+              255
+            ]
+          },
+          {
+            "count": 782,
+            "rgba": [
+              255,
+              102,
+              102,
+              255
+            ]
+          },
+          {
+            "count": 596,
+            "rgba": [
+              165,
+              112,
+              0,
+              255
+            ]
+          }
+        ],
+        "transparent_fraction": 0.0,
+        "unique_colors": 18,
+        "width": 512
+      },
+      "error": null,
+      "format": "png32",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "mosaic_year_eq_2023",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-89.20000000,40.00000000,-89.05000000,40.15000000&bboxSR=4326&imageSR=4326&size=512,512&format=png32&transparent=false&mosaicRule={\"mosaicMethod\":+\"esriMosaicAttribute\",+\"where\":+\"Year+%3D+2023\",+\"sortField\":+\"Year\",+\"sortValue\":+\"2023\"}"
+    },
+    {
+      "bbox_name": "illinois_known_ag",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 41327,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_illinois_known_ag_mosaic_year_eq_2023_png_132e2f9aa73f8f6d.png",
+        "dominant_fraction": 0.4322395324707031,
+        "format": "PNG",
+        "height": 512,
+        "is_image": true,
+        "meaningful_image": true,
+        "mode": "RGB",
+        "nontransparent_pixels": 262144,
+        "sha256": "132e2f9aa73f8f6d57c04a1dd9b0606e320dbfbb29a3d3070c52b19a4740c89f",
+        "top_colors": [
+          {
+            "count": 113309,
+            "rgba": [
+              38,
+              112,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 109805,
+            "rgba": [
+              255,
+              211,
+              0,
+              255
+            ]
+          },
+          {
+            "count": 12889,
+            "rgba": [
+              232,
+              255,
+              191,
+              255
+            ]
+          },
+          {
+            "count": 12887,
+            "rgba": [
+              154,
+              154,
+              154,
+              255
+            ]
+          },
+          {
+            "count": 9057,
+            "rgba": [
+              147,
+              204,
+              147,
+              255
+            ]
+          },
+          {
+            "count": 1865,
+            "rgba": [
+              126,
+              177,
+              177,
+              255
+            ]
+          },
+          {
+            "count": 782,
+            "rgba": [
+              255,
+              102,
+              102,
+              255
+            ]
+          },
+          {
+            "count": 596,
+            "rgba": [
+              165,
+              112,
+              0,
+              255
+            ]
+          }
+        ],
+        "transparent_fraction": 0.0,
+        "unique_colors": 18,
+        "width": 512
+      },
+      "error": null,
+      "format": "png",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "mosaic_year_eq_2023",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-89.20000000,40.00000000,-89.05000000,40.15000000&bboxSR=4326&imageSR=4326&size=512,512&format=png&transparent=false&mosaicRule={\"mosaicMethod\":+\"esriMosaicAttribute\",+\"where\":+\"Year+%3D+2023\",+\"sortField\":+\"Year\",+\"sortValue\":+\"2023\"}"
+    },
+    {
+      "bbox_name": "illinois_known_ag",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 158,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_illinois_known_ag_mosaic_year_string_2023_png32_567987e96a1df41e.png",
+        "image_error": "UnidentifiedImageError(\"cannot identify image file '/home/dmsrsic/raster-work/faster-raster/reports/task_previews/cdl_manual_audit/export_illinois_known_ag_mosaic_year_string_2023_png32_567987e96a1df41e.png'\")",
+        "is_image": false,
+        "sha256": "567987e96a1df41e984f92ea3790a379d6e581d7fbc606d1d0414500eb997671"
+      },
+      "error": null,
+      "format": "png32",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "mosaic_year_string_2023",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-89.20000000,40.00000000,-89.05000000,40.15000000&bboxSR=4326&imageSR=4326&size=512,512&format=png32&transparent=false&mosaicRule={\"mosaicMethod\":+\"esriMosaicAttribute\",+\"where\":+\"Year+%3D+%272023%27\",+\"sortField\":+\"Year\",+\"sortValue\":+\"2023\"}"
+    },
+    {
+      "bbox_name": "illinois_known_ag",
+      "content_type": "image/png",
+      "diag": {
+        "bytes": 158,
+        "cache_path": "reports/task_previews/cdl_manual_audit/export_illinois_known_ag_mosaic_year_string_2023_png_567987e96a1df41e.png",
+        "image_error": "UnidentifiedImageError(\"cannot identify image file '/home/dmsrsic/raster-work/faster-raster/reports/task_previews/cdl_manual_audit/export_illinois_known_ag_mosaic_year_string_2023_png_567987e96a1df41e.png'\")",
+        "is_image": false,
+        "sha256": "567987e96a1df41e984f92ea3790a379d6e581d7fbc606d1d0414500eb997671"
+      },
+      "error": null,
+      "format": "png",
+      "http_status": 200,
+      "probe_type": "exportImage",
+      "time_variant": "mosaic_year_string_2023",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-89.20000000,40.00000000,-89.05000000,40.15000000&bboxSR=4326&imageSR=4326&size=512,512&format=png&transparent=false&mosaicRule={\"mosaicMethod\":+\"esriMosaicAttribute\",+\"where\":+\"Year+%3D+%272023%27\",+\"sortField\":+\"Year\",+\"sortValue\":+\"2023\"}"
+    }
+  ],
+  "generated_at_utc": "2026-07-09T03:25:04.806558+00:00",
+  "identify_probes": [
+    {
+      "bbox_name": "task_original",
+      "bytes": 254,
+      "content_type": "application/json; charset=UTF-8",
+      "error": null,
+      "http_status": 200,
+      "parsed": {
+        "json_ok": true,
+        "keys": [
+          "objectId",
+          "name",
+          "value",
+          "location",
+          "properties",
+          "catalogItems",
+          "catalogItemVisibilities"
+        ],
+        "meaningful_count": 0,
+        "meaningful_values": [],
+        "snippet": "{\"catalogItemVisibilities\": [], \"catalogItems\": {\"features\": [], \"objectIdFieldName\": \"OBJECTID\"}, \"location\": {\"spatialReference\": {\"latestWkid\": 3857, \"wkid\": 102100}, \"x\": -83.195, \"y\": 39.805}, \"name\": \"Pixel\", \"objectId\": 0, \"properties\": {}, \"value\": \"NoData\"}",
+        "values_found": [
+          {
+            "path": "/name",
+            "value": "Pixel"
+          },
+          {
+            "path": "/value",
+            "value": "NoData"
+          }
+        ]
+      },
+      "point": [
+        -83.195,
+        39.805
+      ],
+      "probe_type": "identify",
+      "time_variant": "no_time",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.19500000,39.80500000&geometryType=esriGeometryPoint&sr=4326&mapExtent=-83.20000000,39.80000000,-83.19000000,39.81000000&imageDisplay=512,512,96&tolerance=3&returnGeometry=false&returnCatalogItems=true"
+    },
+    {
+      "bbox_name": "task_original",
+      "bytes": 254,
+      "content_type": "application/json; charset=UTF-8",
+      "error": null,
+      "http_status": 200,
+      "parsed": {
+        "json_ok": true,
+        "keys": [
+          "objectId",
+          "name",
+          "value",
+          "location",
+          "properties",
+          "catalogItems",
+          "catalogItemVisibilities"
+        ],
+        "meaningful_count": 0,
+        "meaningful_values": [],
+        "snippet": "{\"catalogItemVisibilities\": [], \"catalogItems\": {\"features\": [], \"objectIdFieldName\": \"OBJECTID\"}, \"location\": {\"spatialReference\": {\"latestWkid\": 3857, \"wkid\": 102100}, \"x\": -83.195, \"y\": 39.805}, \"name\": \"Pixel\", \"objectId\": 0, \"properties\": {}, \"value\": \"NoData\"}",
+        "values_found": [
+          {
+            "path": "/name",
+            "value": "Pixel"
+          },
+          {
+            "path": "/value",
+            "value": "NoData"
+          }
+        ]
+      },
+      "point": [
+        -83.195,
+        39.805
+      ],
+      "probe_type": "identify",
+      "time_variant": "time_year_string",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.19500000,39.80500000&geometryType=esriGeometryPoint&sr=4326&mapExtent=-83.20000000,39.80000000,-83.19000000,39.81000000&imageDisplay=512,512,96&tolerance=3&returnGeometry=false&returnCatalogItems=true&time=2023"
+    },
+    {
+      "bbox_name": "task_original",
+      "bytes": 254,
+      "content_type": "application/json; charset=UTF-8",
+      "error": null,
+      "http_status": 200,
+      "parsed": {
+        "json_ok": true,
+        "keys": [
+          "objectId",
+          "name",
+          "value",
+          "location",
+          "properties",
+          "catalogItems",
+          "catalogItemVisibilities"
+        ],
+        "meaningful_count": 0,
+        "meaningful_values": [],
+        "snippet": "{\"catalogItemVisibilities\": [], \"catalogItems\": {\"features\": [], \"objectIdFieldName\": \"OBJECTID\"}, \"location\": {\"spatialReference\": {\"latestWkid\": 3857, \"wkid\": 102100}, \"x\": -83.195, \"y\": 39.805}, \"name\": \"Pixel\", \"objectId\": 0, \"properties\": {}, \"value\": \"NoData\"}",
+        "values_found": [
+          {
+            "path": "/name",
+            "value": "Pixel"
+          },
+          {
+            "path": "/value",
+            "value": "NoData"
+          }
+        ]
+      },
+      "point": [
+        -83.195,
+        39.805
+      ],
+      "probe_type": "identify",
+      "time_variant": "time_mid_2023_epoch",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.19500000,39.80500000&geometryType=esriGeometryPoint&sr=4326&mapExtent=-83.20000000,39.80000000,-83.19000000,39.81000000&imageDisplay=512,512,96&tolerance=3&returnGeometry=false&returnCatalogItems=true&time=1688169600000"
+    },
+    {
+      "bbox_name": "task_original",
+      "bytes": 254,
+      "content_type": "application/json; charset=UTF-8",
+      "error": null,
+      "http_status": 200,
+      "parsed": {
+        "json_ok": true,
+        "keys": [
+          "objectId",
+          "name",
+          "value",
+          "location",
+          "properties",
+          "catalogItems",
+          "catalogItemVisibilities"
+        ],
+        "meaningful_count": 0,
+        "meaningful_values": [],
+        "snippet": "{\"catalogItemVisibilities\": [], \"catalogItems\": {\"features\": [], \"objectIdFieldName\": \"OBJECTID\"}, \"location\": {\"spatialReference\": {\"latestWkid\": 3857, \"wkid\": 102100}, \"x\": -83.195, \"y\": 39.805}, \"name\": \"Pixel\", \"objectId\": 0, \"properties\": {}, \"value\": \"NoData\"}",
+        "values_found": [
+          {
+            "path": "/name",
+            "value": "Pixel"
+          },
+          {
+            "path": "/value",
+            "value": "NoData"
+          }
+        ]
+      },
+      "point": [
+        -83.195,
+        39.805
+      ],
+      "probe_type": "identify",
+      "time_variant": "time_2023_interval",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.19500000,39.80500000&geometryType=esriGeometryPoint&sr=4326&mapExtent=-83.20000000,39.80000000,-83.19000000,39.81000000&imageDisplay=512,512,96&tolerance=3&returnGeometry=false&returnCatalogItems=true&time=1672531200000,1703980800000"
+    },
+    {
+      "bbox_name": "task_original",
+      "bytes": 254,
+      "content_type": "application/json; charset=UTF-8",
+      "error": null,
+      "http_status": 200,
+      "parsed": {
+        "json_ok": true,
+        "keys": [
+          "objectId",
+          "name",
+          "value",
+          "location",
+          "properties",
+          "catalogItems",
+          "catalogItemVisibilities"
+        ],
+        "meaningful_count": 0,
+        "meaningful_values": [],
+        "snippet": "{\"catalogItemVisibilities\": [], \"catalogItems\": {\"features\": [], \"objectIdFieldName\": \"OBJECTID\"}, \"location\": {\"spatialReference\": {\"latestWkid\": 3857, \"wkid\": 102100}, \"x\": -83.195, \"y\": 39.805}, \"name\": \"Pixel\", \"objectId\": 0, \"properties\": {}, \"value\": \"NoData\"}",
+        "values_found": [
+          {
+            "path": "/name",
+            "value": "Pixel"
+          },
+          {
+            "path": "/value",
+            "value": "NoData"
+          }
+        ]
+      },
+      "point": [
+        -83.195,
+        39.805
+      ],
+      "probe_type": "identify",
+      "time_variant": "mosaic_year_eq_2023",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.19500000,39.80500000&geometryType=esriGeometryPoint&sr=4326&mapExtent=-83.20000000,39.80000000,-83.19000000,39.81000000&imageDisplay=512,512,96&tolerance=3&returnGeometry=false&returnCatalogItems=true&mosaicRule={\"mosaicMethod\":+\"esriMosaicAttribute\",+\"where\":+\"Year+%3D+2023\",+\"sortField\":+\"Year\",+\"sortValue\":+\"2023\"}"
+    },
+    {
+      "bbox_name": "task_original",
+      "bytes": 214,
+      "content_type": "application/json; charset=UTF-8",
+      "error": null,
+      "http_status": 200,
+      "parsed": {
+        "json_ok": true,
+        "keys": [
+          "objectId",
+          "name",
+          "value",
+          "location",
+          "properties",
+          "catalogItems",
+          "catalogItemVisibilities"
+        ],
+        "meaningful_count": 0,
+        "meaningful_values": [],
+        "snippet": "{\"catalogItemVisibilities\": [], \"catalogItems\": null, \"location\": {\"spatialReference\": {\"latestWkid\": 3857, \"wkid\": 102100}, \"x\": -83.195, \"y\": 39.805}, \"name\": \"Pixel\", \"objectId\": 0, \"properties\": null, \"value\": \"NoData\"}",
+        "values_found": [
+          {
+            "path": "/name",
+            "value": "Pixel"
+          },
+          {
+            "path": "/value",
+            "value": "NoData"
+          }
+        ]
+      },
+      "point": [
+        -83.195,
+        39.805
+      ],
+      "probe_type": "identify",
+      "time_variant": "mosaic_year_string_2023",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.19500000,39.80500000&geometryType=esriGeometryPoint&sr=4326&mapExtent=-83.20000000,39.80000000,-83.19000000,39.81000000&imageDisplay=512,512,96&tolerance=3&returnGeometry=false&returnCatalogItems=true&mosaicRule={\"mosaicMethod\":+\"esriMosaicAttribute\",+\"where\":+\"Year+%3D+%272023%27\",+\"sortField\":+\"Year\",+\"sortValue\":+\"2023\"}"
+    },
+    {
+      "bbox_name": "task_expand10",
+      "bytes": 254,
+      "content_type": "application/json; charset=UTF-8",
+      "error": null,
+      "http_status": 200,
+      "parsed": {
+        "json_ok": true,
+        "keys": [
+          "objectId",
+          "name",
+          "value",
+          "location",
+          "properties",
+          "catalogItems",
+          "catalogItemVisibilities"
+        ],
+        "meaningful_count": 0,
+        "meaningful_values": [],
+        "snippet": "{\"catalogItemVisibilities\": [], \"catalogItems\": {\"features\": [], \"objectIdFieldName\": \"OBJECTID\"}, \"location\": {\"spatialReference\": {\"latestWkid\": 3857, \"wkid\": 102100}, \"x\": -83.195, \"y\": 39.805}, \"name\": \"Pixel\", \"objectId\": 0, \"properties\": {}, \"value\": \"NoData\"}",
+        "values_found": [
+          {
+            "path": "/name",
+            "value": "Pixel"
+          },
+          {
+            "path": "/value",
+            "value": "NoData"
+          }
+        ]
+      },
+      "point": [
+        -83.195,
+        39.805
+      ],
+      "probe_type": "identify",
+      "time_variant": "no_time",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.19500000,39.80500000&geometryType=esriGeometryPoint&sr=4326&mapExtent=-83.24500000,39.75500000,-83.14500000,39.85500000&imageDisplay=512,512,96&tolerance=3&returnGeometry=false&returnCatalogItems=true"
+    },
+    {
+      "bbox_name": "task_expand10",
+      "bytes": 254,
+      "content_type": "application/json; charset=UTF-8",
+      "error": null,
+      "http_status": 200,
+      "parsed": {
+        "json_ok": true,
+        "keys": [
+          "objectId",
+          "name",
+          "value",
+          "location",
+          "properties",
+          "catalogItems",
+          "catalogItemVisibilities"
+        ],
+        "meaningful_count": 0,
+        "meaningful_values": [],
+        "snippet": "{\"catalogItemVisibilities\": [], \"catalogItems\": {\"features\": [], \"objectIdFieldName\": \"OBJECTID\"}, \"location\": {\"spatialReference\": {\"latestWkid\": 3857, \"wkid\": 102100}, \"x\": -83.195, \"y\": 39.805}, \"name\": \"Pixel\", \"objectId\": 0, \"properties\": {}, \"value\": \"NoData\"}",
+        "values_found": [
+          {
+            "path": "/name",
+            "value": "Pixel"
+          },
+          {
+            "path": "/value",
+            "value": "NoData"
+          }
+        ]
+      },
+      "point": [
+        -83.195,
+        39.805
+      ],
+      "probe_type": "identify",
+      "time_variant": "time_year_string",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.19500000,39.80500000&geometryType=esriGeometryPoint&sr=4326&mapExtent=-83.24500000,39.75500000,-83.14500000,39.85500000&imageDisplay=512,512,96&tolerance=3&returnGeometry=false&returnCatalogItems=true&time=2023"
+    },
+    {
+      "bbox_name": "task_expand10",
+      "bytes": 254,
+      "content_type": "application/json; charset=UTF-8",
+      "error": null,
+      "http_status": 200,
+      "parsed": {
+        "json_ok": true,
+        "keys": [
+          "objectId",
+          "name",
+          "value",
+          "location",
+          "properties",
+          "catalogItems",
+          "catalogItemVisibilities"
+        ],
+        "meaningful_count": 0,
+        "meaningful_values": [],
+        "snippet": "{\"catalogItemVisibilities\": [], \"catalogItems\": {\"features\": [], \"objectIdFieldName\": \"OBJECTID\"}, \"location\": {\"spatialReference\": {\"latestWkid\": 3857, \"wkid\": 102100}, \"x\": -83.195, \"y\": 39.805}, \"name\": \"Pixel\", \"objectId\": 0, \"properties\": {}, \"value\": \"NoData\"}",
+        "values_found": [
+          {
+            "path": "/name",
+            "value": "Pixel"
+          },
+          {
+            "path": "/value",
+            "value": "NoData"
+          }
+        ]
+      },
+      "point": [
+        -83.195,
+        39.805
+      ],
+      "probe_type": "identify",
+      "time_variant": "time_mid_2023_epoch",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.19500000,39.80500000&geometryType=esriGeometryPoint&sr=4326&mapExtent=-83.24500000,39.75500000,-83.14500000,39.85500000&imageDisplay=512,512,96&tolerance=3&returnGeometry=false&returnCatalogItems=true&time=1688169600000"
+    },
+    {
+      "bbox_name": "task_expand10",
+      "bytes": 254,
+      "content_type": "application/json; charset=UTF-8",
+      "error": null,
+      "http_status": 200,
+      "parsed": {
+        "json_ok": true,
+        "keys": [
+          "objectId",
+          "name",
+          "value",
+          "location",
+          "properties",
+          "catalogItems",
+          "catalogItemVisibilities"
+        ],
+        "meaningful_count": 0,
+        "meaningful_values": [],
+        "snippet": "{\"catalogItemVisibilities\": [], \"catalogItems\": {\"features\": [], \"objectIdFieldName\": \"OBJECTID\"}, \"location\": {\"spatialReference\": {\"latestWkid\": 3857, \"wkid\": 102100}, \"x\": -83.195, \"y\": 39.805}, \"name\": \"Pixel\", \"objectId\": 0, \"properties\": {}, \"value\": \"NoData\"}",
+        "values_found": [
+          {
+            "path": "/name",
+            "value": "Pixel"
+          },
+          {
+            "path": "/value",
+            "value": "NoData"
+          }
+        ]
+      },
+      "point": [
+        -83.195,
+        39.805
+      ],
+      "probe_type": "identify",
+      "time_variant": "time_2023_interval",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.19500000,39.80500000&geometryType=esriGeometryPoint&sr=4326&mapExtent=-83.24500000,39.75500000,-83.14500000,39.85500000&imageDisplay=512,512,96&tolerance=3&returnGeometry=false&returnCatalogItems=true&time=1672531200000,1703980800000"
+    },
+    {
+      "bbox_name": "task_expand10",
+      "bytes": 254,
+      "content_type": "application/json; charset=UTF-8",
+      "error": null,
+      "http_status": 200,
+      "parsed": {
+        "json_ok": true,
+        "keys": [
+          "objectId",
+          "name",
+          "value",
+          "location",
+          "properties",
+          "catalogItems",
+          "catalogItemVisibilities"
+        ],
+        "meaningful_count": 0,
+        "meaningful_values": [],
+        "snippet": "{\"catalogItemVisibilities\": [], \"catalogItems\": {\"features\": [], \"objectIdFieldName\": \"OBJECTID\"}, \"location\": {\"spatialReference\": {\"latestWkid\": 3857, \"wkid\": 102100}, \"x\": -83.195, \"y\": 39.805}, \"name\": \"Pixel\", \"objectId\": 0, \"properties\": {}, \"value\": \"NoData\"}",
+        "values_found": [
+          {
+            "path": "/name",
+            "value": "Pixel"
+          },
+          {
+            "path": "/value",
+            "value": "NoData"
+          }
+        ]
+      },
+      "point": [
+        -83.195,
+        39.805
+      ],
+      "probe_type": "identify",
+      "time_variant": "mosaic_year_eq_2023",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.19500000,39.80500000&geometryType=esriGeometryPoint&sr=4326&mapExtent=-83.24500000,39.75500000,-83.14500000,39.85500000&imageDisplay=512,512,96&tolerance=3&returnGeometry=false&returnCatalogItems=true&mosaicRule={\"mosaicMethod\":+\"esriMosaicAttribute\",+\"where\":+\"Year+%3D+2023\",+\"sortField\":+\"Year\",+\"sortValue\":+\"2023\"}"
+    },
+    {
+      "bbox_name": "task_expand10",
+      "bytes": 214,
+      "content_type": "application/json; charset=UTF-8",
+      "error": null,
+      "http_status": 200,
+      "parsed": {
+        "json_ok": true,
+        "keys": [
+          "objectId",
+          "name",
+          "value",
+          "location",
+          "properties",
+          "catalogItems",
+          "catalogItemVisibilities"
+        ],
+        "meaningful_count": 0,
+        "meaningful_values": [],
+        "snippet": "{\"catalogItemVisibilities\": [], \"catalogItems\": null, \"location\": {\"spatialReference\": {\"latestWkid\": 3857, \"wkid\": 102100}, \"x\": -83.195, \"y\": 39.805}, \"name\": \"Pixel\", \"objectId\": 0, \"properties\": null, \"value\": \"NoData\"}",
+        "values_found": [
+          {
+            "path": "/name",
+            "value": "Pixel"
+          },
+          {
+            "path": "/value",
+            "value": "NoData"
+          }
+        ]
+      },
+      "point": [
+        -83.195,
+        39.805
+      ],
+      "probe_type": "identify",
+      "time_variant": "mosaic_year_string_2023",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-83.19500000,39.80500000&geometryType=esriGeometryPoint&sr=4326&mapExtent=-83.24500000,39.75500000,-83.14500000,39.85500000&imageDisplay=512,512,96&tolerance=3&returnGeometry=false&returnCatalogItems=true&mosaicRule={\"mosaicMethod\":+\"esriMosaicAttribute\",+\"where\":+\"Year+%3D+%272023%27\",+\"sortField\":+\"Year\",+\"sortValue\":+\"2023\"}"
+    },
+    {
+      "bbox_name": "iowa_known_ag",
+      "bytes": 254,
+      "content_type": "application/json; charset=UTF-8",
+      "error": null,
+      "http_status": 200,
+      "parsed": {
+        "json_ok": true,
+        "keys": [
+          "objectId",
+          "name",
+          "value",
+          "location",
+          "properties",
+          "catalogItems",
+          "catalogItemVisibilities"
+        ],
+        "meaningful_count": 0,
+        "meaningful_values": [],
+        "snippet": "{\"catalogItemVisibilities\": [], \"catalogItems\": {\"features\": [], \"objectIdFieldName\": \"OBJECTID\"}, \"location\": {\"spatialReference\": {\"latestWkid\": 3857, \"wkid\": 102100}, \"x\": -93.625, \"y\": 42.025}, \"name\": \"Pixel\", \"objectId\": 0, \"properties\": {}, \"value\": \"NoData\"}",
+        "values_found": [
+          {
+            "path": "/name",
+            "value": "Pixel"
+          },
+          {
+            "path": "/value",
+            "value": "NoData"
+          }
+        ]
+      },
+      "point": [
+        -93.625,
+        42.025000000000006
+      ],
+      "probe_type": "identify",
+      "time_variant": "no_time",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-93.62500000,42.02500000&geometryType=esriGeometryPoint&sr=4326&mapExtent=-93.70000000,41.95000000,-93.55000000,42.10000000&imageDisplay=512,512,96&tolerance=3&returnGeometry=false&returnCatalogItems=true"
+    },
+    {
+      "bbox_name": "iowa_known_ag",
+      "bytes": 254,
+      "content_type": "application/json; charset=UTF-8",
+      "error": null,
+      "http_status": 200,
+      "parsed": {
+        "json_ok": true,
+        "keys": [
+          "objectId",
+          "name",
+          "value",
+          "location",
+          "properties",
+          "catalogItems",
+          "catalogItemVisibilities"
+        ],
+        "meaningful_count": 0,
+        "meaningful_values": [],
+        "snippet": "{\"catalogItemVisibilities\": [], \"catalogItems\": {\"features\": [], \"objectIdFieldName\": \"OBJECTID\"}, \"location\": {\"spatialReference\": {\"latestWkid\": 3857, \"wkid\": 102100}, \"x\": -93.625, \"y\": 42.025}, \"name\": \"Pixel\", \"objectId\": 0, \"properties\": {}, \"value\": \"NoData\"}",
+        "values_found": [
+          {
+            "path": "/name",
+            "value": "Pixel"
+          },
+          {
+            "path": "/value",
+            "value": "NoData"
+          }
+        ]
+      },
+      "point": [
+        -93.625,
+        42.025000000000006
+      ],
+      "probe_type": "identify",
+      "time_variant": "time_year_string",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-93.62500000,42.02500000&geometryType=esriGeometryPoint&sr=4326&mapExtent=-93.70000000,41.95000000,-93.55000000,42.10000000&imageDisplay=512,512,96&tolerance=3&returnGeometry=false&returnCatalogItems=true&time=2023"
+    },
+    {
+      "bbox_name": "iowa_known_ag",
+      "bytes": 254,
+      "content_type": "application/json; charset=UTF-8",
+      "error": null,
+      "http_status": 200,
+      "parsed": {
+        "json_ok": true,
+        "keys": [
+          "objectId",
+          "name",
+          "value",
+          "location",
+          "properties",
+          "catalogItems",
+          "catalogItemVisibilities"
+        ],
+        "meaningful_count": 0,
+        "meaningful_values": [],
+        "snippet": "{\"catalogItemVisibilities\": [], \"catalogItems\": {\"features\": [], \"objectIdFieldName\": \"OBJECTID\"}, \"location\": {\"spatialReference\": {\"latestWkid\": 3857, \"wkid\": 102100}, \"x\": -93.625, \"y\": 42.025}, \"name\": \"Pixel\", \"objectId\": 0, \"properties\": {}, \"value\": \"NoData\"}",
+        "values_found": [
+          {
+            "path": "/name",
+            "value": "Pixel"
+          },
+          {
+            "path": "/value",
+            "value": "NoData"
+          }
+        ]
+      },
+      "point": [
+        -93.625,
+        42.025000000000006
+      ],
+      "probe_type": "identify",
+      "time_variant": "time_mid_2023_epoch",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-93.62500000,42.02500000&geometryType=esriGeometryPoint&sr=4326&mapExtent=-93.70000000,41.95000000,-93.55000000,42.10000000&imageDisplay=512,512,96&tolerance=3&returnGeometry=false&returnCatalogItems=true&time=1688169600000"
+    },
+    {
+      "bbox_name": "iowa_known_ag",
+      "bytes": 254,
+      "content_type": "application/json; charset=UTF-8",
+      "error": null,
+      "http_status": 200,
+      "parsed": {
+        "json_ok": true,
+        "keys": [
+          "objectId",
+          "name",
+          "value",
+          "location",
+          "properties",
+          "catalogItems",
+          "catalogItemVisibilities"
+        ],
+        "meaningful_count": 0,
+        "meaningful_values": [],
+        "snippet": "{\"catalogItemVisibilities\": [], \"catalogItems\": {\"features\": [], \"objectIdFieldName\": \"OBJECTID\"}, \"location\": {\"spatialReference\": {\"latestWkid\": 3857, \"wkid\": 102100}, \"x\": -93.625, \"y\": 42.025}, \"name\": \"Pixel\", \"objectId\": 0, \"properties\": {}, \"value\": \"NoData\"}",
+        "values_found": [
+          {
+            "path": "/name",
+            "value": "Pixel"
+          },
+          {
+            "path": "/value",
+            "value": "NoData"
+          }
+        ]
+      },
+      "point": [
+        -93.625,
+        42.025000000000006
+      ],
+      "probe_type": "identify",
+      "time_variant": "time_2023_interval",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-93.62500000,42.02500000&geometryType=esriGeometryPoint&sr=4326&mapExtent=-93.70000000,41.95000000,-93.55000000,42.10000000&imageDisplay=512,512,96&tolerance=3&returnGeometry=false&returnCatalogItems=true&time=1672531200000,1703980800000"
+    },
+    {
+      "bbox_name": "iowa_known_ag",
+      "bytes": 254,
+      "content_type": "application/json; charset=UTF-8",
+      "error": null,
+      "http_status": 200,
+      "parsed": {
+        "json_ok": true,
+        "keys": [
+          "objectId",
+          "name",
+          "value",
+          "location",
+          "properties",
+          "catalogItems",
+          "catalogItemVisibilities"
+        ],
+        "meaningful_count": 0,
+        "meaningful_values": [],
+        "snippet": "{\"catalogItemVisibilities\": [], \"catalogItems\": {\"features\": [], \"objectIdFieldName\": \"OBJECTID\"}, \"location\": {\"spatialReference\": {\"latestWkid\": 3857, \"wkid\": 102100}, \"x\": -93.625, \"y\": 42.025}, \"name\": \"Pixel\", \"objectId\": 0, \"properties\": {}, \"value\": \"NoData\"}",
+        "values_found": [
+          {
+            "path": "/name",
+            "value": "Pixel"
+          },
+          {
+            "path": "/value",
+            "value": "NoData"
+          }
+        ]
+      },
+      "point": [
+        -93.625,
+        42.025000000000006
+      ],
+      "probe_type": "identify",
+      "time_variant": "mosaic_year_eq_2023",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-93.62500000,42.02500000&geometryType=esriGeometryPoint&sr=4326&mapExtent=-93.70000000,41.95000000,-93.55000000,42.10000000&imageDisplay=512,512,96&tolerance=3&returnGeometry=false&returnCatalogItems=true&mosaicRule={\"mosaicMethod\":+\"esriMosaicAttribute\",+\"where\":+\"Year+%3D+2023\",+\"sortField\":+\"Year\",+\"sortValue\":+\"2023\"}"
+    },
+    {
+      "bbox_name": "iowa_known_ag",
+      "bytes": 214,
+      "content_type": "application/json; charset=UTF-8",
+      "error": null,
+      "http_status": 200,
+      "parsed": {
+        "json_ok": true,
+        "keys": [
+          "objectId",
+          "name",
+          "value",
+          "location",
+          "properties",
+          "catalogItems",
+          "catalogItemVisibilities"
+        ],
+        "meaningful_count": 0,
+        "meaningful_values": [],
+        "snippet": "{\"catalogItemVisibilities\": [], \"catalogItems\": null, \"location\": {\"spatialReference\": {\"latestWkid\": 3857, \"wkid\": 102100}, \"x\": -93.625, \"y\": 42.025}, \"name\": \"Pixel\", \"objectId\": 0, \"properties\": null, \"value\": \"NoData\"}",
+        "values_found": [
+          {
+            "path": "/name",
+            "value": "Pixel"
+          },
+          {
+            "path": "/value",
+            "value": "NoData"
+          }
+        ]
+      },
+      "point": [
+        -93.625,
+        42.025000000000006
+      ],
+      "probe_type": "identify",
+      "time_variant": "mosaic_year_string_2023",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-93.62500000,42.02500000&geometryType=esriGeometryPoint&sr=4326&mapExtent=-93.70000000,41.95000000,-93.55000000,42.10000000&imageDisplay=512,512,96&tolerance=3&returnGeometry=false&returnCatalogItems=true&mosaicRule={\"mosaicMethod\":+\"esriMosaicAttribute\",+\"where\":+\"Year+%3D+%272023%27\",+\"sortField\":+\"Year\",+\"sortValue\":+\"2023\"}"
+    },
+    {
+      "bbox_name": "illinois_known_ag",
+      "bytes": 254,
+      "content_type": "application/json; charset=UTF-8",
+      "error": null,
+      "http_status": 200,
+      "parsed": {
+        "json_ok": true,
+        "keys": [
+          "objectId",
+          "name",
+          "value",
+          "location",
+          "properties",
+          "catalogItems",
+          "catalogItemVisibilities"
+        ],
+        "meaningful_count": 0,
+        "meaningful_values": [],
+        "snippet": "{\"catalogItemVisibilities\": [], \"catalogItems\": {\"features\": [], \"objectIdFieldName\": \"OBJECTID\"}, \"location\": {\"spatialReference\": {\"latestWkid\": 3857, \"wkid\": 102100}, \"x\": -89.125, \"y\": 40.075}, \"name\": \"Pixel\", \"objectId\": 0, \"properties\": {}, \"value\": \"NoData\"}",
+        "values_found": [
+          {
+            "path": "/name",
+            "value": "Pixel"
+          },
+          {
+            "path": "/value",
+            "value": "NoData"
+          }
+        ]
+      },
+      "point": [
+        -89.125,
+        40.075
+      ],
+      "probe_type": "identify",
+      "time_variant": "no_time",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-89.12500000,40.07500000&geometryType=esriGeometryPoint&sr=4326&mapExtent=-89.20000000,40.00000000,-89.05000000,40.15000000&imageDisplay=512,512,96&tolerance=3&returnGeometry=false&returnCatalogItems=true"
+    },
+    {
+      "bbox_name": "illinois_known_ag",
+      "bytes": 254,
+      "content_type": "application/json; charset=UTF-8",
+      "error": null,
+      "http_status": 200,
+      "parsed": {
+        "json_ok": true,
+        "keys": [
+          "objectId",
+          "name",
+          "value",
+          "location",
+          "properties",
+          "catalogItems",
+          "catalogItemVisibilities"
+        ],
+        "meaningful_count": 0,
+        "meaningful_values": [],
+        "snippet": "{\"catalogItemVisibilities\": [], \"catalogItems\": {\"features\": [], \"objectIdFieldName\": \"OBJECTID\"}, \"location\": {\"spatialReference\": {\"latestWkid\": 3857, \"wkid\": 102100}, \"x\": -89.125, \"y\": 40.075}, \"name\": \"Pixel\", \"objectId\": 0, \"properties\": {}, \"value\": \"NoData\"}",
+        "values_found": [
+          {
+            "path": "/name",
+            "value": "Pixel"
+          },
+          {
+            "path": "/value",
+            "value": "NoData"
+          }
+        ]
+      },
+      "point": [
+        -89.125,
+        40.075
+      ],
+      "probe_type": "identify",
+      "time_variant": "time_year_string",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-89.12500000,40.07500000&geometryType=esriGeometryPoint&sr=4326&mapExtent=-89.20000000,40.00000000,-89.05000000,40.15000000&imageDisplay=512,512,96&tolerance=3&returnGeometry=false&returnCatalogItems=true&time=2023"
+    },
+    {
+      "bbox_name": "illinois_known_ag",
+      "bytes": 254,
+      "content_type": "application/json; charset=UTF-8",
+      "error": null,
+      "http_status": 200,
+      "parsed": {
+        "json_ok": true,
+        "keys": [
+          "objectId",
+          "name",
+          "value",
+          "location",
+          "properties",
+          "catalogItems",
+          "catalogItemVisibilities"
+        ],
+        "meaningful_count": 0,
+        "meaningful_values": [],
+        "snippet": "{\"catalogItemVisibilities\": [], \"catalogItems\": {\"features\": [], \"objectIdFieldName\": \"OBJECTID\"}, \"location\": {\"spatialReference\": {\"latestWkid\": 3857, \"wkid\": 102100}, \"x\": -89.125, \"y\": 40.075}, \"name\": \"Pixel\", \"objectId\": 0, \"properties\": {}, \"value\": \"NoData\"}",
+        "values_found": [
+          {
+            "path": "/name",
+            "value": "Pixel"
+          },
+          {
+            "path": "/value",
+            "value": "NoData"
+          }
+        ]
+      },
+      "point": [
+        -89.125,
+        40.075
+      ],
+      "probe_type": "identify",
+      "time_variant": "time_mid_2023_epoch",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-89.12500000,40.07500000&geometryType=esriGeometryPoint&sr=4326&mapExtent=-89.20000000,40.00000000,-89.05000000,40.15000000&imageDisplay=512,512,96&tolerance=3&returnGeometry=false&returnCatalogItems=true&time=1688169600000"
+    },
+    {
+      "bbox_name": "illinois_known_ag",
+      "bytes": 254,
+      "content_type": "application/json; charset=UTF-8",
+      "error": null,
+      "http_status": 200,
+      "parsed": {
+        "json_ok": true,
+        "keys": [
+          "objectId",
+          "name",
+          "value",
+          "location",
+          "properties",
+          "catalogItems",
+          "catalogItemVisibilities"
+        ],
+        "meaningful_count": 0,
+        "meaningful_values": [],
+        "snippet": "{\"catalogItemVisibilities\": [], \"catalogItems\": {\"features\": [], \"objectIdFieldName\": \"OBJECTID\"}, \"location\": {\"spatialReference\": {\"latestWkid\": 3857, \"wkid\": 102100}, \"x\": -89.125, \"y\": 40.075}, \"name\": \"Pixel\", \"objectId\": 0, \"properties\": {}, \"value\": \"NoData\"}",
+        "values_found": [
+          {
+            "path": "/name",
+            "value": "Pixel"
+          },
+          {
+            "path": "/value",
+            "value": "NoData"
+          }
+        ]
+      },
+      "point": [
+        -89.125,
+        40.075
+      ],
+      "probe_type": "identify",
+      "time_variant": "time_2023_interval",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-89.12500000,40.07500000&geometryType=esriGeometryPoint&sr=4326&mapExtent=-89.20000000,40.00000000,-89.05000000,40.15000000&imageDisplay=512,512,96&tolerance=3&returnGeometry=false&returnCatalogItems=true&time=1672531200000,1703980800000"
+    },
+    {
+      "bbox_name": "illinois_known_ag",
+      "bytes": 254,
+      "content_type": "application/json; charset=UTF-8",
+      "error": null,
+      "http_status": 200,
+      "parsed": {
+        "json_ok": true,
+        "keys": [
+          "objectId",
+          "name",
+          "value",
+          "location",
+          "properties",
+          "catalogItems",
+          "catalogItemVisibilities"
+        ],
+        "meaningful_count": 0,
+        "meaningful_values": [],
+        "snippet": "{\"catalogItemVisibilities\": [], \"catalogItems\": {\"features\": [], \"objectIdFieldName\": \"OBJECTID\"}, \"location\": {\"spatialReference\": {\"latestWkid\": 3857, \"wkid\": 102100}, \"x\": -89.125, \"y\": 40.075}, \"name\": \"Pixel\", \"objectId\": 0, \"properties\": {}, \"value\": \"NoData\"}",
+        "values_found": [
+          {
+            "path": "/name",
+            "value": "Pixel"
+          },
+          {
+            "path": "/value",
+            "value": "NoData"
+          }
+        ]
+      },
+      "point": [
+        -89.125,
+        40.075
+      ],
+      "probe_type": "identify",
+      "time_variant": "mosaic_year_eq_2023",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-89.12500000,40.07500000&geometryType=esriGeometryPoint&sr=4326&mapExtent=-89.20000000,40.00000000,-89.05000000,40.15000000&imageDisplay=512,512,96&tolerance=3&returnGeometry=false&returnCatalogItems=true&mosaicRule={\"mosaicMethod\":+\"esriMosaicAttribute\",+\"where\":+\"Year+%3D+2023\",+\"sortField\":+\"Year\",+\"sortValue\":+\"2023\"}"
+    },
+    {
+      "bbox_name": "illinois_known_ag",
+      "bytes": 214,
+      "content_type": "application/json; charset=UTF-8",
+      "error": null,
+      "http_status": 200,
+      "parsed": {
+        "json_ok": true,
+        "keys": [
+          "objectId",
+          "name",
+          "value",
+          "location",
+          "properties",
+          "catalogItems",
+          "catalogItemVisibilities"
+        ],
+        "meaningful_count": 0,
+        "meaningful_values": [],
+        "snippet": "{\"catalogItemVisibilities\": [], \"catalogItems\": null, \"location\": {\"spatialReference\": {\"latestWkid\": 3857, \"wkid\": 102100}, \"x\": -89.125, \"y\": 40.075}, \"name\": \"Pixel\", \"objectId\": 0, \"properties\": null, \"value\": \"NoData\"}",
+        "values_found": [
+          {
+            "path": "/name",
+            "value": "Pixel"
+          },
+          {
+            "path": "/value",
+            "value": "NoData"
+          }
+        ]
+      },
+      "point": [
+        -89.125,
+        40.075
+      ],
+      "probe_type": "identify",
+      "time_variant": "mosaic_year_string_2023",
+      "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/identify?f=json&geometry=-89.12500000,40.07500000&geometryType=esriGeometryPoint&sr=4326&mapExtent=-89.20000000,40.00000000,-89.05000000,40.15000000&imageDisplay=512,512,96&tolerance=3&returnGeometry=false&returnCatalogItems=true&mosaicRule={\"mosaicMethod\":+\"esriMosaicAttribute\",+\"where\":+\"Year+%3D+%272023%27\",+\"sortField\":+\"Year\",+\"sortValue\":+\"2023\"}"
+    }
+  ],
+  "max_bytes": 2500000,
+  "metadata": {
+    "bytes": 4880,
+    "capabilities": "Catalog,Mensuration,Image,Metadata",
+    "content_type": "application/json; charset=UTF-8",
+    "currentVersion": 12.1,
+    "error": null,
+    "extent": {
+      "spatialReference": {
+        "latestWkid": 3857,
+        "wkid": 102100
+      },
+      "xmax": -7018961.342700001,
+      "xmin": -14397551.3427,
+      "ymax": 6978761.9045,
+      "ymin": 2480531.9045
+    },
+    "fields": [
+      {
+        "alias": "OBJECTID",
+        "domain": null,
+        "name": "OBJECTID",
+        "type": "esriFieldTypeOID"
+      },
+      {
+        "alias": "Shape",
+        "domain": null,
+        "name": "Shape",
+        "type": "esriFieldTypeGeometry"
+      },
+      {
+        "alias": "Name",
+        "domain": null,
+        "length": 200,
+        "name": "Name",
+        "type": "esriFieldTypeString"
+      },
+      {
+        "alias": "MinPS",
+        "domain": null,
+        "name": "MinPS",
+        "type": "esriFieldTypeDouble"
+      },
+      {
+        "alias": "MaxPS",
+        "domain": null,
+        "name": "MaxPS",
+        "type": "esriFieldTypeDouble"
+      },
+      {
+        "alias": "LowPS",
+        "domain": null,
+        "name": "LowPS",
+        "type": "esriFieldTypeDouble"
+      },
+      {
+        "alias": "HighPS",
+        "domain": null,
+        "name": "HighPS",
+        "type": "esriFieldTypeDouble"
+      },
+      {
+        "alias": "Category",
+        "domain": {
+          "codedValues": [
+            {
+              "code": 0,
+              "name": "Unknown"
+            },
+            {
+              "code": 1,
+              "name": "Primary"
+            },
+            {
+              "code": 2,
+              "name": "Overview"
+            },
+            {
+              "code": 3,
+              "name": "Unprocessed Overview"
+            },
+            {
+              "code": 4,
+              "name": "Partial Overview"
+            },
+            {
+              "code": 5,
+              "name": "Inactive"
+            },
+            {
+              "code": 253,
+              "name": "Uploaded"
+            },
+            {
+              "code": 254,
+              "name": "Incomplete"
+            },
+            {
+              "code": 255,
+              "name": "Custom"
+            }
+          ],
+          "description": "Catalog item categories.",
+          "mergePolicy": "esriMPTDefaultValue",
+          "name": "MosaicCatalogItemCategoryDomain",
+          "splitPolicy": "esriSPTDefaultValue",
+          "type": "codedValue"
+        },
+        "name": "Category",
+        "type": "esriFieldTypeInteger"
+      },
+      {
+        "alias": "Year",
+        "domain": null,
+        "name": "Year",
+        "type": "esriFieldTypeInteger"
+      }
+    ],
+    "http_status": 200,
+    "json_ok": true,
+    "maxImageHeight": 4097,
+    "maxImageWidth": 4097,
+    "name": "CDL_WM",
+    "spatialReference": {
+      "latestWkid": 3857,
+      "wkid": 102100
+    },
+    "timeInfo": {
+      "endTimeField": "Year",
+      "startTimeField": "Year",
+      "timeExtent": [
+        852076800000,
+        1735689600000
+      ],
+      "timeReference": null
+    },
+    "type": null,
+    "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer?f=json"
+  }
+}

@@ -49,6 +49,61 @@
         },
         "open_after_create": {
           "type": "boolean"
+        },
+        "real_data": {
+          "additionalProperties": false,
+          "properties": {
+            "cache_raw": {
+              "type": "boolean"
+            },
+            "cdl_render_mode": {
+              "enum": [
+                "auto",
+                "service_png",
+                "manual_samples",
+                "service_tiff"
+              ],
+              "type": "string"
+            },
+            "cdl_verify_samples": {
+              "type": "boolean"
+            },
+            "debug_artifacts": {
+              "type": "boolean"
+            },
+            "enabled": {
+              "type": "boolean"
+            },
+            "include_archives": {
+              "type": "boolean"
+            },
+            "max_bytes_per_source": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "max_pixels": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "preview_expand_factor": {
+              "maximum": 25.0,
+              "minimum": 1.0,
+              "type": "number"
+            },
+            "preview_size": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "sample_grid_size": {
+              "maximum": 7,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          "type": "object"
+        },
+        "style": {
+          "type": "string"
         }
       },
       "required": [

@@ -27,3 +27,20 @@ faster-raster stack preview example_corn_belt_water_balance --plain
 Task preview is semantic/planning only. It uses local atlas/report files for source status, never contacts endpoints, never reads credentials, and never downloads or extracts source data.
 
 The stack preview feeds future adapter-backed live cooking by making AOI, CRS, time, themes, source readiness, warnings, and output artifact paths visible before any runtime execution.
+
+## Real-data preview dry run
+
+```bash
+faster-raster task preview-real example_corn_belt_water_balance --plain
+faster-raster stack preview-real example_corn_belt_water_balance --plain
+```
+
+Live real-data preview remains opt-in with `--allow-network`; see `docs/REAL_DATA_PREVIEW.md`.
+
+Real preview diagnostics example:
+
+```bash
+faster-raster task preview-real example_corn_belt_water_balance --allow-network --max-bytes-per-source 2500000 --preview-size 512 --debug-artifacts --plain
+```
+
+Dry-run remains the default when `--allow-network` is omitted.

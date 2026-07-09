@@ -13,6 +13,7 @@ from faster_raster import cli_render as render
 from faster_raster import cli_lingo
 from faster_raster import user_toggles
 from faster_raster import task_builder
+from faster_raster import real_preview
 
 sources_app = typer.Typer(no_args_is_help=True)
 stack_app = typer.Typer(no_args_is_help=True)
@@ -481,9 +482,108 @@ def task_preview(task_id: str, open_after_create: bool = typer.Option(False, "--
     emit(report, json_output=json_output, plain=True, plain_text=text)
 
 
+@task_app.command("preview-real")
+def task_preview_real(
+    task_id: str,
+    allow_network: bool = typer.Option(False, "--allow-network"),
+    max_bytes_per_source: int = typer.Option(real_preview.DEFAULT_MAX_BYTES_PER_SOURCE, "--max-bytes-per-source"),
+    max_pixels: int = typer.Option(real_preview.DEFAULT_MAX_PIXELS, "--max-pixels"),
+    timeout_seconds: int = typer.Option(real_preview.DEFAULT_TIMEOUT_SECONDS, "--timeout-seconds"),
+    preview_size: int = typer.Option(real_preview.DEFAULT_PREVIEW_SIZE, "--preview-size"),
+    cdl_verify_samples: bool = typer.Option(True, "--cdl-verify-samples/--no-cdl-verify-samples", help="--cdl-verify-samples / --no-cdl-verify-samples"),
+    sample_grid_size: int = typer.Option(real_preview.DEFAULT_SAMPLE_GRID_SIZE, "--sample-grid-size", min=1, max=7, help="--sample-grid-size"),
+    grid_size: Optional[int] = typer.Option(None, "--grid-size", min=1, max=7, help="--grid-size alias for --sample-grid-size"),
+    preview_expand_factor: float = typer.Option(real_preview.DEFAULT_PREVIEW_EXPAND_FACTOR, "--preview-expand-factor", min=1.0, max=25.0, help="--preview-expand-factor"),
+    cdl_render_mode: str = typer.Option("auto", "--cdl-render-mode", help="--cdl-render-mode: auto, service_png, manual_samples, service_tiff"),
+    debug_artifacts: bool = typer.Option(False, "--debug-artifacts"),
+    no_cache_raw: bool = typer.Option(False, "--no-cache-raw"),
+    include_archives: bool = typer.Option(False, "--include-archives"),
+    open_after_create: bool = typer.Option(False, "--open"),
+    json_output: bool = typer.Option(False, "--json"),
+    plain: bool = typer.Option(False, "--plain"),
+) -> None:
+    """Create a bounded real-data preview. CDL options: --cdl-verify-samples --sample-grid-size --grid-size --preview-expand-factor --cdl-render-mode."""
+    report = real_preview.create_real_preview(
+        task_builder.load_task(task_id),
+        allow_network=allow_network,
+        max_bytes_per_source=max_bytes_per_source,
+        max_pixels=max_pixels,
+        timeout_seconds=timeout_seconds,
+        include_archives=include_archives,
+        open_after_create=open_after_create,
+        preview_size=preview_size,
+        debug_artifacts=debug_artifacts,
+        cache_raw=not no_cache_raw,
+        cdl_verify_samples=cdl_verify_samples,
+        sample_grid_size=grid_size if grid_size is not None else sample_grid_size,
+        preview_expand_factor=preview_expand_factor,
+        cdl_render_mode=cdl_render_mode,
+    )
+    if report["network_run"]:
+        text = (
+            f"real_preview_png: {report['png_path']}\n"
+            f"real_preview_json: {report['preview_json']}\n"
+            f"real_preview_md: {report['md_path']}\n"
+            f"network_run: {report['network_run']}\n"
+            f"real_fetch_attempted: {report['real_fetch_attempted']}\n"
+            f"real_raster_data_rendered: {report['real_raster_data_rendered']}\n"
+        )
+    else:
+        text = (
+            f"real_preview_plan_json: {report['json_path']}\n"
+            f"real_preview_plan_md: {report['md_path']}\n"
+            f"network_run: {report['network_run']}\n"
+            f"real_fetch_attempted: {report['real_fetch_attempted']}\n"
+            "dry_run: True\n"
+        )
+    emit(report, json_output=json_output, plain=True, plain_text=text)
+
+
 @stack_app.command("preview")
 def stack_preview(task_id: str, open_after_create: bool = typer.Option(False, "--open"), json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
     task_preview(task_id, open_after_create=open_after_create, json_output=json_output, plain=plain)
+
+
+@stack_app.command("preview-real")
+def stack_preview_real(
+    task_id: str,
+    allow_network: bool = typer.Option(False, "--allow-network"),
+    max_bytes_per_source: int = typer.Option(real_preview.DEFAULT_MAX_BYTES_PER_SOURCE, "--max-bytes-per-source"),
+    max_pixels: int = typer.Option(real_preview.DEFAULT_MAX_PIXELS, "--max-pixels"),
+    timeout_seconds: int = typer.Option(real_preview.DEFAULT_TIMEOUT_SECONDS, "--timeout-seconds"),
+    preview_size: int = typer.Option(real_preview.DEFAULT_PREVIEW_SIZE, "--preview-size"),
+    cdl_verify_samples: bool = typer.Option(True, "--cdl-verify-samples/--no-cdl-verify-samples", help="--cdl-verify-samples / --no-cdl-verify-samples"),
+    sample_grid_size: int = typer.Option(real_preview.DEFAULT_SAMPLE_GRID_SIZE, "--sample-grid-size", min=1, max=7, help="--sample-grid-size"),
+    grid_size: Optional[int] = typer.Option(None, "--grid-size", min=1, max=7, help="--grid-size alias for --sample-grid-size"),
+    preview_expand_factor: float = typer.Option(real_preview.DEFAULT_PREVIEW_EXPAND_FACTOR, "--preview-expand-factor", min=1.0, max=25.0, help="--preview-expand-factor"),
+    cdl_render_mode: str = typer.Option("auto", "--cdl-render-mode", help="--cdl-render-mode: auto, service_png, manual_samples, service_tiff"),
+    debug_artifacts: bool = typer.Option(False, "--debug-artifacts"),
+    no_cache_raw: bool = typer.Option(False, "--no-cache-raw"),
+    include_archives: bool = typer.Option(False, "--include-archives"),
+    open_after_create: bool = typer.Option(False, "--open"),
+    json_output: bool = typer.Option(False, "--json"),
+    plain: bool = typer.Option(False, "--plain"),
+) -> None:
+    """Alias for task preview-real. CDL options: --cdl-verify-samples --sample-grid-size --grid-size --preview-expand-factor --cdl-render-mode."""
+    task_preview_real(
+        task_id,
+        allow_network=allow_network,
+        max_bytes_per_source=max_bytes_per_source,
+        max_pixels=max_pixels,
+        timeout_seconds=timeout_seconds,
+        include_archives=include_archives,
+        open_after_create=open_after_create,
+        preview_size=preview_size,
+        debug_artifacts=debug_artifacts,
+        no_cache_raw=no_cache_raw,
+        cdl_verify_samples=cdl_verify_samples,
+        sample_grid_size=sample_grid_size,
+        grid_size=grid_size,
+        preview_expand_factor=preview_expand_factor,
+        cdl_render_mode=cdl_render_mode,
+        json_output=json_output,
+        plain=plain,
+    )
 
 def register_product_commands(app: typer.Typer) -> None:
     app.command("version")(version_command)

@@ -1,0 +1,149 @@
+{
+  "artifact_type": "cdl_working_export_preview",
+  "best_candidate": {
+    "bbox_name": "task_expand10",
+    "bytes": 74523,
+    "cache_path": "reports/task_previews/cdl_manual_audit/export_task_expand10_no_time_png32_1cb4875beee09d2f.png",
+    "content_type": "image/png",
+    "dominant_fraction": 0.2553863525390625,
+    "format": "png32",
+    "http_status": 200,
+    "meaningful_image": true,
+    "nontransparent_pixels": 262144,
+    "score": 138,
+    "time_variant": "no_time",
+    "unique_colors": 28,
+    "url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer/exportImage?f=image&bbox=-83.24500000,39.75500000,-83.14500000,39.85500000&bboxSR=4326&imageSR=4326&size=512,512&format=png32&transparent=false"
+  },
+  "decision": "CDL exportImage works for the task-expanded AOI when no time parameter is used.",
+  "do_not_use_as_final_logic": [
+    "Do not rely on identify as the primary CDL gate for this service.",
+    "Do not force time=2023 before testing no_time/export diagnostics.",
+    "Do not classify a one-color transparent PNG as meaningful raster data."
+  ],
+  "generated_at_utc": "2026-07-09T03:29:37.407411+00:00",
+  "image": {
+    "bytes": 74523,
+    "format": "PNG",
+    "height": 512,
+    "mode": "RGBA",
+    "nontransparent_pixels": 262144,
+    "top_colors": [
+      {
+        "count": 66948,
+        "rgba": [
+          38,
+          112,
+          0,
+          255
+        ]
+      },
+      {
+        "count": 49973,
+        "rgba": [
+          255,
+          211,
+          0,
+          255
+        ]
+      },
+      {
+        "count": 41853,
+        "rgba": [
+          232,
+          255,
+          191,
+          255
+        ]
+      },
+      {
+        "count": 40463,
+        "rgba": [
+          147,
+          204,
+          147,
+          255
+        ]
+      },
+      {
+        "count": 33602,
+        "rgba": [
+          154,
+          154,
+          154,
+          255
+        ]
+      },
+      {
+        "count": 7650,
+        "rgba": [
+          112,
+          112,
+          0,
+          255
+        ]
+      },
+      {
+        "count": 5132,
+        "rgba": [
+          165,
+          112,
+          0,
+          255
+        ]
+      },
+      {
+        "count": 3493,
+        "rgba": [
+          126,
+          177,
+          177,
+          255
+        ]
+      },
+      {
+        "count": 2939,
+        "rgba": [
+          191,
+          191,
+          119,
+          255
+        ]
+      },
+      {
+        "count": 2022,
+        "rgba": [
+          165,
+          242,
+          140,
+          255
+        ]
+      },
+      {
+        "count": 1895,
+        "rgba": [
+          75,
+          112,
+          163,
+          255
+        ]
+      },
+      {
+        "count": 1389,
+        "rgba": [
+          198,
+          214,
+          158,
+          255
+        ]
+      }
+    ],
+    "unique_colors": 28,
+    "width": 512
+  },
+  "implementation_fix": "In real_preview.py, add an exportImage candidate cascade and select the first meaningful image by diagnostics. For the current task AOI, no_time should beat time=2023.",
+  "png_path": "reports/task_previews/example_corn_belt_water_balance_cdl_working_export_preview.png",
+  "sha256": "1cb4875beee09d2f17442208982f4e16e010369e7bfec90e65415439e17e19a5",
+  "source_audit": "reports/task_previews/manual_cdl_endpoint_audit_now.json",
+  "source_cache_path": "reports/task_previews/cdl_manual_audit/export_task_expand10_no_time_png32_1cb4875beee09d2f.png"
+}
