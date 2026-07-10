@@ -201,6 +201,10 @@ def render_task_plain(summary: dict[str, Any]) -> str:
         f"years: {summary['time'].get('years', [])}",
         f"dates: {summary['time'].get('dates', [])}",
         f"themes: {', '.join(summary['themes'])}",
+        f"static_range_adapter_available: {summary.get('static_range_adapter_available', False)}",
+        f"static_range_wave1_available_sources: {summary.get('static_range_wave1_available_sources', [])}",
+        f"static_range_wave1_fixture_sources: {summary.get('static_range_wave1_fixture_sources', [])}",
+        f"static_range_wave1_missing_sources: {summary.get('static_range_wave1_missing_sources', [])}",
         'layers:',
     ]
     for layer in summary['layers']:

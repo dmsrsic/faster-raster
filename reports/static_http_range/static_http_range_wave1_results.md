@@ -1,0 +1,64 @@
+# Static HTTP Range Results
+
+runnable_source_count: 4
+fixture_source_count: 1
+attempted_source_count: 4
+pass_count: 4
+fail_count: 0
+fixture_count: 1
+network_run: True
+decision: wave1_adapter_live_validated
+
+The static_http_range adapter was live-validated against four currently reproducible sources. PRISM is preserved separately as historical bounded contract evidence and is not counted as a live adapter failure.
+
+| Source | Status | HTTP | Bytes | Magic | Family | Quality |
+| --- | --- | ---: | ---: | --- | --- | --- |
+| `chirps_daily_precipitation` | `pass_bounded_truncated` | `206` | `65536` | `gzip` | `gzip` | `candidate` |
+| `gridmet_daily` | `pass_bounded_truncated` | `206` | `65536` | `hdf5` | `hdf5` | `candidate` |
+| `terraclimate_monthly` | `pass_bounded_truncated` | `206` | `65536` | `hdf5` | `hdf5` | `candidate` |
+| `worldclim_bioclim_normals` | `pass_bounded_truncated` | `206` | `65536` | `zip` | `zip` | `candidate` |
+
+## Contract Fixtures
+
+| Source | Status | Historical evidence | Current endpoint |
+| --- | --- | --- | --- |
+| `prism_daily_ppt_static_zip` | `fixture_only` | `application/zip / zip / cc89306d4d5b` | `unresolved_or_stale` |
+
+## Content Families
+
+| Source | Expected | Detected |
+| --- | --- | --- |
+| `chirps_daily_precipitation` | `gzip` | `gzip` |
+| `gridmet_daily` | `['netcdf', 'hdf5']` | `hdf5` |
+| `terraclimate_monthly` | `['netcdf', 'hdf5']` | `hdf5` |
+| `worldclim_bioclim_normals` | `zip` | `zip` |
+
+## Magic Validation
+
+| Source | Expected | Detected |
+| --- | --- | --- |
+| `chirps_daily_precipitation` | `gzip` | `gzip` |
+| `gridmet_daily` | `['netcdf', 'hdf5']` | `hdf5` |
+| `terraclimate_monthly` | `['netcdf', 'hdf5']` | `hdf5` |
+| `worldclim_bioclim_normals` | `zip` | `zip` |
+
+## Strongest Candidates
+
+- `chirps_daily_precipitation`
+- `gridmet_daily`
+- `terraclimate_monthly`
+- `worldclim_bioclim_normals`
+
+## Failures/Cautions
+
+- None
+
+## Decision
+
+`wave1_adapter_live_validated`
+
+## Next Live Command
+
+```bash
+faster-raster range wave1 --allow-network --max-bytes 65536 --plain
+```

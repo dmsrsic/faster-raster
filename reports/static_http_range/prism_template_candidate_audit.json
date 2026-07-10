@@ -1,0 +1,62 @@
+[
+  {
+    "bytes_read": 0,
+    "content_type": null,
+    "error": "HTTPError: 404 Not Found",
+    "http_status": 404,
+    "magic": null,
+    "ok": false,
+    "range_honored": false,
+    "sha256_short": null,
+    "template": "https://data.prism.oregonstate.edu/daily/ppt/{year}/PRISM_ppt_stable_4kmD2_{yyyymmdd}_bil.zip",
+    "url": "https://data.prism.oregonstate.edu/daily/ppt/2023/PRISM_ppt_stable_4kmD2_20230101_bil.zip"
+  },
+  {
+    "bytes_read": 430,
+    "content_type": "text/html; charset=UTF-8",
+    "error": null,
+    "http_status": 200,
+    "magic": "unknown",
+    "ok": false,
+    "range_honored": false,
+    "sha256_short": "8afe1d6ad716",
+    "template": "https://services.nacse.org/prism/data/public/4km/ppt/{yyyymmdd}",
+    "url": "https://services.nacse.org/prism/data/public/4km/ppt/20230101"
+  },
+  {
+    "bytes_read": 430,
+    "content_type": "text/html; charset=UTF-8",
+    "error": null,
+    "http_status": 200,
+    "magic": "unknown",
+    "ok": false,
+    "range_honored": false,
+    "sha256_short": "8afe1d6ad716",
+    "template": "https://services.nacse.org/prism/data/public/4km/{variable}/{yyyymmdd}",
+    "url": "https://services.nacse.org/prism/data/public/4km/ppt/20230101"
+  },
+  {
+    "bytes_read": 0,
+    "content_type": null,
+    "error": "HTTPError: 404 Not Found",
+    "http_status": 404,
+    "magic": null,
+    "ok": false,
+    "range_honored": false,
+    "sha256_short": null,
+    "template": "https://ftp.prism.oregonstate.edu/daily/ppt/{year}/PRISM_ppt_stable_4kmD2_{yyyymmdd}_bil.zip",
+    "url": "https://ftp.prism.oregonstate.edu/daily/ppt/2023/PRISM_ppt_stable_4kmD2_20230101_bil.zip"
+  },
+  {
+    "bytes_read": 0,
+    "content_type": null,
+    "error": "HTTPError: 404 Not Found",
+    "http_status": 404,
+    "magic": null,
+    "ok": false,
+    "range_honored": false,
+    "sha256_short": null,
+    "template": "https://ftp.prism.oregonstate.edu/daily/{variable}/{year}/PRISM_{variable}_stable_4kmD2_{yyyymmdd}_bil.zip",
+    "url": "https://ftp.prism.oregonstate.edu/daily/ppt/2023/PRISM_ppt_stable_4kmD2_20230101_bil.zip"
+  }
+]

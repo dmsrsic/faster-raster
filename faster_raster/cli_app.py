@@ -16,6 +16,7 @@ from faster_raster import task_builder
 from faster_raster import real_preview
 from faster_raster import copernicus_auth
 from faster_raster.adapters import copernicus_cdse
+from faster_raster.adapters import static_http_range
 
 sources_app = typer.Typer(no_args_is_help=True)
 stack_app = typer.Typer(no_args_is_help=True)
@@ -29,6 +30,7 @@ knobs_app = typer.Typer(no_args_is_help=False, invoke_without_command=True)
 task_app = typer.Typer(no_args_is_help=True)
 copernicus_app = typer.Typer(no_args_is_help=True)
 copernicus_sentinel_app = typer.Typer(no_args_is_help=True)
+range_app = typer.Typer(no_args_is_help=True)
 
 
 def emit(value, *, json_output: bool = False, plain: bool = False, no_color: bool = False, plain_text: str | None = None, table: tuple[str, list[str], list[list]] | None = None) -> None:
@@ -268,6 +270,110 @@ def dips(source_id: str, dry_run: bool = typer.Option(False, "--dry-run"), allow
     probe_atlas(source_id, dry_run=dry_run, allow_network=allow_network, max_bytes=65_536, json_output=json_output, plain=plain, atlas=atlas)
 
 
+def _range_report_paths(*, live: bool, source_id: str | None = None) -> tuple[Path, Path]:
+    report_dir = static_http_range.DEFAULT_REPORT_DIR
+    if source_id and live:
+        return (
+            report_dir / f"{source_id}_static_range_probe.json",
+            report_dir / f"{source_id}_static_range_probe.md",
+        )
+    stem = "static_http_range_wave1_results" if live else "static_http_range_wave1_plan"
+    return report_dir / f"{stem}.json", report_dir / f"{stem}.md"
+
+
+def _render_range_plain(payload: dict) -> str:
+    results = payload.get("results", [])
+    fixtures = payload.get("fixtures", [])
+    rows = [
+        [row["source_id"], row["status"], row["http_status"], row["bytes_read"], row["detected_magic"] or row["expected_magic"], row["quality"]]
+        for row in results
+    ]
+    text = "Static HTTP range probe\n" + render.table_plain(
+        ["source_id", "status", "http", "bytes", "magic", "quality"],
+        rows,
+        max_widths=[34, 24, 5, 8, 18, 18],
+    )
+    if fixtures:
+        text += "\nFixture-only sources\n" + render.table_plain(
+            ["source_id", "status", "evidence", "current_endpoint"],
+            [
+                [
+                    row["source_id"],
+                    row["status"],
+                    f"historical {row.get('historical_detected_magic')} evidence",
+                    row.get("current_endpoint_status"),
+                ]
+                for row in fixtures
+            ],
+            max_widths=[34, 18, 28, 26],
+        )
+    text += (
+        f"runnable_source_count: {payload.get('runnable_source_count', len(results))}\n"
+        f"fixture_source_count: {payload.get('fixture_source_count', len(fixtures))}\n"
+        f"attempted_source_count: {payload.get('attempted_source_count', 0)}\n"
+        f"pass_count: {payload.get('pass_count', 0)}\n"
+        f"fail_count: {payload.get('fail_count', 0)}\n"
+        f"fixture_count: {payload.get('fixture_count', len(fixtures))}\n"
+        f"decision: {payload.get('decision')}\n"
+    )
+    return text
+
+
+@range_app.command("sources")
+def range_sources(json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
+    rows = static_http_range.source_plan_rows()
+    text = "Static HTTP range Wave 1 sources\n" + render.table_plain(
+        ["source_id", "classification", "expected_magic", "family", "max_bytes"],
+        [[row["source_id"], row["classification"], row["expected_magic"], row["expected_content_family"], row["max_bytes"]] for row in rows],
+        max_widths=[34, 14, 20, 20, 9],
+    )
+    emit({"sources": rows}, json_output=json_output, plain=True, plain_text=text)
+
+
+@range_app.command("plan")
+def range_plan(json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain"), max_bytes: int = typer.Option(static_http_range.DEFAULT_MAX_BYTES, "--max-bytes")) -> None:
+    payload = static_http_range.probe_wave1_sources(allow_network=False, max_bytes=max_bytes)
+    out_json, out_md = _range_report_paths(live=False)
+    artifacts = static_http_range.write_static_range_report(payload, out_json, out_md)
+    payload["artifacts"] = artifacts
+    text = _render_range_plain(payload) + f"network_run: False\nplan_json: {artifacts['json']}\nplan_md: {artifacts['md']}\nnext_live_command: faster-raster range wave1 --allow-network --max-bytes {max_bytes} --plain\n"
+    emit(payload, json_output=json_output, plain=True, plain_text=text)
+
+
+@range_app.command("probe")
+def range_probe(
+    source_id: str,
+    allow_network: bool = typer.Option(False, "--allow-network"),
+    max_bytes: int = typer.Option(static_http_range.DEFAULT_MAX_BYTES, "--max-bytes"),
+    timeout_seconds: int = typer.Option(static_http_range.DEFAULT_TIMEOUT_SECONDS, "--timeout-seconds"),
+    json_output: bool = typer.Option(False, "--json"),
+    plain: bool = typer.Option(False, "--plain"),
+) -> None:
+    payload = static_http_range.probe_wave1_sources(source_ids=[source_id], allow_network=allow_network, max_bytes=max_bytes, timeout_seconds=timeout_seconds)
+    out_json, out_md = _range_report_paths(live=allow_network, source_id=source_id if allow_network else None)
+    artifacts = static_http_range.write_static_range_report(payload, out_json, out_md)
+    payload["artifacts"] = artifacts
+    text = _render_range_plain(payload) + f"json: {artifacts['json']}\nmarkdown: {artifacts['md']}\nnetwork_run: {payload.get('network_run')}\n"
+    emit(payload, json_output=json_output, plain=True, plain_text=text)
+
+
+@range_app.command("wave1")
+def range_wave1(
+    allow_network: bool = typer.Option(False, "--allow-network"),
+    max_bytes: int = typer.Option(static_http_range.DEFAULT_MAX_BYTES, "--max-bytes"),
+    timeout_seconds: int = typer.Option(static_http_range.DEFAULT_TIMEOUT_SECONDS, "--timeout-seconds"),
+    json_output: bool = typer.Option(False, "--json"),
+    plain: bool = typer.Option(False, "--plain"),
+) -> None:
+    payload = static_http_range.probe_wave1_sources(allow_network=allow_network, max_bytes=max_bytes, timeout_seconds=timeout_seconds)
+    out_json, out_md = _range_report_paths(live=allow_network)
+    artifacts = static_http_range.write_static_range_report(payload, out_json, out_md)
+    payload["artifacts"] = artifacts
+    label = "results" if allow_network else "plan"
+    text = _render_range_plain(payload) + f"{label}_json: {artifacts['json']}\n{label}_md: {artifacts['md']}\nnetwork_run: {payload.get('network_run')}\n"
+    emit(payload, json_output=json_output, plain=True, plain_text=text)
+
+
 menu_app = typer.Typer(no_args_is_help=True)
 @menu_app.command("lingo")
 def menu_lingo(json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
@@ -348,6 +454,22 @@ def cook_propose(source_id: str, json_output: bool = typer.Option(False, "--json
     write_reports(proposal, Path("reports/adapter_promotion_proposals"))
     text = "Cook proposal / adapter promotion proposal\n" + "\n".join(f"{k}: {proposal[k]}" for k in ["source_id", "promotion_decision", "endpoint_status", "credential_status", "expected_adapter_type", "proposal_only"] if k in proposal) + "\n"
     emit(proposal, json_output=json_output, plain=True, plain_text=text)
+
+
+@cook_app.command("wave1")
+def cook_wave1(
+    allow_network: bool = typer.Option(False, "--allow-network"),
+    max_bytes: int = typer.Option(static_http_range.DEFAULT_MAX_BYTES, "--max-bytes"),
+    json_output: bool = typer.Option(False, "--json"),
+    plain: bool = typer.Option(False, "--plain"),
+) -> None:
+    range_wave1(
+        allow_network=allow_network,
+        max_bytes=max_bytes,
+        timeout_seconds=static_http_range.DEFAULT_TIMEOUT_SECONDS,
+        json_output=json_output,
+        plain=plain,
+    )
 
 
 @knobs_app.callback(invoke_without_command=True)
@@ -719,6 +841,7 @@ def register_product_commands(app: typer.Typer) -> None:
     app.add_typer(toggles_app, name="toggles")
     app.add_typer(cook_app, name="cook")
     app.add_typer(knobs_app, name="knobs")
+    app.add_typer(range_app, name="range")
     app.command("cookplan")(cookplan)
     app.command("queue")(queue)
     app.command("cookdip")(cookdip)

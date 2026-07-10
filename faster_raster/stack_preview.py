@@ -71,6 +71,8 @@ def atlas_status(source_id: str) -> dict[str, Any]:
 
 
 def build_preview_summary(task: dict[str, Any]) -> dict[str, Any]:
+    from faster_raster.adapters.static_http_range import static_range_availability
+
     layers = []
     for idx, source_id in enumerate(task.get('sources') or []):
         meta = atlas_status(source_id)
@@ -85,6 +87,7 @@ def build_preview_summary(task: dict[str, Any]) -> dict[str, Any]:
     for layer in layers:
         if layer['status'] not in {'verified_now', 'reused_existing_result'}:
             warnings.append(f"{layer['source_id']} is {layer['status']}")
+    availability = static_range_availability(task.get('sources') or [])
     return {
         'task_id': task['task_id'],
         'name': task.get('name'),
@@ -97,6 +100,7 @@ def build_preview_summary(task: dict[str, Any]) -> dict[str, Any]:
         'source_count': len(task.get('sources') or []),
         'theme_count': len(task.get('themes') or []),
         'network_needed': False,
+        **availability,
         'output_artifacts': {
             'task_yaml': str(task_path(task['task_id'])),
             'task_json': str(TASK_REPORTS_DIR / f"{task['task_id']}_task.json"),
@@ -224,6 +228,10 @@ def create_preview(task: dict[str, Any], open_after_create: bool = False) -> dic
         'layers': summary['layers'],
         'warnings': summary['warnings'],
         'network_run': False,
+        'static_range_adapter_available': summary['static_range_adapter_available'],
+        'static_range_wave1_available_sources': summary['static_range_wave1_available_sources'],
+        'static_range_wave1_fixture_sources': summary.get('static_range_wave1_fixture_sources', []),
+        'static_range_wave1_missing_sources': summary['static_range_wave1_missing_sources'],
         'preview_json': str(json_path),
         'preview_md': str(md_path),
         'preview_png': str(png_path),
