@@ -2,10 +2,10 @@
 
 ## Environment
 
-- Python: `3.12.13 | packaged by conda-forge | (main, Mar  5 2026, 16:50:00) [GCC 14.3.0]`
+- Python: `3.10.12 (main, Mar  3 2026, 11:56:32) [GCC 11.4.0]`
 - Platform: `Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.35`
 - Working directory: `/home/dmsrsic/raster-work/faster-raster`
-- Package version: `0.3.1`
+- Package version: `0.6.0`
 
 ## Artifacts
 
@@ -19,8 +19,8 @@
 - Manifest size bytes: `1798`
 - Manifest SHA256: `fd46106cde9e8c51b0aae26296b46a48ec75d65ca47ed4e911329723693151cc`
 - Harmonization plan SHA256: `4493ea4f494d589fc098bdb7744e07caef4bb15141a1877d12c9044205e4e2c6`
-- Rows planned per second: `2849.003`
-- Peak memory MB: `1.202`
+- Rows planned per second: `3642.987`
+- Peak memory MB: `1.361`
 - Inspect contract status: `PASS`
 - Inspect contract JSON sane: `True`
 - Schema structural validation: `PASS`
@@ -34,26 +34,26 @@
 
 | Stage | Seconds |
 |---|---:|
-| validate | 0.000312 |
-| resolve | 0.000027 |
-| plan_urls | 0.000702 |
-| plan_harmonization | 0.000187 |
-| inspect | 0.000265 |
-| inspect_contract | 0.077580 |
-| schema_export | 0.006014 |
-| validate_outputs | 0.001049 |
-| compile_execution_package | 0.008521 |
-| export_slurm_scheduler | 0.002526 |
-| export_local_dry_run_scheduler | 0.002389 |
-| total | 0.125365 |
+| validate | 0.000118 |
+| resolve | 0.000019 |
+| plan_urls | 0.000549 |
+| plan_harmonization | 0.000206 |
+| inspect | 0.000253 |
+| inspect_contract | 0.067219 |
+| schema_export | 0.003195 |
+| validate_outputs | 0.001206 |
+| compile_execution_package | 0.002727 |
+| export_slurm_scheduler | 0.002479 |
+| export_local_dry_run_scheduler | 0.002176 |
+| total | 0.130337 |
 
 ## Synthetic Planning Performance
 
 | Target Rows | Planned Rows | Seconds | Rows/sec | Peak MB |
 |---:|---:|---:|---:|---:|
-| 100 | 100 | 0.007618 | 13126.908 | 0.115 |
-| 1000 | 1000 | 0.066441 | 15050.866 | 1.191 |
-| 10000 | 10000 | 0.577673 | 17310.834 | 11.915 |
+| 100 | 100 | 0.005834 | 17140.836 | 0.150 |
+| 1000 | 1000 | 0.041062 | 24353.712 | 1.536 |
+| 10000 | 10000 | 0.418817 | 23876.757 | 15.348 |
 
 ## Adapter Counts
 
@@ -69,10 +69,10 @@
     "arcgis_imageserver": 2,
     "generic_https_template": 6
   },
-  "peak_memory_mb": 0.016,
+  "peak_memory_mb": 0.019,
   "planned_rows": 8,
-  "rows_per_second": 5910.336,
-  "time_seconds": 0.001354
+  "rows_per_second": 7626.892,
+  "time_seconds": 0.001049
 }
 ```
 
@@ -83,7 +83,7 @@
 - Package ID: `fr_exec_51438d1287b43021`
 - Jobs emitted: `8`
 - Validation status: `PASS`
-- Package SHA256: `44d1fe803ab88deb31497a66443815b16605e4bf1a5d3eb0c4eb2e39389489a3`
+- Package SHA256: `85a1b22c97035bc347164cbccc30805f5a169546feb2973652558a078e4461ee`
 - Jobs SHA256: `29c814e3fedbb69c80295e90b5c04e61df7aed04ffa56e115cce3a37230a339f`
 - Cache plan SHA256: `1d3a4241ef9e8ca7c3c83b2150b97a17ba54dd2796f5f659b0133a5a5e310490`
 - Failure policy SHA256: `a2102a8f82112f044e027d2dcc82fd5d6ed13dc676848154306ddfe54f5d7cc5`
@@ -100,7 +100,7 @@
   "dependency_count": 6,
   "hashes": {
     "cache_plan_sha256": "1d3a4241ef9e8ca7c3c83b2150b97a17ba54dd2796f5f659b0133a5a5e310490",
-    "execution_package_sha256": "44d1fe803ab88deb31497a66443815b16605e4bf1a5d3eb0c4eb2e39389489a3",
+    "execution_package_sha256": "85a1b22c97035bc347164cbccc30805f5a169546feb2973652558a078e4461ee",
     "failure_policy_sha256": "a2102a8f82112f044e027d2dcc82fd5d6ed13dc676848154306ddfe54f5d7cc5",
     "jobs_sha256": "29c814e3fedbb69c80295e90b5c04e61df7aed04ffa56e115cce3a37230a339f"
   },
@@ -195,11 +195,11 @@
 
 | Scenario | Passed | Seconds | Errors |
 |---|---:|---:|---|
-| valid_registry | True | 0.000005 | `` |
-| unsupported_adapter | True | 0.000003 | `Unsupported adapter for v0: stac` |
+| valid_registry | True | 0.000009 | `` |
+| unsupported_adapter | True | 0.000002 | `Unsupported adapter for v0: stac` |
 | missing_bboxsr_support | True | 0.000002 | `Source cdl must support bbox CRS parameter for v0 ArcGIS planning` |
 | unsupported_year_strategy | True | 0.000002 | `Unsupported year_parameter_strategy for source cdl: mosaic_rule_by_attribute` |
-| unsupported_bbox_transform | True | 0.000009 | `UnsupportedCRSTransform: EPSG:5070 -> EPSG:3857; install pyproj-backed transform support in a later milestone.` |
+| unsupported_bbox_transform | True | 0.000006 | `UnsupportedCRSTransform: EPSG:5070 -> EPSG:3857; install pyproj-backed transform support in a later milestone.` |
 
 ## Documentation Coverage
 
@@ -305,29 +305,32 @@
 Exit code: `0`
 
 ```text
-........................................................................ [ 56%]
-.......................................................                  [100%]
+........................................................................ [ 21%]
+........................................................................ [ 43%]
+........................................................................ [ 65%]
+........................................................................ [ 87%]
+.........................................                                [100%]
 ============================= slowest 20 durations =============================
-0.03s call     tests/test_cli_integration.py::test_cli_inspect_contract_check_goldens_detects_drift
-0.02s call     tests/test_cli_integration.py::test_cli_inspect_contract_check_goldens_detects_present_goldens
-0.01s call     tests/test_cli_integration.py::test_cli_inspect_contract_no_network_access
-0.01s call     tests/test_cli_integration.py::test_cli_inspect_harmonization_prints_summary
-0.01s call     tests/test_cli_integration.py::test_cli_plan_harmonization_writes_plan_and_summary
-0.01s call     tests/test_cli_integration.py::test_cli_inspect_manifest_prints_summary
-0.01s call     tests/test_cli_integration.py::test_cli_plan_urls_writes_manifest_and_summary
-0.01s call     tests/test_cli_integration.py::test_cli_resolve_sources_summary
-0.01s call     tests/test_cli_integration.py::test_cli_validate_success
-0.01s call     tests/test_real_raster_url_structures.py::test_real_url_golden_byte_stability
-0.01s call     tests/test_cli_integration.py::test_cli_inspect_contract_passes_for_example
-0.01s call     tests/test_cli_integration.py::test_cli_inspect_contract_invalid_capability_returns_nonzero
-0.01s call     tests/test_cli_integration.py::test_cli_inspect_contract_json_emits_expected_fields
-0.01s call     tests/test_cli_integration.py::test_cli_inspect_contract_does_not_create_manifests
-0.01s setup    tests/test_harmonization_planning.py::test_golden_harmonization_plan_bytes_are_stable
-0.01s call     tests/test_generic_https_template.py::test_generic_url_template_byte_stability
-0.01s call     tests/test_generic_https_template.py::test_generic_missing_url_template_fails_clearly
-0.01s setup    tests/test_harmonization_planning.py::test_harmonization_plan_is_deterministic
-
-(2 durations < 0.005s hidden.  Use -vv to show these durations.)
-127 passed in 0.54s
+1.76s call     tests/test_real_preview.py::test_clean_cockpit_report_layouts_write_png_json_md
+0.75s call     tests/test_cli_kitchen_aliases.py::test_explore_kitchen_slash_parser
+0.75s call     tests/test_cli_kitchen_aliases.py::test_kitchen_aliases_return_success
+0.71s call     tests/test_real_preview.py::test_debug_artifacts_written
+0.65s call     tests/test_real_preview.py::test_byte_cap_enforced
+0.61s call     tests/test_real_preview.py::test_multicolor_cdl_png_remains_real_raster_rendered
+0.59s call     tests/test_real_preview.py::test_no_cache_raw_avoids_cache_but_renders
+0.58s call     tests/test_real_preview.py::test_cdl_candidate_cascade_selects_no_time_and_records_attempts
+0.58s call     tests/test_real_preview.py::test_mocked_daymet_fetch_renders_point_result
+0.58s call     tests/test_real_preview.py::test_cdl_candidate_cascade_tries_until_meaningful
+0.58s call     tests/test_real_preview.py::test_malformed_response_warning_not_crash
+0.57s call     tests/test_real_preview.py::test_mocked_cdl_fetch_renders_png_and_json
+0.51s call     tests/test_real_preview.py::test_single_color_cdl_png_with_meaningful_samples_becomes_manual_sample_result
+0.50s call     tests/test_real_preview.py::test_single_color_cdl_png_with_no_sample_values_becomes_no_data
+0.48s call     tests/test_real_preview.py::test_cdl_black_png_no_candidate_becomes_no_data_without_samples
+0.45s call     tests/test_task_cli.py::test_task_cli_create_list_show_validate_preview
+0.40s call     tests/test_cli_cook_toggles.py::test_cook_queue_and_aliases
+0.35s call     tests/test_task_cli.py::test_task_preview_open_fallback
+0.34s call     tests/test_render_cli_screenshots.py::test_render_cli_screenshots_creates_svg_and_text
+0.28s call     tests/test_cli_models.py::test_load_sources_and_summary
+329 passed in 20.10s
 
 ```

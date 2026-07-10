@@ -2,7 +2,7 @@
   "adapter_counts": {
     "arcgis_imageserver": 2
   },
-  "created_by": "FasterRaster 0.3.1",
+  "created_by": "FasterRaster 0.6.0",
   "dag_validation": {
     "dependency_count": 6,
     "error_count": 0,

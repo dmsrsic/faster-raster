@@ -12,7 +12,7 @@
         "expected_substring": null,
         "name": "valid_registry",
         "passed": true,
-        "time_seconds": 5e-06
+        "time_seconds": 9e-06
       },
       {
         "errors": [
@@ -21,7 +21,7 @@
         "expected_substring": "Unsupported adapter for v0: stac",
         "name": "unsupported_adapter",
         "passed": true,
-        "time_seconds": 3e-06
+        "time_seconds": 2e-06
       },
       {
         "errors": [
@@ -48,11 +48,11 @@
         "expected_substring": "UnsupportedCRSTransform: EPSG:5070 -> EPSG:3857",
         "name": "unsupported_bbox_transform",
         "passed": true,
-        "time_seconds": 9e-06
+        "time_seconds": 6e-06
       }
     ]
   },
-  "compile_execution_package_time_seconds": 0.008521,
+  "compile_execution_package_time_seconds": 0.002727,
   "docs_presence_check": {
     "expected": 5,
     "items": [
@@ -91,7 +91,7 @@
     "dependency_count": 6,
     "hashes": {
       "cache_plan_sha256": "1d3a4241ef9e8ca7c3c83b2150b97a17ba54dd2796f5f659b0133a5a5e310490",
-      "execution_package_sha256": "44d1fe803ab88deb31497a66443815b16605e4bf1a5d3eb0c4eb2e39389489a3",
+      "execution_package_sha256": "85a1b22c97035bc347164cbccc30805f5a169546feb2973652558a078e4461ee",
       "failure_policy_sha256": "a2102a8f82112f044e027d2dcc82fd5d6ed13dc676848154306ddfe54f5d7cc5",
       "jobs_sha256": "29c814e3fedbb69c80295e90b5c04e61df7aed04ffa56e115cce3a37230a339f"
     },
@@ -109,8 +109,8 @@
     "total_job_count": 8,
     "validation_status": "PASS"
   },
-  "export_local_dry_run_scheduler_time_seconds": 0.002389,
-  "export_slurm_scheduler_time_seconds": 0.002526,
+  "export_local_dry_run_scheduler_time_seconds": 0.002176,
+  "export_slurm_scheduler_time_seconds": 0.002479,
   "golden_fixture_check": {
     "expected": 23,
     "items": [
@@ -282,7 +282,7 @@
       "status": "PASS"
     },
     "overall_status": "PASS",
-    "package_version": "0.3.1",
+    "package_version": "0.6.0",
     "project_id": "ohio_cdl_edge_dynamics_v001",
     "source_count": 1,
     "sources": [
@@ -310,8 +310,8 @@
     ]
   },
   "inspect_contract_status": "PASS",
-  "inspect_contract_time_seconds": 0.07758,
-  "inspect_time_seconds": 0.000265,
+  "inspect_contract_time_seconds": 0.067219,
+  "inspect_time_seconds": 0.000253,
   "manifest_file_size_bytes": 1798,
   "manifest_path": "/home/dmsrsic/raster-work/projects/ohio_cdl_edges/manifests/acquisition_manifest.jsonl",
   "manifest_row_count": 2,
@@ -337,10 +337,10 @@
       "arcgis_imageserver": 2,
       "generic_https_template": 6
     },
-    "peak_memory_mb": 0.016,
+    "peak_memory_mb": 0.019,
     "planned_rows": 8,
-    "rows_per_second": 5910.336,
-    "time_seconds": 0.001354
+    "rows_per_second": 7626.892,
+    "time_seconds": 0.001049
   },
   "output_validation_eval": {
     "example_failure_messages": [
@@ -354,19 +354,19 @@
     "manifest_status": "PASS",
     "pass_count": 2
   },
-  "package_version": "0.3.1",
-  "peak_memory_mb": 1.202,
-  "plan_harmonization_time_seconds": 0.000187,
-  "plan_urls_time_seconds": 0.000702,
+  "package_version": "0.6.0",
+  "peak_memory_mb": 1.361,
+  "plan_harmonization_time_seconds": 0.000206,
+  "plan_urls_time_seconds": 0.000549,
   "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.35",
   "pytest_durations": {
     "exit_code": 0,
-    "output": "........................................................................ [ 56%]\n.......................................................                  [100%]\n============================= slowest 20 durations =============================\n0.03s call     tests/test_cli_integration.py::test_cli_inspect_contract_check_goldens_detects_drift\n0.02s call     tests/test_cli_integration.py::test_cli_inspect_contract_check_goldens_detects_present_goldens\n0.01s call     tests/test_cli_integration.py::test_cli_inspect_contract_no_network_access\n0.01s call     tests/test_cli_integration.py::test_cli_inspect_harmonization_prints_summary\n0.01s call     tests/test_cli_integration.py::test_cli_plan_harmonization_writes_plan_and_summary\n0.01s call     tests/test_cli_integration.py::test_cli_inspect_manifest_prints_summary\n0.01s call     tests/test_cli_integration.py::test_cli_plan_urls_writes_manifest_and_summary\n0.01s call     tests/test_cli_integration.py::test_cli_resolve_sources_summary\n0.01s call     tests/test_cli_integration.py::test_cli_validate_success\n0.01s call     tests/test_real_raster_url_structures.py::test_real_url_golden_byte_stability\n0.01s call     tests/test_cli_integration.py::test_cli_inspect_contract_passes_for_example\n0.01s call     tests/test_cli_integration.py::test_cli_inspect_contract_invalid_capability_returns_nonzero\n0.01s call     tests/test_cli_integration.py::test_cli_inspect_contract_json_emits_expected_fields\n0.01s call     tests/test_cli_integration.py::test_cli_inspect_contract_does_not_create_manifests\n0.01s setup    tests/test_harmonization_planning.py::test_golden_harmonization_plan_bytes_are_stable\n0.01s call     tests/test_generic_https_template.py::test_generic_url_template_byte_stability\n0.01s call     tests/test_generic_https_template.py::test_generic_missing_url_template_fails_clearly\n0.01s setup    tests/test_harmonization_planning.py::test_harmonization_plan_is_deterministic\n\n(2 durations < 0.005s hidden.  Use -vv to show these durations.)\n127 passed in 0.54s\n",
-    "time_seconds": 0.779646
+    "output": "........................................................................ [ 21%]\n........................................................................ [ 43%]\n........................................................................ [ 65%]\n........................................................................ [ 87%]\n.........................................                                [100%]\n============================= slowest 20 durations =============================\n1.76s call     tests/test_real_preview.py::test_clean_cockpit_report_layouts_write_png_json_md\n0.75s call     tests/test_cli_kitchen_aliases.py::test_explore_kitchen_slash_parser\n0.75s call     tests/test_cli_kitchen_aliases.py::test_kitchen_aliases_return_success\n0.71s call     tests/test_real_preview.py::test_debug_artifacts_written\n0.65s call     tests/test_real_preview.py::test_byte_cap_enforced\n0.61s call     tests/test_real_preview.py::test_multicolor_cdl_png_remains_real_raster_rendered\n0.59s call     tests/test_real_preview.py::test_no_cache_raw_avoids_cache_but_renders\n0.58s call     tests/test_real_preview.py::test_cdl_candidate_cascade_selects_no_time_and_records_attempts\n0.58s call     tests/test_real_preview.py::test_mocked_daymet_fetch_renders_point_result\n0.58s call     tests/test_real_preview.py::test_cdl_candidate_cascade_tries_until_meaningful\n0.58s call     tests/test_real_preview.py::test_malformed_response_warning_not_crash\n0.57s call     tests/test_real_preview.py::test_mocked_cdl_fetch_renders_png_and_json\n0.51s call     tests/test_real_preview.py::test_single_color_cdl_png_with_meaningful_samples_becomes_manual_sample_result\n0.50s call     tests/test_real_preview.py::test_single_color_cdl_png_with_no_sample_values_becomes_no_data\n0.48s call     tests/test_real_preview.py::test_cdl_black_png_no_candidate_becomes_no_data_without_samples\n0.45s call     tests/test_task_cli.py::test_task_cli_create_list_show_validate_preview\n0.40s call     tests/test_cli_cook_toggles.py::test_cook_queue_and_aliases\n0.35s call     tests/test_task_cli.py::test_task_preview_open_fallback\n0.34s call     tests/test_render_cli_screenshots.py::test_render_cli_screenshots_creates_svg_and_text\n0.28s call     tests/test_cli_models.py::test_load_sources_and_summary\n329 passed in 20.10s\n",
+    "time_seconds": 20.574177
   },
-  "python_version": "3.12.13 | packaged by conda-forge | (main, Mar  5 2026, 16:50:00) [GCC 14.3.0]",
-  "resolve_time_seconds": 2.7e-05,
-  "rows_planned_per_second": 2849.003,
+  "python_version": "3.10.12 (main, Mar  3 2026, 11:56:32) [GCC 11.4.0]",
+  "resolve_time_seconds": 1.9e-05,
+  "rows_planned_per_second": 3642.987,
   "scheduler_export_eval": {
     "local_dry_run": {
       "dag_validation_status": "PASS",
@@ -413,7 +413,7 @@
       }
     }
   },
-  "schema_export_time_seconds": 0.006014,
+  "schema_export_time_seconds": 0.003195,
   "schema_hashes": {
     "acquisition_manifest_row.schema.json": "c62e8ad4c19fa36dba0aa6aad07e2f05b9c47ba0e913a91b2eb7aa192d45172a",
     "harmonization_plan.schema.json": "d2191bb2d806ee7a8131f347f4ae3cf0e38c9589f2c7d80cc6012dbcab598525",
@@ -491,33 +491,33 @@
     {
       "first_request_id": "cdl_2023_crop_type_00000_tile_000001",
       "last_request_id": "cdl_2024_crop_type_00049_tile_000001",
-      "peak_memory_mb": 0.115,
+      "peak_memory_mb": 0.15,
       "planned_rows": 100,
-      "rows_per_second": 13126.908,
+      "rows_per_second": 17140.836,
       "target_rows": 100,
-      "time_seconds": 0.007618
+      "time_seconds": 0.005834
     },
     {
       "first_request_id": "cdl_2023_crop_type_00000_tile_000001",
       "last_request_id": "cdl_2024_crop_type_00499_tile_000001",
-      "peak_memory_mb": 1.191,
+      "peak_memory_mb": 1.536,
       "planned_rows": 1000,
-      "rows_per_second": 15050.866,
+      "rows_per_second": 24353.712,
       "target_rows": 1000,
-      "time_seconds": 0.066441
+      "time_seconds": 0.041062
     },
     {
       "first_request_id": "cdl_2023_crop_type_00000_tile_000001",
       "last_request_id": "cdl_2024_crop_type_04999_tile_000001",
-      "peak_memory_mb": 11.915,
+      "peak_memory_mb": 15.348,
       "planned_rows": 10000,
-      "rows_per_second": 17310.834,
+      "rows_per_second": 23876.757,
       "target_rows": 10000,
-      "time_seconds": 0.577673
+      "time_seconds": 0.418817
     }
   ],
-  "total_time_seconds": 0.125365,
-  "validate_outputs_time_seconds": 0.001049,
-  "validate_time_seconds": 0.000312,
+  "total_time_seconds": 0.130337,
+  "validate_outputs_time_seconds": 0.001206,
+  "validate_time_seconds": 0.000118,
   "working_directory": "/home/dmsrsic/raster-work/faster-raster"
 }

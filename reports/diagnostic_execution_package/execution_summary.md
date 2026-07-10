@@ -1,7 +1,7 @@
 # FasterRaster Execution Package
 
 - Package ID: `fr_exec_51438d1287b43021`
-- Created by: `FasterRaster 0.3.1`
+- Created by: `FasterRaster 0.6.0`
 - Request count: `2`
 - Total job count: `8`
 - Dependency count: `6`
