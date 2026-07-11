@@ -2,6 +2,8 @@
 
 FasterRaster v0.8 adds a local bounded execution engine for the v0.7 execution package DAG.
 
+Bounded execution produces source evidence only. A bounded probe does not authorize or perform full-object acquisition. v0.9 materialization consumes verified bounded probe receipts, requires exact plan-hash approval, and validates probe-prefix continuity before committing a complete artifact.
+
 The engine consumes:
 
 - `reports/execution_packages/TASK_ID/execution_package.json`

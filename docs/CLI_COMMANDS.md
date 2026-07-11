@@ -2,6 +2,21 @@
 
 Professional commands remain stable:
 
+Materialization commands are available in v0.9:
+
+```bash
+faster-raster materialize plan example_wave1_climate_stack --source chirps_daily_precipitation --plain
+faster-raster materialize eligibility example_wave1_climate_stack --plain
+faster-raster materialize local example_wave1_climate_stack --source chirps_daily_precipitation --plain
+faster-raster materialize inspect example_wave1_climate_stack --plain
+faster-raster materialize verify example_wave1_climate_stack --plain
+faster-raster materialize evidence example_wave1_climate_stack --plain
+faster-raster materialize catalog --plain
+faster-raster materialize catalog-verify --plain
+```
+
+Planning performs no network requests. Complete-object materialization remains blocked until `--allow-network`, `--allow-materialization`, and a full exact `--approve-plan-sha256` are supplied.
+
 ```bash
 faster-raster sources list
 faster-raster sources tree
@@ -193,3 +208,7 @@ faster-raster copernicus auth-check --live --allow-network --plain
 ```
 
 `auth-check --live` probes only the CDSE/STAC root and records `no_downloads: true`. It does not run a Sentinel search. Sentinel search-live remains an explicit separate command and still downloads no products or assets.
+
+### Probe selection for materialization
+
+`faster-raster materialize plan` and `faster-raster materialize local` accept `--probe-run-id` and `--probe-receipt-sha256`. Live materialization still requires `--allow-network`, `--allow-materialization`, and the full approved plan hash.

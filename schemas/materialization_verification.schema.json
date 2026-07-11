@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "checks": {
+      "items": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "failures": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "verification_status": {
+      "enum": [
+        "PASS",
+        "FAIL",
+        "WARN"
+      ],
+      "type": "string"
+    },
+    "warnings": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "verification_status",
+    "checks",
+    "failures",
+    "warnings"
+  ],
+  "title": "FasterRaster v0.9 materialization verification",
+  "type": "object"
+}

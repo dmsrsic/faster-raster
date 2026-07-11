@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from pathlib import Path
 from typing import Any
 
@@ -74,6 +75,40 @@ def compute_receipt_contract_sha256(receipt: dict[str, Any], repo_root: Path | N
 
 def _check(name: str, passed: bool, details: str | None = None) -> dict[str, Any]:
     return {"name": name, "status": "PASS" if passed else "FAIL", "details": details}
+
+
+def parse_content_range(value: str | None) -> dict[str, int | None]:
+    if not value:
+        raise ValueError("content_range_malformed")
+    match = re.fullmatch(r"bytes (\d+)-(\d+)/(\d+|\*)", value.strip())
+    if not match:
+        raise ValueError("content_range_malformed")
+    start = int(match.group(1))
+    end = int(match.group(2))
+    total_raw = match.group(3)
+    total = None if total_raw == "*" else int(total_raw)
+    if end < start:
+        raise ValueError("content_range_malformed")
+    if total is not None and total <= end:
+        raise ValueError("content_range_total_invalid")
+    return {"start": start, "end": end, "total": total, "length": end - start + 1}
+
+
+def validate_http_206_evidence(item: dict[str, Any]) -> list[str]:
+    if item.get("fixture_only") or item.get("http_status") != 206:
+        return []
+    try:
+        parsed = parse_content_range(item.get("content_range"))
+    except ValueError as exc:
+        return [str(exc)]
+    errors: list[str] = []
+    if item.get("range_requested") is not True or item.get("range_honored") is not True:
+        errors.append("probe_evidence_inconsistent")
+    if int(item.get("bytes_read") or -1) != parsed["length"]:
+        errors.append("content_range_byte_count_mismatch")
+    if int(item.get("bytes_read") or 0) > int(item.get("byte_cap") or 0):
+        errors.append("probe_evidence_inconsistent")
+    return errors
 
 
 def verify_job_receipts(job_receipts: list[dict[str, Any]], *, allow_unknown_stages: bool = False) -> dict[str, Any]:
@@ -174,6 +209,8 @@ def verify_run_receipt(
     if total_bytes != receipt.get("total_bytes_read"):
         failures.append("total bytes mismatch")
     for item in evidence_items:
+        range_errors = validate_http_206_evidence(item)
+        failures.extend(f"{error}: {item.get('source_id')}" for error in range_errors)
         if item.get("fixture_only") and item.get("network_attempted"):
             failures.append(f"fixture source attempted network: {item.get('source_id')}")
         if not item.get("fixture_only") and item.get("status") == "succeeded":

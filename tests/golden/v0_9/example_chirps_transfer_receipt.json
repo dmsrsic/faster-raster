@@ -1,0 +1,7 @@
+{
+  "bytes_transferred": 52,
+  "request_id": "example_wave1_climate_stack__chirps_daily_precipitation__20230101",
+  "source_id": "chirps_daily_precipitation",
+  "status": "succeeded",
+  "whole_object_sha256": "7fa542c65747ccfd31b1e1336fd74c42e8f620c71381011267ca21613d429fba"
+}

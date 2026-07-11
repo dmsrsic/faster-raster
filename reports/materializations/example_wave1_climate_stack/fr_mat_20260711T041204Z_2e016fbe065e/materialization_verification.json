@@ -1,0 +1,30 @@
+{
+  "artifact_verification_status": "PASS",
+  "catalog_verification_status": "PASS",
+  "check_count": 3,
+  "checks": [
+    {
+      "details": null,
+      "name": "materialization_run_receipt_hash",
+      "status": "PASS"
+    },
+    {
+      "details": null,
+      "name": "artifact_receipts",
+      "status": "PASS"
+    },
+    {
+      "details": null,
+      "name": "no_credentials",
+      "status": "PASS"
+    }
+  ],
+  "contract_verification_status": "PASS",
+  "execution_outcome_status": "PASS",
+  "failed_check_count": 0,
+  "failures": [],
+  "passed_check_count": 3,
+  "release_evidence_status": "PASS",
+  "verification_status": "PASS",
+  "warnings": []
+}

@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "all_container_validations_passed": {
+      "type": "boolean"
+    },
+    "all_probe_prefixes_match": {
+      "type": "boolean"
+    },
+    "all_whole_object_checksums_present": {
+      "type": "boolean"
+    },
+    "allow_materialization": {
+      "type": "boolean"
+    },
+    "allow_network": {
+      "type": "boolean"
+    },
+    "approval_hash_valid": {
+      "type": "boolean"
+    },
+    "artifact_receipt_count": {
+      "type": "integer"
+    },
+    "authorization_headers_present": {
+      "type": "boolean"
+    },
+    "credentials_used": {
+      "type": "boolean"
+    },
+    "execution_blocked": {},
+    "failed_source_count": {
+      "type": "integer"
+    },
+    "materialization_plan_contract_sha256": {
+      "type": "string"
+    },
+    "materialization_run_id": {
+      "type": "string"
+    },
+    "materialization_run_receipt_contract_sha256": {
+      "type": "string"
+    },
+    "materialized_source_count": {
+      "type": "integer"
+    },
+    "network_run": {
+      "type": "boolean"
+    },
+    "package_id": {
+      "type": "string"
+    },
+    "package_version": {
+      "type": "string"
+    },
+    "run_status": {
+      "enum": [
+        "planned",
+        "blocked_policy",
+        "completed",
+        "completed_with_warnings",
+        "failed"
+      ],
+      "type": "string"
+    },
+    "task_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "materialization_run_id",
+    "task_id",
+    "package_id",
+    "package_version",
+    "materialization_plan_contract_sha256",
+    "materialization_run_receipt_contract_sha256",
+    "run_status",
+    "execution_blocked",
+    "allow_network",
+    "allow_materialization",
+    "approval_hash_valid",
+    "network_run",
+    "materialized_source_count",
+    "failed_source_count",
+    "all_probe_prefixes_match",
+    "all_whole_object_checksums_present",
+    "all_container_validations_passed",
+    "credentials_used",
+    "authorization_headers_present",
+    "artifact_receipt_count"
+  ],
+  "title": "FasterRaster v0.9 materialization run receipt",
+  "type": "object"
+}

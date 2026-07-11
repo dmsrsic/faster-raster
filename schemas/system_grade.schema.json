@@ -2,11 +2,32 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": true,
   "properties": {
+    "artifact_catalog_score": {
+      "type": "integer"
+    },
+    "artifact_catalog_valid": {
+      "type": "boolean"
+    },
+    "artifact_integrity_score": {
+      "type": "integer"
+    },
     "blocking_failures": {
       "items": {
         "type": "string"
       },
       "type": "array"
+    },
+    "latest_materialization_present": {
+      "type": "boolean"
+    },
+    "latest_materialization_run_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "latest_materialization_valid": {
+      "type": "boolean"
     },
     "latest_run_receipt_present": {
       "type": "boolean"
@@ -32,6 +53,18 @@
     "local_successful_source_count": {
       "type": "integer"
     },
+    "materialization_run_status": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "materialization_score": {
+      "type": "integer"
+    },
+    "materialized_source_count": {
+      "type": "integer"
+    },
     "overall_grade": {
       "type": "string"
     },
@@ -51,6 +84,9 @@
     },
     "safety_score": {
       "type": "integer"
+    },
+    "verified_artifact_count": {
+      "type": "integer"
     }
   },
   "required": [
@@ -66,8 +102,17 @@
     "local_run_status",
     "local_successful_source_count",
     "local_failed_source_count",
-    "local_fixture_source_count"
+    "local_fixture_source_count",
+    "materialization_score",
+    "artifact_integrity_score",
+    "artifact_catalog_score",
+    "latest_materialization_present",
+    "latest_materialization_valid",
+    "materialization_run_status",
+    "materialized_source_count",
+    "verified_artifact_count",
+    "artifact_catalog_valid"
   ],
-  "title": "FasterRaster v0.8 system grade",
+  "title": "FasterRaster v0.9 system grade",
   "type": "object"
 }

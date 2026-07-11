@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "artifact_id": {
+      "type": "string"
+    },
+    "artifact_path": {
+      "type": "string"
+    },
+    "artifact_receipt_contract_sha256": {
+      "type": "string"
+    },
+    "artifact_receipt_version": {
+      "type": "integer"
+    },
+    "authorization_headers_present": {
+      "type": "boolean"
+    },
+    "bounded_probe_only": {
+      "type": "boolean"
+    },
+    "complete_object": {
+      "type": "boolean"
+    },
+    "container_validation_status": {
+      "type": "string"
+    },
+    "content_addressed": {
+      "type": "boolean"
+    },
+    "credentials_used": {
+      "type": "boolean"
+    },
+    "materialization_run_id": {
+      "type": "string"
+    },
+    "object_status": {
+      "type": "string"
+    },
+    "prefix_match": {
+      "type": "boolean"
+    },
+    "request_id": {
+      "type": "string"
+    },
+    "source_id": {
+      "type": "string"
+    },
+    "task_id": {
+      "type": "string"
+    },
+    "whole_object_sha256": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "artifact_receipt_version",
+    "artifact_id",
+    "task_id",
+    "materialization_run_id",
+    "request_id",
+    "source_id",
+    "object_status",
+    "complete_object",
+    "bounded_probe_only",
+    "whole_object_sha256",
+    "artifact_path",
+    "content_addressed",
+    "prefix_match",
+    "container_validation_status",
+    "credentials_used",
+    "authorization_headers_present",
+    "artifact_receipt_contract_sha256"
+  ],
+  "title": "FasterRaster v0.9 artifact receipt",
+  "type": "object"
+}

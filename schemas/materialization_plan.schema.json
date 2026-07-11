@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "approval_required": {
+      "type": "boolean"
+    },
+    "approval_status": {
+      "type": "string"
+    },
+    "execution_dag_sha256": {
+      "type": "string"
+    },
+    "manifest_sha256": {
+      "type": "string"
+    },
+    "materialization_plan_contract_sha256": {
+      "type": "string"
+    },
+    "max_object_bytes": {
+      "type": "integer"
+    },
+    "max_total_bytes": {
+      "type": "integer"
+    },
+    "network_allowed": {
+      "type": "boolean"
+    },
+    "network_required": {
+      "type": "boolean"
+    },
+    "object_plans": {
+      "items": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": true,
+        "properties": {
+          "adapter": {
+            "type": "string"
+          },
+          "artifact_extension": {
+            "type": "string"
+          },
+          "blocking_reasons": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "eligibility_status": {
+            "type": "string"
+          },
+          "expected_content_family": {},
+          "expected_magic": {},
+          "materialization_eligible": {
+            "type": "boolean"
+          },
+          "max_object_bytes": {
+            "type": "integer"
+          },
+          "request_id": {
+            "type": "string"
+          },
+          "source_id": {
+            "type": "string"
+          },
+          "url_sha256": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "request_id",
+          "source_id",
+          "adapter",
+          "url_sha256",
+          "expected_content_family",
+          "expected_magic",
+          "artifact_extension",
+          "max_object_bytes",
+          "materialization_eligible",
+          "eligibility_status",
+          "blocking_reasons"
+        ],
+        "title": "FasterRaster v0.9 materialization object plan",
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "package_id": {
+      "type": "string"
+    },
+    "package_sha256": {
+      "type": "string"
+    },
+    "package_version": {
+      "type": "string"
+    },
+    "planned_transfer_count": {
+      "type": "integer"
+    },
+    "source_selection": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "task_id": {
+      "type": "string"
+    },
+    "validation_status": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "task_id",
+    "package_id",
+    "package_version",
+    "package_sha256",
+    "manifest_sha256",
+    "execution_dag_sha256",
+    "materialization_plan_contract_sha256",
+    "source_selection",
+    "planned_transfer_count",
+    "max_object_bytes",
+    "max_total_bytes",
+    "network_required",
+    "network_allowed",
+    "approval_required",
+    "approval_status",
+    "object_plans",
+    "validation_status"
+  ],
+  "title": "FasterRaster v0.9 materialization plan",
+  "type": "object"
+}

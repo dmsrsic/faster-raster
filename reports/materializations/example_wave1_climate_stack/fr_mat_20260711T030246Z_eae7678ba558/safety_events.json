@@ -1,0 +1,15 @@
+{
+  "events": [
+    {
+      "action": "no_artifact_promoted",
+      "errors_redacted": [
+        "[Errno 2] No such file or directory: 'cache/artifacts'"
+      ],
+      "event_type": "materialization_failure",
+      "failure_class": "artifact_store_error",
+      "request_id": "example_wave1_climate_stack__chirps_daily_precipitation__20230101",
+      "source_id": "chirps_daily_precipitation",
+      "timestamp_utc": "2026-07-11T03:02:46Z"
+    }
+  ]
+}

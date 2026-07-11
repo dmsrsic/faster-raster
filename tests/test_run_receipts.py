@@ -14,9 +14,11 @@ class FakeHeaders(dict):
 
 
 class FakeResponse:
-    def __init__(self, data: bytes, *, status: int = 206, content_type: str = "application/octet-stream", content_range: str | None = "bytes 0-3/100"):
+    def __init__(self, data: bytes, *, status: int = 206, content_type: str = "application/octet-stream", content_range: str | None = None):
         self.status = status
         self.headers = FakeHeaders({"Content-Type": content_type})
+        if content_range is None and status == 206:
+            content_range = f"bytes 0-{len(data)-1}/100"
         if content_range:
             self.headers["Content-Range"] = content_range
         self._data = data
@@ -118,3 +120,29 @@ def test_absolute_paths_are_excluded_from_receipt_contract_hash():
     second = run_receipts.compute_receipt_contract_sha256(receipt, Path("/tmp/b"))
 
     assert first == second
+
+
+def test_content_range_byte_count_mismatch_fails_verification(tmp_path):
+    item = {
+        "source_id": "chirps_daily_precipitation",
+        "http_status": 206,
+        "content_range": "bytes 0-3/100",
+        "bytes_read": 18,
+        "byte_cap": 65536,
+        "range_requested": True,
+        "range_honored": True,
+    }
+    assert "content_range_byte_count_mismatch" in run_receipts.validate_http_206_evidence(item)
+
+
+def test_valid_content_range_passes_consistency_check():
+    item = {
+        "source_id": "chirps_daily_precipitation",
+        "http_status": 206,
+        "content_range": "bytes 0-65535/123456",
+        "bytes_read": 65536,
+        "byte_cap": 65536,
+        "range_requested": True,
+        "range_honored": True,
+    }
+    assert run_receipts.validate_http_206_evidence(item) == []

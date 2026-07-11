@@ -2,6 +2,8 @@
 
 `faster-raster task package TASK_ID` compiles the task if needed and writes scheduler-ready dry-run artifacts under `reports/execution_packages/TASK_ID/`.
 
+v0.9 does not mutate the v0.7 execution package. Materialization plans derive from the compiled manifest, execution package, DAG hashes, and verified v0.8 bounded probe receipts.
+
 Artifacts:
 
 - `execution_package.json`

@@ -1,0 +1,23 @@
+{
+  "artifact_count": 1,
+  "blocking": false,
+  "catalog_status": "verified",
+  "check_count": 2,
+  "checks": [
+    {
+      "details": null,
+      "name": "catalog_hash",
+      "status": "PASS"
+    },
+    {
+      "details": null,
+      "name": "artifact_entries",
+      "status": "PASS"
+    }
+  ],
+  "failed_check_count": 0,
+  "failures": [],
+  "passed_check_count": 2,
+  "verification_status": "PASS",
+  "warnings": []
+}

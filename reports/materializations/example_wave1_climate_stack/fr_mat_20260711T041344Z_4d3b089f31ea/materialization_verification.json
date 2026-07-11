@@ -1,0 +1,12 @@
+{
+  "artifact_verification_status": "NOT_APPLICABLE",
+  "catalog_verification_status": "PASS",
+  "checks": [],
+  "contract_verification_status": "PASS",
+  "execution_outcome_status": "BLOCKED",
+  "failures": [
+    "approval_required"
+  ],
+  "release_evidence_status": "FAIL",
+  "verification_status": "NOT_APPLICABLE"
+}

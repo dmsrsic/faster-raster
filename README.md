@@ -2,6 +2,8 @@
 
 FasterRaster v0 is a deterministic HTTPS/API URL generation, adapter planning, and raster harmonization planning tool.
 
+FasterRaster v0.9.0 converts validated source contracts into complete, content-addressed, cryptographically receipted local source artifacts under explicit storage and network budgets.
+
 It accepts a semantic `research_spec.json` and compiles:
 
 1. `acquisition_manifest.jsonl` containing planned HTTPS/API requests.
@@ -18,6 +20,8 @@ task contract -> source resolution -> adapter planning -> acquisition manifest -
 Static HTTP range sources compile into bounded probe jobs. Fixture-only sources, including PRISM in v0.7, remain historical evidence rows and do not generate fetch jobs.
 
 Network execution remains off by default. `faster-raster run local TASK_ID` writes a blocked-policy receipt when network is not allowed; live bounded fetches require `--allow-network`.
+
+Complete-object materialization is a separate opt-in step. `faster-raster materialize plan TASK_ID` performs no network requests and prints a plan hash. `faster-raster materialize local TASK_ID` requires `--allow-network`, `--allow-materialization`, and the full `--approve-plan-sha256` value before any complete-object transfer can occur.
 
 ## Commands
 

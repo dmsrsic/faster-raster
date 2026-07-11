@@ -1,0 +1,9 @@
+{
+  "events": [
+    {
+      "event_type": "materialization_blocked",
+      "failure_class": "approval_required",
+      "timestamp_utc": "2026-07-11T04:13:44Z"
+    }
+  ]
+}

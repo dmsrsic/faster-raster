@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "adapter": {
+      "type": "string"
+    },
+    "artifact_extension": {
+      "type": "string"
+    },
+    "blocking_reasons": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "eligibility_status": {
+      "type": "string"
+    },
+    "expected_content_family": {},
+    "expected_magic": {},
+    "materialization_eligible": {
+      "type": "boolean"
+    },
+    "max_object_bytes": {
+      "type": "integer"
+    },
+    "request_id": {
+      "type": "string"
+    },
+    "source_id": {
+      "type": "string"
+    },
+    "url_sha256": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "request_id",
+    "source_id",
+    "adapter",
+    "url_sha256",
+    "expected_content_family",
+    "expected_magic",
+    "artifact_extension",
+    "max_object_bytes",
+    "materialization_eligible",
+    "eligibility_status",
+    "blocking_reasons"
+  ],
+  "title": "FasterRaster v0.9 materialization object plan",
+  "type": "object"
+}

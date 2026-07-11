@@ -2,6 +2,8 @@
 
 `static_http_range` is an experimental, no-auth adapter for deterministic bounded probes against public raster, archive, and NetCDF URLs.
 
+The static HTTP range adapter remains the bounded evidence layer. Complete-object materialization uses separate staging and artifact roots and never treats `.head65536` prefix files as complete objects.
+
 It does not implement production acquisition, extraction, catalog crawling, credential handling, or unbounded downloads. Network access is off by default and live probes require `--allow-network`.
 
 ## Wave 1 Sources

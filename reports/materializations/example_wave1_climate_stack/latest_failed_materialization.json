@@ -1,0 +1,8 @@
+{
+  "materialization_run_id": "fr_mat_20260711T030246Z_eae7678ba558",
+  "receipt_contract_sha256": "65b3a4598b160390269cadd54116a97f0c9871dd9638db18cc7c367f2733e375",
+  "receipt_path": "reports/materializations/example_wave1_climate_stack/fr_mat_20260711T030246Z_eae7678ba558/materialization_run_receipt.json",
+  "run_status": "failed",
+  "task_id": "example_wave1_climate_stack",
+  "updated_at_utc": "2026-07-11T03:02:46Z"
+}

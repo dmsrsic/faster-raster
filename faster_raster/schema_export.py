@@ -18,6 +18,13 @@ SCHEMA_FILENAMES = [
     "run_receipt.schema.json",
     "source_evidence.schema.json",
     "receipt_verification.schema.json",
+    "materialization_plan.schema.json",
+    "materialization_object_plan.schema.json",
+    "transfer_receipt.schema.json",
+    "artifact_receipt.schema.json",
+    "materialization_run_receipt.schema.json",
+    "artifact_catalog.schema.json",
+    "materialization_verification.schema.json",
     "system_grade.schema.json",
 ]
 
@@ -503,10 +510,19 @@ def system_grade_schema() -> dict:
         "local_successful_source_count",
         "local_failed_source_count",
         "local_fixture_source_count",
+        "materialization_score",
+        "artifact_integrity_score",
+        "artifact_catalog_score",
+        "latest_materialization_present",
+        "latest_materialization_valid",
+        "materialization_run_status",
+        "materialized_source_count",
+        "verified_artifact_count",
+        "artifact_catalog_valid",
     ]
     return {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
-        "title": "FasterRaster v0.8 system grade",
+        "title": "FasterRaster v0.9 system grade",
         "type": "object",
         "additionalProperties": True,
         "required": required,
@@ -524,6 +540,16 @@ def system_grade_schema() -> dict:
             "local_successful_source_count": integer_schema(),
             "local_failed_source_count": integer_schema(),
             "local_fixture_source_count": integer_schema(),
+            "materialization_score": integer_schema(),
+            "artifact_integrity_score": integer_schema(),
+            "artifact_catalog_score": integer_schema(),
+            "latest_materialization_present": {"type": "boolean"},
+            "latest_materialization_valid": {"type": "boolean"},
+            "latest_materialization_run_id": {"type": ["string", "null"]},
+            "materialization_run_status": {"type": ["string", "null"]},
+            "materialized_source_count": integer_schema(),
+            "verified_artifact_count": integer_schema(),
+            "artifact_catalog_valid": {"type": "boolean"},
         },
     }
 
@@ -695,6 +721,236 @@ def receipt_verification_schema() -> dict:
     }
 
 
+def materialization_object_plan_schema() -> dict:
+    required = [
+        "request_id",
+        "source_id",
+        "adapter",
+        "url_sha256",
+        "expected_content_family",
+        "expected_magic",
+        "artifact_extension",
+        "max_object_bytes",
+        "materialization_eligible",
+        "eligibility_status",
+        "blocking_reasons",
+    ]
+    return {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "title": "FasterRaster v0.9 materialization object plan",
+        "type": "object",
+        "additionalProperties": True,
+        "required": required,
+        "properties": {
+            "request_id": string_schema(),
+            "source_id": string_schema(),
+            "adapter": string_schema(),
+            "url_sha256": string_schema(),
+            "expected_content_family": {},
+            "expected_magic": {},
+            "artifact_extension": string_schema(),
+            "max_object_bytes": integer_schema(),
+            "materialization_eligible": {"type": "boolean"},
+            "eligibility_status": string_schema(),
+            "blocking_reasons": {"type": "array", "items": string_schema()},
+        },
+    }
+
+
+def materialization_plan_schema() -> dict:
+    required = [
+        "task_id",
+        "package_id",
+        "package_version",
+        "package_sha256",
+        "manifest_sha256",
+        "execution_dag_sha256",
+        "materialization_plan_contract_sha256",
+        "source_selection",
+        "planned_transfer_count",
+        "max_object_bytes",
+        "max_total_bytes",
+        "network_required",
+        "network_allowed",
+        "approval_required",
+        "approval_status",
+        "object_plans",
+        "validation_status",
+    ]
+    return {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "title": "FasterRaster v0.9 materialization plan",
+        "type": "object",
+        "additionalProperties": True,
+        "required": required,
+        "properties": {
+            "task_id": string_schema(),
+            "package_id": string_schema(),
+            "package_version": string_schema(),
+            "package_sha256": string_schema(),
+            "manifest_sha256": string_schema(),
+            "execution_dag_sha256": string_schema(),
+            "materialization_plan_contract_sha256": string_schema(),
+            "source_selection": {"type": "array", "items": string_schema()},
+            "planned_transfer_count": integer_schema(),
+            "max_object_bytes": integer_schema(),
+            "max_total_bytes": integer_schema(),
+            "network_required": {"type": "boolean"},
+            "network_allowed": {"type": "boolean"},
+            "approval_required": {"type": "boolean"},
+            "approval_status": string_schema(),
+            "object_plans": {"type": "array", "items": materialization_object_plan_schema()},
+            "validation_status": string_schema(),
+        },
+    }
+
+
+def transfer_receipt_schema() -> dict:
+    return {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "title": "FasterRaster v0.9 transfer receipt",
+        "type": "object",
+        "additionalProperties": True,
+        "required": ["request_id", "source_id", "status"],
+        "properties": {"request_id": string_schema(), "source_id": string_schema(), "status": string_schema()},
+    }
+
+
+def artifact_receipt_schema() -> dict:
+    required = [
+        "artifact_receipt_version",
+        "artifact_id",
+        "task_id",
+        "materialization_run_id",
+        "request_id",
+        "source_id",
+        "object_status",
+        "complete_object",
+        "bounded_probe_only",
+        "whole_object_sha256",
+        "artifact_path",
+        "content_addressed",
+        "prefix_match",
+        "container_validation_status",
+        "credentials_used",
+        "authorization_headers_present",
+        "artifact_receipt_contract_sha256",
+    ]
+    return {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "title": "FasterRaster v0.9 artifact receipt",
+        "type": "object",
+        "additionalProperties": True,
+        "required": required,
+        "properties": {
+            "artifact_receipt_version": integer_schema(),
+            "artifact_id": string_schema(),
+            "task_id": string_schema(),
+            "materialization_run_id": string_schema(),
+            "request_id": string_schema(),
+            "source_id": string_schema(),
+            "object_status": string_schema(),
+            "complete_object": {"type": "boolean"},
+            "bounded_probe_only": {"type": "boolean"},
+            "whole_object_sha256": string_schema(),
+            "artifact_path": string_schema(),
+            "content_addressed": {"type": "boolean"},
+            "prefix_match": {"type": "boolean"},
+            "container_validation_status": string_schema(),
+            "credentials_used": {"type": "boolean"},
+            "authorization_headers_present": {"type": "boolean"},
+            "artifact_receipt_contract_sha256": string_schema(),
+        },
+    }
+
+
+def materialization_run_receipt_schema() -> dict:
+    required = [
+        "materialization_run_id",
+        "task_id",
+        "package_id",
+        "package_version",
+        "materialization_plan_contract_sha256",
+        "materialization_run_receipt_contract_sha256",
+        "run_status",
+        "execution_blocked",
+        "allow_network",
+        "allow_materialization",
+        "approval_hash_valid",
+        "network_run",
+        "materialized_source_count",
+        "failed_source_count",
+        "all_probe_prefixes_match",
+        "all_whole_object_checksums_present",
+        "all_container_validations_passed",
+        "credentials_used",
+        "authorization_headers_present",
+        "artifact_receipt_count",
+    ]
+    return {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "title": "FasterRaster v0.9 materialization run receipt",
+        "type": "object",
+        "additionalProperties": True,
+        "required": required,
+        "properties": {
+            "materialization_run_id": string_schema(),
+            "task_id": string_schema(),
+            "package_id": string_schema(),
+            "package_version": string_schema(),
+            "materialization_plan_contract_sha256": string_schema(),
+            "materialization_run_receipt_contract_sha256": string_schema(),
+            "run_status": string_schema(enum=["planned", "blocked_policy", "completed", "completed_with_warnings", "failed"]),
+            "execution_blocked": {},
+            "allow_network": {"type": "boolean"},
+            "allow_materialization": {"type": "boolean"},
+            "approval_hash_valid": {"type": "boolean"},
+            "network_run": {"type": "boolean"},
+            "materialized_source_count": integer_schema(),
+            "failed_source_count": integer_schema(),
+            "all_probe_prefixes_match": {"type": "boolean"},
+            "all_whole_object_checksums_present": {"type": "boolean"},
+            "all_container_validations_passed": {"type": "boolean"},
+            "credentials_used": {"type": "boolean"},
+            "authorization_headers_present": {"type": "boolean"},
+            "artifact_receipt_count": integer_schema(),
+        },
+    }
+
+
+def artifact_catalog_schema() -> dict:
+    return {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "title": "FasterRaster v0.9 artifact catalog",
+        "type": "object",
+        "additionalProperties": True,
+        "required": ["catalog_version", "artifact_count", "total_materialized_bytes", "entries", "catalog_contract_sha256"],
+        "properties": {
+            "catalog_version": integer_schema(),
+            "artifact_count": integer_schema(),
+            "total_materialized_bytes": integer_schema(),
+            "entries": {"type": "array", "items": {"type": "object", "additionalProperties": True}},
+            "catalog_contract_sha256": string_schema(),
+        },
+    }
+
+
+def materialization_verification_schema() -> dict:
+    return {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "title": "FasterRaster v0.9 materialization verification",
+        "type": "object",
+        "additionalProperties": True,
+        "required": ["verification_status", "checks", "failures", "warnings"],
+        "properties": {
+            "verification_status": string_schema(enum=["PASS", "FAIL", "WARN"]),
+            "checks": {"type": "array", "items": {"type": "object", "additionalProperties": True}},
+            "failures": {"type": "array", "items": string_schema()},
+            "warnings": {"type": "array", "items": string_schema()},
+        },
+    }
+
+
 def all_schemas() -> dict[str, dict]:
     return {
         "research_spec.schema.json": research_spec_schema(),
@@ -710,6 +966,13 @@ def all_schemas() -> dict[str, dict]:
         "run_receipt.schema.json": run_receipt_schema(),
         "source_evidence.schema.json": source_evidence_schema(),
         "receipt_verification.schema.json": receipt_verification_schema(),
+        "materialization_plan.schema.json": materialization_plan_schema(),
+        "materialization_object_plan.schema.json": materialization_object_plan_schema(),
+        "transfer_receipt.schema.json": transfer_receipt_schema(),
+        "artifact_receipt.schema.json": artifact_receipt_schema(),
+        "materialization_run_receipt.schema.json": materialization_run_receipt_schema(),
+        "artifact_catalog.schema.json": artifact_catalog_schema(),
+        "materialization_verification.schema.json": materialization_verification_schema(),
         "system_grade.schema.json": system_grade_schema(),
     }
 

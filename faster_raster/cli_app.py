@@ -17,6 +17,9 @@ from faster_raster import task_compiler
 from faster_raster import system_grade
 from faster_raster import local_executor
 from faster_raster import run_receipts
+from faster_raster import materialization
+from faster_raster import artifact_catalog
+from faster_raster import artifact_receipts
 from faster_raster import real_preview
 from faster_raster import copernicus_auth
 from faster_raster.adapters import copernicus_cdse
@@ -37,6 +40,7 @@ copernicus_sentinel_app = typer.Typer(no_args_is_help=True)
 range_app = typer.Typer(no_args_is_help=True)
 grade_app = typer.Typer(no_args_is_help=True)
 run_app = typer.Typer(no_args_is_help=True)
+materialize_app = typer.Typer(no_args_is_help=True)
 
 
 def emit(value, *, json_output: bool = False, plain: bool = False, no_color: bool = False, plain_text: str | None = None, table: tuple[str, list[str], list[list]] | None = None) -> None:
@@ -906,6 +910,208 @@ def run_evidence_command(task_id: str, json_output: bool = typer.Option(False, "
     emit(evidence, json_output=json_output, plain=True, plain_text="\n".join(lines) + ("\n" if lines else ""))
 
 
+def _materialization_options(
+    source: list[str] | None,
+    max_object_bytes: int,
+    max_total_bytes: int,
+    minimum_free_disk_bytes: int,
+    disk_safety_margin_bytes: int,
+    timeout_seconds: int,
+    retry_limit: int,
+    resume: bool,
+) -> dict:
+    return {
+        "sources": tuple(source or ()),
+        "max_object_bytes": max_object_bytes,
+        "max_total_bytes": max_total_bytes,
+        "minimum_free_disk_bytes": minimum_free_disk_bytes,
+        "disk_safety_margin_bytes": disk_safety_margin_bytes,
+        "timeout_seconds": timeout_seconds,
+        "retry_limit": retry_limit,
+        "resume_enabled": resume,
+    }
+
+
+@materialize_app.command("plan")
+def materialize_plan_command(
+    task_id: str,
+    source: list[str] = typer.Option(None, "--source"),
+    max_object_bytes: int = typer.Option(materialization.DEFAULT_MAX_OBJECT_BYTES, "--max-object-bytes"),
+    max_total_bytes: int = typer.Option(materialization.DEFAULT_MAX_TOTAL_BYTES, "--max-total-bytes"),
+    minimum_free_disk_bytes: int = typer.Option(materialization.DEFAULT_MINIMUM_FREE_DISK_BYTES, "--minimum-free-disk-bytes"),
+    disk_safety_margin_bytes: int = typer.Option(materialization.DEFAULT_DISK_SAFETY_MARGIN_BYTES, "--disk-safety-margin-bytes"),
+    timeout_seconds: int = typer.Option(materialization.DEFAULT_TIMEOUT_SECONDS, "--timeout-seconds"),
+    retry_limit: int = typer.Option(materialization.DEFAULT_RETRY_LIMIT, "--retry-limit"),
+    resume: bool = typer.Option(True, "--resume/--no-resume"),
+    probe_run_id: str | None = typer.Option(None, "--probe-run-id"),
+    probe_receipt_sha256: str | None = typer.Option(None, "--probe-receipt-sha256"),
+    json_output: bool = typer.Option(False, "--json"),
+    plain: bool = typer.Option(False, "--plain"),
+) -> None:
+    plan = materialization.build_materialization_plan(
+        task_id,
+        allow_network=False,
+        probe_run_id=probe_run_id,
+        probe_receipt_sha256=probe_receipt_sha256,
+        **_materialization_options(source, max_object_bytes, max_total_bytes, minimum_free_disk_bytes, disk_safety_margin_bytes, timeout_seconds, retry_limit, resume),
+    )
+    text = (
+        f"task_id: {task_id}\n"
+        f"source_selection: {plan['source_selection']}\n"
+        f"planned_transfer_count: {plan['planned_transfer_count']}\n"
+        f"fixture_source_count: {plan['fixture_source_count']}\n"
+        f"network_required: {plan['network_required']}\n"
+        f"probe_run_id: {plan['probe_run_id']}\n"
+        f"probe_evidence_class: {plan['probe_evidence_class']}\n"
+        f"probe_selection_method: {plan['probe_selection_method']}\n"
+        f"approval_required: {plan['approval_required']}\n"
+        f"validation_status: {plan['validation_status']}\n"
+        f"materialization_plan_contract_sha256: {plan['materialization_plan_contract_sha256']}\n"
+        f"materialization_plan_json: reports/materializations/{task_id}/materialization_plan.json\n"
+    )
+    emit(plan, json_output=json_output, plain=True, plain_text=text)
+
+
+@materialize_app.command("eligibility")
+def materialize_eligibility_command(task_id: str, json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
+    plan = materialization.build_materialization_plan(task_id, write_artifacts=True)
+    rows = []
+    for item in plan["object_plans"]:
+        rows.append(
+            {
+                "source": item["source_id"],
+                "eligibility": item["eligibility_status"],
+                "probe_status": "present" if item.get("probe_sha256") else "missing",
+                "expected_object_size": item.get("expected_object_size_bytes"),
+                "object_cap": item.get("max_object_bytes"),
+                "selected": item["source_id"] in plan["source_selection"],
+                "existing_artifact_status": "not_checked",
+                "blocking_reason": item.get("blocking_reasons"),
+            }
+        )
+    text = "\n".join(
+        f"{row['source']}: {row['eligibility']} probe={row['probe_status']} expected_size={row['expected_object_size']} cap={row['object_cap']} selected={row['selected']} blocking={row['blocking_reason']}"
+        for row in rows
+    ) + "\n"
+    emit({"task_id": task_id, "rows": rows}, json_output=json_output, plain=True, plain_text=text)
+
+
+@materialize_app.command("local")
+def materialize_local_command(
+    task_id: str,
+    source: list[str] = typer.Option(None, "--source"),
+    allow_network: bool = typer.Option(False, "--allow-network"),
+    allow_materialization: bool = typer.Option(False, "--allow-materialization"),
+    approve_plan_sha256: str | None = typer.Option(None, "--approve-plan-sha256"),
+    max_object_bytes: int = typer.Option(materialization.DEFAULT_MAX_OBJECT_BYTES, "--max-object-bytes"),
+    max_total_bytes: int = typer.Option(materialization.DEFAULT_MAX_TOTAL_BYTES, "--max-total-bytes"),
+    minimum_free_disk_bytes: int = typer.Option(materialization.DEFAULT_MINIMUM_FREE_DISK_BYTES, "--minimum-free-disk-bytes"),
+    disk_safety_margin_bytes: int = typer.Option(materialization.DEFAULT_DISK_SAFETY_MARGIN_BYTES, "--disk-safety-margin-bytes"),
+    timeout_seconds: int = typer.Option(materialization.DEFAULT_TIMEOUT_SECONDS, "--timeout-seconds"),
+    retry_limit: int = typer.Option(materialization.DEFAULT_RETRY_LIMIT, "--retry-limit"),
+    resume: bool = typer.Option(True, "--resume/--no-resume"),
+    probe_run_id: str | None = typer.Option(None, "--probe-run-id"),
+    probe_receipt_sha256: str | None = typer.Option(None, "--probe-receipt-sha256"),
+    json_output: bool = typer.Option(False, "--json"),
+    plain: bool = typer.Option(False, "--plain"),
+) -> None:
+    result = materialization.execute_materialization(
+        task_id,
+        allow_network=allow_network,
+        allow_materialization=allow_materialization,
+        approve_plan_sha256=approve_plan_sha256,
+        probe_run_id=probe_run_id,
+        probe_receipt_sha256=probe_receipt_sha256,
+        **_materialization_options(source, max_object_bytes, max_total_bytes, minimum_free_disk_bytes, disk_safety_margin_bytes, timeout_seconds, retry_limit, resume),
+    )
+    receipt = result["receipt"]
+    text = (
+        f"task_id: {task_id}\n"
+        f"materialization_run_id: {result['materialization_run_id']}\n"
+        f"run_status: {receipt['run_status']}\n"
+        f"execution_blocked: {receipt['execution_blocked']}\n"
+        f"network_run: {receipt['network_run']}\n"
+        f"materialized_source_count: {receipt['materialized_source_count']}\n"
+        f"failed_source_count: {receipt['failed_source_count']}\n"
+        f"receipt_json: {result['receipt_path']}\n"
+    )
+    emit(result, json_output=json_output, plain=True, plain_text=text)
+
+
+@materialize_app.command("inspect")
+def materialize_inspect_command(task_id: str, json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
+    latest_path = materialization.MATERIALIZATION_ROOT / task_id / "latest_materialization.json"
+    if not latest_path.exists():
+        raise typer.BadParameter(f"no latest materialization for task: {task_id}")
+    latest = run_receipts.read_json(latest_path)
+    receipt = run_receipts.read_json(Path(latest["receipt_path"]))
+    payload = {"latest_materialization": latest, "receipt": receipt}
+    text = f"task_id: {task_id}\nmaterialization_run_id: {latest['materialization_run_id']}\nrun_status: {receipt['run_status']}\n"
+    emit(payload, json_output=json_output, plain=True, plain_text=text)
+
+
+@materialize_app.command("verify")
+def materialize_verify_command(task_id: str, json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
+    latest_path = materialization.MATERIALIZATION_ROOT / task_id / "latest_materialization.json"
+    if not latest_path.exists():
+        raise typer.BadParameter(f"no latest materialization for task: {task_id}")
+    latest = run_receipts.read_json(latest_path)
+    verification = artifact_receipts.verify_materialization_run(Path(latest["receipt_path"]))
+    text = (
+        f"task_id: {task_id}\n"
+        f"contract_verification_status: {verification.get('contract_verification_status')}\n"
+        f"execution_outcome_status: {verification.get('execution_outcome_status')}\n"
+        f"artifact_verification_status: {verification.get('artifact_verification_status')}\n"
+        f"catalog_verification_status: {verification.get('catalog_verification_status')}\n"
+        f"release_evidence_status: {verification.get('release_evidence_status')}\n"
+        f"verification_status: {verification['verification_status']}\n"
+        f"failures: {verification['failures']}\n"
+    )
+    emit(verification, json_output=json_output, plain=True, plain_text=text)
+    if verification.get("verification_status") == "FAIL":
+        raise typer.BadParameter("materialization verification failed")
+
+
+@materialize_app.command("evidence")
+def materialize_evidence_command(task_id: str, json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
+    latest_path = materialization.MATERIALIZATION_ROOT / task_id / "latest_materialization.json"
+    if not latest_path.exists():
+        raise typer.BadParameter(f"no latest materialization for task: {task_id}")
+    latest = run_receipts.read_json(latest_path)
+    receipt = run_receipts.read_json(Path(latest["receipt_path"]))
+    rows = [
+        {
+            "source": item["source_id"],
+            "artifact_status": item["object_status"],
+            "object_size": item["object_size_bytes"],
+            "sha_short": item["whole_object_sha256_short"],
+            "content_family": item["detected_content_family"],
+            "container_validation": item["container_validation_status"],
+            "prefix_continuity": item["prefix_match"],
+            "artifact_path": item["artifact_path"],
+            "reused": item["reused_existing_artifact"],
+        }
+        for item in receipt.get("artifact_receipts", [])
+    ]
+    text = "\n".join(f"{row['source']}: {row['artifact_status']} bytes={row['object_size']} sha={row['sha_short']} prefix={row['prefix_continuity']} path={row['artifact_path']}" for row in rows) + "\n"
+    emit({"task_id": task_id, "rows": rows}, json_output=json_output, plain=True, plain_text=text)
+
+
+@materialize_app.command("catalog")
+def materialize_catalog_command(json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
+    catalog = artifact_catalog.load_catalog()
+    verification = artifact_catalog.verify_artifact_catalog()
+    text = f"artifact_count: {catalog['artifact_count']}\ncatalog_status: {verification.get('catalog_status', 'verified')}\ntotal_materialized_bytes: {catalog['total_materialized_bytes']}\n"
+    emit(catalog, json_output=json_output, plain=True, plain_text=text)
+
+
+@materialize_app.command("catalog-verify")
+def materialize_catalog_verify_command(json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
+    verification = artifact_catalog.verify_artifact_catalog()
+    text = f"verification_status: {verification['verification_status']}\nreason: {verification.get('reason')}\nfailures: {verification['failures']}\n"
+    emit(verification, json_output=json_output, plain=True, plain_text=text)
+
+
 @copernicus_app.command("auth-check")
 def copernicus_auth_check(
     live: bool = typer.Option(False, "--live"),
@@ -1079,6 +1285,7 @@ def register_product_commands(app: typer.Typer) -> None:
     app.add_typer(range_app, name="range")
     app.add_typer(grade_app, name="grade")
     app.add_typer(run_app, name="run")
+    app.add_typer(materialize_app, name="materialize")
     app.command("cookplan")(cookplan)
     app.command("queue")(queue)
     app.command("cookdip")(cookdip)

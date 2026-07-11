@@ -1,0 +1,58 @@
+{
+  "entries": [
+    {
+      "bytes_read": 65536,
+      "cache_path": "cache/runtime/static_http_range/chirps_daily_precipitation/20230101/3009598c9e96.gz.head65536",
+      "cache_status": "fetched",
+      "http_status": 206,
+      "payload_sha256": "fa6755981504a1a8f46ab4c3cc305fc3f70f96bd0c4ae132066f6e22dcfef886",
+      "range_honored": true,
+      "receipt_path": "cache/runtime/static_http_range/chirps_daily_precipitation/20230101/3009598c9e96.gz.head65536.receipt.json",
+      "request_id": "example_wave1_climate_stack__chirps_daily_precipitation__20230101",
+      "source_id": "chirps_daily_precipitation",
+      "validated": true,
+      "validation_errors": []
+    },
+    {
+      "bytes_read": 65536,
+      "cache_path": "cache/runtime/static_http_range/gridmet_daily/20230101/52426a4173c8.nc.head65536",
+      "cache_status": "fetched",
+      "http_status": 206,
+      "payload_sha256": "b1a8ed52034ad00a0ba19768e60d6a2eb09e20dfdf394446d3ecdda045803876",
+      "range_honored": true,
+      "receipt_path": "cache/runtime/static_http_range/gridmet_daily/20230101/52426a4173c8.nc.head65536.receipt.json",
+      "request_id": "example_wave1_climate_stack__gridmet_daily__20230101",
+      "source_id": "gridmet_daily",
+      "validated": true,
+      "validation_errors": []
+    },
+    {
+      "bytes_read": 65536,
+      "cache_path": "cache/runtime/static_http_range/terraclimate_monthly/2023-01/97c4f45acff2.nc.head65536",
+      "cache_status": "fetched",
+      "http_status": 206,
+      "payload_sha256": "6f90094fe5e7569a8aa61b6c14d31027f22a064791835da6f42f42ba9db797d4",
+      "range_honored": true,
+      "receipt_path": "cache/runtime/static_http_range/terraclimate_monthly/2023-01/97c4f45acff2.nc.head65536.receipt.json",
+      "request_id": "example_wave1_climate_stack__terraclimate_monthly__2023-01",
+      "source_id": "terraclimate_monthly",
+      "validated": true,
+      "validation_errors": []
+    },
+    {
+      "bytes_read": 65536,
+      "cache_path": "cache/runtime/static_http_range/worldclim_bioclim_normals/normals/8dc55e9390c5.zip.head65536",
+      "cache_status": "fetched",
+      "http_status": 206,
+      "payload_sha256": "9c647f5f3380f060ae1b599571ba6a4a703caf1453621d4cad3d443421fd5c09",
+      "range_honored": true,
+      "receipt_path": "cache/runtime/static_http_range/worldclim_bioclim_normals/normals/8dc55e9390c5.zip.head65536.receipt.json",
+      "request_id": "example_wave1_climate_stack__worldclim_bioclim_normals__normals",
+      "source_id": "worldclim_bioclim_normals",
+      "validated": true,
+      "validation_errors": []
+    }
+  ],
+  "run_id": "fr_run_20260711T040956Z_6a08115f26f1",
+  "task_id": "example_wave1_climate_stack"
+}

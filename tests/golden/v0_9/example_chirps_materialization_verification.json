@@ -1,0 +1,25 @@
+{
+  "check_count": 7,
+  "checks": [
+    {
+      "details": null,
+      "name": "receipt_hash",
+      "status": "PASS"
+    },
+    {
+      "details": null,
+      "name": "whole_object_sha256",
+      "status": "PASS"
+    },
+    {
+      "details": null,
+      "name": "probe_prefix",
+      "status": "PASS"
+    }
+  ],
+  "failed_check_count": 0,
+  "failures": [],
+  "passed_check_count": 7,
+  "verification_status": "PASS",
+  "warnings": []
+}

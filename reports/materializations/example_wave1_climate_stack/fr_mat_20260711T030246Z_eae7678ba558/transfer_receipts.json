@@ -1,0 +1,21 @@
+[
+  {
+    "artifact_promoted": false,
+    "bytes_requested": 3373363,
+    "bytes_transferred": 0,
+    "container_validation_status": "NOT_APPLICABLE",
+    "errors": [
+      "[Errno 2] No such file or directory: 'cache/artifacts'"
+    ],
+    "failure_class": "artifact_store_error",
+    "http_status": null,
+    "network_attempted": false,
+    "prefix_match": null,
+    "request_id": "example_wave1_climate_stack__chirps_daily_precipitation__20230101",
+    "source_id": "chirps_daily_precipitation",
+    "status": "failed",
+    "transfer_length_valid": false,
+    "transfer_status": "failed",
+    "whole_object_sha256": null
+  }
+]

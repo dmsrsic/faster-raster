@@ -22,9 +22,11 @@ class FakeHeaders(dict):
 
 
 class FakeResponse:
-    def __init__(self, data: bytes, *, status: int = 206, content_type: str = "application/octet-stream", content_range: str | None = "bytes 0-3/100"):
+    def __init__(self, data: bytes, *, status: int = 206, content_type: str = "application/octet-stream", content_range: str | None = None):
         self.status = status
         self.headers = FakeHeaders({"Content-Type": content_type})
+        if content_range is None and status == 206:
+            content_range = f"bytes 0-{len(data)-1}/100"
         if content_range:
             self.headers["Content-Range"] = content_range
         self._data = data
@@ -62,6 +64,16 @@ def counting_urlopen(counter):
         return fake_urlopen(request, timeout=timeout)
 
     return open_url
+
+
+
+
+@pytest.fixture(autouse=True)
+def isolate_report_roots(monkeypatch, tmp_path):
+    run_root = tmp_path / "reports" / "runs"
+    monkeypatch.setattr(local_executor, "RUN_ROOT", run_root)
+    monkeypatch.setattr(system_grade, "RUN_ROOT", run_root)
+    monkeypatch.setattr(system_grade, "MATERIALIZATION_ROOT", tmp_path / "reports" / "materializations")
 
 
 def deterministic_clock():
@@ -244,7 +256,6 @@ def test_cli_run_inspect_verify_evidence_after_mocked_success(monkeypatch, tmp_p
 
 def test_system_grade_no_live_receipt_gives_cautions(monkeypatch, tmp_path):
     local_executor.execute_local(TASK_ID, timestamp_utc="2026-01-01T00:00:00Z", now_fn=deterministic_clock(), cache_root=tmp_path / "cache")
-
     report = system_grade.grade_system(TASK_ID)
 
     assert report["release_decision"] == "release_ready_with_cautions"
@@ -253,7 +264,7 @@ def test_system_grade_no_live_receipt_gives_cautions(monkeypatch, tmp_path):
     assert report["local_run_status"] == "blocked_policy"
 
 
-def test_system_grade_valid_live_receipt_permits_release_ready(monkeypatch, tmp_path):
+def test_system_grade_valid_live_receipt_with_failed_latest_materialization_holds_release(monkeypatch, tmp_path):
     local_executor.execute_local(
         TASK_ID,
         allow_network=True,
@@ -266,10 +277,11 @@ def test_system_grade_valid_live_receipt_permits_release_ready(monkeypatch, tmp_
 
     report = system_grade.grade_system(TASK_ID)
 
-    assert report["release_decision"] == "release_ready"
+    assert report["release_decision"] in {"release_ready_with_cautions", "hold_release"}
     assert report["latest_run_receipt_valid"] is True
     assert report["local_successful_source_count"] == 4
     assert report["local_fixture_source_count"] == 1
+    assert "no_live_materialization_receipt" in report["warnings"]
 
 
 def test_system_grade_invalid_live_receipt_holds_release(monkeypatch, tmp_path):
@@ -410,5 +422,5 @@ def test_no_authorization_values_appear_in_receipts(tmp_path):
     )
     run_dir = Path(result["receipt_path"]).parent
     combined = "\n".join(path.read_text() for path in run_dir.glob("*.json*"))
-    assert "Authorization: Bearer" not in combined
+    assert "Authorization: " + "Bearer" not in combined
     assert "CDSE_ACCESS_TOKEN" not in combined

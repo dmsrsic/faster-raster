@@ -325,6 +325,7 @@ def execute_local(
     now = now_fn or utc_now
     sleep = sleep_fn or time.sleep
     opener = urlopen or urllib.request.urlopen
+    deterministic_test_fixture = urlopen is not None
     inputs = load_execution_inputs(task_id)
     validate_package_and_dag(inputs)
     plan = build_run_plan(
@@ -431,7 +432,7 @@ def execute_local(
             event("job_skipped", job, receipt["status"], {"reason": "fail_fast_triggered"})
 
     source_evidence = {"task_id": task_id, "run_id": run_id, "sources": sorted(state["source_evidence"].values(), key=lambda item: item["source_id"])}
-    receipt = _build_run_receipt(run_id, task_id, package, plan, inputs, options, job_receipts, source_evidence, safety_events, blocked_by_policy, now())
+    receipt = _build_run_receipt(run_id, task_id, package, plan, inputs, options, job_receipts, source_evidence, safety_events, blocked_by_policy, now(), deterministic_test_fixture)
     receipt["receipt_contract_sha256"] = compute_receipt_contract_sha256(receipt, Path.cwd())
     run_dir.mkdir(parents=True, exist_ok=True)
     write_json(run_dir / "run_receipt.json", receipt)
@@ -444,17 +445,20 @@ def execute_local(
     event("run_completed", details={"run_status": receipt["run_status"]})
     event("receipt_written", details={"receipt_path": str(run_dir / "run_receipt.json")})
     write_jsonl(run_dir / "execution_log.jsonl", log)
-    write_json(
-        RUN_ROOT / task_id / "latest_run.json",
-        {
-            "task_id": task_id,
-            "run_id": run_id,
-            "receipt_path": str(run_dir / "run_receipt.json"),
-            "receipt_contract_sha256": receipt["receipt_contract_sha256"],
-            "run_status": receipt["run_status"],
-            "updated_at_utc": now(),
-        },
-    )
+    latest_payload = {
+        "task_id": task_id,
+        "run_id": run_id,
+        "receipt_path": str(run_dir / "run_receipt.json"),
+        "receipt_contract_sha256": receipt["receipt_contract_sha256"],
+        "run_status": receipt["run_status"],
+        "evidence_class": receipt["evidence_class"],
+        "updated_at_utc": now(),
+    }
+    write_json(RUN_ROOT / task_id / "latest_run.json", latest_payload)
+    if receipt["run_status"] in {"completed", "completed_with_warnings"} and receipt["evidence_class"] == "live_network":
+        write_json(RUN_ROOT / task_id / "latest_live_verified_run.json", latest_payload)
+    if receipt["evidence_class"] == "deterministic_test_fixture":
+        write_json(RUN_ROOT / task_id / "latest_test_fixture_run.json", latest_payload)
     return {"run_status": receipt["run_status"], "run_id": run_id, "receipt": receipt, "receipt_path": str(run_dir / "run_receipt.json")}
 
 
@@ -858,6 +862,7 @@ def _build_run_receipt(
     safety_events: list[dict[str, Any]],
     blocked_by_policy: bool,
     finished_at: str,
+    deterministic_test_fixture: bool = False,
 ) -> dict[str, Any]:
     statuses = [job["status"] for job in job_receipts]
     sources = source_evidence["sources"]
@@ -873,6 +878,17 @@ def _build_run_receipt(
     else:
         run_status = "completed"
     total_bytes = sum(int(item.get("bytes_read") or 0) for item in runnable)
+    network_run = any(job.get("network_attempted") is True for job in job_receipts)
+    if blocked_by_policy:
+        evidence_class = "blocked_policy"
+    elif deterministic_test_fixture:
+        evidence_class = "deterministic_test_fixture"
+    elif network_run:
+        evidence_class = "live_network"
+    elif any(job.get("status") == "cache_hit" for job in job_receipts):
+        evidence_class = "validated_cache_reuse"
+    else:
+        evidence_class = "historical_fixture"
     return {
         "run_id": run_id,
         "task_id": task_id,
@@ -890,7 +906,8 @@ def _build_run_receipt(
         "finished_at_utc": finished_at,
         "duration_ms": None,
         "run_status": run_status,
-        "network_run": any(job.get("network_attempted") is True for job in job_receipts),
+        "network_run": network_run,
+        "evidence_class": evidence_class,
         "allow_network": options.allow_network,
         "max_bytes_per_source": options.max_bytes_per_source,
         "max_total_bytes": options.max_total_bytes,

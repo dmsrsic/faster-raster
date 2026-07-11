@@ -2,6 +2,8 @@
 
 FasterRaster v0.8 writes auditable local execution receipts under:
 
+Run receipts are bounded evidence receipts. v0.9 artifact receipts build on them by requiring the complete object's first retained-prefix bytes to hash to the verified v0.8 probe SHA256.
+
 ```text
 reports/runs/TASK_ID/RUN_ID/
 ```
