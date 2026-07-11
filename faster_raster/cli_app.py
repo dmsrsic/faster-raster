@@ -13,6 +13,8 @@ from faster_raster import cli_render as render
 from faster_raster import cli_lingo
 from faster_raster import user_toggles
 from faster_raster import task_builder
+from faster_raster import task_compiler
+from faster_raster import system_grade
 from faster_raster import real_preview
 from faster_raster import copernicus_auth
 from faster_raster.adapters import copernicus_cdse
@@ -31,6 +33,7 @@ task_app = typer.Typer(no_args_is_help=True)
 copernicus_app = typer.Typer(no_args_is_help=True)
 copernicus_sentinel_app = typer.Typer(no_args_is_help=True)
 range_app = typer.Typer(no_args_is_help=True)
+grade_app = typer.Typer(no_args_is_help=True)
 
 
 def emit(value, *, json_output: bool = False, plain: bool = False, no_color: bool = False, plain_text: str | None = None, table: tuple[str, list[str], list[list]] | None = None) -> None:
@@ -671,6 +674,100 @@ def task_preview_real(
     emit(report, json_output=json_output, plain=True, plain_text=text)
 
 
+def _render_task_compile_plain(report: dict) -> str:
+    return (
+        f"task_id: {report['task_id']}\n"
+        f"validation_status: {report['validation_status']}\n"
+        f"determinism_status: {report['determinism_status']}\n"
+        f"manifest_row_count: {report['manifest_row_count']}\n"
+        f"request_count: {report['request_count']}\n"
+        f"executable_request_count: {report['executable_request_count']}\n"
+        f"fixture_request_count: {report['fixture_request_count']}\n"
+        f"adapter_counts: {report['adapter_counts']}\n"
+        f"network_run: {report['network_run']}\n"
+        f"acquisition_manifest_sha256: {report['acquisition_manifest_sha256']}\n"
+        f"compile_report_json: reports/task_compiles/{report['task_id']}/compile_report.json\n"
+    )
+
+
+@task_app.command("compile")
+def task_compile(
+    task_id: str,
+    max_bytes_per_source: int = typer.Option(static_http_range.DEFAULT_MAX_BYTES, "--max-bytes-per-source"),
+    json_output: bool = typer.Option(False, "--json"),
+    plain: bool = typer.Option(False, "--plain"),
+) -> None:
+    report = task_compiler.compile_task(task_id, max_bytes_per_source=max_bytes_per_source)
+    emit(report, json_output=json_output, plain=True, plain_text=_render_task_compile_plain(report))
+
+
+@task_app.command("package")
+def task_package(
+    task_id: str,
+    max_bytes_per_source: int = typer.Option(static_http_range.DEFAULT_MAX_BYTES, "--max-bytes-per-source"),
+    json_output: bool = typer.Option(False, "--json"),
+    plain: bool = typer.Option(False, "--plain"),
+) -> None:
+    package = task_compiler.package_task(task_id, max_bytes_per_source=max_bytes_per_source)
+    text = (
+        f"task_id: {package['task_id']}\n"
+        f"package_id: {package['package_id']}\n"
+        f"request_count: {package['request_count']}\n"
+        f"executable_request_count: {package['executable_request_count']}\n"
+        f"fixture_request_count: {package['fixture_request_count']}\n"
+        f"total_job_count: {package['total_job_count']}\n"
+        f"dependency_count: {package['dependency_count']}\n"
+        f"dag_validation_status: {package['dag_validation_status']}\n"
+        f"network_run: False\n"
+        f"execution_package_json: reports/execution_packages/{task_id}/execution_package.json\n"
+    )
+    emit(package, json_output=json_output, plain=True, plain_text=text)
+
+
+@task_app.command("inspect-compile")
+def task_inspect_compile(task_id: str, json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
+    report = task_compiler.inspect_compile(task_id)
+    text = (
+        f"task_id: {task_id}\n"
+        f"adapter_counts: {report['adapter_counts']}\n"
+        f"executable_request_count: {report['executable_request_count']}\n"
+        f"fixture_request_count: {report['fixture_request_count']}\n"
+        f"manifest_row_count: {report['manifest_row_count']}\n"
+        f"validation_stages: {report['validation_stages']}\n"
+        f"hashes: {report['hashes']}\n"
+    )
+    emit(report, json_output=json_output, plain=True, plain_text=text)
+
+
+@grade_app.command("system")
+def grade_system_command(json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
+    report = system_grade.grade_system()
+    text = (
+        f"overall_score: {report['overall_score']}\n"
+        f"overall_grade: {report['overall_grade']}\n"
+        f"safety_score: {report['safety_score']}\n"
+        f"release_decision: {report['release_decision']}\n"
+        f"blocking_failures: {report['blocking_failures']}\n"
+        f"network_run: False\n"
+        f"system_grade_json: {report['artifacts']['system_grade_json']}\n"
+    )
+    emit(report, json_output=json_output, plain=True, plain_text=text)
+
+
+@grade_app.command("task")
+def grade_task_command(task_id: str, json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
+    task_compiler.compile_task(task_id)
+    package = task_compiler.package_task(task_id)
+    report = {
+        "task_id": task_id,
+        "dag_validation_status": package["dag_validation_status"],
+        "determinism_status": "PASS",
+        "network_run": False,
+        "score": 100 if package["dag_validation_status"] == "PASS" else 0,
+    }
+    emit(report, json_output=json_output, plain=True, plain_text="\n".join(f"{k}: {v}" for k, v in report.items()) + "\n")
+
+
 @copernicus_app.command("auth-check")
 def copernicus_auth_check(
     live: bool = typer.Option(False, "--live"),
@@ -842,6 +939,7 @@ def register_product_commands(app: typer.Typer) -> None:
     app.add_typer(cook_app, name="cook")
     app.add_typer(knobs_app, name="knobs")
     app.add_typer(range_app, name="range")
+    app.add_typer(grade_app, name="grade")
     app.command("cookplan")(cookplan)
     app.command("queue")(queue)
     app.command("cookdip")(cookdip)

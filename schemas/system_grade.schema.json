@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "blocking_failures": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "overall_grade": {
+      "type": "string"
+    },
+    "overall_score": {
+      "type": "number"
+    },
+    "release_decision": {
+      "enum": [
+        "release_ready",
+        "release_ready_with_cautions",
+        "hold_release"
+      ],
+      "type": "string"
+    },
+    "safety_score": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "overall_score",
+    "overall_grade",
+    "blocking_failures",
+    "safety_score",
+    "release_decision"
+  ],
+  "title": "FasterRaster v0.7 system grade",
+  "type": "object"
+}

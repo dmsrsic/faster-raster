@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "acquisition_mode": {
+      "type": "string"
+    },
+    "adapter": {
+      "enum": [
+        "arcgis_imageserver",
+        "generic_https_template",
+        "static_http_range",
+        "stac_metadata"
+      ],
+      "type": "string"
+    },
+    "auth_profile": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "bounded_request": {
+      "type": "boolean"
+    },
+    "checksum_policy": {
+      "type": "string"
+    },
+    "credential_required": {
+      "type": "boolean"
+    },
+    "deterministic_url": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "execution_status": {
+      "type": "string"
+    },
+    "expected_content_family": {},
+    "expected_format": {
+      "type": "string"
+    },
+    "expected_magic": {},
+    "fixture_only": {
+      "type": "boolean"
+    },
+    "harmonization_readiness": {
+      "type": "string"
+    },
+    "max_bytes": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "network_required": {
+      "type": "boolean"
+    },
+    "request_headers_redacted": {
+      "type": "object"
+    },
+    "request_id": {
+      "type": "string"
+    },
+    "request_method": {
+      "type": "string"
+    },
+    "source_classification": {
+      "enum": [
+        "runnable",
+        "fixture_only"
+      ],
+      "type": "string"
+    },
+    "source_id": {
+      "type": "string"
+    },
+    "spatial_key": {
+      "type": "string"
+    },
+    "task_id": {
+      "type": "string"
+    },
+    "temporal_key": {
+      "type": "string"
+    },
+    "url_sha256": {
+      "type": "string"
+    },
+    "validation_steps": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "request_id",
+    "task_id",
+    "source_id",
+    "adapter",
+    "acquisition_mode",
+    "source_classification",
+    "execution_status",
+    "url_sha256",
+    "request_method",
+    "request_headers_redacted",
+    "temporal_key",
+    "spatial_key",
+    "expected_content_family",
+    "expected_magic",
+    "expected_format",
+    "bounded_request",
+    "credential_required",
+    "fixture_only",
+    "network_required",
+    "checksum_policy",
+    "validation_steps",
+    "harmonization_readiness"
+  ],
+  "title": "FasterRaster v0.7 unified acquisition manifest row",
+  "type": "object"
+}

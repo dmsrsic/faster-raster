@@ -70,7 +70,12 @@ def test_schemas_have_required_fields_and_enum_like_contracts():
         "no_bbox_url_template",
     ]
     assert entry_props["year_parameter_strategy"]["enum"] == ["time_value", "mosaic_rule_by_attribute"]
+    unified = load_schema(SCHEMA_DIR / "unified_acquisition_manifest_row.schema.json")
+    system_grade = load_schema(SCHEMA_DIR / "system_grade.schema.json")
+
     assert "tile_width_pixels" in manifest["required"]
+    assert "request_id" in unified["required"]
+    assert "safety_score" in system_grade["required"]
     assert report["properties"]["overall_status"]["enum"] == ["PASS", "FAIL"]
 
 
@@ -97,7 +102,7 @@ def test_cli_export_schemas_writes_only_schema_files(tmp_path):
     result = runner.invoke(app, ["export-schemas", "--out", str(tmp_path)])
 
     assert result.exit_code == 0
-    assert "wrote 5 schema files" in result.output
+    assert f"wrote {len(SCHEMA_FILENAMES)} schema files" in result.output
     assert sorted(path.name for path in tmp_path.iterdir()) == sorted(SCHEMA_FILENAMES)
 
 

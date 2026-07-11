@@ -66,6 +66,27 @@ The PRISM deep audit evidence is preserved in:
 - `reports/static_http_range/prism_static_range_deep_audit.json`
 - `reports/static_http_range/prism_static_range_deep_audit.md`
 
+## v0.7 Compiler Integration
+
+`static_http_range` participates in `faster-raster task compile` and `faster-raster task package`.
+
+Runnable sources compile into bounded HTTP range manifest rows with:
+
+- `acquisition_mode: bounded_http_range`
+- `request_method: GET`
+- `Range: bytes=0-65535`
+- `checksum_policy: compute_after_fetch`
+- validation steps for HTTP status, byte cap, magic bytes, content family, SHA256, and range behavior
+
+Fixture-only PRISM compiles into a historical evidence row with `execution_status: non_executable_fixture`. It does not generate a fetch job.
+
+Harmonization readiness is explicit. The package stops before unsupported decoding:
+
+- CHIRPS requires decompression and raster decode.
+- gridMET and TerraClimate require NetCDF variable selection.
+- WorldClim requires archive member resolution.
+- PRISM requires endpoint resolution before live execution.
+
 ## Safety Contract
 
 - Sends `Range: bytes=0-(max_bytes-1)`.

@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "dependency_count": {
+      "type": "integer"
+    },
+    "errors": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "job_count": {
+      "type": "integer"
+    },
+    "stage_counts": {
+      "type": "object"
+    },
+    "status": {
+      "enum": [
+        "PASS",
+        "FAIL"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "status",
+    "job_count",
+    "dependency_count",
+    "stage_counts",
+    "errors"
+  ],
+  "title": "FasterRaster v0.7 execution DAG",
+  "type": "object"
+}

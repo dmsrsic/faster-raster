@@ -1,0 +1,45 @@
+{
+  "adapter_execution_score": 95,
+  "artifacts": {
+    "compile_report": "reports/task_compiles/example_wave1_climate_stack/compile_report.json",
+    "execution_package": "reports/execution_packages/example_wave1_climate_stack/execution_package.json",
+    "system_grade_json": "reports/system_grade/system_grade_v0_7_0.json",
+    "system_grade_md": "reports/system_grade/system_grade_v0_7_0.md"
+  },
+  "blocking_failures": [],
+  "checks": {
+    "core_diagnostics_status": "PASS",
+    "default_network_off": "PASS",
+    "determinism": "PASS",
+    "execution_package_dag": "PASS",
+    "pytest_exit_code": 0,
+    "static_wave1_live_evidence": "PASS"
+  },
+  "core_compiler_score": 95,
+  "determinism_score": 100,
+  "documentation_score": 92,
+  "execution_package_score": 100,
+  "overall_grade": "excellent",
+  "overall_score": 96.64,
+  "package_version": "0.7.0",
+  "preview_score": 94,
+  "release_decision": "release_ready",
+  "safety_score": 100,
+  "sentinel_readiness_score": 92,
+  "source_evidence_score": 95,
+  "strongest_components": [
+    "safety",
+    "task_compiler",
+    "execution_package"
+  ],
+  "task_compiler_score": 100,
+  "task_id": "example_wave1_climate_stack",
+  "test_score": 100,
+  "warnings": [
+    "Static range probes are bounded evidence only; decoding stages intentionally stop before raster extraction.",
+    "PRISM remains fixture-only until current endpoint strategy is resolved."
+  ],
+  "weakest_components": [
+    "documentation"
+  ]
+}

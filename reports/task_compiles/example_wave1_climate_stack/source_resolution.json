@@ -1,0 +1,21 @@
+{
+  "adapter_counts": {
+    "static_http_range": 5
+  },
+  "missing_sources": [],
+  "requested_sources": [
+    "chirps_daily_precipitation",
+    "gridmet_daily",
+    "terraclimate_monthly",
+    "worldclim_bioclim_normals",
+    "prism_daily_ppt_static_zip"
+  ],
+  "resolved_sources": [
+    "chirps_daily_precipitation",
+    "gridmet_daily",
+    "prism_daily_ppt_static_zip",
+    "terraclimate_monthly",
+    "worldclim_bioclim_normals"
+  ],
+  "task_id": "example_wave1_climate_stack"
+}

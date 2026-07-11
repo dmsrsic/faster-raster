@@ -1,0 +1,31 @@
+task_id: example_wave1_climate_stack
+name: Example Wave 1 climate stack
+description: Deterministic no-network compile task for static_http_range Wave 1.
+aoi:
+  bbox:
+    - -83.20
+    - 39.80
+    - -83.19
+    - 39.81
+  bbox_crs: EPSG:4326
+target_grid:
+  crs: EPSG:5070
+  resolution_m: 4000
+time:
+  years:
+    - 2023
+  dates:
+    - "2023-01-01"
+themes:
+  - precipitation
+sources:
+  - chirps_daily_precipitation
+  - gridmet_daily
+  - terraclimate_monthly
+  - worldclim_bioclim_normals
+  - prism_daily_ppt_static_zip
+network_mode: off
+preview:
+  color_scheme: default
+  open_after_create: false
+notes: []

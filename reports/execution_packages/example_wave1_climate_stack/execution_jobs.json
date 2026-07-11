@@ -1,0 +1,538 @@
+{
+  "jobs": [
+    {
+      "adapter": "static_http_range",
+      "cache_path": "cache/static_http_range/chirps_daily_precipitation/20230101/3009598c9e96.gz",
+      "dependencies": [
+        "example_wave1_climate_stack__chirps_daily_precipitation__20230101__resolve_request"
+      ],
+      "deterministic_url": "https://data.chc.ucsb.edu/products/CHIRPS-2.0/global_daily/tifs/p05/2023/chirps-v2.0.2023.01.01.tif.gz",
+      "fixture_only": false,
+      "job_id": "example_wave1_climate_stack__chirps_daily_precipitation__20230101__bounded_fetch",
+      "max_bytes": 65536,
+      "network_required": true,
+      "request_id": "example_wave1_climate_stack__chirps_daily_precipitation__20230101",
+      "source_id": "chirps_daily_precipitation",
+      "stage": "bounded_fetch",
+      "task_id": "example_wave1_climate_stack"
+    },
+    {
+      "adapter": "static_http_range",
+      "cache_path": "cache/static_http_range/chirps_daily_precipitation/20230101/3009598c9e96.gz",
+      "dependencies": [
+        "example_wave1_climate_stack__chirps_daily_precipitation__20230101__bounded_fetch"
+      ],
+      "deterministic_url": "https://data.chc.ucsb.edu/products/CHIRPS-2.0/global_daily/tifs/p05/2023/chirps-v2.0.2023.01.01.tif.gz",
+      "fixture_only": false,
+      "job_id": "example_wave1_climate_stack__chirps_daily_precipitation__20230101__compute_checksum",
+      "max_bytes": 65536,
+      "network_required": false,
+      "request_id": "example_wave1_climate_stack__chirps_daily_precipitation__20230101",
+      "source_id": "chirps_daily_precipitation",
+      "stage": "compute_checksum",
+      "task_id": "example_wave1_climate_stack"
+    },
+    {
+      "adapter": "static_http_range",
+      "cache_path": "cache/static_http_range/chirps_daily_precipitation/20230101/3009598c9e96.gz",
+      "dependencies": [
+        "example_wave1_climate_stack__chirps_daily_precipitation__20230101__validate_http_status",
+        "example_wave1_climate_stack__chirps_daily_precipitation__20230101__validate_byte_cap",
+        "example_wave1_climate_stack__chirps_daily_precipitation__20230101__validate_magic",
+        "example_wave1_climate_stack__chirps_daily_precipitation__20230101__validate_content_family",
+        "example_wave1_climate_stack__chirps_daily_precipitation__20230101__compute_checksum"
+      ],
+      "deterministic_url": "https://data.chc.ucsb.edu/products/CHIRPS-2.0/global_daily/tifs/p05/2023/chirps-v2.0.2023.01.01.tif.gz",
+      "fixture_only": false,
+      "job_id": "example_wave1_climate_stack__chirps_daily_precipitation__20230101__record_source_evidence",
+      "max_bytes": 65536,
+      "network_required": false,
+      "request_id": "example_wave1_climate_stack__chirps_daily_precipitation__20230101",
+      "source_id": "chirps_daily_precipitation",
+      "stage": "record_source_evidence",
+      "task_id": "example_wave1_climate_stack"
+    },
+    {
+      "adapter": "static_http_range",
+      "cache_path": "cache/static_http_range/chirps_daily_precipitation/20230101/3009598c9e96.gz",
+      "dependencies": [],
+      "deterministic_url": "https://data.chc.ucsb.edu/products/CHIRPS-2.0/global_daily/tifs/p05/2023/chirps-v2.0.2023.01.01.tif.gz",
+      "fixture_only": false,
+      "job_id": "example_wave1_climate_stack__chirps_daily_precipitation__20230101__resolve_request",
+      "max_bytes": 65536,
+      "network_required": false,
+      "request_id": "example_wave1_climate_stack__chirps_daily_precipitation__20230101",
+      "source_id": "chirps_daily_precipitation",
+      "stage": "resolve_request",
+      "task_id": "example_wave1_climate_stack"
+    },
+    {
+      "adapter": "static_http_range",
+      "cache_path": "cache/static_http_range/chirps_daily_precipitation/20230101/3009598c9e96.gz",
+      "dependencies": [
+        "example_wave1_climate_stack__chirps_daily_precipitation__20230101__bounded_fetch"
+      ],
+      "deterministic_url": "https://data.chc.ucsb.edu/products/CHIRPS-2.0/global_daily/tifs/p05/2023/chirps-v2.0.2023.01.01.tif.gz",
+      "fixture_only": false,
+      "job_id": "example_wave1_climate_stack__chirps_daily_precipitation__20230101__validate_byte_cap",
+      "max_bytes": 65536,
+      "network_required": false,
+      "request_id": "example_wave1_climate_stack__chirps_daily_precipitation__20230101",
+      "source_id": "chirps_daily_precipitation",
+      "stage": "validate_byte_cap",
+      "task_id": "example_wave1_climate_stack"
+    },
+    {
+      "adapter": "static_http_range",
+      "cache_path": "cache/static_http_range/chirps_daily_precipitation/20230101/3009598c9e96.gz",
+      "dependencies": [
+        "example_wave1_climate_stack__chirps_daily_precipitation__20230101__bounded_fetch"
+      ],
+      "deterministic_url": "https://data.chc.ucsb.edu/products/CHIRPS-2.0/global_daily/tifs/p05/2023/chirps-v2.0.2023.01.01.tif.gz",
+      "fixture_only": false,
+      "job_id": "example_wave1_climate_stack__chirps_daily_precipitation__20230101__validate_content_family",
+      "max_bytes": 65536,
+      "network_required": false,
+      "request_id": "example_wave1_climate_stack__chirps_daily_precipitation__20230101",
+      "source_id": "chirps_daily_precipitation",
+      "stage": "validate_content_family",
+      "task_id": "example_wave1_climate_stack"
+    },
+    {
+      "adapter": "static_http_range",
+      "cache_path": "cache/static_http_range/chirps_daily_precipitation/20230101/3009598c9e96.gz",
+      "dependencies": [
+        "example_wave1_climate_stack__chirps_daily_precipitation__20230101__bounded_fetch"
+      ],
+      "deterministic_url": "https://data.chc.ucsb.edu/products/CHIRPS-2.0/global_daily/tifs/p05/2023/chirps-v2.0.2023.01.01.tif.gz",
+      "fixture_only": false,
+      "job_id": "example_wave1_climate_stack__chirps_daily_precipitation__20230101__validate_http_status",
+      "max_bytes": 65536,
+      "network_required": false,
+      "request_id": "example_wave1_climate_stack__chirps_daily_precipitation__20230101",
+      "source_id": "chirps_daily_precipitation",
+      "stage": "validate_http_status",
+      "task_id": "example_wave1_climate_stack"
+    },
+    {
+      "adapter": "static_http_range",
+      "cache_path": "cache/static_http_range/chirps_daily_precipitation/20230101/3009598c9e96.gz",
+      "dependencies": [
+        "example_wave1_climate_stack__chirps_daily_precipitation__20230101__bounded_fetch"
+      ],
+      "deterministic_url": "https://data.chc.ucsb.edu/products/CHIRPS-2.0/global_daily/tifs/p05/2023/chirps-v2.0.2023.01.01.tif.gz",
+      "fixture_only": false,
+      "job_id": "example_wave1_climate_stack__chirps_daily_precipitation__20230101__validate_magic",
+      "max_bytes": 65536,
+      "network_required": false,
+      "request_id": "example_wave1_climate_stack__chirps_daily_precipitation__20230101",
+      "source_id": "chirps_daily_precipitation",
+      "stage": "validate_magic",
+      "task_id": "example_wave1_climate_stack"
+    },
+    {
+      "adapter": "static_http_range",
+      "cache_path": "cache/static_http_range/gridmet_daily/20230101/52426a4173c8.nc",
+      "dependencies": [
+        "example_wave1_climate_stack__gridmet_daily__20230101__resolve_request"
+      ],
+      "deterministic_url": "https://www.northwestknowledge.net/metdata/data/pr_2023.nc",
+      "fixture_only": false,
+      "job_id": "example_wave1_climate_stack__gridmet_daily__20230101__bounded_fetch",
+      "max_bytes": 65536,
+      "network_required": true,
+      "request_id": "example_wave1_climate_stack__gridmet_daily__20230101",
+      "source_id": "gridmet_daily",
+      "stage": "bounded_fetch",
+      "task_id": "example_wave1_climate_stack"
+    },
+    {
+      "adapter": "static_http_range",
+      "cache_path": "cache/static_http_range/gridmet_daily/20230101/52426a4173c8.nc",
+      "dependencies": [
+        "example_wave1_climate_stack__gridmet_daily__20230101__bounded_fetch"
+      ],
+      "deterministic_url": "https://www.northwestknowledge.net/metdata/data/pr_2023.nc",
+      "fixture_only": false,
+      "job_id": "example_wave1_climate_stack__gridmet_daily__20230101__compute_checksum",
+      "max_bytes": 65536,
+      "network_required": false,
+      "request_id": "example_wave1_climate_stack__gridmet_daily__20230101",
+      "source_id": "gridmet_daily",
+      "stage": "compute_checksum",
+      "task_id": "example_wave1_climate_stack"
+    },
+    {
+      "adapter": "static_http_range",
+      "cache_path": "cache/static_http_range/gridmet_daily/20230101/52426a4173c8.nc",
+      "dependencies": [
+        "example_wave1_climate_stack__gridmet_daily__20230101__validate_http_status",
+        "example_wave1_climate_stack__gridmet_daily__20230101__validate_byte_cap",
+        "example_wave1_climate_stack__gridmet_daily__20230101__validate_magic",
+        "example_wave1_climate_stack__gridmet_daily__20230101__validate_content_family",
+        "example_wave1_climate_stack__gridmet_daily__20230101__compute_checksum"
+      ],
+      "deterministic_url": "https://www.northwestknowledge.net/metdata/data/pr_2023.nc",
+      "fixture_only": false,
+      "job_id": "example_wave1_climate_stack__gridmet_daily__20230101__record_source_evidence",
+      "max_bytes": 65536,
+      "network_required": false,
+      "request_id": "example_wave1_climate_stack__gridmet_daily__20230101",
+      "source_id": "gridmet_daily",
+      "stage": "record_source_evidence",
+      "task_id": "example_wave1_climate_stack"
+    },
+    {
+      "adapter": "static_http_range",
+      "cache_path": "cache/static_http_range/gridmet_daily/20230101/52426a4173c8.nc",
+      "dependencies": [],
+      "deterministic_url": "https://www.northwestknowledge.net/metdata/data/pr_2023.nc",
+      "fixture_only": false,
+      "job_id": "example_wave1_climate_stack__gridmet_daily__20230101__resolve_request",
+      "max_bytes": 65536,
+      "network_required": false,
+      "request_id": "example_wave1_climate_stack__gridmet_daily__20230101",
+      "source_id": "gridmet_daily",
+      "stage": "resolve_request",
+      "task_id": "example_wave1_climate_stack"
+    },
+    {
+      "adapter": "static_http_range",
+      "cache_path": "cache/static_http_range/gridmet_daily/20230101/52426a4173c8.nc",
+      "dependencies": [
+        "example_wave1_climate_stack__gridmet_daily__20230101__bounded_fetch"
+      ],
+      "deterministic_url": "https://www.northwestknowledge.net/metdata/data/pr_2023.nc",
+      "fixture_only": false,
+      "job_id": "example_wave1_climate_stack__gridmet_daily__20230101__validate_byte_cap",
+      "max_bytes": 65536,
+      "network_required": false,
+      "request_id": "example_wave1_climate_stack__gridmet_daily__20230101",
+      "source_id": "gridmet_daily",
+      "stage": "validate_byte_cap",
+      "task_id": "example_wave1_climate_stack"
+    },
+    {
+      "adapter": "static_http_range",
+      "cache_path": "cache/static_http_range/gridmet_daily/20230101/52426a4173c8.nc",
+      "dependencies": [
+        "example_wave1_climate_stack__gridmet_daily__20230101__bounded_fetch"
+      ],
+      "deterministic_url": "https://www.northwestknowledge.net/metdata/data/pr_2023.nc",
+      "fixture_only": false,
+      "job_id": "example_wave1_climate_stack__gridmet_daily__20230101__validate_content_family",
+      "max_bytes": 65536,
+      "network_required": false,
+      "request_id": "example_wave1_climate_stack__gridmet_daily__20230101",
+      "source_id": "gridmet_daily",
+      "stage": "validate_content_family",
+      "task_id": "example_wave1_climate_stack"
+    },
+    {
+      "adapter": "static_http_range",
+      "cache_path": "cache/static_http_range/gridmet_daily/20230101/52426a4173c8.nc",
+      "dependencies": [
+        "example_wave1_climate_stack__gridmet_daily__20230101__bounded_fetch"
+      ],
+      "deterministic_url": "https://www.northwestknowledge.net/metdata/data/pr_2023.nc",
+      "fixture_only": false,
+      "job_id": "example_wave1_climate_stack__gridmet_daily__20230101__validate_http_status",
+      "max_bytes": 65536,
+      "network_required": false,
+      "request_id": "example_wave1_climate_stack__gridmet_daily__20230101",
+      "source_id": "gridmet_daily",
+      "stage": "validate_http_status",
+      "task_id": "example_wave1_climate_stack"
+    },
+    {
+      "adapter": "static_http_range",
+      "cache_path": "cache/static_http_range/gridmet_daily/20230101/52426a4173c8.nc",
+      "dependencies": [
+        "example_wave1_climate_stack__gridmet_daily__20230101__bounded_fetch"
+      ],
+      "deterministic_url": "https://www.northwestknowledge.net/metdata/data/pr_2023.nc",
+      "fixture_only": false,
+      "job_id": "example_wave1_climate_stack__gridmet_daily__20230101__validate_magic",
+      "max_bytes": 65536,
+      "network_required": false,
+      "request_id": "example_wave1_climate_stack__gridmet_daily__20230101",
+      "source_id": "gridmet_daily",
+      "stage": "validate_magic",
+      "task_id": "example_wave1_climate_stack"
+    },
+    {
+      "adapter": "static_http_range",
+      "cache_path": null,
+      "dependencies": [],
+      "deterministic_url": null,
+      "fixture_only": true,
+      "job_id": "example_wave1_climate_stack__prism_daily_ppt_static_zip__20230101__record_fixture_evidence",
+      "max_bytes": null,
+      "network_required": false,
+      "request_id": "example_wave1_climate_stack__prism_daily_ppt_static_zip__20230101",
+      "source_id": "prism_daily_ppt_static_zip",
+      "stage": "record_fixture_evidence",
+      "task_id": "example_wave1_climate_stack"
+    },
+    {
+      "adapter": "static_http_range",
+      "cache_path": "cache/static_http_range/terraclimate_monthly/2023-01/97c4f45acff2.nc",
+      "dependencies": [
+        "example_wave1_climate_stack__terraclimate_monthly__2023-01__resolve_request"
+      ],
+      "deterministic_url": "https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_2023.nc",
+      "fixture_only": false,
+      "job_id": "example_wave1_climate_stack__terraclimate_monthly__2023-01__bounded_fetch",
+      "max_bytes": 65536,
+      "network_required": true,
+      "request_id": "example_wave1_climate_stack__terraclimate_monthly__2023-01",
+      "source_id": "terraclimate_monthly",
+      "stage": "bounded_fetch",
+      "task_id": "example_wave1_climate_stack"
+    },
+    {
+      "adapter": "static_http_range",
+      "cache_path": "cache/static_http_range/terraclimate_monthly/2023-01/97c4f45acff2.nc",
+      "dependencies": [
+        "example_wave1_climate_stack__terraclimate_monthly__2023-01__bounded_fetch"
+      ],
+      "deterministic_url": "https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_2023.nc",
+      "fixture_only": false,
+      "job_id": "example_wave1_climate_stack__terraclimate_monthly__2023-01__compute_checksum",
+      "max_bytes": 65536,
+      "network_required": false,
+      "request_id": "example_wave1_climate_stack__terraclimate_monthly__2023-01",
+      "source_id": "terraclimate_monthly",
+      "stage": "compute_checksum",
+      "task_id": "example_wave1_climate_stack"
+    },
+    {
+      "adapter": "static_http_range",
+      "cache_path": "cache/static_http_range/terraclimate_monthly/2023-01/97c4f45acff2.nc",
+      "dependencies": [
+        "example_wave1_climate_stack__terraclimate_monthly__2023-01__validate_http_status",
+        "example_wave1_climate_stack__terraclimate_monthly__2023-01__validate_byte_cap",
+        "example_wave1_climate_stack__terraclimate_monthly__2023-01__validate_magic",
+        "example_wave1_climate_stack__terraclimate_monthly__2023-01__validate_content_family",
+        "example_wave1_climate_stack__terraclimate_monthly__2023-01__compute_checksum"
+      ],
+      "deterministic_url": "https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_2023.nc",
+      "fixture_only": false,
+      "job_id": "example_wave1_climate_stack__terraclimate_monthly__2023-01__record_source_evidence",
+      "max_bytes": 65536,
+      "network_required": false,
+      "request_id": "example_wave1_climate_stack__terraclimate_monthly__2023-01",
+      "source_id": "terraclimate_monthly",
+      "stage": "record_source_evidence",
+      "task_id": "example_wave1_climate_stack"
+    },
+    {
+      "adapter": "static_http_range",
+      "cache_path": "cache/static_http_range/terraclimate_monthly/2023-01/97c4f45acff2.nc",
+      "dependencies": [],
+      "deterministic_url": "https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_2023.nc",
+      "fixture_only": false,
+      "job_id": "example_wave1_climate_stack__terraclimate_monthly__2023-01__resolve_request",
+      "max_bytes": 65536,
+      "network_required": false,
+      "request_id": "example_wave1_climate_stack__terraclimate_monthly__2023-01",
+      "source_id": "terraclimate_monthly",
+      "stage": "resolve_request",
+      "task_id": "example_wave1_climate_stack"
+    },
+    {
+      "adapter": "static_http_range",
+      "cache_path": "cache/static_http_range/terraclimate_monthly/2023-01/97c4f45acff2.nc",
+      "dependencies": [
+        "example_wave1_climate_stack__terraclimate_monthly__2023-01__bounded_fetch"
+      ],
+      "deterministic_url": "https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_2023.nc",
+      "fixture_only": false,
+      "job_id": "example_wave1_climate_stack__terraclimate_monthly__2023-01__validate_byte_cap",
+      "max_bytes": 65536,
+      "network_required": false,
+      "request_id": "example_wave1_climate_stack__terraclimate_monthly__2023-01",
+      "source_id": "terraclimate_monthly",
+      "stage": "validate_byte_cap",
+      "task_id": "example_wave1_climate_stack"
+    },
+    {
+      "adapter": "static_http_range",
+      "cache_path": "cache/static_http_range/terraclimate_monthly/2023-01/97c4f45acff2.nc",
+      "dependencies": [
+        "example_wave1_climate_stack__terraclimate_monthly__2023-01__bounded_fetch"
+      ],
+      "deterministic_url": "https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_2023.nc",
+      "fixture_only": false,
+      "job_id": "example_wave1_climate_stack__terraclimate_monthly__2023-01__validate_content_family",
+      "max_bytes": 65536,
+      "network_required": false,
+      "request_id": "example_wave1_climate_stack__terraclimate_monthly__2023-01",
+      "source_id": "terraclimate_monthly",
+      "stage": "validate_content_family",
+      "task_id": "example_wave1_climate_stack"
+    },
+    {
+      "adapter": "static_http_range",
+      "cache_path": "cache/static_http_range/terraclimate_monthly/2023-01/97c4f45acff2.nc",
+      "dependencies": [
+        "example_wave1_climate_stack__terraclimate_monthly__2023-01__bounded_fetch"
+      ],
+      "deterministic_url": "https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_2023.nc",
+      "fixture_only": false,
+      "job_id": "example_wave1_climate_stack__terraclimate_monthly__2023-01__validate_http_status",
+      "max_bytes": 65536,
+      "network_required": false,
+      "request_id": "example_wave1_climate_stack__terraclimate_monthly__2023-01",
+      "source_id": "terraclimate_monthly",
+      "stage": "validate_http_status",
+      "task_id": "example_wave1_climate_stack"
+    },
+    {
+      "adapter": "static_http_range",
+      "cache_path": "cache/static_http_range/terraclimate_monthly/2023-01/97c4f45acff2.nc",
+      "dependencies": [
+        "example_wave1_climate_stack__terraclimate_monthly__2023-01__bounded_fetch"
+      ],
+      "deterministic_url": "https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_2023.nc",
+      "fixture_only": false,
+      "job_id": "example_wave1_climate_stack__terraclimate_monthly__2023-01__validate_magic",
+      "max_bytes": 65536,
+      "network_required": false,
+      "request_id": "example_wave1_climate_stack__terraclimate_monthly__2023-01",
+      "source_id": "terraclimate_monthly",
+      "stage": "validate_magic",
+      "task_id": "example_wave1_climate_stack"
+    },
+    {
+      "adapter": "static_http_range",
+      "cache_path": "cache/static_http_range/worldclim_bioclim_normals/normals/8dc55e9390c5.zip",
+      "dependencies": [
+        "example_wave1_climate_stack__worldclim_bioclim_normals__normals__resolve_request"
+      ],
+      "deterministic_url": "https://geodata.ucdavis.edu/climate/worldclim/2_1/base/wc2.1_10m_prec.zip",
+      "fixture_only": false,
+      "job_id": "example_wave1_climate_stack__worldclim_bioclim_normals__normals__bounded_fetch",
+      "max_bytes": 65536,
+      "network_required": true,
+      "request_id": "example_wave1_climate_stack__worldclim_bioclim_normals__normals",
+      "source_id": "worldclim_bioclim_normals",
+      "stage": "bounded_fetch",
+      "task_id": "example_wave1_climate_stack"
+    },
+    {
+      "adapter": "static_http_range",
+      "cache_path": "cache/static_http_range/worldclim_bioclim_normals/normals/8dc55e9390c5.zip",
+      "dependencies": [
+        "example_wave1_climate_stack__worldclim_bioclim_normals__normals__bounded_fetch"
+      ],
+      "deterministic_url": "https://geodata.ucdavis.edu/climate/worldclim/2_1/base/wc2.1_10m_prec.zip",
+      "fixture_only": false,
+      "job_id": "example_wave1_climate_stack__worldclim_bioclim_normals__normals__compute_checksum",
+      "max_bytes": 65536,
+      "network_required": false,
+      "request_id": "example_wave1_climate_stack__worldclim_bioclim_normals__normals",
+      "source_id": "worldclim_bioclim_normals",
+      "stage": "compute_checksum",
+      "task_id": "example_wave1_climate_stack"
+    },
+    {
+      "adapter": "static_http_range",
+      "cache_path": "cache/static_http_range/worldclim_bioclim_normals/normals/8dc55e9390c5.zip",
+      "dependencies": [
+        "example_wave1_climate_stack__worldclim_bioclim_normals__normals__validate_http_status",
+        "example_wave1_climate_stack__worldclim_bioclim_normals__normals__validate_byte_cap",
+        "example_wave1_climate_stack__worldclim_bioclim_normals__normals__validate_magic",
+        "example_wave1_climate_stack__worldclim_bioclim_normals__normals__validate_content_family",
+        "example_wave1_climate_stack__worldclim_bioclim_normals__normals__compute_checksum"
+      ],
+      "deterministic_url": "https://geodata.ucdavis.edu/climate/worldclim/2_1/base/wc2.1_10m_prec.zip",
+      "fixture_only": false,
+      "job_id": "example_wave1_climate_stack__worldclim_bioclim_normals__normals__record_source_evidence",
+      "max_bytes": 65536,
+      "network_required": false,
+      "request_id": "example_wave1_climate_stack__worldclim_bioclim_normals__normals",
+      "source_id": "worldclim_bioclim_normals",
+      "stage": "record_source_evidence",
+      "task_id": "example_wave1_climate_stack"
+    },
+    {
+      "adapter": "static_http_range",
+      "cache_path": "cache/static_http_range/worldclim_bioclim_normals/normals/8dc55e9390c5.zip",
+      "dependencies": [],
+      "deterministic_url": "https://geodata.ucdavis.edu/climate/worldclim/2_1/base/wc2.1_10m_prec.zip",
+      "fixture_only": false,
+      "job_id": "example_wave1_climate_stack__worldclim_bioclim_normals__normals__resolve_request",
+      "max_bytes": 65536,
+      "network_required": false,
+      "request_id": "example_wave1_climate_stack__worldclim_bioclim_normals__normals",
+      "source_id": "worldclim_bioclim_normals",
+      "stage": "resolve_request",
+      "task_id": "example_wave1_climate_stack"
+    },
+    {
+      "adapter": "static_http_range",
+      "cache_path": "cache/static_http_range/worldclim_bioclim_normals/normals/8dc55e9390c5.zip",
+      "dependencies": [
+        "example_wave1_climate_stack__worldclim_bioclim_normals__normals__bounded_fetch"
+      ],
+      "deterministic_url": "https://geodata.ucdavis.edu/climate/worldclim/2_1/base/wc2.1_10m_prec.zip",
+      "fixture_only": false,
+      "job_id": "example_wave1_climate_stack__worldclim_bioclim_normals__normals__validate_byte_cap",
+      "max_bytes": 65536,
+      "network_required": false,
+      "request_id": "example_wave1_climate_stack__worldclim_bioclim_normals__normals",
+      "source_id": "worldclim_bioclim_normals",
+      "stage": "validate_byte_cap",
+      "task_id": "example_wave1_climate_stack"
+    },
+    {
+      "adapter": "static_http_range",
+      "cache_path": "cache/static_http_range/worldclim_bioclim_normals/normals/8dc55e9390c5.zip",
+      "dependencies": [
+        "example_wave1_climate_stack__worldclim_bioclim_normals__normals__bounded_fetch"
+      ],
+      "deterministic_url": "https://geodata.ucdavis.edu/climate/worldclim/2_1/base/wc2.1_10m_prec.zip",
+      "fixture_only": false,
+      "job_id": "example_wave1_climate_stack__worldclim_bioclim_normals__normals__validate_content_family",
+      "max_bytes": 65536,
+      "network_required": false,
+      "request_id": "example_wave1_climate_stack__worldclim_bioclim_normals__normals",
+      "source_id": "worldclim_bioclim_normals",
+      "stage": "validate_content_family",
+      "task_id": "example_wave1_climate_stack"
+    },
+    {
+      "adapter": "static_http_range",
+      "cache_path": "cache/static_http_range/worldclim_bioclim_normals/normals/8dc55e9390c5.zip",
+      "dependencies": [
+        "example_wave1_climate_stack__worldclim_bioclim_normals__normals__bounded_fetch"
+      ],
+      "deterministic_url": "https://geodata.ucdavis.edu/climate/worldclim/2_1/base/wc2.1_10m_prec.zip",
+      "fixture_only": false,
+      "job_id": "example_wave1_climate_stack__worldclim_bioclim_normals__normals__validate_http_status",
+      "max_bytes": 65536,
+      "network_required": false,
+      "request_id": "example_wave1_climate_stack__worldclim_bioclim_normals__normals",
+      "source_id": "worldclim_bioclim_normals",
+      "stage": "validate_http_status",
+      "task_id": "example_wave1_climate_stack"
+    },
+    {
+      "adapter": "static_http_range",
+      "cache_path": "cache/static_http_range/worldclim_bioclim_normals/normals/8dc55e9390c5.zip",
+      "dependencies": [
+        "example_wave1_climate_stack__worldclim_bioclim_normals__normals__bounded_fetch"
+      ],
+      "deterministic_url": "https://geodata.ucdavis.edu/climate/worldclim/2_1/base/wc2.1_10m_prec.zip",
+      "fixture_only": false,
+      "job_id": "example_wave1_climate_stack__worldclim_bioclim_normals__normals__validate_magic",
+      "max_bytes": 65536,
+      "network_required": false,
+      "request_id": "example_wave1_climate_stack__worldclim_bioclim_normals__normals",
+      "source_id": "worldclim_bioclim_normals",
+      "stage": "validate_magic",
+      "task_id": "example_wave1_climate_stack"
+    }
+  ]
+}

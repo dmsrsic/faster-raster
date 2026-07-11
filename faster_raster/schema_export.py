@@ -10,6 +10,10 @@ SCHEMA_FILENAMES = [
     "acquisition_manifest_row.schema.json",
     "harmonization_plan.schema.json",
     "inspect_contract_report.schema.json",
+    "unified_acquisition_manifest_row.schema.json",
+    "task_compile_report.schema.json",
+    "execution_dag.schema.json",
+    "system_grade.schema.json",
 ]
 
 
@@ -371,6 +375,131 @@ def inspect_contract_report_schema() -> dict:
     }
 
 
+def unified_acquisition_manifest_row_schema() -> dict:
+    required = [
+        "request_id",
+        "task_id",
+        "source_id",
+        "adapter",
+        "acquisition_mode",
+        "source_classification",
+        "execution_status",
+        "url_sha256",
+        "request_method",
+        "request_headers_redacted",
+        "temporal_key",
+        "spatial_key",
+        "expected_content_family",
+        "expected_magic",
+        "expected_format",
+        "bounded_request",
+        "credential_required",
+        "fixture_only",
+        "network_required",
+        "checksum_policy",
+        "validation_steps",
+        "harmonization_readiness",
+    ]
+    return {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "title": "FasterRaster v0.7 unified acquisition manifest row",
+        "type": "object",
+        "additionalProperties": True,
+        "required": required,
+        "properties": {
+            "request_id": string_schema(),
+            "task_id": string_schema(),
+            "source_id": string_schema(),
+            "adapter": string_schema(enum=["arcgis_imageserver", "generic_https_template", "static_http_range", "stac_metadata"]),
+            "acquisition_mode": string_schema(),
+            "source_classification": string_schema(enum=["runnable", "fixture_only"]),
+            "execution_status": string_schema(),
+            "deterministic_url": {"type": ["string", "null"]},
+            "url_sha256": string_schema(),
+            "request_method": string_schema(),
+            "request_headers_redacted": {"type": "object"},
+            "temporal_key": string_schema(),
+            "spatial_key": string_schema(),
+            "expected_content_family": {},
+            "expected_magic": {},
+            "expected_format": string_schema(),
+            "max_bytes": {"type": ["integer", "null"]},
+            "bounded_request": {"type": "boolean"},
+            "credential_required": {"type": "boolean"},
+            "auth_profile": {"type": ["string", "null"]},
+            "fixture_only": {"type": "boolean"},
+            "network_required": {"type": "boolean"},
+            "checksum_policy": string_schema(),
+            "validation_steps": {"type": "array", "items": string_schema()},
+            "harmonization_readiness": string_schema(),
+        },
+    }
+
+
+def task_compile_report_schema() -> dict:
+    return {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "title": "FasterRaster v0.7 task compile report",
+        "type": "object",
+        "additionalProperties": True,
+        "required": [
+            "task_id",
+            "manifest_row_count",
+            "executable_request_count",
+            "fixture_request_count",
+            "validation_status",
+            "determinism_status",
+            "acquisition_manifest_sha256",
+            "compile_report_contract_sha256",
+        ],
+        "properties": {
+            "task_id": string_schema(),
+            "validation_status": string_schema(enum=["PASS", "FAIL"]),
+            "determinism_status": string_schema(enum=["PASS", "FAIL"]),
+            "manifest_row_count": integer_schema(),
+            "request_count": integer_schema(),
+            "executable_request_count": integer_schema(),
+            "fixture_request_count": integer_schema(),
+            "acquisition_manifest_sha256": string_schema(),
+            "compile_report_contract_sha256": string_schema(),
+        },
+    }
+
+
+def execution_dag_schema() -> dict:
+    return {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "title": "FasterRaster v0.7 execution DAG",
+        "type": "object",
+        "additionalProperties": True,
+        "required": ["status", "job_count", "dependency_count", "stage_counts", "errors"],
+        "properties": {
+            "status": string_schema(enum=["PASS", "FAIL"]),
+            "job_count": integer_schema(),
+            "dependency_count": integer_schema(),
+            "stage_counts": {"type": "object"},
+            "errors": {"type": "array", "items": string_schema()},
+        },
+    }
+
+
+def system_grade_schema() -> dict:
+    return {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "title": "FasterRaster v0.7 system grade",
+        "type": "object",
+        "additionalProperties": True,
+        "required": ["overall_score", "overall_grade", "blocking_failures", "safety_score", "release_decision"],
+        "properties": {
+            "overall_score": number_schema(),
+            "overall_grade": string_schema(),
+            "blocking_failures": {"type": "array", "items": string_schema()},
+            "safety_score": integer_schema(),
+            "release_decision": string_schema(enum=["release_ready", "release_ready_with_cautions", "hold_release"]),
+        },
+    }
+
+
 def all_schemas() -> dict[str, dict]:
     return {
         "research_spec.schema.json": research_spec_schema(),
@@ -378,6 +507,10 @@ def all_schemas() -> dict[str, dict]:
         "acquisition_manifest_row.schema.json": acquisition_manifest_row_schema(),
         "harmonization_plan.schema.json": harmonization_plan_schema(),
         "inspect_contract_report.schema.json": inspect_contract_report_schema(),
+        "unified_acquisition_manifest_row.schema.json": unified_acquisition_manifest_row_schema(),
+        "task_compile_report.schema.json": task_compile_report_schema(),
+        "execution_dag.schema.json": execution_dag_schema(),
+        "system_grade.schema.json": system_grade_schema(),
     }
 
 

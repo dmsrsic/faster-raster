@@ -92,6 +92,20 @@ Task previews are static local PNG artifacts. They do not download rasters, cont
 
 See `docs/DATA_TASK_BUILDER.md` for the local data task and semantic stack preview workflow.
 
+## v0.7 Task compile, package, and grade
+
+```bash
+faster-raster task validate example_wave1_climate_stack --plain
+faster-raster task compile example_wave1_climate_stack --plain
+faster-raster task compile example_wave1_climate_stack --max-bytes-per-source 65536 --plain
+faster-raster task inspect-compile example_wave1_climate_stack --plain
+faster-raster task package example_wave1_climate_stack --plain
+faster-raster grade system --plain
+faster-raster grade task example_wave1_climate_stack --plain
+```
+
+These commands write deterministic planning and scheduler artifacts only. They do not fetch data, run jobs, decode rasters, extract archives, or contact Sentinel services.
+
 ## Real-data preview dry run
 
 ```bash

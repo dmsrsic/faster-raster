@@ -1,0 +1,48 @@
+{
+  "network_run": false,
+  "request_validation_steps": {
+    "example_wave1_climate_stack__chirps_daily_precipitation__20230101": [
+      "validate_http_status",
+      "validate_byte_cap",
+      "validate_magic",
+      "validate_content_family",
+      "compute_sha256",
+      "record_range_behavior"
+    ],
+    "example_wave1_climate_stack__gridmet_daily__20230101": [
+      "validate_http_status",
+      "validate_byte_cap",
+      "validate_magic",
+      "validate_content_family",
+      "compute_sha256",
+      "record_range_behavior"
+    ],
+    "example_wave1_climate_stack__prism_daily_ppt_static_zip__20230101": [],
+    "example_wave1_climate_stack__terraclimate_monthly__2023-01": [
+      "validate_http_status",
+      "validate_byte_cap",
+      "validate_magic",
+      "validate_content_family",
+      "compute_sha256",
+      "record_range_behavior"
+    ],
+    "example_wave1_climate_stack__worldclim_bioclim_normals__normals": [
+      "validate_http_status",
+      "validate_byte_cap",
+      "validate_magic",
+      "validate_content_family",
+      "compute_sha256",
+      "record_range_behavior"
+    ]
+  },
+  "stages": [
+    "validate_task",
+    "resolve_sources",
+    "validate_adapter_contract",
+    "validate_manifest_rows",
+    "validate_fixture_rows",
+    "validate_no_credentials"
+  ],
+  "status": "PASS",
+  "task_id": "example_wave1_climate_stack"
+}

@@ -1,0 +1,57 @@
+{
+  "cache_plan_version": "0.7.0",
+  "entries": [
+    {
+      "bounded_probe_only": true,
+      "cache_path": "cache/static_http_range/chirps_daily_precipitation/20230101/3009598c9e96.gz",
+      "checksum_algorithm": "sha256",
+      "eviction_class": "bounded_probe_evidence",
+      "extension": ".gz",
+      "full_object_expected": false,
+      "max_bytes": 65536,
+      "overwrite_policy": "content_addressed",
+      "request_id": "example_wave1_climate_stack__chirps_daily_precipitation__20230101",
+      "resume_supported": false,
+      "source_id": "chirps_daily_precipitation"
+    },
+    {
+      "bounded_probe_only": true,
+      "cache_path": "cache/static_http_range/gridmet_daily/20230101/52426a4173c8.nc",
+      "checksum_algorithm": "sha256",
+      "eviction_class": "bounded_probe_evidence",
+      "extension": ".nc",
+      "full_object_expected": false,
+      "max_bytes": 65536,
+      "overwrite_policy": "content_addressed",
+      "request_id": "example_wave1_climate_stack__gridmet_daily__20230101",
+      "resume_supported": false,
+      "source_id": "gridmet_daily"
+    },
+    {
+      "bounded_probe_only": true,
+      "cache_path": "cache/static_http_range/terraclimate_monthly/2023-01/97c4f45acff2.nc",
+      "checksum_algorithm": "sha256",
+      "eviction_class": "bounded_probe_evidence",
+      "extension": ".nc",
+      "full_object_expected": false,
+      "max_bytes": 65536,
+      "overwrite_policy": "content_addressed",
+      "request_id": "example_wave1_climate_stack__terraclimate_monthly__2023-01",
+      "resume_supported": false,
+      "source_id": "terraclimate_monthly"
+    },
+    {
+      "bounded_probe_only": true,
+      "cache_path": "cache/static_http_range/worldclim_bioclim_normals/normals/8dc55e9390c5.zip",
+      "checksum_algorithm": "sha256",
+      "eviction_class": "bounded_probe_evidence",
+      "extension": ".zip",
+      "full_object_expected": false,
+      "max_bytes": 65536,
+      "overwrite_policy": "content_addressed",
+      "request_id": "example_wave1_climate_stack__worldclim_bioclim_normals__normals",
+      "resume_supported": false,
+      "source_id": "worldclim_bioclim_normals"
+    }
+  ]
+}

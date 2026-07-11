@@ -1,0 +1,49 @@
+{
+  "classifications": [
+    {
+      "classification": "credential_required",
+      "condition": "HTTP 401/403"
+    },
+    {
+      "classification": "source_unavailable",
+      "condition": "HTTP 404"
+    },
+    {
+      "classification": "validation_failure",
+      "condition": "content family mismatch"
+    },
+    {
+      "classification": "validation_failure",
+      "condition": "empty response"
+    },
+    {
+      "classification": "fixture_only_non_error",
+      "condition": "fixture-only source"
+    },
+    {
+      "classification": "validation_failure",
+      "condition": "magic mismatch"
+    },
+    {
+      "classification": "fatal_contract_error",
+      "condition": "response exceeds byte cap"
+    },
+    {
+      "classification": "validation_failure",
+      "condition": "server ignores Range"
+    },
+    {
+      "classification": "retryable_transport",
+      "condition": "timeout"
+    },
+    {
+      "classification": "retryable_transport",
+      "condition": "transient HTTP 429/5xx"
+    },
+    {
+      "classification": "unsupported_downstream_stage",
+      "condition": "unsupported decoder"
+    }
+  ],
+  "failure_policy_version": "0.7.0"
+}

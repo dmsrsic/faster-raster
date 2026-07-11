@@ -1,0 +1,17 @@
+{
+  "dependency_count": 44,
+  "errors": [],
+  "job_count": 33,
+  "stage_counts": {
+    "bounded_fetch": 4,
+    "compute_checksum": 4,
+    "record_fixture_evidence": 1,
+    "record_source_evidence": 4,
+    "resolve_request": 4,
+    "validate_byte_cap": 4,
+    "validate_content_family": 4,
+    "validate_http_status": 4,
+    "validate_magic": 4
+  },
+  "status": "PASS"
+}

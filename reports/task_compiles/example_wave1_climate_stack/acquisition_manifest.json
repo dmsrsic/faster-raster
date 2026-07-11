@@ -1,0 +1,249 @@
+{
+  "rows": [
+    {
+      "acquisition_mode": "bounded_http_range",
+      "adapter": "static_http_range",
+      "auth_profile": null,
+      "bounded_probe_only": true,
+      "bounded_request": true,
+      "checksum_policy": "compute_after_fetch",
+      "container": "gzip",
+      "credential_required": false,
+      "deterministic_url": "https://data.chc.ucsb.edu/products/CHIRPS-2.0/global_daily/tifs/p05/2023/chirps-v2.0.2023.01.01.tif.gz",
+      "execution_status": "planned_executable",
+      "expected_content_family": "gzip",
+      "expected_format": "geotiff.gz",
+      "expected_inner_format": "geotiff",
+      "expected_magic": "gzip",
+      "fixture_only": false,
+      "full_object_expected": false,
+      "harmonization_readiness": "requires_decompression_and_raster_decode",
+      "max_bytes": 65536,
+      "network_required": true,
+      "provenance": {
+        "config": "/home/dmsrsic/raster-work/faster-raster/configs/static_http_range_wave1.yaml",
+        "container": "gzip",
+        "expected_inner_format": "geotiff",
+        "planning_index": 0
+      },
+      "request_headers_redacted": {
+        "Range": "bytes=0-65535"
+      },
+      "request_id": "example_wave1_climate_stack__chirps_daily_precipitation__20230101",
+      "request_method": "GET",
+      "source_classification": "runnable",
+      "source_id": "chirps_daily_precipitation",
+      "spatial_key": "EPSG:4326:-83.2,39.8,-83.19,39.81",
+      "task_id": "example_wave1_climate_stack",
+      "temporal_key": "20230101",
+      "url_sha256": "3009598c9e9639b312b893cb454a5bf68e2e4a73d572380995fff129a4486a94",
+      "validation_steps": [
+        "validate_http_status",
+        "validate_byte_cap",
+        "validate_magic",
+        "validate_content_family",
+        "compute_sha256",
+        "record_range_behavior"
+      ],
+      "warnings": []
+    },
+    {
+      "acquisition_mode": "bounded_http_range",
+      "adapter": "static_http_range",
+      "auth_profile": null,
+      "bounded_probe_only": true,
+      "bounded_request": true,
+      "checksum_policy": "compute_after_fetch",
+      "container": "hdf5_netcdf4",
+      "credential_required": false,
+      "deterministic_url": "https://www.northwestknowledge.net/metdata/data/pr_2023.nc",
+      "execution_status": "planned_executable",
+      "expected_content_family": [
+        "netcdf",
+        "hdf5"
+      ],
+      "expected_format": "netcdf",
+      "expected_inner_format": null,
+      "expected_magic": [
+        "netcdf",
+        "hdf5"
+      ],
+      "fixture_only": false,
+      "full_object_expected": false,
+      "harmonization_readiness": "requires_netcdf_variable_selection",
+      "max_bytes": 65536,
+      "network_required": true,
+      "provenance": {
+        "config": "/home/dmsrsic/raster-work/faster-raster/configs/static_http_range_wave1.yaml",
+        "container": "hdf5_netcdf4",
+        "expected_inner_format": null,
+        "planning_index": 1
+      },
+      "request_headers_redacted": {
+        "Range": "bytes=0-65535"
+      },
+      "request_id": "example_wave1_climate_stack__gridmet_daily__20230101",
+      "request_method": "GET",
+      "source_classification": "runnable",
+      "source_id": "gridmet_daily",
+      "spatial_key": "EPSG:4326:-83.2,39.8,-83.19,39.81",
+      "task_id": "example_wave1_climate_stack",
+      "temporal_key": "20230101",
+      "url_sha256": "52426a4173c8d3588e27964c46d958d738eb7e0df5821264a88ead3a133f118f",
+      "validation_steps": [
+        "validate_http_status",
+        "validate_byte_cap",
+        "validate_magic",
+        "validate_content_family",
+        "compute_sha256",
+        "record_range_behavior"
+      ],
+      "warnings": []
+    },
+    {
+      "acquisition_mode": "historical_contract_fixture",
+      "adapter": "static_http_range",
+      "auth_profile": null,
+      "bounded_probe_only": true,
+      "bounded_request": false,
+      "checksum_policy": "historical_evidence_only",
+      "container": "zip",
+      "credential_required": false,
+      "deterministic_url": null,
+      "execution_status": "non_executable_fixture",
+      "expected_content_family": "zip",
+      "expected_format": "zip",
+      "expected_inner_format": null,
+      "expected_magic": "zip",
+      "fixture_only": true,
+      "full_object_expected": false,
+      "harmonization_readiness": "fixture_only_endpoint_resolution_required",
+      "max_bytes": null,
+      "network_required": false,
+      "provenance": {
+        "config": "/home/dmsrsic/raster-work/faster-raster/configs/static_http_range_wave1.yaml",
+        "container": "zip",
+        "current_endpoint_status": "unresolved_or_stale",
+        "expected_inner_format": null,
+        "historical_bytes_read": 65536,
+        "historical_detected_magic": "zip",
+        "historical_http_status": 206,
+        "historical_sha256_short": "cc89306d4d5b",
+        "planning_index": 4
+      },
+      "request_headers_redacted": {},
+      "request_id": "example_wave1_climate_stack__prism_daily_ppt_static_zip__20230101",
+      "request_method": "GET",
+      "source_classification": "fixture_only",
+      "source_id": "prism_daily_ppt_static_zip",
+      "spatial_key": "EPSG:4326:-83.2,39.8,-83.19,39.81",
+      "task_id": "example_wave1_climate_stack",
+      "temporal_key": "20230101",
+      "url_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validation_steps": [],
+      "warnings": [
+        "fixture-only source; no fetch job generated"
+      ]
+    },
+    {
+      "acquisition_mode": "bounded_http_range",
+      "adapter": "static_http_range",
+      "auth_profile": null,
+      "bounded_probe_only": true,
+      "bounded_request": true,
+      "checksum_policy": "compute_after_fetch",
+      "container": "hdf5_netcdf4",
+      "credential_required": false,
+      "deterministic_url": "https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_2023.nc",
+      "execution_status": "planned_executable",
+      "expected_content_family": [
+        "netcdf",
+        "hdf5"
+      ],
+      "expected_format": "netcdf",
+      "expected_inner_format": null,
+      "expected_magic": [
+        "netcdf",
+        "hdf5"
+      ],
+      "fixture_only": false,
+      "full_object_expected": false,
+      "harmonization_readiness": "requires_netcdf_variable_selection",
+      "max_bytes": 65536,
+      "network_required": true,
+      "provenance": {
+        "config": "/home/dmsrsic/raster-work/faster-raster/configs/static_http_range_wave1.yaml",
+        "container": "hdf5_netcdf4",
+        "expected_inner_format": null,
+        "planning_index": 2
+      },
+      "request_headers_redacted": {
+        "Range": "bytes=0-65535"
+      },
+      "request_id": "example_wave1_climate_stack__terraclimate_monthly__2023-01",
+      "request_method": "GET",
+      "source_classification": "runnable",
+      "source_id": "terraclimate_monthly",
+      "spatial_key": "EPSG:4326:-83.2,39.8,-83.19,39.81",
+      "task_id": "example_wave1_climate_stack",
+      "temporal_key": "2023-01",
+      "url_sha256": "97c4f45acff2023d3bce43fd05a15616e95796672c2723910e7d0dcb98e9d01f",
+      "validation_steps": [
+        "validate_http_status",
+        "validate_byte_cap",
+        "validate_magic",
+        "validate_content_family",
+        "compute_sha256",
+        "record_range_behavior"
+      ],
+      "warnings": []
+    },
+    {
+      "acquisition_mode": "bounded_http_range",
+      "adapter": "static_http_range",
+      "auth_profile": null,
+      "bounded_probe_only": true,
+      "bounded_request": true,
+      "checksum_policy": "compute_after_fetch",
+      "container": "zip",
+      "credential_required": false,
+      "deterministic_url": "https://geodata.ucdavis.edu/climate/worldclim/2_1/base/wc2.1_10m_prec.zip",
+      "execution_status": "planned_executable",
+      "expected_content_family": "zip",
+      "expected_format": "zip",
+      "expected_inner_format": null,
+      "expected_magic": "zip",
+      "fixture_only": false,
+      "full_object_expected": false,
+      "harmonization_readiness": "requires_archive_member_resolution",
+      "max_bytes": 65536,
+      "network_required": true,
+      "provenance": {
+        "config": "/home/dmsrsic/raster-work/faster-raster/configs/static_http_range_wave1.yaml",
+        "container": "zip",
+        "expected_inner_format": null,
+        "planning_index": 3
+      },
+      "request_headers_redacted": {
+        "Range": "bytes=0-65535"
+      },
+      "request_id": "example_wave1_climate_stack__worldclim_bioclim_normals__normals",
+      "request_method": "GET",
+      "source_classification": "runnable",
+      "source_id": "worldclim_bioclim_normals",
+      "spatial_key": "EPSG:4326:-83.2,39.8,-83.19,39.81",
+      "task_id": "example_wave1_climate_stack",
+      "temporal_key": "normals",
+      "url_sha256": "8dc55e9390c58bbb6d64d707056386dab46f860ffcb03df1c2d8c32029155802",
+      "validation_steps": [
+        "validate_http_status",
+        "validate_byte_cap",
+        "validate_magic",
+        "validate_content_family",
+        "compute_sha256",
+        "record_range_behavior"
+      ],
+      "warnings": []
+    }
+  ]
+}

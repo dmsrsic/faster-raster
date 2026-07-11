@@ -1,0 +1,40 @@
+{
+  "adapter_counts": {
+    "static_http_range": 5
+  },
+  "cache_plan_sha256": "18a81049abbf02ff878bc93c41c809770f770fbc822250fc6d449c42ee69dbb5",
+  "dag_sha256": "c34dcf4760c793584dc2073223cecd8841effa579b86adfb09c5a1dbf8aed3c0",
+  "dag_validation_status": "PASS",
+  "dependency_count": 44,
+  "executable_request_count": 4,
+  "execution_package_contract_sha256": "6a08115f26f17e89b3347852ecd7f43b7c4607c57821e081959e9f82d171e3ed",
+  "failure_policy_sha256": "f21b33e44e06ac8e9e47da9a812583f92adb2d83c00ccd323f5bf2bc35484be3",
+  "fixture_request_count": 1,
+  "jobs_sha256": "5a6c3697a569723b7875572aec5890d816e99a099ce5f620fdf6cf2c26f69f22",
+  "manifest_sha256": "e99b0a3fd94756f3f9e58db63ee4fc79bc8da1707bcd33b6ae22f8ba2c1c5c85",
+  "package_id": "fr_v07_b9aaeb7e827f2a56",
+  "package_sha256": "6a08115f26f17e89b3347852ecd7f43b7c4607c57821e081959e9f82d171e3ed",
+  "package_version": "0.7.0",
+  "request_count": 5,
+  "source_counts": {
+    "chirps_daily_precipitation": 1,
+    "gridmet_daily": 1,
+    "prism_daily_ppt_static_zip": 1,
+    "terraclimate_monthly": 1,
+    "worldclim_bioclim_normals": 1
+  },
+  "stage_counts": {
+    "bounded_fetch": 4,
+    "compute_checksum": 4,
+    "record_fixture_evidence": 1,
+    "record_source_evidence": 4,
+    "resolve_request": 4,
+    "validate_byte_cap": 4,
+    "validate_content_family": 4,
+    "validate_http_status": 4,
+    "validate_magic": 4
+  },
+  "task_id": "example_wave1_climate_stack",
+  "total_job_count": 33,
+  "validation_status": "PASS"
+}

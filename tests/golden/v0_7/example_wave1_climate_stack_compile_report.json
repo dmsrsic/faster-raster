@@ -1,0 +1,28 @@
+{
+  "acquisition_manifest_sha256": "e99b0a3fd94756f3f9e58db63ee4fc79bc8da1707bcd33b6ae22f8ba2c1c5c85",
+  "adapter_counts": {
+    "static_http_range": 5
+  },
+  "compile_report_contract_sha256": "e2c60877f1456a4781ec11db554d29536b597e03b4e8905191ade2f08253bd26",
+  "determinism_status": "PASS",
+  "executable_request_count": 4,
+  "fixture_request_count": 1,
+  "manifest_row_count": 5,
+  "network_run": false,
+  "package_version": "0.7.0",
+  "request_count": 5,
+  "source_counts": {
+    "chirps_daily_precipitation": 1,
+    "gridmet_daily": 1,
+    "prism_daily_ppt_static_zip": 1,
+    "terraclimate_monthly": 1,
+    "worldclim_bioclim_normals": 1
+  },
+  "source_resolution_sha256": "b18b0087b66ba3442827eb989b0bc770fb862a8d2355abbea980adadfdec318e",
+  "task_id": "example_wave1_climate_stack",
+  "validation_plan_sha256": "73c92c8f9e73ba514d47225095c4c833798cd2aab51ce96acb4b9b45f30e99ef",
+  "validation_status": "PASS",
+  "warnings": [
+    "fixture-only source; no fetch job generated"
+  ]
+}

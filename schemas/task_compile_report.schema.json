@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "acquisition_manifest_sha256": {
+      "type": "string"
+    },
+    "compile_report_contract_sha256": {
+      "type": "string"
+    },
+    "determinism_status": {
+      "enum": [
+        "PASS",
+        "FAIL"
+      ],
+      "type": "string"
+    },
+    "executable_request_count": {
+      "type": "integer"
+    },
+    "fixture_request_count": {
+      "type": "integer"
+    },
+    "manifest_row_count": {
+      "type": "integer"
+    },
+    "request_count": {
+      "type": "integer"
+    },
+    "task_id": {
+      "type": "string"
+    },
+    "validation_status": {
+      "enum": [
+        "PASS",
+        "FAIL"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "task_id",
+    "manifest_row_count",
+    "executable_request_count",
+    "fixture_request_count",
+    "validation_status",
+    "determinism_status",
+    "acquisition_manifest_sha256",
+    "compile_report_contract_sha256"
+  ],
+  "title": "FasterRaster v0.7 task compile report",
+  "type": "object"
+}
