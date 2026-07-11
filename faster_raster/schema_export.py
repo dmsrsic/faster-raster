@@ -13,6 +13,11 @@ SCHEMA_FILENAMES = [
     "unified_acquisition_manifest_row.schema.json",
     "task_compile_report.schema.json",
     "execution_dag.schema.json",
+    "run_plan.schema.json",
+    "job_receipt.schema.json",
+    "run_receipt.schema.json",
+    "source_evidence.schema.json",
+    "receipt_verification.schema.json",
     "system_grade.schema.json",
 ]
 
@@ -484,18 +489,208 @@ def execution_dag_schema() -> dict:
 
 
 def system_grade_schema() -> dict:
+    required = [
+        "overall_score",
+        "overall_grade",
+        "blocking_failures",
+        "safety_score",
+        "release_decision",
+        "local_execution_score",
+        "run_receipt_score",
+        "latest_run_receipt_present",
+        "latest_run_receipt_valid",
+        "local_run_status",
+        "local_successful_source_count",
+        "local_failed_source_count",
+        "local_fixture_source_count",
+    ]
     return {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
-        "title": "FasterRaster v0.7 system grade",
+        "title": "FasterRaster v0.8 system grade",
         "type": "object",
         "additionalProperties": True,
-        "required": ["overall_score", "overall_grade", "blocking_failures", "safety_score", "release_decision"],
+        "required": required,
         "properties": {
             "overall_score": number_schema(),
             "overall_grade": string_schema(),
             "blocking_failures": {"type": "array", "items": string_schema()},
             "safety_score": integer_schema(),
             "release_decision": string_schema(enum=["release_ready", "release_ready_with_cautions", "hold_release"]),
+            "local_execution_score": integer_schema(),
+            "run_receipt_score": integer_schema(),
+            "latest_run_receipt_present": {"type": "boolean"},
+            "latest_run_receipt_valid": {"type": "boolean"},
+            "local_run_status": {"type": ["string", "null"]},
+            "local_successful_source_count": integer_schema(),
+            "local_failed_source_count": integer_schema(),
+            "local_fixture_source_count": integer_schema(),
+        },
+    }
+
+
+def run_plan_schema() -> dict:
+    required = [
+        "task_id",
+        "package_id",
+        "package_version",
+        "package_sha256",
+        "manifest_sha256",
+        "dag_sha256",
+        "run_plan_contract_sha256",
+        "planned_job_count",
+        "planned_network_job_count",
+        "planned_fixture_job_count",
+        "max_bytes_per_source",
+        "max_total_bytes",
+        "network_required",
+        "network_allowed",
+    ]
+    return {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "title": "FasterRaster v0.8 run plan",
+        "type": "object",
+        "additionalProperties": True,
+        "required": required,
+        "properties": {
+            "task_id": string_schema(),
+            "package_id": string_schema(),
+            "package_version": string_schema(),
+            "package_sha256": string_schema(),
+            "manifest_sha256": string_schema(),
+            "dag_sha256": string_schema(),
+            "run_plan_contract_sha256": string_schema(),
+            "planned_job_count": integer_schema(),
+            "planned_network_job_count": integer_schema(),
+            "planned_fixture_job_count": integer_schema(),
+            "max_bytes_per_source": integer_schema(),
+            "max_total_bytes": integer_schema(),
+            "network_required": {"type": "boolean"},
+            "network_allowed": {"type": "boolean"},
+        },
+    }
+
+
+def job_receipt_schema() -> dict:
+    required = [
+        "job_id",
+        "request_id",
+        "task_id",
+        "source_id",
+        "adapter",
+        "stage",
+        "status",
+        "dependencies",
+        "dependency_statuses",
+        "network_attempted",
+        "input_contract_sha256",
+        "output_contract_sha256",
+        "credentials_used",
+        "authorization_redacted",
+    ]
+    return {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "title": "FasterRaster v0.8 job receipt",
+        "type": "object",
+        "additionalProperties": True,
+        "required": required,
+        "properties": {
+            "job_id": string_schema(),
+            "request_id": {"type": ["string", "null"]},
+            "task_id": string_schema(),
+            "source_id": {"type": ["string", "null"]},
+            "adapter": {"type": ["string", "null"]},
+            "stage": string_schema(),
+            "status": string_schema(enum=["pending", "running", "succeeded", "failed", "skipped_dependency_failed", "skipped_network_disabled", "fixture_recorded", "cache_hit", "unsupported"]),
+            "dependencies": {"type": "array", "items": string_schema()},
+            "dependency_statuses": {"type": "object"},
+            "network_attempted": {"type": "boolean"},
+            "input_contract_sha256": string_schema(),
+            "output_contract_sha256": string_schema(),
+            "credentials_used": {"type": "boolean"},
+            "authorization_redacted": {"type": "boolean"},
+        },
+    }
+
+
+def run_receipt_schema() -> dict:
+    required = [
+        "run_id",
+        "task_id",
+        "package_id",
+        "package_version",
+        "package_sha256",
+        "manifest_sha256",
+        "dag_sha256",
+        "run_plan_contract_sha256",
+        "receipt_contract_sha256",
+        "run_status",
+        "allow_network",
+        "max_bytes_per_source",
+        "max_total_bytes",
+        "planned_job_count",
+        "job_receipt_count",
+        "safety_event_count",
+        "all_byte_caps_respected",
+        "credentials_used",
+        "authorization_headers_present",
+    ]
+    return {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "title": "FasterRaster v0.8 run receipt",
+        "type": "object",
+        "additionalProperties": True,
+        "required": required,
+        "properties": {
+            "run_id": string_schema(),
+            "task_id": string_schema(),
+            "package_id": string_schema(),
+            "package_version": string_schema(),
+            "package_sha256": string_schema(),
+            "manifest_sha256": string_schema(),
+            "dag_sha256": string_schema(),
+            "run_plan_contract_sha256": string_schema(),
+            "receipt_contract_sha256": string_schema(),
+            "run_status": string_schema(enum=["planned", "completed", "completed_with_warnings", "failed", "blocked_policy"]),
+            "allow_network": {"type": "boolean"},
+            "max_bytes_per_source": integer_schema(),
+            "max_total_bytes": integer_schema(),
+            "planned_job_count": integer_schema(),
+            "job_receipt_count": integer_schema(),
+            "safety_event_count": integer_schema(),
+            "all_byte_caps_respected": {"type": "boolean"},
+            "credentials_used": {"type": "boolean"},
+            "authorization_headers_present": {"type": "boolean"},
+        },
+    }
+
+
+def source_evidence_schema() -> dict:
+    return {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "title": "FasterRaster v0.8 source evidence",
+        "type": "object",
+        "additionalProperties": True,
+        "required": ["task_id", "run_id", "sources"],
+        "properties": {
+            "task_id": string_schema(),
+            "run_id": string_schema(),
+            "sources": {"type": "array", "items": {"type": "object", "additionalProperties": True}},
+        },
+    }
+
+
+def receipt_verification_schema() -> dict:
+    return {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "title": "FasterRaster v0.8 receipt verification",
+        "type": "object",
+        "additionalProperties": True,
+        "required": ["verification_status", "checks", "failures", "warnings"],
+        "properties": {
+            "verification_status": string_schema(enum=["PASS", "FAIL"]),
+            "checks": {"type": "array", "items": {"type": "object", "additionalProperties": True}},
+            "failures": {"type": "array", "items": string_schema()},
+            "warnings": {"type": "array", "items": string_schema()},
         },
     }
 
@@ -510,6 +705,11 @@ def all_schemas() -> dict[str, dict]:
         "unified_acquisition_manifest_row.schema.json": unified_acquisition_manifest_row_schema(),
         "task_compile_report.schema.json": task_compile_report_schema(),
         "execution_dag.schema.json": execution_dag_schema(),
+        "run_plan.schema.json": run_plan_schema(),
+        "job_receipt.schema.json": job_receipt_schema(),
+        "run_receipt.schema.json": run_receipt_schema(),
+        "source_evidence.schema.json": source_evidence_schema(),
+        "receipt_verification.schema.json": receipt_verification_schema(),
         "system_grade.schema.json": system_grade_schema(),
     }
 

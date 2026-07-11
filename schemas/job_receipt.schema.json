@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "adapter": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "authorization_redacted": {
+      "type": "boolean"
+    },
+    "credentials_used": {
+      "type": "boolean"
+    },
+    "dependencies": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "dependency_statuses": {
+      "type": "object"
+    },
+    "input_contract_sha256": {
+      "type": "string"
+    },
+    "job_id": {
+      "type": "string"
+    },
+    "network_attempted": {
+      "type": "boolean"
+    },
+    "output_contract_sha256": {
+      "type": "string"
+    },
+    "request_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "source_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "stage": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "pending",
+        "running",
+        "succeeded",
+        "failed",
+        "skipped_dependency_failed",
+        "skipped_network_disabled",
+        "fixture_recorded",
+        "cache_hit",
+        "unsupported"
+      ],
+      "type": "string"
+    },
+    "task_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "job_id",
+    "request_id",
+    "task_id",
+    "source_id",
+    "adapter",
+    "stage",
+    "status",
+    "dependencies",
+    "dependency_statuses",
+    "network_attempted",
+    "input_contract_sha256",
+    "output_contract_sha256",
+    "credentials_used",
+    "authorization_redacted"
+  ],
+  "title": "FasterRaster v0.8 job receipt",
+  "type": "object"
+}

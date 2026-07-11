@@ -95,3 +95,9 @@ Harmonization readiness is explicit. The package stops before unsupported decodi
 - Fails closed on missing URL parameters, HTTP failures, and magic/content-family mismatches.
 - Preserves fixture-only rows separately instead of silently treating them as live failures.
 - Does not store credentials or mutate the runtime source registry.
+
+## v0.8 Runtime Evidence
+
+The local executor reuses the static range contract for bounded prefix evidence. Runtime cache payloads are stored under `cache/runtime/static_http_range/` with `.head{max_bytes}` suffixes and JSON sidecars that declare `bounded_probe_only: true` and `full_object: false`.
+
+The v0.8 executor still stops before full acquisition, archive extraction, gzip decompression, NetCDF variable decoding, GeoTIFF raster decoding, harmonization, Sentinel imagery download, and PRISM live execution.

@@ -155,10 +155,11 @@ def test_system_grade_incorrect_manifest_count_holds_release(monkeypatch):
     assert "compile report manifest_row_count does not equal executable_request_count + fixture_request_count" in grade["blocking_failures"]
 
 
-def test_system_grade_valid_compile_report_remains_release_ready(monkeypatch):
+def test_system_grade_valid_compile_report_without_live_receipt_has_cautions(monkeypatch):
     _mock_grade_inputs(monkeypatch, _valid_compile_report())
 
     grade = system_grade.grade_system(TASK_ID)
 
-    assert grade["release_decision"] == "release_ready"
+    assert grade["release_decision"] == "release_ready_with_cautions"
     assert grade["blocking_failures"] == []
+    assert "no_live_local_execution_receipt" in grade["warnings"]

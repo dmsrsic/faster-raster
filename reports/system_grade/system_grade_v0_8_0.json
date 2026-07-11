@@ -1,0 +1,54 @@
+{
+  "adapter_execution_score": 95,
+  "artifacts": {
+    "compile_report": "reports/task_compiles/example_wave1_climate_stack/compile_report.json",
+    "execution_package": "reports/execution_packages/example_wave1_climate_stack/execution_package.json",
+    "system_grade_json": "reports/system_grade/system_grade_v0_8_0.json",
+    "system_grade_md": "reports/system_grade/system_grade_v0_8_0.md"
+  },
+  "blocking_failures": [],
+  "checks": {
+    "core_diagnostics_status": "PASS",
+    "default_network_off": "PASS",
+    "determinism": "PASS",
+    "execution_package_dag": "PASS",
+    "local_run_receipt": "PASS",
+    "pytest_exit_code": 0,
+    "static_wave1_live_evidence": "PASS"
+  },
+  "core_compiler_score": 95,
+  "determinism_score": 100,
+  "documentation_score": 92,
+  "execution_package_score": 100,
+  "latest_run_receipt_present": true,
+  "latest_run_receipt_valid": true,
+  "local_execution_score": 100,
+  "local_failed_source_count": 0,
+  "local_fixture_source_count": 1,
+  "local_run_status": "completed",
+  "local_successful_source_count": 4,
+  "overall_grade": "excellent",
+  "overall_score": 97.15,
+  "package_version": "0.8.0",
+  "preview_score": 94,
+  "release_decision": "release_ready",
+  "run_receipt_score": 100,
+  "safety_score": 100,
+  "sentinel_readiness_score": 92,
+  "source_evidence_score": 95,
+  "strongest_components": [
+    "safety",
+    "task_compiler",
+    "execution_package"
+  ],
+  "task_compiler_score": 100,
+  "task_id": "example_wave1_climate_stack",
+  "test_score": 100,
+  "warnings": [
+    "Static range probes are bounded evidence only; decoding stages intentionally stop before raster extraction.",
+    "PRISM remains fixture-only until current endpoint strategy is resolved."
+  ],
+  "weakest_components": [
+    "documentation"
+  ]
+}

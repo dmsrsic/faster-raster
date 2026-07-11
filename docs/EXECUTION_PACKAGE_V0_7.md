@@ -34,3 +34,9 @@ cache/static_http_range/{source_id}/{temporal_key}/{url_sha256_short}.{extension
 ```
 
 For v0.7 all cache entries are bounded probes only, content-addressed, non-resumable, and not expected to contain full objects.
+
+## v0.8 Local Executor
+
+v0.8 consumes the same package artifacts and executes only the explicit stage handler map used by the local bounded executor. It does not execute arbitrary shell command strings from package artifacts.
+
+Runtime cache payloads use `cache/runtime/static_http_range/...head{max_bytes}` names so truncated prefixes are not confused with ordinary archive or raster files. Run receipts record job state, source evidence, cache sidecars, safety events, and an execution log.

@@ -1,0 +1,51 @@
+{
+  "dag_artifact_sha256": "b70efd5f3a8abae5106b779b90ac0c76d22a11b2bcabbacc1a857a7d6a62b19e",
+  "dag_sha256": "c34dcf4760c793584dc2073223cecd8841effa579b86adfb09c5a1dbf8aed3c0",
+  "executable_request_count": 4,
+  "expected_total_max_bytes": 262144,
+  "fail_fast": false,
+  "fixture_request_count": 1,
+  "manifest_artifact_sha256": "3d05aabe247a5d6c168620fba3e704480be7dd7864e3e24b859524386cae0c03",
+  "manifest_sha256": "e99b0a3fd94756f3f9e58db63ee4fc79bc8da1707bcd33b6ae22f8ba2c1c5c85",
+  "max_bytes_per_source": 65536,
+  "max_total_bytes": 1048576,
+  "network_allowed": false,
+  "network_required": true,
+  "package_artifact_sha256": "0a20dfccf7ebee26b23725aa5584c4177b7c862cce390743c3f1a0a8672bcf09",
+  "package_id": "fr_v07_b9aaeb7e827f2a56",
+  "package_sha256": "6a08115f26f17e89b3347852ecd7f43b7c4607c57821e081959e9f82d171e3ed",
+  "package_version": "0.7.0",
+  "planned_fixture_job_count": 1,
+  "planned_job_count": 33,
+  "planned_network_job_count": 4,
+  "retry_limit": 1,
+  "run_plan_contract_sha256": "e532062ad3c702962cfc39a6e82df3125512e5717ab7157a5746592b92d83e9d",
+  "safety_checks": [
+    "explicit_network_opt_in",
+    "bounded_range_request",
+    "host_template_match",
+    "byte_caps_enforced",
+    "no_credentials",
+    "no_arbitrary_shell"
+  ],
+  "source_ids": [
+    "chirps_daily_precipitation",
+    "gridmet_daily",
+    "prism_daily_ppt_static_zip",
+    "terraclimate_monthly",
+    "worldclim_bioclim_normals"
+  ],
+  "task_id": "example_wave1_climate_stack",
+  "timeout_seconds": 30,
+  "validation_steps": [
+    "validate_http_status",
+    "validate_byte_cap",
+    "validate_magic",
+    "validate_content_family",
+    "compute_checksum",
+    "record_source_evidence"
+  ],
+  "warnings": [
+    "network_not_allowed; local execution will be policy-blocked"
+  ]
+}

@@ -29,13 +29,13 @@ def test_parse_select_and_summarize_items():
 def test_search_plan_writes_without_network_or_credentials(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     task_builder.save_task(sample_task())
-    monkeypatch.setenv("CDSE_ACCESS_TOKEN", "fake-token-value")
+    monkeypatch.setenv("CDSE_ACCESS_TOKEN", "fake-token")
     plan = copernicus_cdse.create_search_plan("sentinel_task")
     assert plan["network_run"] is False
     assert plan["collection"] == "sentinel-2-l2a"
     assert Path(plan["json_path"]).exists()
     text = Path(plan["json_path"]).read_text() + Path(plan["md_path"]).read_text()
-    assert "fake-token-value" not in text
+    assert "fake-token" not in text
 
 
 def test_source_registry_has_cdse_entry():
@@ -69,7 +69,7 @@ class FakeResponse:
 def test_search_live_writes_bounded_stac_report_without_hrefs_or_token(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     task_builder.save_task(sample_task())
-    monkeypatch.setenv("CDSE_ACCESS_TOKEN", "fake-token-value")
+    monkeypatch.setenv("CDSE_ACCESS_TOKEN", "fake-token")
     payload = {
         "features": [{
             "id": "S2A_TEST",
@@ -85,7 +85,7 @@ def test_search_live_writes_bounded_stac_report_without_hrefs_or_token(tmp_path,
         return FakeResponse(json.dumps(payload).encode("utf-8"))
     monkeypatch.setattr(copernicus_cdse.urllib.request, "urlopen", fake_urlopen)
     report = copernicus_cdse.create_search_live("sentinel_task", max_items=5)
-    assert seen["authorization"] == "Bearer fake-token-value"
+    assert seen["authorization"] == "Bearer fake-token"
     assert report["network_run"] is True
     assert report["no_downloads"] is True
     assert report["item_count"] == 1
@@ -96,7 +96,7 @@ def test_search_live_writes_bounded_stac_report_without_hrefs_or_token(tmp_path,
     assert item["has_nir_band"] is True
     assert item["hrefs_redacted"] is True
     text = Path(report["json_path"]).read_text() + Path(report["md_path"]).read_text()
-    assert "fake-token-value" not in text
+    assert "fake-token" not in text
     assert "https://example/red.tif" not in text
 
 

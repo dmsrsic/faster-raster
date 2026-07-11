@@ -1,0 +1,8 @@
+{
+  "receipt_contract_sha256": "9a22fd8ad62851f906876a1e4f556c988337102568b0335bb5cdea1e2ca791a6",
+  "receipt_path": "reports/runs/example_wave1_climate_stack/fr_run_20260101T000000Z_6a08115f26f1/run_receipt.json",
+  "run_id": "fr_run_20260101T000000Z_6a08115f26f1",
+  "run_status": "completed",
+  "task_id": "example_wave1_climate_stack",
+  "updated_at_utc": "2026-01-01T00:02:50Z"
+}

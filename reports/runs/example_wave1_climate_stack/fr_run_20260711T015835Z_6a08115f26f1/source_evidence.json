@@ -1,0 +1,31 @@
+{
+  "run_id": "fr_run_20260711T015835Z_6a08115f26f1",
+  "sources": [
+    {
+      "adapter": "static_http_range",
+      "byte_cap": null,
+      "bytes_read": 0,
+      "cache_path": null,
+      "current_endpoint_status": "unresolved_or_stale",
+      "detected_content_family": "zip",
+      "detected_magic": "zip",
+      "expected_content_family": "zip",
+      "expected_magic": "zip",
+      "fixture_only": true,
+      "historical_bytes_read": 65536,
+      "historical_detected_magic": "zip",
+      "historical_http_status": 206,
+      "historical_sha256_short": "cc89306d4d5b",
+      "http_status": 206,
+      "network_attempted": false,
+      "range_honored": true,
+      "request_id": "example_wave1_climate_stack__prism_daily_ppt_static_zip__20230101",
+      "sha256": null,
+      "sha256_short": "cc89306d4d5b",
+      "source_id": "prism_daily_ppt_static_zip",
+      "status": "fixture_recorded",
+      "task_id": "example_wave1_climate_stack"
+    }
+  ],
+  "task_id": "example_wave1_climate_stack"
+}

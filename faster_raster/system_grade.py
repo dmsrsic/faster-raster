@@ -6,6 +6,7 @@ from typing import Any
 
 from faster_raster import __version__
 from faster_raster.task_compiler import compile_task, package_task, write_json
+from faster_raster import run_receipts
 
 
 SYSTEM_GRADE_DIR = Path("reports/system_grade")
@@ -54,12 +55,56 @@ def grade_system(task_id: str = "example_wave1_climate_stack") -> dict[str, Any]
         and package.get("jobs_sha256")
     )
     determinism_ok = determinism_hashes_ok and not compile_contract_failures
+    latest_run_path = Path(f"reports/runs/{task_id}/latest_run.json")
+    latest_run_receipt_present = False
+    latest_run_receipt_valid = False
+    local_run_status = None
+    local_successful_source_count = 0
+    local_failed_source_count = 0
+    local_fixture_source_count = 0
+    live_receipt_present = False
+    live_receipt_invalid = False
+    receipt_verification: dict[str, Any] | None = None
+    if latest_run_path.exists():
+        latest_run_receipt_present = True
+        latest = _read_json(latest_run_path)
+        receipt_path = Path(latest.get("receipt_path", ""))
+        if latest.get("receipt_path") and receipt_path.is_file():
+            receipt = _read_json(receipt_path)
+            local_run_status = receipt.get("run_status")
+            local_successful_source_count = int(receipt.get("successful_source_count") or 0)
+            local_failed_source_count = int(receipt.get("failed_source_count") or 0)
+            local_fixture_source_count = int(receipt.get("fixture_source_count") or 0)
+            live_receipt_present = bool(receipt.get("network_run")) and receipt.get("run_status") == "completed"
+            receipt_verification = run_receipts.verify_run_receipt(
+                receipt_path,
+                package_path=Path(f"reports/execution_packages/{task_id}/execution_package.json"),
+                manifest_path=Path(f"reports/task_compiles/{task_id}/acquisition_manifest.jsonl"),
+                dag_path=Path(f"reports/execution_packages/{task_id}/dag.json"),
+            )
+            latest_run_receipt_valid = receipt_verification["verification_status"] == "PASS"
+            live_requirements_ok = (
+                live_receipt_present
+                and latest_run_receipt_valid
+                and local_successful_source_count == 4
+                and local_failed_source_count == 0
+                and local_fixture_source_count == 1
+                and receipt.get("all_byte_caps_respected") is True
+                and receipt.get("all_magic_valid") is True
+                and receipt.get("all_content_families_valid") is True
+                and receipt.get("all_checksums_present") is True
+                and receipt.get("credentials_used") is False
+                and receipt.get("authorization_headers_present") is False
+            )
+            live_receipt_invalid = bool(receipt.get("network_run")) and not live_requirements_ok
     scores = {
         "core_compiler_score": 95,
         "task_compiler_score": _score_status(compile_report["validation_status"] == "PASS"),
         "adapter_execution_score": _score_status(static_live_ok, 95),
         "execution_package_score": _score_status(dag_ok),
         "determinism_score": _score_status(determinism_ok),
+        "local_execution_score": 100 if (latest_run_receipt_valid and live_receipt_present) else 75,
+        "run_receipt_score": 100 if (latest_run_receipt_valid and live_receipt_present) else 75,
         "preview_score": 94,
         "sentinel_readiness_score": 92,
         "source_evidence_score": _score_status(static_live_ok, 95),
@@ -75,9 +120,13 @@ def grade_system(task_id: str = "example_wave1_climate_stack") -> dict[str, Any]
     if not determinism_hashes_ok:
         blocking_failures.append("determinism hashes missing")
     blocking_failures.extend(compile_contract_failures)
+    if live_receipt_invalid:
+        blocking_failures.append("invalid local live run receipt")
     overall_score = round(sum(scores.values()) / len(scores), 2)
     if blocking_failures:
         release_decision = "hold_release"
+    elif not (latest_run_receipt_valid and live_receipt_present):
+        release_decision = "release_ready_with_cautions"
     elif overall_score >= 95:
         release_decision = "release_ready"
     elif overall_score >= 90:
@@ -91,10 +140,16 @@ def grade_system(task_id: str = "example_wave1_climate_stack") -> dict[str, Any]
         "overall_score": overall_score,
         "overall_grade": "excellent" if overall_score >= 90 else "needs_work",
         "blocking_failures": blocking_failures,
+        "latest_run_receipt_present": latest_run_receipt_present,
+        "latest_run_receipt_valid": latest_run_receipt_valid,
+        "local_run_status": local_run_status,
+        "local_successful_source_count": local_successful_source_count,
+        "local_failed_source_count": local_failed_source_count,
+        "local_fixture_source_count": local_fixture_source_count,
         "warnings": [
             "Static range probes are bounded evidence only; decoding stages intentionally stop before raster extraction.",
             "PRISM remains fixture-only until current endpoint strategy is resolved.",
-        ],
+        ] + ([] if (latest_run_receipt_valid and live_receipt_present) else ["no_live_local_execution_receipt"]),
         "strongest_components": ["safety", "task_compiler", "execution_package"],
         "weakest_components": ["documentation" if scores["documentation_score"] < 95 else "none"],
         "release_decision": release_decision,
@@ -103,6 +158,7 @@ def grade_system(task_id: str = "example_wave1_climate_stack") -> dict[str, Any]
             "static_wave1_live_evidence": "PASS" if static_live_ok else "FAIL",
             "execution_package_dag": package["dag_validation_status"],
             "determinism": "PASS" if determinism_ok else "FAIL",
+            "local_run_receipt": "PASS" if latest_run_receipt_valid else "WARN",
             "default_network_off": "PASS",
             "pytest_exit_code": 0,
         },
@@ -111,8 +167,8 @@ def grade_system(task_id: str = "example_wave1_climate_stack") -> dict[str, Any]
             "execution_package": f"reports/execution_packages/{task_id}/execution_package.json",
         },
     }
-    out_json = SYSTEM_GRADE_DIR / "system_grade_v0_7_0.json"
-    out_md = SYSTEM_GRADE_DIR / "system_grade_v0_7_0.md"
+    out_json = SYSTEM_GRADE_DIR / "system_grade_v0_8_0.json"
+    out_md = SYSTEM_GRADE_DIR / "system_grade_v0_8_0.md"
     write_json(out_json, report)
     write_markdown(report, out_md)
     report["artifacts"]["system_grade_json"] = str(out_json)
@@ -123,7 +179,7 @@ def grade_system(task_id: str = "example_wave1_climate_stack") -> dict[str, Any]
 
 def write_markdown(report: dict[str, Any], path: Path) -> None:
     lines = [
-        "# FasterRaster v0.7 Whole-System Grade",
+        "# FasterRaster v0.8 Whole-System Grade",
         "",
         f"- Overall score: `{report['overall_score']}`",
         f"- Overall grade: `{report['overall_grade']}`",

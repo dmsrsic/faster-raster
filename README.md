@@ -9,13 +9,15 @@ It accepts a semantic `research_spec.json` and compiles:
 
 v0 deliberately does not download rasters, run GDAL, perform edge analytics, classify imagery, or model correlations.
 
-v0.7 adds a no-network task compiler and scheduler-ready execution package path:
+v0.7 adds a no-network task compiler and scheduler-ready execution package path. v0.8 adds an opt-in local bounded execution engine and auditable run receipts:
 
 ```text
-task contract -> source resolution -> adapter planning -> acquisition manifest -> validation plan -> execution package -> DAG -> system grade
+task contract -> source resolution -> adapter planning -> acquisition manifest -> validation plan -> execution package -> DAG -> run plan -> local bounded execution -> run receipts -> system grade
 ```
 
 Static HTTP range sources compile into bounded probe jobs. Fixture-only sources, including PRISM in v0.7, remain historical evidence rows and do not generate fetch jobs.
+
+Network execution remains off by default. `faster-raster run local TASK_ID` writes a blocked-policy receipt when network is not allowed; live bounded fetches require `--allow-network`.
 
 ## Commands
 
@@ -28,6 +30,9 @@ faster-raster inspect-manifest <manifest>
 faster-raster inspect-harmonization <plan>
 faster-raster task compile example_wave1_climate_stack --plain
 faster-raster task package example_wave1_climate_stack --plain
+faster-raster run plan example_wave1_climate_stack --plain
+faster-raster run local example_wave1_climate_stack --plain
+faster-raster run verify example_wave1_climate_stack --plain
 faster-raster grade system --plain
 ```
 

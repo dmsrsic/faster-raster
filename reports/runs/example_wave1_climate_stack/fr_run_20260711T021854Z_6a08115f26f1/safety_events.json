@@ -1,0 +1,30 @@
+{
+  "events": [
+    {
+      "event_type": "network_blocked",
+      "job_id": "example_wave1_climate_stack__chirps_daily_precipitation__20230101__bounded_fetch",
+      "source_id": "chirps_daily_precipitation",
+      "timestamp_utc": "2026-07-11T02:18:54Z"
+    },
+    {
+      "event_type": "network_blocked",
+      "job_id": "example_wave1_climate_stack__gridmet_daily__20230101__bounded_fetch",
+      "source_id": "gridmet_daily",
+      "timestamp_utc": "2026-07-11T02:18:54Z"
+    },
+    {
+      "event_type": "network_blocked",
+      "job_id": "example_wave1_climate_stack__terraclimate_monthly__2023-01__bounded_fetch",
+      "source_id": "terraclimate_monthly",
+      "timestamp_utc": "2026-07-11T02:18:54Z"
+    },
+    {
+      "event_type": "network_blocked",
+      "job_id": "example_wave1_climate_stack__worldclim_bioclim_normals__normals__bounded_fetch",
+      "source_id": "worldclim_bioclim_normals",
+      "timestamp_utc": "2026-07-11T02:18:54Z"
+    }
+  ],
+  "run_id": "fr_run_20260711T021854Z_6a08115f26f1",
+  "task_id": "example_wave1_climate_stack"
+}

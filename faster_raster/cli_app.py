@@ -15,6 +15,8 @@ from faster_raster import user_toggles
 from faster_raster import task_builder
 from faster_raster import task_compiler
 from faster_raster import system_grade
+from faster_raster import local_executor
+from faster_raster import run_receipts
 from faster_raster import real_preview
 from faster_raster import copernicus_auth
 from faster_raster.adapters import copernicus_cdse
@@ -34,6 +36,7 @@ copernicus_app = typer.Typer(no_args_is_help=True)
 copernicus_sentinel_app = typer.Typer(no_args_is_help=True)
 range_app = typer.Typer(no_args_is_help=True)
 grade_app = typer.Typer(no_args_is_help=True)
+run_app = typer.Typer(no_args_is_help=True)
 
 
 def emit(value, *, json_output: bool = False, plain: bool = False, no_color: bool = False, plain_text: str | None = None, table: tuple[str, list[str], list[list]] | None = None) -> None:
@@ -768,6 +771,141 @@ def grade_task_command(task_id: str, json_output: bool = typer.Option(False, "--
     emit(report, json_output=json_output, plain=True, plain_text="\n".join(f"{k}: {v}" for k, v in report.items()) + "\n")
 
 
+def _run_options(
+    max_bytes_per_source: int,
+    max_total_bytes: int,
+    timeout_seconds: int,
+    retry_limit: int,
+    fail_fast: bool,
+) -> dict:
+    return {
+        "max_bytes_per_source": max_bytes_per_source,
+        "max_total_bytes": max_total_bytes,
+        "timeout_seconds": timeout_seconds,
+        "retry_limit": retry_limit,
+        "fail_fast": fail_fast,
+    }
+
+
+@run_app.command("plan")
+def run_plan_command(
+    task_id: str,
+    max_bytes_per_source: int = typer.Option(local_executor.DEFAULT_MAX_BYTES_PER_SOURCE, "--max-bytes-per-source"),
+    max_total_bytes: int = typer.Option(local_executor.DEFAULT_MAX_TOTAL_BYTES, "--max-total-bytes"),
+    timeout_seconds: int = typer.Option(local_executor.DEFAULT_TIMEOUT_SECONDS, "--timeout-seconds"),
+    retry_limit: int = typer.Option(local_executor.DEFAULT_RETRY_LIMIT, "--retry-limit"),
+    fail_fast: bool = typer.Option(False, "--fail-fast"),
+    json_output: bool = typer.Option(False, "--json"),
+    plain: bool = typer.Option(False, "--plain"),
+) -> None:
+    plan = local_executor.build_run_plan(
+        task_id,
+        allow_network=False,
+        **_run_options(max_bytes_per_source, max_total_bytes, timeout_seconds, retry_limit, fail_fast),
+    )
+    text = (
+        f"task_id: {plan['task_id']}\n"
+        f"planned_job_count: {plan['planned_job_count']}\n"
+        f"planned_network_job_count: {plan['planned_network_job_count']}\n"
+        f"planned_fixture_job_count: {plan['planned_fixture_job_count']}\n"
+        f"network_required: {plan['network_required']}\n"
+        f"network_allowed: {plan['network_allowed']}\n"
+        f"run_plan_contract_sha256: {plan['run_plan_contract_sha256']}\n"
+        f"run_plan_json: reports/runs/{task_id}/run_plan.json\n"
+    )
+    emit(plan, json_output=json_output, plain=True, plain_text=text)
+
+
+@run_app.command("local")
+def run_local_command(
+    task_id: str,
+    allow_network: bool = typer.Option(False, "--allow-network"),
+    max_bytes_per_source: int = typer.Option(local_executor.DEFAULT_MAX_BYTES_PER_SOURCE, "--max-bytes-per-source"),
+    max_total_bytes: int = typer.Option(local_executor.DEFAULT_MAX_TOTAL_BYTES, "--max-total-bytes"),
+    timeout_seconds: int = typer.Option(local_executor.DEFAULT_TIMEOUT_SECONDS, "--timeout-seconds"),
+    retry_limit: int = typer.Option(local_executor.DEFAULT_RETRY_LIMIT, "--retry-limit"),
+    fail_fast: bool = typer.Option(False, "--fail-fast"),
+    json_output: bool = typer.Option(False, "--json"),
+    plain: bool = typer.Option(False, "--plain"),
+) -> None:
+    result = local_executor.execute_local(
+        task_id,
+        allow_network=allow_network,
+        **_run_options(max_bytes_per_source, max_total_bytes, timeout_seconds, retry_limit, fail_fast),
+    )
+    receipt = result["receipt"]
+    text = (
+        f"task_id: {task_id}\n"
+        f"run_id: {result['run_id']}\n"
+        f"run_status: {receipt['run_status']}\n"
+        f"execution_blocked: {'network_not_allowed' if receipt['run_status'] == 'blocked_policy' else False}\n"
+        f"network_run: {receipt['network_run']}\n"
+        f"successful_source_count: {receipt['successful_source_count']}\n"
+        f"failed_source_count: {receipt['failed_source_count']}\n"
+        f"fixture_source_count: {receipt['fixture_source_count']}\n"
+        f"receipt_json: {result['receipt_path']}\n"
+    )
+    emit(result, json_output=json_output, plain=True, plain_text=text)
+
+
+@run_app.command("inspect")
+def run_inspect_command(task_id: str, json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
+    latest_path = local_executor.RUN_ROOT / task_id / "latest_run.json"
+    if not latest_path.exists():
+        raise typer.BadParameter(f"no latest run for task: {task_id}")
+    latest = run_receipts.read_json(latest_path)
+    receipt = run_receipts.read_json(Path(latest["receipt_path"]))
+    payload = {"latest_run": latest, "receipt": receipt}
+    text = (
+        f"task_id: {task_id}\n"
+        f"run_id: {latest['run_id']}\n"
+        f"run_status: {latest['run_status']}\n"
+        f"receipt_contract_sha256: {latest['receipt_contract_sha256']}\n"
+        f"receipt_path: {latest['receipt_path']}\n"
+    )
+    emit(payload, json_output=json_output, plain=True, plain_text=text)
+
+
+@run_app.command("verify")
+def run_verify_command(task_id: str, json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
+    latest_path = local_executor.RUN_ROOT / task_id / "latest_run.json"
+    if not latest_path.exists():
+        raise typer.BadParameter(f"no latest run for task: {task_id}")
+    latest = run_receipts.read_json(latest_path)
+    verification = run_receipts.verify_run_receipt(
+        Path(latest["receipt_path"]),
+        package_path=local_executor.PACKAGE_ROOT / task_id / "execution_package.json",
+        manifest_path=local_executor.COMPILE_ROOT / task_id / "acquisition_manifest.jsonl",
+        dag_path=local_executor.PACKAGE_ROOT / task_id / "dag.json",
+    )
+    text = (
+        f"task_id: {task_id}\n"
+        f"run_id: {latest['run_id']}\n"
+        f"verification_status: {verification['verification_status']}\n"
+        f"failure_count: {len(verification['failures'])}\n"
+    )
+    emit(verification, json_output=json_output, plain=True, plain_text=text)
+
+
+@run_app.command("evidence")
+def run_evidence_command(task_id: str, json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
+    latest_path = local_executor.RUN_ROOT / task_id / "latest_run.json"
+    if not latest_path.exists():
+        raise typer.BadParameter(f"no latest run for task: {task_id}")
+    latest = run_receipts.read_json(latest_path)
+    evidence = run_receipts.read_json(Path(latest["receipt_path"]).parent / "source_evidence.json")
+    lines = []
+    for item in evidence["sources"]:
+        lines.append(
+            f"{item['source_id']}: status={item.get('status')} http={item.get('http_status')} "
+            f"bytes={item.get('bytes_read')} magic={item.get('detected_magic')} "
+            f"family={item.get('detected_content_family')} sha={item.get('sha256_short')} "
+            f"range_honored={item.get('range_honored')} cache={item.get('cache_path')} "
+            f"fixture={item.get('fixture_only')}"
+        )
+    emit(evidence, json_output=json_output, plain=True, plain_text="\n".join(lines) + ("\n" if lines else ""))
+
+
 @copernicus_app.command("auth-check")
 def copernicus_auth_check(
     live: bool = typer.Option(False, "--live"),
@@ -940,6 +1078,7 @@ def register_product_commands(app: typer.Typer) -> None:
     app.add_typer(knobs_app, name="knobs")
     app.add_typer(range_app, name="range")
     app.add_typer(grade_app, name="grade")
+    app.add_typer(run_app, name="run")
     app.command("cookplan")(cookplan)
     app.command("queue")(queue)
     app.command("cookdip")(cookdip)

@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "all_byte_caps_respected": {
+      "type": "boolean"
+    },
+    "allow_network": {
+      "type": "boolean"
+    },
+    "authorization_headers_present": {
+      "type": "boolean"
+    },
+    "credentials_used": {
+      "type": "boolean"
+    },
+    "dag_sha256": {
+      "type": "string"
+    },
+    "job_receipt_count": {
+      "type": "integer"
+    },
+    "manifest_sha256": {
+      "type": "string"
+    },
+    "max_bytes_per_source": {
+      "type": "integer"
+    },
+    "max_total_bytes": {
+      "type": "integer"
+    },
+    "package_id": {
+      "type": "string"
+    },
+    "package_sha256": {
+      "type": "string"
+    },
+    "package_version": {
+      "type": "string"
+    },
+    "planned_job_count": {
+      "type": "integer"
+    },
+    "receipt_contract_sha256": {
+      "type": "string"
+    },
+    "run_id": {
+      "type": "string"
+    },
+    "run_plan_contract_sha256": {
+      "type": "string"
+    },
+    "run_status": {
+      "enum": [
+        "planned",
+        "completed",
+        "completed_with_warnings",
+        "failed",
+        "blocked_policy"
+      ],
+      "type": "string"
+    },
+    "safety_event_count": {
+      "type": "integer"
+    },
+    "task_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "run_id",
+    "task_id",
+    "package_id",
+    "package_version",
+    "package_sha256",
+    "manifest_sha256",
+    "dag_sha256",
+    "run_plan_contract_sha256",
+    "receipt_contract_sha256",
+    "run_status",
+    "allow_network",
+    "max_bytes_per_source",
+    "max_total_bytes",
+    "planned_job_count",
+    "job_receipt_count",
+    "safety_event_count",
+    "all_byte_caps_respected",
+    "credentials_used",
+    "authorization_headers_present"
+  ],
+  "title": "FasterRaster v0.8 run receipt",
+  "type": "object"
+}

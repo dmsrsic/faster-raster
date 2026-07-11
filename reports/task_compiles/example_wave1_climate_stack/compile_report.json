@@ -3,13 +3,13 @@
   "adapter_counts": {
     "static_http_range": 5
   },
-  "compile_report_contract_sha256": "e2c60877f1456a4781ec11db554d29536b597e03b4e8905191ade2f08253bd26",
+  "compile_report_contract_sha256": "129850568fe45f1aa9ca25f4dbcb5364062807b597aad253fb7c3d8e49864612",
   "determinism_status": "PASS",
   "executable_request_count": 4,
   "fixture_request_count": 1,
   "manifest_row_count": 5,
   "network_run": false,
-  "package_version": "0.7.0",
+  "package_version": "0.8.0",
   "request_count": 5,
   "source_counts": {
     "chirps_daily_precipitation": 1,

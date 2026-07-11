@@ -1,0 +1,57 @@
+{
+  "checks": [
+    {
+      "details": null,
+      "name": "receipt_contract_hash",
+      "status": "PASS"
+    },
+    {
+      "details": null,
+      "name": "package_hash",
+      "status": "PASS"
+    },
+    {
+      "details": null,
+      "name": "manifest_hash",
+      "status": "PASS"
+    },
+    {
+      "details": null,
+      "name": "dag_hash",
+      "status": "PASS"
+    },
+    {
+      "details": null,
+      "name": "job_count",
+      "status": "PASS"
+    },
+    {
+      "details": null,
+      "name": "source_evidence_count",
+      "status": "PASS"
+    },
+    {
+      "details": null,
+      "name": "total_bytes",
+      "status": "PASS"
+    },
+    {
+      "details": null,
+      "name": "known_stages",
+      "status": "PASS"
+    },
+    {
+      "details": null,
+      "name": "dependency_ordering",
+      "status": "PASS"
+    },
+    {
+      "details": null,
+      "name": "no_credentials_or_authorization",
+      "status": "PASS"
+    }
+  ],
+  "failures": [],
+  "verification_status": "PASS",
+  "warnings": []
+}

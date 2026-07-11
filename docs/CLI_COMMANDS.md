@@ -106,6 +106,20 @@ faster-raster grade task example_wave1_climate_stack --plain
 
 These commands write deterministic planning and scheduler artifacts only. They do not fetch data, run jobs, decode rasters, extract archives, or contact Sentinel services.
 
+## v0.8 Local bounded execution
+
+```bash
+faster-raster run plan example_wave1_climate_stack --plain
+faster-raster run plan example_wave1_climate_stack --json
+faster-raster run local example_wave1_climate_stack --plain
+faster-raster run local example_wave1_climate_stack --allow-network --plain
+faster-raster run inspect example_wave1_climate_stack --plain
+faster-raster run verify example_wave1_climate_stack --plain
+faster-raster run evidence example_wave1_climate_stack --plain
+```
+
+`run plan` never uses network. `run local` defaults to network disabled and reports `execution_blocked: network_not_allowed` instead of claiming live success. Live bounded evidence requires `--allow-network`.
+
 ## Real-data preview dry run
 
 ```bash

@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "run_id": {
+      "type": "string"
+    },
+    "sources": {
+      "items": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "task_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "task_id",
+    "run_id",
+    "sources"
+  ],
+  "title": "FasterRaster v0.8 source evidence",
+  "type": "object"
+}

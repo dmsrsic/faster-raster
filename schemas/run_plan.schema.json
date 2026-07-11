@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "dag_sha256": {
+      "type": "string"
+    },
+    "manifest_sha256": {
+      "type": "string"
+    },
+    "max_bytes_per_source": {
+      "type": "integer"
+    },
+    "max_total_bytes": {
+      "type": "integer"
+    },
+    "network_allowed": {
+      "type": "boolean"
+    },
+    "network_required": {
+      "type": "boolean"
+    },
+    "package_id": {
+      "type": "string"
+    },
+    "package_sha256": {
+      "type": "string"
+    },
+    "package_version": {
+      "type": "string"
+    },
+    "planned_fixture_job_count": {
+      "type": "integer"
+    },
+    "planned_job_count": {
+      "type": "integer"
+    },
+    "planned_network_job_count": {
+      "type": "integer"
+    },
+    "run_plan_contract_sha256": {
+      "type": "string"
+    },
+    "task_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "task_id",
+    "package_id",
+    "package_version",
+    "package_sha256",
+    "manifest_sha256",
+    "dag_sha256",
+    "run_plan_contract_sha256",
+    "planned_job_count",
+    "planned_network_job_count",
+    "planned_fixture_job_count",
+    "max_bytes_per_source",
+    "max_total_bytes",
+    "network_required",
+    "network_allowed"
+  ],
+  "title": "FasterRaster v0.8 run plan",
+  "type": "object"
+}

@@ -8,6 +8,30 @@
       },
       "type": "array"
     },
+    "latest_run_receipt_present": {
+      "type": "boolean"
+    },
+    "latest_run_receipt_valid": {
+      "type": "boolean"
+    },
+    "local_execution_score": {
+      "type": "integer"
+    },
+    "local_failed_source_count": {
+      "type": "integer"
+    },
+    "local_fixture_source_count": {
+      "type": "integer"
+    },
+    "local_run_status": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "local_successful_source_count": {
+      "type": "integer"
+    },
     "overall_grade": {
       "type": "string"
     },
@@ -22,6 +46,9 @@
       ],
       "type": "string"
     },
+    "run_receipt_score": {
+      "type": "integer"
+    },
     "safety_score": {
       "type": "integer"
     }
@@ -31,8 +58,16 @@
     "overall_grade",
     "blocking_failures",
     "safety_score",
-    "release_decision"
+    "release_decision",
+    "local_execution_score",
+    "run_receipt_score",
+    "latest_run_receipt_present",
+    "latest_run_receipt_valid",
+    "local_run_status",
+    "local_successful_source_count",
+    "local_failed_source_count",
+    "local_fixture_source_count"
   ],
-  "title": "FasterRaster v0.7 system grade",
+  "title": "FasterRaster v0.8 system grade",
   "type": "object"
 }
