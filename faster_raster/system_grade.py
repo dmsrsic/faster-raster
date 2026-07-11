@@ -101,11 +101,24 @@ def grade_system(task_id: str = "example_wave1_climate_stack") -> dict[str, Any]
                 and receipt.get("authorization_headers_present") is False
             )
             live_receipt_invalid = bool(receipt.get("network_run")) and not live_requirements_ok
-    latest_materialization_path = MATERIALIZATION_ROOT / task_id / "latest_materialization.json"
-    latest_materialization_present = False
+    pointer_root = MATERIALIZATION_ROOT / task_id
+    latest_materialization_path = pointer_root / "latest_materialization.json"
+    latest_successful_materialization_path = pointer_root / "latest_successful_materialization.json"
+    latest_materialization_present = latest_materialization_path.exists()
     latest_materialization_valid = False
     latest_materialization_run_id = None
     materialization_run_status = None
+    latest_materialization_attempt_run_id = None
+    latest_materialization_attempt_status = None
+    latest_materialization_attempt_valid = False
+    latest_successful_materialization_present = latest_successful_materialization_path.exists()
+    latest_successful_materialization_run_id = None
+    latest_successful_materialization_valid = False
+    latest_successful_materialization_status = None
+    latest_successful_materialized_source_count = 0
+    latest_successful_total_materialized_bytes = 0
+    latest_attempt_newer_than_success = False
+    latest_attempt_effect_on_release = "none"
     materialization_selected_source_count = 0
     materialized_source_count = 0
     reused_artifact_count = 0
@@ -119,42 +132,88 @@ def grade_system(task_id: str = "example_wave1_climate_stack") -> dict[str, Any]
     wave1_materialization_coverage = 0.0
     full_wave1_materialized = False
     materialization_invalid = False
+
+    latest_attempt_receipt: dict[str, Any] = {}
     if latest_materialization_path.exists():
-        latest_materialization_present = True
         latest_materialization = _read_json(latest_materialization_path)
-        mat_receipt_path = Path(latest_materialization.get("receipt_path", ""))
         latest_materialization_run_id = latest_materialization.get("materialization_run_id")
+        latest_materialization_attempt_run_id = latest_materialization_run_id
+        mat_receipt_path = Path(latest_materialization.get("receipt_path", ""))
         if latest_materialization.get("receipt_path") and mat_receipt_path.is_file():
-            mat_receipt = _read_json(mat_receipt_path)
-            materialization_run_status = mat_receipt.get("run_status")
-            materialization_selected_source_count = len(mat_receipt.get("source_selection") or [])
-            materialized_source_count = int(mat_receipt.get("materialized_source_count") or 0)
-            reused_artifact_count = int(mat_receipt.get("reused_source_count") or 0)
-            failed_materialization_source_count = int(mat_receipt.get("failed_source_count") or 0)
-            total_materialized_bytes = int(mat_receipt.get("total_bytes_materialized") or 0)
-            all_probe_prefixes_match = mat_receipt.get("all_probe_prefixes_match") is True
-            all_whole_object_hashes_valid = mat_receipt.get("all_whole_object_checksums_present") is True
-            all_container_validations_passed = mat_receipt.get("all_container_validations_passed") is True
-            verified_artifact_count = int(mat_receipt.get("artifact_receipt_count") or 0)
-            materialization_verification = artifact_receipts.verify_materialization_run(mat_receipt_path)
-            latest_materialization_valid = materialization_verification["verification_status"] == "PASS"
+            latest_attempt_receipt = _read_json(mat_receipt_path)
+            materialization_run_status = latest_attempt_receipt.get("run_status")
+            latest_materialization_attempt_status = materialization_run_status
+            attempt_verification = artifact_receipts.verify_materialization_run(mat_receipt_path)
+            latest_materialization_attempt_valid = attempt_verification.get("verification_status") in {"PASS", "NOT_APPLICABLE"}
+            latest_materialization_valid = attempt_verification.get("verification_status") == "PASS"
+
+    successful_receipt: dict[str, Any] = {}
+    if latest_successful_materialization_path.exists():
+        successful_pointer = _read_json(latest_successful_materialization_path)
+        latest_successful_materialization_run_id = successful_pointer.get("materialization_run_id")
+        success_receipt_path = Path(successful_pointer.get("receipt_path", ""))
+        if successful_pointer.get("receipt_path") and success_receipt_path.is_file():
+            successful_receipt = _read_json(success_receipt_path)
+            latest_successful_materialization_status = successful_receipt.get("run_status")
+            materialization_selected_source_count = len(successful_receipt.get("source_selection") or [])
+            materialized_source_count = int(successful_receipt.get("materialized_source_count") or 0)
+            latest_successful_materialized_source_count = materialized_source_count
+            reused_artifact_count = int(successful_receipt.get("reused_source_count") or 0)
+            failed_materialization_source_count = int(successful_receipt.get("failed_source_count") or 0)
+            total_materialized_bytes = int(successful_receipt.get("total_bytes_materialized") or 0)
+            latest_successful_total_materialized_bytes = total_materialized_bytes
+            all_probe_prefixes_match = successful_receipt.get("all_probe_prefixes_match") is True
+            all_whole_object_hashes_valid = successful_receipt.get("all_whole_object_checksums_present") is True
+            all_container_validations_passed = successful_receipt.get("all_container_validations_passed") is True
+            success_verification = artifact_receipts.verify_materialization_run(success_receipt_path)
             catalog_verification = artifact_catalog.verify_artifact_catalog()
             artifact_catalog_valid = catalog_verification["verification_status"] == "PASS"
-            wave1_materialization_coverage = round(min(verified_artifact_count, 4) / 4, 2)
-            full_wave1_materialized = verified_artifact_count >= 4
-            materialization_invalid = bool(mat_receipt.get("network_run")) and not (
-                latest_materialization_valid
+            verified_artifact_count = int(successful_receipt.get("artifact_receipt_count") or 0) if artifact_catalog_valid else 0
+            latest_successful_materialization_valid = (
+                success_verification.get("verification_status") == "PASS"
+                and successful_receipt.get("run_status") in {"completed", "completed_with_warnings"}
                 and materialized_source_count >= 1
                 and failed_materialization_source_count == 0
-                and mat_receipt.get("all_object_caps_respected") is True
-                and mat_receipt.get("total_byte_cap_respected") is True
+                and successful_receipt.get("all_object_caps_respected") is True
+                and successful_receipt.get("total_byte_cap_respected") is True
                 and all_probe_prefixes_match
                 and all_whole_object_hashes_valid
                 and all_container_validations_passed
                 and artifact_catalog_valid
-                and mat_receipt.get("credentials_used") is False
-                and mat_receipt.get("authorization_headers_present") is False
+                and successful_receipt.get("credentials_used") is False
+                and successful_receipt.get("authorization_headers_present") is False
+                and verified_artifact_count >= 1
             )
+            wave1_materialization_coverage = round(min(verified_artifact_count, 4) / 4, 2)
+            full_wave1_materialized = verified_artifact_count >= 4
+
+    if latest_materialization_attempt_run_id and latest_successful_materialization_run_id:
+        latest_attempt_newer_than_success = latest_materialization_attempt_run_id > latest_successful_materialization_run_id
+
+    if latest_attempt_newer_than_success and latest_materialization_attempt_status == "blocked_policy":
+        no_mutation_block = (
+            latest_attempt_receipt.get("network_run") is False
+            and int(latest_attempt_receipt.get("attempted_source_count") or 0) == 0
+            and int(latest_attempt_receipt.get("failed_source_count") or 0) == 0
+            and int(latest_attempt_receipt.get("materialized_source_count") or 0) == 0
+            and latest_attempt_receipt.get("catalog_update_status") in {"PASS", "NOT_APPLICABLE"}
+            and "approval_required" in (latest_attempt_receipt.get("failure_classes") or [])
+        )
+        latest_attempt_effect_on_release = "warning" if no_mutation_block else "hold_release"
+        materialization_invalid = not no_mutation_block
+    elif latest_attempt_newer_than_success and latest_materialization_attempt_status == "failed":
+        attempted_network = bool(latest_attempt_receipt.get("network_run"))
+        artifact_mutated = int(latest_attempt_receipt.get("materialized_source_count") or 0) > 0 or latest_attempt_receipt.get("catalog_update_status") not in {"PASS", "NOT_APPLICABLE"}
+        if artifact_mutated:
+            latest_attempt_effect_on_release = "hold_release"
+            materialization_invalid = True
+        elif attempted_network:
+            latest_attempt_effect_on_release = "caution"
+        else:
+            latest_attempt_effect_on_release = "warning"
+    elif latest_successful_materialization_valid:
+        latest_attempt_effect_on_release = "positive_evidence"
+
     scores = {
         "core_compiler_score": 95,
         "task_compiler_score": _score_status(compile_report["validation_status"] == "PASS"),
@@ -163,8 +222,8 @@ def grade_system(task_id: str = "example_wave1_climate_stack") -> dict[str, Any]
         "determinism_score": _score_status(determinism_ok),
         "local_execution_score": 100 if (latest_run_receipt_valid and live_receipt_present) else 75,
         "run_receipt_score": 100 if (latest_run_receipt_valid and live_receipt_present) else 75,
-        "materialization_score": 100 if (latest_materialization_valid and materialized_source_count >= 1) else 75,
-        "artifact_integrity_score": 100 if (latest_materialization_valid and all_whole_object_hashes_valid and all_probe_prefixes_match) else 75,
+        "materialization_score": 100 if (latest_successful_materialization_valid and materialized_source_count >= 1) else 75,
+        "artifact_integrity_score": 100 if (latest_successful_materialization_valid and all_whole_object_hashes_valid and all_probe_prefixes_match) else 75,
         "artifact_catalog_score": 100 if artifact_catalog_valid and materialized_source_count >= 1 else 75,
         "preview_score": 94,
         "sentinel_readiness_score": 92,
@@ -190,9 +249,9 @@ def grade_system(task_id: str = "example_wave1_climate_stack") -> dict[str, Any]
         release_decision = "hold_release"
     elif not (latest_run_receipt_valid and live_receipt_present):
         release_decision = "release_ready_with_cautions"
-    elif latest_materialization_present and latest_materialization_valid and materialized_source_count >= 1 and overall_score >= 95:
+    elif latest_successful_materialization_valid and materialized_source_count >= 1 and overall_score >= 95:
         release_decision = "release_ready"
-    elif not (latest_materialization_valid and materialized_source_count >= 1):
+    elif not (latest_successful_materialization_valid and materialized_source_count >= 1):
         release_decision = "release_ready_with_cautions"
     elif overall_score >= 95:
         release_decision = "release_ready"
@@ -217,6 +276,17 @@ def grade_system(task_id: str = "example_wave1_climate_stack") -> dict[str, Any]
         "latest_materialization_valid": latest_materialization_valid,
         "latest_materialization_run_id": latest_materialization_run_id,
         "materialization_run_status": materialization_run_status,
+        "latest_materialization_attempt_run_id": latest_materialization_attempt_run_id,
+        "latest_materialization_attempt_status": latest_materialization_attempt_status,
+        "latest_materialization_attempt_valid": latest_materialization_attempt_valid,
+        "latest_successful_materialization_present": latest_successful_materialization_present,
+        "latest_successful_materialization_run_id": latest_successful_materialization_run_id,
+        "latest_successful_materialization_valid": latest_successful_materialization_valid,
+        "latest_successful_materialization_status": latest_successful_materialization_status,
+        "latest_successful_materialized_source_count": latest_successful_materialized_source_count,
+        "latest_successful_total_materialized_bytes": latest_successful_total_materialized_bytes,
+        "latest_attempt_newer_than_success": latest_attempt_newer_than_success,
+        "latest_attempt_effect_on_release": latest_attempt_effect_on_release,
         "materialization_selected_source_count": materialization_selected_source_count,
         "materialized_source_count": materialized_source_count,
         "reused_artifact_count": reused_artifact_count,
@@ -234,7 +304,8 @@ def grade_system(task_id: str = "example_wave1_climate_stack") -> dict[str, Any]
             "PRISM remains fixture-only until current endpoint strategy is resolved.",
         ]
         + ([] if (latest_run_receipt_valid and live_receipt_present) else ["no_live_local_execution_receipt"])
-        + ([] if (latest_materialization_valid and materialized_source_count >= 1) else ["no_live_materialization_receipt"]),
+        + ([] if (latest_successful_materialization_valid and materialized_source_count >= 1) else ["no_live_materialization_receipt"])
+        + (["latest_materialization_attempt_blocked_policy"] if latest_attempt_effect_on_release == "warning" and latest_materialization_attempt_status == "blocked_policy" else []),
         "strongest_components": ["safety", "task_compiler", "execution_package"],
         "weakest_components": ["documentation" if scores["documentation_score"] < 95 else "none"],
         "release_decision": release_decision,
@@ -244,7 +315,7 @@ def grade_system(task_id: str = "example_wave1_climate_stack") -> dict[str, Any]
             "execution_package_dag": package["dag_validation_status"],
             "determinism": "PASS" if determinism_ok else "FAIL",
             "local_run_receipt": "PASS" if latest_run_receipt_valid else "WARN",
-            "materialization_receipt": "PASS" if latest_materialization_valid else "WARN",
+            "materialization_receipt": "PASS" if latest_successful_materialization_valid else "WARN",
             "artifact_catalog": "PASS" if artifact_catalog_valid else "WARN",
             "default_network_off": "PASS",
             "pytest_exit_code": 0,

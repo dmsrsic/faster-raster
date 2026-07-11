@@ -1,8 +1,8 @@
 # FasterRaster v0.9 Whole-System Grade
 
-- Overall score: `93.0`
+- Overall score: `97.69`
 - Overall grade: `excellent`
-- Release decision: `release_ready_with_cautions`
+- Release decision: `release_ready`
 - Safety score: `100`
 
 The grader reads existing local evidence and generated compile/package artifacts. It does not run network requests.
@@ -16,13 +16,13 @@ The grader reads existing local evidence and generated compile/package artifacts
 - `determinism_score`: `100`
 - `local_execution_score`: `100`
 - `run_receipt_score`: `100`
-- `materialization_score`: `75`
-- `artifact_integrity_score`: `75`
-- `artifact_catalog_score`: `75`
+- `materialization_score`: `100`
+- `artifact_integrity_score`: `100`
+- `artifact_catalog_score`: `100`
 - `preview_score`: `94`
 - `sentinel_readiness_score`: `92`
 - `source_evidence_score`: `95`
 - `safety_score`: `100`
 - `test_score`: `100`
 - `documentation_score`: `92`
-- `overall_score`: `93.0`
+- `overall_score`: `97.69`

@@ -17,6 +17,27 @@
       },
       "type": "array"
     },
+    "latest_attempt_effect_on_release": {
+      "type": "string"
+    },
+    "latest_attempt_newer_than_success": {
+      "type": "boolean"
+    },
+    "latest_materialization_attempt_run_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "latest_materialization_attempt_status": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "latest_materialization_attempt_valid": {
+      "type": "boolean"
+    },
     "latest_materialization_present": {
       "type": "boolean"
     },
@@ -34,6 +55,30 @@
     },
     "latest_run_receipt_valid": {
       "type": "boolean"
+    },
+    "latest_successful_materialization_present": {
+      "type": "boolean"
+    },
+    "latest_successful_materialization_run_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "latest_successful_materialization_status": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "latest_successful_materialization_valid": {
+      "type": "boolean"
+    },
+    "latest_successful_materialized_source_count": {
+      "type": "integer"
+    },
+    "latest_successful_total_materialized_bytes": {
+      "type": "integer"
     },
     "local_execution_score": {
       "type": "integer"
@@ -109,6 +154,17 @@
     "latest_materialization_present",
     "latest_materialization_valid",
     "materialization_run_status",
+    "latest_materialization_attempt_run_id",
+    "latest_materialization_attempt_status",
+    "latest_materialization_attempt_valid",
+    "latest_successful_materialization_present",
+    "latest_successful_materialization_run_id",
+    "latest_successful_materialization_valid",
+    "latest_successful_materialization_status",
+    "latest_successful_materialized_source_count",
+    "latest_successful_total_materialized_bytes",
+    "latest_attempt_newer_than_success",
+    "latest_attempt_effect_on_release",
     "materialized_source_count",
     "verified_artifact_count",
     "artifact_catalog_valid"

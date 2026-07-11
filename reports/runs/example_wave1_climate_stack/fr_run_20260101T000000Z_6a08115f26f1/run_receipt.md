@@ -8,4 +8,4 @@
 - Failed sources: `0`
 - Fixture sources: `1`
 - Bytes read: `79`
-- Receipt contract SHA256: `34bf9887b55227d686f7ec8290e5ed50886ef53660b9a0c5243739f9aef4675f`
+- Receipt contract SHA256: `39c30687b969b201e94616a5939df0415e22f3e2cfd764e3c3dc787fa9934bd3`

@@ -319,8 +319,10 @@ def execute_local(
     sleep_fn: Callable[[float], None] | None = None,
     urlopen: Callable[..., Any] | None = None,
     cache_root: Path | None = None,
+    reports_root: Path | None = None,
 ) -> dict[str, Any]:
     options = RuntimeOptions(max_bytes_per_source, max_total_bytes, timeout_seconds, retry_limit, fail_fast, allow_network, cache_root or RUNTIME_CACHE_ROOT)
+    run_root = (reports_root / "runs") if reports_root is not None else RUN_ROOT
     _validate_options(options)
     now = now_fn or utc_now
     sleep = sleep_fn or time.sleep
@@ -341,7 +343,7 @@ def execute_local(
     package = inputs["package"]
     package_hash_short = package["package_sha256"][:12]
     run_id = f"fr_run_{(timestamp_utc or now()).replace('-', '').replace(':', '').replace('Z', 'Z')}_{package_hash_short}"
-    run_dir = RUN_ROOT / task_id / run_id
+    run_dir = run_root / task_id / run_id
     log: list[dict[str, Any]] = []
     safety_events: list[dict[str, Any]] = []
     state: dict[str, Any] = {
@@ -454,11 +456,11 @@ def execute_local(
         "evidence_class": receipt["evidence_class"],
         "updated_at_utc": now(),
     }
-    write_json(RUN_ROOT / task_id / "latest_run.json", latest_payload)
+    write_json(run_root / task_id / "latest_run.json", latest_payload)
     if receipt["run_status"] in {"completed", "completed_with_warnings"} and receipt["evidence_class"] == "live_network":
-        write_json(RUN_ROOT / task_id / "latest_live_verified_run.json", latest_payload)
+        write_json(run_root / task_id / "latest_live_verified_run.json", latest_payload)
     if receipt["evidence_class"] == "deterministic_test_fixture":
-        write_json(RUN_ROOT / task_id / "latest_test_fixture_run.json", latest_payload)
+        write_json(run_root / task_id / "latest_test_fixture_run.json", latest_payload)
     return {"run_status": receipt["run_status"], "run_id": run_id, "receipt": receipt, "receipt_path": str(run_dir / "run_receipt.json")}
 
 
@@ -521,13 +523,15 @@ def _stage_handlers(
         if state["total_bytes_read"] + len(retained) > options.max_total_bytes:
             raise LocalExecutionError("total byte cap exceeded")
         cache_path, sidecar_path = _write_runtime_cache(job, row, retained, result, options.max_bytes_per_source, now(), options.cache_root)
-        result["cache_path"] = str(cache_path)
+        logical_cache_path = _logical_runtime_cache_path(cache_path, options.cache_root)
+        logical_sidecar_path = _logical_runtime_cache_path(sidecar_path, options.cache_root)
+        result["cache_path"] = str(logical_cache_path)
         state["cache_entries"].append(
             {
                 "source_id": job["source_id"],
                 "request_id": job["request_id"],
-                "cache_path": str(cache_path),
-                "receipt_path": str(sidecar_path),
+                "cache_path": str(logical_cache_path),
+                "receipt_path": str(logical_sidecar_path),
                 "cache_status": "invalid_refetched" if cache_errors else "fetched",
                 "validation_errors": cache_errors,
                 "payload_sha256": result["sha256"],
@@ -713,6 +717,14 @@ def _runtime_cache_path(job: dict[str, Any], row: dict[str, Any], max_bytes: int
     return cache_root / job["source_id"] / temporal_key / f"{row.get('url_sha256', _short_hash(job['deterministic_url']))[:12]}{ext}.head{max_bytes}"
 
 
+def _logical_runtime_cache_path(path: Path, cache_root: Path) -> Path:
+    try:
+        relative = path.relative_to(cache_root)
+    except ValueError:
+        return path
+    return RUNTIME_CACHE_ROOT / relative
+
+
 def _write_runtime_cache(job: dict[str, Any], row: dict[str, Any], data: bytes, result: dict[str, Any], max_bytes: int, generated_at: str, cache_root: Path) -> tuple[Path, Path]:
     path = _runtime_cache_path(job, row, max_bytes, cache_root)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -828,8 +840,8 @@ def _read_valid_cache(job: dict[str, Any], row: dict[str, Any], max_bytes: int, 
         "detected_content_family": magic.content_family,
         "sha256": digest,
         "sha256_short": digest[:12],
-        "cache_path": str(path),
-        "cache_receipt_path": str(sidecar),
+        "cache_path": str(_logical_runtime_cache_path(path, cache_root)),
+        "cache_receipt_path": str(_logical_runtime_cache_path(sidecar, cache_root)),
         "warnings": [],
         "retry_count": 0,
     }, []

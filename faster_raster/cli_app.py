@@ -753,8 +753,13 @@ def grade_system_command(json_output: bool = typer.Option(False, "--json"), plai
         f"overall_score: {report['overall_score']}\n"
         f"overall_grade: {report['overall_grade']}\n"
         f"safety_score: {report['safety_score']}\n"
+        f"materialized_source_count: {report['materialized_source_count']}\n"
+        f"verified_artifact_count: {report['verified_artifact_count']}\n"
+        f"wave1_materialization_coverage: {report['wave1_materialization_coverage']}\n"
+        f"full_wave1_materialized: {report['full_wave1_materialized']}\n"
         f"release_decision: {report['release_decision']}\n"
         f"blocking_failures: {report['blocking_failures']}\n"
+        f"warnings: {report['warnings']}\n"
         f"network_run: False\n"
         f"system_grade_json: {report['artifacts']['system_grade_json']}\n"
     )
@@ -951,6 +956,7 @@ def materialize_plan_command(
     plan = materialization.build_materialization_plan(
         task_id,
         allow_network=False,
+        materializations_root=materialization.MATERIALIZATION_ROOT,
         probe_run_id=probe_run_id,
         probe_receipt_sha256=probe_receipt_sha256,
         **_materialization_options(source, max_object_bytes, max_total_bytes, minimum_free_disk_bytes, disk_safety_margin_bytes, timeout_seconds, retry_limit, resume),
@@ -974,7 +980,7 @@ def materialize_plan_command(
 
 @materialize_app.command("eligibility")
 def materialize_eligibility_command(task_id: str, json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
-    plan = materialization.build_materialization_plan(task_id, write_artifacts=True)
+    plan = materialization.build_materialization_plan(task_id, write_artifacts=True, materializations_root=materialization.MATERIALIZATION_ROOT)
     rows = []
     for item in plan["object_plans"]:
         rows.append(
@@ -1020,6 +1026,7 @@ def materialize_local_command(
         allow_network=allow_network,
         allow_materialization=allow_materialization,
         approve_plan_sha256=approve_plan_sha256,
+        materializations_root=materialization.MATERIALIZATION_ROOT,
         probe_run_id=probe_run_id,
         probe_receipt_sha256=probe_receipt_sha256,
         **_materialization_options(source, max_object_bytes, max_total_bytes, minimum_free_disk_bytes, disk_safety_margin_bytes, timeout_seconds, retry_limit, resume),
@@ -1051,25 +1058,62 @@ def materialize_inspect_command(task_id: str, json_output: bool = typer.Option(F
 
 
 @materialize_app.command("verify")
-def materialize_verify_command(task_id: str, json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
-    latest_path = materialization.MATERIALIZATION_ROOT / task_id / "latest_materialization.json"
-    if not latest_path.exists():
-        raise typer.BadParameter(f"no latest materialization for task: {task_id}")
-    latest = run_receipts.read_json(latest_path)
-    verification = artifact_receipts.verify_materialization_run(Path(latest["receipt_path"]))
+def materialize_verify_command(
+    task_id: str,
+    json_output: bool = typer.Option(False, "--json"),
+    plain: bool = typer.Option(False, "--plain"),
+    latest_attempt: bool = typer.Option(False, "--latest-attempt"),
+    latest_successful: bool = typer.Option(False, "--latest-successful"),
+    run_id: str | None = typer.Option(None, "--run-id"),
+) -> None:
+    selected = sum(1 for item in [latest_attempt, latest_successful, bool(run_id)] if item)
+    if selected > 1:
+        raise typer.BadParameter("choose only one of --latest-attempt, --latest-successful, or --run-id")
+    root = materialization.MATERIALIZATION_ROOT / task_id
+    if run_id:
+        target_selection = "run_id"
+        receipt_path = root / run_id / "materialization_run_receipt.json"
+        pointer = {"materialization_run_id": run_id, "receipt_path": str(receipt_path)}
+    else:
+        if latest_attempt:
+            target_selection = "latest_attempt"
+            pointer_path = root / "latest_materialization.json"
+        elif latest_successful:
+            target_selection = "latest_successful"
+            pointer_path = root / "latest_successful_materialization.json"
+        else:
+            success_path = root / "latest_successful_materialization.json"
+            if success_path.exists():
+                target_selection = "latest_successful"
+                pointer_path = success_path
+            else:
+                target_selection = "latest_attempt"
+                pointer_path = root / "latest_materialization.json"
+        if not pointer_path.exists():
+            raise typer.BadParameter(f"no {target_selection.replace('_', ' ')} materialization for task: {task_id}")
+        pointer = run_receipts.read_json(pointer_path)
+        receipt_path = Path(pointer["receipt_path"])
+    if not receipt_path.is_file():
+        raise typer.BadParameter(f"materialization receipt not found: {receipt_path}")
+    receipt = run_receipts.read_json(receipt_path)
+    verification = artifact_receipts.verify_materialization_run(receipt_path)
+    payload = {"target_selection": target_selection, "materialization_run_id": receipt.get("materialization_run_id") or pointer.get("materialization_run_id"), "run_status": receipt.get("run_status"), **verification}
     text = (
-        f"task_id: {task_id}\n"
+        f"target_selection: {target_selection}\n"
+        f"materialization_run_id: {payload['materialization_run_id']}\n"
+        f"run_status: {payload['run_status']}\n"
         f"contract_verification_status: {verification.get('contract_verification_status')}\n"
         f"execution_outcome_status: {verification.get('execution_outcome_status')}\n"
         f"artifact_verification_status: {verification.get('artifact_verification_status')}\n"
         f"catalog_verification_status: {verification.get('catalog_verification_status')}\n"
         f"release_evidence_status: {verification.get('release_evidence_status')}\n"
         f"verification_status: {verification['verification_status']}\n"
+        f"blocking_reasons: {verification.get('blocking_reasons', [])}\n"
         f"failures: {verification['failures']}\n"
     )
-    emit(verification, json_output=json_output, plain=True, plain_text=text)
+    emit(payload, json_output=json_output, plain=True, plain_text=text)
     if verification.get("verification_status") == "FAIL":
-        raise typer.BadParameter("materialization verification failed")
+        raise typer.Exit(code=1)
 
 
 @materialize_app.command("evidence")
@@ -1108,7 +1152,7 @@ def materialize_catalog_command(json_output: bool = typer.Option(False, "--json"
 @materialize_app.command("catalog-verify")
 def materialize_catalog_verify_command(json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
     verification = artifact_catalog.verify_artifact_catalog()
-    text = f"verification_status: {verification['verification_status']}\nreason: {verification.get('reason')}\nfailures: {verification['failures']}\n"
+    text = f"verification_status: {verification['verification_status']}\nartifact_count: {verification.get('artifact_count', 0)}\nreason: {verification.get('reason')}\nfailures: {verification['failures']}\n"
     emit(verification, json_output=json_output, plain=True, plain_text=text)
 
 

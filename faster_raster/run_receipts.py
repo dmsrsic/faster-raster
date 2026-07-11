@@ -18,6 +18,7 @@ VOLATILE_RECEIPT_FIELDS = {
     "timestamp_utc",
     "receipt_contract_sha256",
 }
+LOGICAL_RUNTIME_CACHE_ROOT = Path("cache/runtime/static_http_range")
 
 
 def sha256_bytes(data: bytes) -> str:
@@ -146,11 +147,22 @@ def verify_job_receipts(job_receipts: list[dict[str, Any]], *, allow_unknown_sta
     return {"verification_status": "PASS" if not failures else "FAIL", "checks": checks, "failures": failures, "warnings": []}
 
 
-def verify_cache_index(cache_index: dict[str, Any]) -> dict[str, Any]:
+def resolve_cache_contract_path(path_value: str, *, cache_root: Path | None = None) -> Path:
+    path = Path(path_value)
+    if path.is_absolute() or cache_root is None:
+        return path
+    try:
+        relative = path.relative_to(LOGICAL_RUNTIME_CACHE_ROOT)
+    except ValueError:
+        return path
+    return cache_root / relative
+
+
+def verify_cache_index(cache_index: dict[str, Any], *, cache_root: Path | None = None) -> dict[str, Any]:
     failures: list[str] = []
     for entry in cache_index.get("entries", []):
-        payload = Path(entry["cache_path"])
-        sidecar = Path(entry["receipt_path"])
+        payload = resolve_cache_contract_path(entry["cache_path"], cache_root=cache_root)
+        sidecar = resolve_cache_contract_path(entry["receipt_path"], cache_root=cache_root)
         if not payload.exists() or not sidecar.exists():
             failures.append(f"cache entry missing: {entry.get('cache_path')}")
             continue

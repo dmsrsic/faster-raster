@@ -55,6 +55,7 @@ def deterministic_clock():
 
 
 def test_receipt_hash_verifies_and_tamper_fails(monkeypatch, tmp_path):
+    cache_root = tmp_path / "cache"
     result = local_executor.execute_local(
         TASK_ID,
         allow_network=True,
@@ -62,7 +63,8 @@ def test_receipt_hash_verifies_and_tamper_fails(monkeypatch, tmp_path):
         now_fn=deterministic_clock(),
         sleep_fn=lambda seconds: None,
         urlopen=fake_urlopen,
-        cache_root=tmp_path / "cache",
+        cache_root=cache_root,
+        reports_root=tmp_path / "reports",
     )
     receipt_path = Path(result["receipt_path"])
 
@@ -88,6 +90,9 @@ def test_receipt_hash_verifies_and_tamper_fails(monkeypatch, tmp_path):
 
 
 def test_cache_verification_detects_corruption(monkeypatch, tmp_path):
+    cache_root = tmp_path / "cache"
+    production_run_root = local_executor.RUN_ROOT / TASK_ID
+    before = _file_fingerprints(production_run_root)
     result = local_executor.execute_local(
         TASK_ID,
         allow_network=True,
@@ -95,14 +100,84 @@ def test_cache_verification_detects_corruption(monkeypatch, tmp_path):
         now_fn=deterministic_clock(),
         sleep_fn=lambda seconds: None,
         urlopen=fake_urlopen,
-        cache_root=tmp_path / "cache",
+        cache_root=cache_root,
+        reports_root=tmp_path / "reports",
     )
     run_dir = Path(result["receipt_path"]).parent
     cache_index = json.loads((run_dir / "cache_index.json").read_text())
 
-    assert run_receipts.verify_cache_index(cache_index)["verification_status"] == "PASS"
-    Path(cache_index["entries"][0]["cache_path"]).write_bytes(b"corrupt")
-    assert run_receipts.verify_cache_index(cache_index)["verification_status"] == "FAIL"
+    assert run_dir.is_relative_to(tmp_path / "reports")
+    assert all(not Path(entry["cache_path"]).is_absolute() for entry in cache_index["entries"])
+    assert all(str(entry["cache_path"]).startswith("cache/runtime/static_http_range/") for entry in cache_index["entries"])
+    assert run_receipts.verify_cache_index(cache_index, cache_root=cache_root)["verification_status"] == "PASS"
+    run_receipts.resolve_cache_contract_path(cache_index["entries"][0]["cache_path"], cache_root=cache_root).write_bytes(b"corrupt")
+    assert run_receipts.verify_cache_index(cache_index, cache_root=cache_root)["verification_status"] == "FAIL"
+    assert _file_fingerprints(production_run_root) == before
+
+
+def test_fixture_contract_hashes_are_stable_across_temp_cache_roots(tmp_path):
+    runs = []
+    for name in ("one", "two"):
+        result = local_executor.execute_local(
+            TASK_ID,
+            allow_network=True,
+            timestamp_utc="2026-01-01T00:00:00Z",
+            now_fn=deterministic_clock(),
+            sleep_fn=lambda seconds: None,
+            urlopen=fake_urlopen,
+            cache_root=tmp_path / name / "cache",
+            reports_root=tmp_path / name / "reports",
+        )
+        run_dir = Path(result["receipt_path"]).parent
+        runs.append(
+            {
+                "receipt": result["receipt"],
+                "cache_index": json.loads((run_dir / "cache_index.json").read_text()),
+                "jobs": json.loads((run_dir / "job_receipts.json").read_text()),
+            }
+        )
+
+    assert runs[0]["receipt"]["receipt_contract_sha256"] == runs[1]["receipt"]["receipt_contract_sha256"]
+    assert [entry["cache_path"] for entry in runs[0]["cache_index"]["entries"]] == [entry["cache_path"] for entry in runs[1]["cache_index"]["entries"]]
+    assert [job.get("cache_path") for job in runs[0]["jobs"]] == [job.get("cache_path") for job in runs[1]["jobs"]]
+
+
+def test_committed_reports_and_goldens_do_not_contain_pytest_temp_paths():
+    roots = [Path("reports"), Path("tests/golden")]
+    offenders = [
+        str(path)
+        for root in roots
+        if root.exists()
+        for path in root.rglob("*")
+        if path.is_file() and "/tmp/pytest-" in path.read_text(encoding="utf-8", errors="ignore")
+    ]
+    assert offenders == []
+
+
+def test_committed_deterministic_run_fixtures_do_not_contain_machine_paths():
+    root = Path("reports/runs/example_wave1_climate_stack")
+    fixtures = [
+        root / "fr_run_20260101T000000Z_6a08115f26f1",
+        root / "fr_run_20260101T000100Z_6a08115f26f1",
+    ]
+    offenders = [
+        str(path)
+        for fixture in fixtures
+        for path in fixture.rglob("*")
+        if path.is_file()
+        and any(token in path.read_text(encoding="utf-8", errors="ignore") for token in ("/tmp/pytest-", "/home/dmsrsic/"))
+    ]
+    assert offenders == []
+
+
+def _file_fingerprints(root: Path) -> dict[str, tuple[int, str]]:
+    if not root.exists():
+        return {}
+    return {
+        str(path.relative_to(root)): (path.stat().st_size, run_receipts.sha256_file(path))
+        for path in sorted(root.rglob("*"))
+        if path.is_file()
+    }
 
 
 def test_absolute_paths_are_excluded_from_receipt_contract_hash():

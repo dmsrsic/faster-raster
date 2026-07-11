@@ -1,0 +1,34 @@
+{
+  "artifact_verification_status": "NOT_APPLICABLE",
+  "blocking_reasons": [
+    "approval_required"
+  ],
+  "catalog_verification_status": "PASS",
+  "check_count": 3,
+  "checks": [
+    {
+      "details": null,
+      "name": "materialization_run_receipt_hash",
+      "status": "PASS"
+    },
+    {
+      "details": null,
+      "name": "artifact_receipts",
+      "status": "PASS"
+    },
+    {
+      "details": null,
+      "name": "no_credentials",
+      "status": "PASS"
+    }
+  ],
+  "contract_verification_status": "PASS",
+  "execution_outcome_status": "BLOCKED",
+  "failed_check_count": 0,
+  "failures": [],
+  "informational_reasons": [],
+  "passed_check_count": 3,
+  "release_evidence_status": "NOT_APPLICABLE",
+  "verification_status": "NOT_APPLICABLE",
+  "warnings": []
+}

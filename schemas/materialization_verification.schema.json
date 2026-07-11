@@ -2,6 +2,28 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": true,
   "properties": {
+    "artifact_verification_status": {
+      "enum": [
+        "PASS",
+        "FAIL",
+        "NOT_APPLICABLE"
+      ],
+      "type": "string"
+    },
+    "blocking_reasons": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "catalog_verification_status": {
+      "enum": [
+        "PASS",
+        "FAIL",
+        "NOT_APPLICABLE"
+      ],
+      "type": "string"
+    },
     "checks": {
       "items": {
         "additionalProperties": true,
@@ -9,17 +31,63 @@
       },
       "type": "array"
     },
+    "contract_verification_status": {
+      "enum": [
+        "PASS",
+        "FAIL"
+      ],
+      "type": "string"
+    },
+    "execution_outcome_status": {
+      "enum": [
+        "PASS",
+        "FAILED",
+        "BLOCKED",
+        "NOT_APPLICABLE"
+      ],
+      "type": "string"
+    },
     "failures": {
       "items": {
         "type": "string"
       },
       "type": "array"
     },
+    "informational_reasons": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "materialization_run_id": {
+      "type": "string"
+    },
+    "release_evidence_status": {
+      "enum": [
+        "PASS",
+        "FAIL",
+        "NOT_APPLICABLE"
+      ],
+      "type": "string"
+    },
+    "run_status": {
+      "enum": [
+        "completed",
+        "completed_with_warnings",
+        "failed",
+        "blocked_policy"
+      ],
+      "type": "string"
+    },
+    "target_selection": {
+      "type": "string"
+    },
     "verification_status": {
       "enum": [
         "PASS",
         "FAIL",
-        "WARN"
+        "WARN",
+        "NOT_APPLICABLE"
       ],
       "type": "string"
     },

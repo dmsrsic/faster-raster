@@ -1,8 +1,8 @@
 {
   "evidence_class": "deterministic_test_fixture",
-  "receipt_contract_sha256": "34bf9887b55227d686f7ec8290e5ed50886ef53660b9a0c5243739f9aef4675f",
-  "receipt_path": "reports/runs/example_wave1_climate_stack/fr_run_20260101T000000Z_6a08115f26f1/run_receipt.json",
-  "run_id": "fr_run_20260101T000000Z_6a08115f26f1",
+  "receipt_contract_sha256": "39c30687b969b201e94616a5939df0415e22f3e2cfd764e3c3dc787fa9934bd3",
+  "receipt_path": "reports/runs/example_wave1_climate_stack/fr_run_20260101T000100Z_6a08115f26f1/run_receipt.json",
+  "run_id": "fr_run_20260101T000100Z_6a08115f26f1",
   "run_status": "completed",
   "task_id": "example_wave1_climate_stack",
   "updated_at_utc": "2026-01-01T00:02:50Z"

@@ -7,7 +7,7 @@ from pathlib import Path
 from typer.testing import CliRunner
 import pytest
 
-from faster_raster import materialization, artifact_catalog, artifact_receipts, local_executor, system_grade
+from faster_raster import materialization, artifact_catalog, artifact_receipts, local_executor, system_grade, run_receipts
 from faster_raster.cli import app
 
 
@@ -153,6 +153,47 @@ def test_materialization_blocks_without_approval(monkeypatch, tmp_path):
     _clear_latest_materialization()
 
 
+
+
+def _create_success_then_blocked(monkeypatch, tmp_path):
+    payload = _payload()
+    _patch_probe(monkeypatch, payload)
+    plan = materialization.build_materialization_plan(
+        TASK_ID,
+        sources=[SOURCE_ID],
+        artifact_root=tmp_path / "artifacts",
+        staging_root=tmp_path / "staging",
+        catalog_root=tmp_path / "catalog",
+        materializations_root=tmp_path / "materializations",
+        write_artifacts=False,
+    )
+    success = materialization.execute_materialization(
+        TASK_ID,
+        sources=[SOURCE_ID],
+        allow_network=True,
+        allow_materialization=True,
+        approve_plan_sha256=plan["materialization_plan_contract_sha256"],
+        artifact_root=tmp_path / "artifacts",
+        staging_root=tmp_path / "staging",
+        catalog_root=tmp_path / "catalog",
+        materializations_root=tmp_path / "materializations",
+        timestamp_utc="2026-01-01T00:00:00Z",
+        now_fn=iter(["2026-01-01T00:00:01Z"] * 100).__next__,
+        sleep_fn=lambda _: None,
+        urlopen=lambda request, timeout=0: FakeResponse(payload),
+    )
+    blocked = materialization.execute_materialization(
+        TASK_ID,
+        sources=[SOURCE_ID],
+        artifact_root=tmp_path / "artifacts",
+        staging_root=tmp_path / "staging",
+        catalog_root=tmp_path / "catalog",
+        materializations_root=tmp_path / "materializations",
+        timestamp_utc="2026-01-01T00:01:00Z",
+        now_fn=iter(["2026-01-01T00:01:01Z"] * 100).__next__,
+    )
+    return success, blocked
+
 def test_mocked_complete_materialization_succeeds(monkeypatch, tmp_path):
     payload = _payload()
     _patch_probe(monkeypatch, payload)
@@ -295,6 +336,7 @@ def test_system_grade_valid_canary_materialization_permits_release_ready(monkeyp
         sleep_fn=lambda _: None,
         urlopen=fake_probe_urlopen,
         cache_root=tmp_path / "probe-cache",
+        reports_root=tmp_path / "reports",
     )
     _patch_probe(monkeypatch, payload)
     plan = materialization.build_materialization_plan(TASK_ID, sources=[SOURCE_ID], artifact_root=tmp_path / "artifacts", staging_root=tmp_path / "staging", catalog_root=tmp_path / "catalog", write_artifacts=False)
@@ -409,3 +451,68 @@ def test_materialize_verify_cli_reports_failed_components(monkeypatch, tmp_path)
     assert "release_evidence_status: FAIL" in result.output
     assert "verification_status: FAIL" in result.output
     assert "artifact_store_error" in result.output
+
+
+def test_successful_materialization_followed_by_blocked_policy_still_grades_release_ready(monkeypatch, tmp_path):
+    success, blocked = _create_success_then_blocked(monkeypatch, tmp_path)
+    assert success["run_status"] == "completed"
+    assert blocked["run_status"] == "blocked_policy"
+    monkeypatch.setattr(system_grade.artifact_catalog, "verify_artifact_catalog", lambda: {"verification_status": "PASS"})
+    monkeypatch.setattr(system_grade, "MATERIALIZATION_ROOT", tmp_path / "materializations")
+    monkeypatch.setattr(system_grade, "RUN_ROOT", Path("reports/runs"))
+
+    report = system_grade.grade_system(TASK_ID)
+
+    assert report["release_decision"] == "release_ready"
+    assert report["latest_successful_materialization_present"] is True
+    assert report["latest_successful_materialization_valid"] is True
+    assert report["latest_successful_materialization_run_id"] == success["materialization_run_id"]
+    assert report["latest_materialization_attempt_run_id"] == blocked["materialization_run_id"]
+    assert report["latest_materialization_attempt_status"] == "blocked_policy"
+    assert report["latest_attempt_newer_than_success"] is True
+    assert report["latest_attempt_effect_on_release"] == "warning"
+    assert report["materialized_source_count"] == 1
+    assert report["verified_artifact_count"] == 1
+    assert report["wave1_materialization_coverage"] == 0.25
+    assert report["full_wave1_materialized"] is False
+    assert "no_live_materialization_receipt" not in report["warnings"]
+    assert "latest_materialization_attempt_blocked_policy" in report["warnings"]
+
+
+def test_blocked_run_verification_is_not_applicable_without_failures(monkeypatch, tmp_path):
+    _, blocked = _create_success_then_blocked(monkeypatch, tmp_path)
+    receipt_path = Path(blocked["receipt_path"])
+    stored = run_receipts.read_json(receipt_path.parent / "materialization_verification.json")
+    recomputed = artifact_receipts.verify_materialization_run(receipt_path)
+
+    assert stored == recomputed
+    assert recomputed["execution_outcome_status"] == "BLOCKED"
+    assert recomputed["verification_status"] == "NOT_APPLICABLE"
+    assert recomputed["release_evidence_status"] == "NOT_APPLICABLE"
+    assert recomputed["failures"] == []
+    assert recomputed["blocking_reasons"] == ["approval_required"]
+
+
+def test_materialize_verify_cli_target_selection(monkeypatch, tmp_path):
+    success, blocked = _create_success_then_blocked(monkeypatch, tmp_path)
+    monkeypatch.setattr(materialization, "MATERIALIZATION_ROOT", tmp_path / "materializations")
+    runner = CliRunner()
+
+    successful = runner.invoke(app, ["materialize", "verify", TASK_ID, "--latest-successful", "--plain"])
+    assert successful.exit_code == 0
+    assert "target_selection: latest_successful" in successful.output
+    assert f"materialization_run_id: {success['materialization_run_id']}" in successful.output
+    assert "verification_status: PASS" in successful.output
+
+    latest = runner.invoke(app, ["materialize", "verify", TASK_ID, "--latest-attempt", "--plain"])
+    assert latest.exit_code == 0
+    assert "target_selection: latest_attempt" in latest.output
+    assert f"materialization_run_id: {blocked['materialization_run_id']}" in latest.output
+    assert "verification_status: NOT_APPLICABLE" in latest.output
+    assert "blocking_reasons: ['approval_required']" in latest.output
+    assert "failures: []" in latest.output
+
+    exact = runner.invoke(app, ["materialize", "verify", TASK_ID, "--run-id", success["materialization_run_id"], "--plain"])
+    assert exact.exit_code == 0
+    assert "target_selection: run_id" in exact.output
+    assert f"materialization_run_id: {success['materialization_run_id']}" in exact.output

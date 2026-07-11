@@ -335,11 +335,13 @@ def build_materialization_plan(
     artifact_root: Path = artifact_store.ARTIFACT_ROOT,
     staging_root: Path = artifact_store.STAGING_ROOT,
     catalog_root: Path = artifact_catalog.CATALOG_ROOT,
-    materializations_root: Path = MATERIALIZATION_ROOT,
+    materializations_root: Path | None = None,
     probe_runs_root: Path = Path("reports/runs"),
     probe_run_id: str | None = None,
     probe_receipt_sha256: str | None = None,
 ) -> dict[str, Any]:
+    materializations_root = materializations_root or MATERIALIZATION_ROOT
+    materializations_root = materializations_root or MATERIALIZATION_ROOT
     options = MaterializationOptions(
         _as_tuple(sources),
         max_object_bytes,
@@ -666,7 +668,7 @@ def execute_materialization(
     artifact_root: Path = artifact_store.ARTIFACT_ROOT,
     staging_root: Path = artifact_store.STAGING_ROOT,
     catalog_root: Path = artifact_catalog.CATALOG_ROOT,
-    materializations_root: Path = MATERIALIZATION_ROOT,
+    materializations_root: Path | None = None,
     probe_runs_root: Path = Path("reports/runs"),
     probe_run_id: str | None = None,
     probe_receipt_sha256: str | None = None,
@@ -674,6 +676,7 @@ def execute_materialization(
     now = now_fn or utc_now
     sleep = sleep_fn or time.sleep
     opener = urlopen or urllib.request.urlopen
+    materializations_root = materializations_root or MATERIALIZATION_ROOT
     options = MaterializationOptions(
         _as_tuple(sources),
         max_object_bytes,
@@ -946,16 +949,7 @@ def execute_materialization(
     write_jsonl(run_dir / "artifact_receipts.jsonl", artifact_receipts)
     write_json(run_dir / "transfer_receipts.json", transfer_receipts)
     write_jsonl(run_dir / "transfer_receipts.jsonl", transfer_receipts)
-    verification = verify_materialization_run(run_dir / "materialization_run_receipt.json", repo_root=Path.cwd()) if artifact_receipts else {
-        "contract_verification_status": "PASS",
-        "execution_outcome_status": "FAILED" if run_status == "failed" else ("BLOCKED" if run_status == "blocked_policy" else "NOT_APPLICABLE"),
-        "artifact_verification_status": "NOT_APPLICABLE",
-        "catalog_verification_status": catalog_verification["verification_status"],
-        "release_evidence_status": "FAIL",
-        "verification_status": "FAIL" if run_status == "failed" else "NOT_APPLICABLE",
-        "failures": failure_classes,
-        "checks": [],
-    }
+    verification = verify_materialization_run(run_dir / "materialization_run_receipt.json", repo_root=Path.cwd())
     write_json(run_dir / "materialization_verification.json", verification)
     write_json(run_dir / "safety_events.json", {"events": safety_events})
     write_json(run_dir / "artifact_catalog_delta.json", {"artifact_count": len(artifact_receipts), "catalog_status": catalog_verification["verification_status"]})
@@ -976,6 +970,8 @@ def execute_materialization(
         write_json(pointer_root / "latest_successful_materialization.json", pointer)
     elif run_status == "failed":
         write_json(pointer_root / "latest_failed_materialization.json", pointer)
+    elif run_status == "blocked_policy":
+        write_json(pointer_root / "latest_blocked_materialization.json", pointer)
     return {"run_status": run_status, "materialization_run_id": run_id, "receipt_path": str(run_dir / "materialization_run_receipt.json"), "receipt": run_receipt, "verification": verification, "transfer_receipts": transfer_receipts}
 
 

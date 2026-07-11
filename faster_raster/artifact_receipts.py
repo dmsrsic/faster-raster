@@ -155,8 +155,14 @@ def verify_materialization_run(receipt_path: Path, *, repo_root: Path | None = N
     execution_status = "FAILED" if execution_failed else ("BLOCKED" if execution_blocked else "PASS")
     artifact_status = "NOT_APPLICABLE" if not artifact_receipts else ("PASS" if not artifact_failures else "FAIL")
     catalog_status = receipt.get("catalog_update_status") or "NOT_APPLICABLE"
-    release_status = "PASS" if contract_status == "PASS" and execution_status == "PASS" and artifact_status == "PASS" and catalog_status in {"PASS", "NOT_APPLICABLE"} and not failures else "FAIL"
-    verification_status = "PASS" if release_status == "PASS" else "FAIL"
+    blocking_reasons = [str(item) for item in receipt.get("failure_classes", []) if item] if execution_blocked else []
+    informational_reasons: list[str] = []
+    if execution_blocked:
+        release_status = "NOT_APPLICABLE"
+        verification_status = "NOT_APPLICABLE"
+    else:
+        release_status = "PASS" if contract_status == "PASS" and execution_status == "PASS" and artifact_status == "PASS" and catalog_status in {"PASS", "NOT_APPLICABLE"} and not failures else "FAIL"
+        verification_status = "PASS" if release_status == "PASS" else "FAIL"
     return {
         "contract_verification_status": contract_status,
         "execution_outcome_status": execution_status,
@@ -168,6 +174,8 @@ def verify_materialization_run(receipt_path: Path, *, repo_root: Path | None = N
         "passed_check_count": sum(1 for check in checks if check["status"] == "PASS"),
         "failed_check_count": sum(1 for check in checks if check["status"] == "FAIL"),
         "warnings": [],
+        "blocking_reasons": sorted(set(blocking_reasons)),
+        "informational_reasons": sorted(set(informational_reasons)),
         "failures": sorted(set(failures)),
         "checks": checks,
     }
