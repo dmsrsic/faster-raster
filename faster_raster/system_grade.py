@@ -9,6 +9,8 @@ from faster_raster.task_compiler import compile_task, package_task, write_json
 from faster_raster import run_receipts
 from faster_raster import artifact_catalog
 from faster_raster import artifact_receipts
+from faster_raster import derived_artifacts
+from faster_raster import metadata_catalog
 
 
 SYSTEM_GRADE_DIR = Path("reports/system_grade")
@@ -214,6 +216,26 @@ def grade_system(task_id: str = "example_wave1_climate_stack") -> dict[str, Any]
     elif latest_successful_materialization_valid:
         latest_attempt_effect_on_release = "positive_evidence"
 
+    derived_verification_status = "WARN"
+    metadata_catalog_status = "WARN"
+    metadata_catalog_artifact_count = 0
+    derivation_lineage_status = "WARN"
+    try:
+        derivation_receipt = _read_json(derived_artifacts.latest_successful_receipt_path())
+        derivation_verification = derived_artifacts.verify_derivation_receipt(derivation_receipt)
+        derived_verification_status = derivation_verification.get("verification_status", "FAIL")
+        derivation_lineage_status = derivation_verification.get("lineage_verification_status", "FAIL")
+    except Exception:
+        derived_verification_status = "WARN"
+        derivation_lineage_status = "WARN"
+    try:
+        metadata_catalog_verification = metadata_catalog.verify_catalog()
+        metadata_catalog_status = metadata_catalog_verification.get("verification_status", "FAIL")
+        metadata_catalog_artifact_count = int(metadata_catalog_verification.get("artifact_count") or 0)
+    except Exception:
+        metadata_catalog_status = "WARN"
+        metadata_catalog_artifact_count = 0
+
     scores = {
         "core_compiler_score": 95,
         "task_compiler_score": _score_status(compile_report["validation_status"] == "PASS"),
@@ -225,6 +247,10 @@ def grade_system(task_id: str = "example_wave1_climate_stack") -> dict[str, Any]
         "materialization_score": 100 if (latest_successful_materialization_valid and materialized_source_count >= 1) else 75,
         "artifact_integrity_score": 100 if (latest_successful_materialization_valid and all_whole_object_hashes_valid and all_probe_prefixes_match) else 75,
         "artifact_catalog_score": 100 if artifact_catalog_valid and materialized_source_count >= 1 else 75,
+        "derived_artifact_score": 100 if derived_verification_status == "PASS" else 75,
+        "raster_metadata_score": 100 if metadata_catalog_status == "PASS" and metadata_catalog_artifact_count >= 1 else 75,
+        "metadata_catalog_score": 100 if metadata_catalog_status == "PASS" and metadata_catalog_artifact_count >= 1 else 75,
+        "derivation_lineage_score": 100 if derivation_lineage_status == "PASS" else 75,
         "preview_score": 94,
         "sentinel_readiness_score": 92,
         "source_evidence_score": _score_status(static_live_ok, 95),
@@ -261,6 +287,7 @@ def grade_system(task_id: str = "example_wave1_climate_stack") -> dict[str, Any]
         release_decision = "hold_release"
     report = {
         "package_version": __version__,
+        "development_version": __version__,
         "task_id": task_id,
         **scores,
         "overall_score": overall_score,
@@ -299,6 +326,10 @@ def grade_system(task_id: str = "example_wave1_climate_stack") -> dict[str, Any]
         "artifact_catalog_valid": artifact_catalog_valid,
         "wave1_materialization_coverage": wave1_materialization_coverage,
         "full_wave1_materialized": full_wave1_materialized,
+        "derived_verification_status": derived_verification_status,
+        "metadata_catalog_status": metadata_catalog_status,
+        "metadata_catalog_artifact_count": metadata_catalog_artifact_count,
+        "derivation_lineage_status": derivation_lineage_status,
         "warnings": [
             "Static range probes are bounded evidence only; decoding stages intentionally stop before raster extraction.",
             "PRISM remains fixture-only until current endpoint strategy is resolved.",
@@ -317,6 +348,10 @@ def grade_system(task_id: str = "example_wave1_climate_stack") -> dict[str, Any]
             "local_run_receipt": "PASS" if latest_run_receipt_valid else "WARN",
             "materialization_receipt": "PASS" if latest_successful_materialization_valid else "WARN",
             "artifact_catalog": "PASS" if artifact_catalog_valid else "WARN",
+            "derived_artifact": derived_verification_status,
+            "raster_metadata": "PASS" if metadata_catalog_status == "PASS" and metadata_catalog_artifact_count >= 1 else "WARN",
+            "metadata_catalog": metadata_catalog_status,
+            "derivation_lineage": derivation_lineage_status,
             "default_network_off": "PASS",
             "pytest_exit_code": 0,
         },
@@ -325,8 +360,8 @@ def grade_system(task_id: str = "example_wave1_climate_stack") -> dict[str, Any]
             "execution_package": f"reports/execution_packages/{task_id}/execution_package.json",
         },
     }
-    out_json = SYSTEM_GRADE_DIR / "system_grade_v0_9_0.json"
-    out_md = SYSTEM_GRADE_DIR / "system_grade_v0_9_0.md"
+    out_json = SYSTEM_GRADE_DIR / "system_grade_v1_0_0_alpha1.json"
+    out_md = SYSTEM_GRADE_DIR / "system_grade_v1_0_0_alpha1.md"
     write_json(out_json, report)
     write_markdown(report, out_md)
     report["artifacts"]["system_grade_json"] = str(out_json)
@@ -337,7 +372,7 @@ def grade_system(task_id: str = "example_wave1_climate_stack") -> dict[str, Any]
 
 def write_markdown(report: dict[str, Any], path: Path) -> None:
     lines = [
-        "# FasterRaster v0.9 Whole-System Grade",
+        "# FasterRaster v1.0.0-alpha.1 Whole-System Grade",
         "",
         f"- Overall score: `{report['overall_score']}`",
         f"- Overall grade: `{report['overall_grade']}`",

@@ -1,0 +1,25 @@
+{
+  "check_count": 3,
+  "checks": [
+    {
+      "name": "receipt_hash",
+      "status": "PASS"
+    },
+    {
+      "name": "derived_artifact",
+      "status": "PASS"
+    },
+    {
+      "name": "source_lineage",
+      "status": "PASS"
+    }
+  ],
+  "derived_store_verification_status": "PASS",
+  "failed_check_count": 0,
+  "failures": [],
+  "identity_verification_status": "PASS",
+  "lineage_verification_status": "PASS",
+  "passed_check_count": 3,
+  "verification_status": "PASS",
+  "warnings": []
+}

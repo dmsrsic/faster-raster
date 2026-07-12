@@ -1,0 +1,147 @@
+{
+  "band_metadata": [
+    {
+      "band_index": 1,
+      "block_shape": [
+        1,
+        7200
+      ],
+      "description": null,
+      "dtype": "float32",
+      "mask_flags": [],
+      "nodata": null,
+      "offset": null,
+      "scale": null,
+      "status": {
+        "dtype": "confirmed",
+        "nodata": "missing",
+        "units": "missing"
+      },
+      "tags": {},
+      "units": null
+    }
+  ],
+  "container": {
+    "block_shapes": [
+      [
+        1,
+        7200
+      ]
+    ],
+    "byte_order": "little",
+    "compression": 1,
+    "container_format": "geotiff",
+    "driver": "GTiff",
+    "file_extension": ".tif",
+    "interleave": null,
+    "overview_levels": [],
+    "size_bytes": 57616614,
+    "status": {
+      "byte_order": "confirmed",
+      "compression": "confirmed",
+      "driver": "confirmed"
+    },
+    "tiled": false
+  },
+  "derivation_plan_sha256": "54c410c58e3248822e510ad9201ca1c8314e2c8aa8720d1297133ef4a8feebc3",
+  "derived_artifact_receipt_sha256": "8014a8bdffa1da5d33ea75bb08bebd8b8d8c7ce5ce3013d4f0f1710a50513662",
+  "derived_artifact_sha256": "b08614b6fc5bc1f4382cf343f821175207cdc2f74a95d3123ebf6505dfda89f0",
+  "grid_geometry": {
+    "affine_transform": [
+      0.05000000074505806,
+      0.0,
+      -180.0,
+      0.0,
+      -0.05000000074505806,
+      50.0
+    ],
+    "bounds": [
+      -180.0,
+      -50.00000149011612,
+      180.00000536441803,
+      50.0
+    ],
+    "column_direction": "west_to_east",
+    "lower_right": [
+      180.00000536441803,
+      -50.00000149011612
+    ],
+    "pixel_height": -0.05000000074505806,
+    "pixel_registration": "area",
+    "pixel_width": 0.05000000074505806,
+    "rotation_present": false,
+    "row_direction": "north_to_south",
+    "status": {
+      "affine_transform": "confirmed",
+      "bounds": "confirmed",
+      "pixel_registration": "inferred"
+    },
+    "upper_left": [
+      -180.0,
+      50.0
+    ]
+  },
+  "metadata_contract_sha256": "4de07fdd955b094274559f3f447d7e8300ee5c36f431a3da0eec650ffb42e875",
+  "metadata_provenance": {
+    "derived_artifact_receipt": "8014a8bdffa1da5d33ea75bb08bebd8b8d8c7ce5ce3013d4f0f1710a50513662",
+    "embedded_file_metadata": "Pillow",
+    "filename_or_temporal_key": "artifact_catalog_temporal_key_20230101",
+    "source_registry": "declared_source_id_without_registry_mutation",
+    "task_contract": "example_wave1_climate_stack"
+  },
+  "metadata_schema_version": 1,
+  "provenance_status": {
+    "derived_artifact_receipt": "confirmed",
+    "embedded_file_metadata": "confirmed",
+    "filename_or_temporal_key": "declared_only",
+    "source_registry": "declared_only",
+    "task_contract": "declared_only"
+  },
+  "raster_shape": {
+    "band_count": 1,
+    "color_interpretations": [
+      "F"
+    ],
+    "dtypes": [
+      "float32"
+    ],
+    "height": 2000,
+    "status": {
+      "band_count": "confirmed",
+      "dtypes": "confirmed",
+      "height": "confirmed",
+      "width": "confirmed"
+    },
+    "width": 7200
+  },
+  "semantic_declarations": {
+    "canonical_units": "mm/day",
+    "semantic_type": "daily_precipitation",
+    "status": {
+      "canonical_units": "declared_only",
+      "semantic_type": "declared_only",
+      "temporal_key": "declared_only",
+      "temporal_support": "declared_only",
+      "variable_name": "declared_only"
+    },
+    "temporal_key": "20230101",
+    "temporal_support": "daily",
+    "variable_name": "precipitation"
+  },
+  "source_artifact_sha256": "975aa6e54a75551d76b4390a7a30c6fc813e86eabd967e5f65a9db2e0b4cb4d8",
+  "source_id": "chirps_daily_precipitation",
+  "spatial_reference": {
+    "axis_order": null,
+    "coordinate_units": "degree",
+    "crs_authority": "EPSG",
+    "crs_code": "4326",
+    "crs_present": true,
+    "crs_projjson": null,
+    "crs_wkt": null,
+    "status": {
+      "axis_order": "unsupported",
+      "coordinate_units": "inferred",
+      "crs": "confirmed"
+    }
+  }
+}

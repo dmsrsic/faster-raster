@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+  "catalog_status",
+  "verification_status",
+  "artifact_count",
+  "failures",
+  "warnings"
+],
+  "properties": {
+  "catalog_status": {},
+  "verification_status": {},
+  "artifact_count": {},
+  "failures": {},
+  "warnings": {}
+}
+}

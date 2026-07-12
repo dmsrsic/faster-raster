@@ -1,0 +1,26 @@
+{
+  "approval_requirement": "require --allow-derivation and --approve-plan-sha256",
+  "derivation_plan_contract_sha256": "54c410c58e3248822e510ad9201ca1c8314e2c8aa8720d1297133ef4a8feebc3",
+  "derived_artifact_root_policy": {
+    "content_addressed": true,
+    "no_overwrite": true,
+    "root": "cache/derived/sha256",
+    "symlinks_rejected": true
+  },
+  "expected_derived_format": "geotiff",
+  "expected_source_container": "gzip",
+  "generated_at_utc": "2026-07-12T22:27:51Z",
+  "implementation_version": "derived-artifacts-v1",
+  "max_decompressed_bytes": 1073741824,
+  "max_expansion_ratio": 500.0,
+  "operation": "gzip_decompress",
+  "schema_version": 1,
+  "source_artifact_logical_path": "cache/artifacts/sha256/97/5a/975aa6e54a75551d76b4390a7a30c6fc813e86eabd967e5f65a9db2e0b4cb4d8.tif.gz",
+  "source_artifact_sha256": "975aa6e54a75551d76b4390a7a30c6fc813e86eabd967e5f65a9db2e0b4cb4d8",
+  "source_size_bytes": 3373363,
+  "staging_root_policy": {
+    "absolute_paths_excluded_from_hash": true,
+    "root": "cache/staging/derivations",
+    "symlinks_rejected": true
+  }
+}

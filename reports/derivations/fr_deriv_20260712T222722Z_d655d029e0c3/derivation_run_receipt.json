@@ -1,0 +1,43 @@
+{
+  "atomic_commit_completed": false,
+  "complete_output": false,
+  "compressed_bytes_read": 0,
+  "decompressed_bytes_written": 0,
+  "derivation_plan_contract_sha256": "54c410c58e3248822e510ad9201ca1c8314e2c8aa8720d1297133ef4a8feebc3",
+  "derivation_run_id": "fr_deriv_20260712T222722Z_d655d029e0c3",
+  "derived_artifact_receipt_contract_sha256": "1620c84fcab472eea6d94f3b05e11930fcd89d684db6cf056924ad201f36280b",
+  "duration_ms": 30,
+  "errors": [
+    "plan_hash_mismatch"
+  ],
+  "expansion_ratio": 0.0,
+  "failure_class": "plan_hash_mismatch",
+  "finished_at_utc": "2026-07-12T22:27:22Z",
+  "gzip_member_count": 0,
+  "multiple_gzip_members": false,
+  "operation": "gzip_decompress",
+  "operation_status": "failed",
+  "output_extension": ".tif",
+  "output_format": "geotiff",
+  "output_logical_path": null,
+  "output_sha256": null,
+  "output_sha256_short": "",
+  "output_size_bytes": 0,
+  "provenance": {
+    "derivation_implementation_version": "derived-artifacts-v1",
+    "faster_raster_version": "1.0.0.dev0",
+    "source_artifact_catalog_sha256": "91356f3577d7db9b10ea582a39dddf47caed890164b6858cdeeb61524afd8694",
+    "source_artifact_receipt_sha256": "87bd117580983123083cc8038726e65b53a5e9309cede508ecd90d6a35f2436f"
+  },
+  "reused_existing_artifact": false,
+  "schema_version": 1,
+  "source_artifact_logical_path": "cache/artifacts/sha256/97/5a/975aa6e54a75551d76b4390a7a30c6fc813e86eabd967e5f65a9db2e0b4cb4d8.tif.gz",
+  "source_artifact_sha256": "975aa6e54a75551d76b4390a7a30c6fc813e86eabd967e5f65a9db2e0b4cb4d8",
+  "source_artifact_size_bytes": 3373363,
+  "started_at_utc": "2026-07-12T22:27:22Z",
+  "validation": {
+    "validation_status": "NOT_RUN"
+  },
+  "validation_status": "NOT_RUN",
+  "warnings": []
+}

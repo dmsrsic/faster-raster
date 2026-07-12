@@ -20,6 +20,10 @@ from faster_raster import run_receipts
 from faster_raster import materialization
 from faster_raster import artifact_catalog
 from faster_raster import artifact_receipts
+from faster_raster import derived_artifacts
+from faster_raster import raster_metadata
+from faster_raster import metadata_verification
+from faster_raster import metadata_catalog
 from faster_raster import real_preview
 from faster_raster import copernicus_auth
 from faster_raster.adapters import copernicus_cdse
@@ -41,6 +45,8 @@ range_app = typer.Typer(no_args_is_help=True)
 grade_app = typer.Typer(no_args_is_help=True)
 run_app = typer.Typer(no_args_is_help=True)
 materialize_app = typer.Typer(no_args_is_help=True)
+derive_app = typer.Typer(no_args_is_help=True)
+metadata_app = typer.Typer(no_args_is_help=True)
 
 
 def emit(value, *, json_output: bool = False, plain: bool = False, no_color: bool = False, plain_text: str | None = None, table: tuple[str, list[str], list[list]] | None = None) -> None:
@@ -1299,6 +1305,130 @@ def stack_preview_real(
         plain=plain,
     )
 
+
+def _plain_lines(value: dict) -> str:
+    return "\n".join(f"{key}: {item}" for key, item in value.items()) + "\n"
+
+
+@derive_app.command("plan")
+def derive_plan(
+    artifact_sha256: str = typer.Option(..., "--artifact-sha256"),
+    operation: str = typer.Option("gzip-decompress", "--operation"),
+    max_output_bytes: int = typer.Option(1_073_741_824, "--max-output-bytes"),
+    max_expansion_ratio: float = typer.Option(500, "--max-expansion-ratio"),
+    json_output: bool = typer.Option(False, "--json"),
+    plain: bool = typer.Option(False, "--plain"),
+) -> None:
+    plan = derived_artifacts.build_derivation_plan(artifact_sha256, operation=operation, max_output_bytes=max_output_bytes, max_expansion_ratio=max_expansion_ratio)
+    path = derived_artifacts.write_plan(plan)
+    payload = {**plan, "plan_json": str(path)}
+    emit(payload, json_output=json_output, plain=True, plain_text=_plain_lines(payload) if plain else render.stable_json(payload))
+
+
+@derive_app.command("local")
+def derive_local(
+    artifact_sha256: str = typer.Option(..., "--artifact-sha256"),
+    operation: str = typer.Option("gzip-decompress", "--operation"),
+    allow_derivation: bool = typer.Option(False, "--allow-derivation"),
+    approve_plan_sha256: str | None = typer.Option(None, "--approve-plan-sha256"),
+    max_output_bytes: int = typer.Option(1_073_741_824, "--max-output-bytes"),
+    max_expansion_ratio: float = typer.Option(500, "--max-expansion-ratio"),
+    json_output: bool = typer.Option(False, "--json"),
+    plain: bool = typer.Option(False, "--plain"),
+) -> None:
+    result = derived_artifacts.run_derivation(artifact_sha256, operation=operation, allow_derivation=allow_derivation, approve_plan_sha256=approve_plan_sha256, max_output_bytes=max_output_bytes, max_expansion_ratio=max_expansion_ratio)
+    receipt = result["receipt"]
+    if receipt["operation_status"] == "completed":
+        metadata = raster_metadata.extract_raster_metadata(receipt)
+        verification = metadata_verification.verify_metadata(metadata, receipt)
+        raster_metadata.write_metadata_reports(metadata, verification)
+        catalog = metadata_catalog.update_catalog(metadata, verification)
+        result["metadata"] = metadata
+        result["metadata_verification"] = verification
+        result["metadata_catalog"] = catalog
+    plain_payload = {
+        "derivation_run_id": receipt["derivation_run_id"],
+        "operation_status": receipt["operation_status"],
+        "source_artifact_sha256": receipt["source_artifact_sha256"],
+        "output_sha256": receipt.get("output_sha256"),
+        "output_size_bytes": receipt.get("output_size_bytes"),
+        "reused_existing_artifact": receipt.get("reused_existing_artifact"),
+        "validation_status": receipt.get("validation_status"),
+        "receipt_json": f"reports/derivations/{receipt['derivation_run_id']}/derivation_run_receipt.json",
+    }
+    emit(result, json_output=json_output, plain=True, plain_text=_plain_lines(plain_payload) if plain else render.stable_json(result))
+    if receipt["operation_status"] != "completed":
+        raise typer.Exit(code=1)
+
+
+@derive_app.command("inspect")
+def derive_inspect(latest_successful: bool = typer.Option(False, "--latest-successful"), json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
+    path = derived_artifacts.latest_successful_receipt_path() if latest_successful else derived_artifacts.latest_receipt_path()
+    receipt = json.loads(path.read_text(encoding="utf-8"))
+    emit(receipt, json_output=json_output, plain=True, plain_text=_plain_lines(receipt) if plain else render.stable_json(receipt))
+
+
+@derive_app.command("verify")
+def derive_verify(latest_successful: bool = typer.Option(False, "--latest-successful"), receipt_path: Path | None = typer.Option(None, "--receipt"), json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
+    path = receipt_path or (derived_artifacts.latest_successful_receipt_path() if latest_successful else derived_artifacts.latest_receipt_path())
+    receipt = json.loads(path.read_text(encoding="utf-8"))
+    verification = derived_artifacts.verify_derivation_receipt(receipt)
+    emit(verification, json_output=json_output, plain=True, plain_text=_plain_lines(verification) if plain else render.stable_json(verification))
+    if verification["verification_status"] != "PASS":
+        raise typer.Exit(code=1)
+
+
+@derive_app.command("catalog")
+def derive_catalog(json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
+    catalog = metadata_catalog.load_catalog()
+    emit(catalog, json_output=json_output, plain=True, plain_text=_plain_lines(catalog) if plain else render.stable_json(catalog))
+
+
+@derive_app.command("catalog-verify")
+def derive_catalog_verify(json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
+    verification = metadata_catalog.verify_catalog()
+    emit(verification, json_output=json_output, plain=True, plain_text=_plain_lines(verification) if plain else render.stable_json(verification))
+    if verification["verification_status"] != "PASS":
+        raise typer.Exit(code=1)
+
+
+@metadata_app.command("inspect")
+def metadata_inspect(latest: bool = typer.Option(False, "--latest"), metadata_path: Path | None = typer.Option(None, "--metadata"), json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
+    path = metadata_path or raster_metadata.latest_metadata_path()
+    metadata = json.loads(path.read_text(encoding="utf-8"))
+    verification_path = path.with_name("metadata_verification.json")
+    status = "NOT_RUN"
+    if verification_path.exists():
+        status = json.loads(verification_path.read_text(encoding="utf-8")).get("verification_status", "NOT_RUN")
+    emit(metadata, json_output=json_output, plain=True, plain_text=raster_metadata.inspect_plain(metadata, status) if plain else render.stable_json(metadata))
+
+
+@metadata_app.command("verify")
+def metadata_verify(latest: bool = typer.Option(False, "--latest"), metadata_path: Path | None = typer.Option(None, "--metadata"), json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
+    path = metadata_path or raster_metadata.latest_metadata_path()
+    metadata = json.loads(path.read_text(encoding="utf-8"))
+    receipt = json.loads(derived_artifacts.latest_successful_receipt_path().read_text(encoding="utf-8"))
+    verification = metadata_verification.verify_metadata(metadata, receipt)
+    raster_metadata.write_metadata_reports(metadata, verification)
+    emit(verification, json_output=json_output, plain=True, plain_text=_plain_lines(verification) if plain else render.stable_json(verification))
+    if verification["verification_status"] != "PASS":
+        raise typer.Exit(code=1)
+
+
+@metadata_app.command("catalog")
+def metadata_catalog_command(json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
+    catalog = metadata_catalog.load_catalog()
+    emit(catalog, json_output=json_output, plain=True, plain_text=_plain_lines(catalog) if plain else render.stable_json(catalog))
+
+
+@metadata_app.command("catalog-verify")
+def metadata_catalog_verify_command(json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
+    verification = metadata_catalog.verify_catalog()
+    emit(verification, json_output=json_output, plain=True, plain_text=_plain_lines(verification) if plain else render.stable_json(verification))
+    if verification["verification_status"] != "PASS":
+        raise typer.Exit(code=1)
+
+
 def register_product_commands(app: typer.Typer) -> None:
     app.command("version")(version_command)
     app.command("doctor")(doctor_command)
@@ -1330,6 +1460,8 @@ def register_product_commands(app: typer.Typer) -> None:
     app.add_typer(grade_app, name="grade")
     app.add_typer(run_app, name="run")
     app.add_typer(materialize_app, name="materialize")
+    app.add_typer(derive_app, name="derive")
+    app.add_typer(metadata_app, name="metadata")
     app.command("cookplan")(cookplan)
     app.command("queue")(queue)
     app.command("cookdip")(cookdip)

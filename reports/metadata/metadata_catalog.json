@@ -1,0 +1,30 @@
+{
+  "artifact_count": 1,
+  "entries": [
+    {
+      "band_count": 1,
+      "bounds": [
+        -180.0,
+        -50.00000149011612,
+        180.00000536441803,
+        50.0
+      ],
+      "crs_summary": "EPSG:4326",
+      "derived_artifact_sha256": "b08614b6fc5bc1f4382cf343f821175207cdc2f74a95d3123ebf6505dfda89f0",
+      "format": "geotiff",
+      "height": 2000,
+      "metadata_contract_sha256": "4de07fdd955b094274559f3f447d7e8300ee5c36f431a3da0eec650ffb42e875",
+      "metadata_verification_sha256": "b0d9480db30e3c9859b72f9ce21e483e52e80ac075bf8240639b7f06e5808bbf",
+      "metadata_verification_status": "PASS",
+      "semantic_type": "daily_precipitation",
+      "source_artifact_sha256": "975aa6e54a75551d76b4390a7a30c6fc813e86eabd967e5f65a9db2e0b4cb4d8",
+      "source_id": "chirps_daily_precipitation",
+      "temporal_key": "20230101",
+      "units_status": "declared_only",
+      "verification_status": "PASS",
+      "width": 7200
+    }
+  ],
+  "metadata_catalog_contract_sha256": "caead7f5a3efb6223bd63301febc3642bcde9c6714cc4118cf4366c0744416be",
+  "schema_version": 1
+}

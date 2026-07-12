@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+  "schema_version",
+  "artifact_count",
+  "entries",
+  "metadata_catalog_contract_sha256"
+],
+  "properties": {
+  "schema_version": {},
+  "artifact_count": {},
+  "entries": {},
+  "metadata_catalog_contract_sha256": {}
+}
+}

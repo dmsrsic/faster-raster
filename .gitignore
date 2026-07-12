@@ -19,3 +19,6 @@ configs/*credentials*.yaml
 cache/runtime/
 cache/artifacts/
 cache/staging/materialization/
+
+# FasterRaster runtime artifacts
+cache/

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+  "identity_verification_status",
+  "container_verification_status",
+  "spatial_verification_status",
+  "band_verification_status",
+  "semantic_verification_status",
+  "lineage_verification_status",
+  "verification_status"
+],
+  "properties": {
+  "identity_verification_status": {},
+  "container_verification_status": {},
+  "spatial_verification_status": {},
+  "band_verification_status": {},
+  "semantic_verification_status": {},
+  "lineage_verification_status": {},
+  "verification_status": {}
+}
+}
