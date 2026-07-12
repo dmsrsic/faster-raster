@@ -24,6 +24,7 @@ from faster_raster import derived_artifacts
 from faster_raster import raster_metadata
 from faster_raster import metadata_verification
 from faster_raster import metadata_catalog
+from faster_raster import preview_alpha2
 from faster_raster import real_preview
 from faster_raster import copernicus_auth
 from faster_raster.adapters import copernicus_cdse
@@ -47,6 +48,7 @@ run_app = typer.Typer(no_args_is_help=True)
 materialize_app = typer.Typer(no_args_is_help=True)
 derive_app = typer.Typer(no_args_is_help=True)
 metadata_app = typer.Typer(no_args_is_help=True)
+preview_app = typer.Typer(no_args_is_help=True)
 
 
 def emit(value, *, json_output: bool = False, plain: bool = False, no_color: bool = False, plain_text: str | None = None, table: tuple[str, list[str], list[list]] | None = None) -> None:
@@ -1429,6 +1431,68 @@ def metadata_catalog_verify_command(json_output: bool = typer.Option(False, "--j
         raise typer.Exit(code=1)
 
 
+@preview_app.command("plan")
+def preview_plan(task_id: str, max_total_bytes: int = typer.Option(25_000_000, "--max-total-bytes"), json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
+    contract = preview_alpha2.plan_preview(task_id, max_total_bytes=max_total_bytes)
+    emit(contract, json_output=json_output, plain=True, plain_text=_plain_lines(contract) if plain else render.stable_json(contract))
+
+
+@preview_app.command("render")
+def preview_render(task_id: str, allow_network: bool = typer.Option(False, "--allow-network"), allow_preview: bool = typer.Option(False, "--allow-preview"), approve_plan_sha256: str | None = typer.Option(None, "--approve-plan-sha256"), max_total_bytes: int = typer.Option(25_000_000, "--max-total-bytes"), timeout_seconds: int = typer.Option(30, "--timeout-seconds"), retry_count: int = typer.Option(0, "--retry-count"), json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
+    result = preview_alpha2.render_preview(task_id, allow_network=allow_network, allow_preview=allow_preview, approve_plan_sha256=approve_plan_sha256, max_total_bytes=max_total_bytes, timeout_seconds=timeout_seconds, retry_count=retry_count)
+    receipt = result["receipt"]
+    payload = {"preview_run_id": receipt["preview_run_id"], "operation_status": receipt["operation_status"], "preview_render_contract_sha256": receipt["preview_render_contract_sha256"], "output_image_sha256": receipt["output_image_sha256"], "output_image_logical_path": receipt["output_image_logical_path"], "primary_imagery_source": receipt["primary_imagery_source"], "primary_imagery_visible_fraction": receipt["primary_imagery_visible_fraction"], "imagery_coverage_fraction": receipt["imagery_coverage_fraction"], "preview_verification_status": result["verification"]["preview_verification_status"]}
+    emit(result, json_output=json_output, plain=True, plain_text=_plain_lines(payload) if plain else render.stable_json(result))
+    if result["verification"]["preview_verification_status"] != "PASS":
+        raise typer.Exit(code=1)
+
+
+@preview_app.command("inspect")
+def preview_inspect(latest_successful: bool = typer.Option(False, "--latest-successful"), json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
+    pointer = preview_alpha2.latest_pointer(successful=latest_successful)
+    receipt = json.loads(Path(pointer["receipt_path"]).read_text(encoding="utf-8"))
+    emit(receipt, json_output=json_output, plain=True, plain_text=_plain_lines(receipt) if plain else render.stable_json(receipt))
+
+
+@preview_app.command("verify")
+def preview_verify(latest_successful: bool = typer.Option(False, "--latest-successful"), json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
+    pointer = preview_alpha2.latest_pointer(successful=latest_successful)
+    receipt = json.loads(Path(pointer["receipt_path"]).read_text(encoding="utf-8"))
+    verification = preview_alpha2.verify_preview(receipt)
+    emit(verification, json_output=json_output, plain=True, plain_text=_plain_lines(verification) if plain else render.stable_json(verification))
+    if verification["preview_verification_status"] != "PASS":
+        raise typer.Exit(code=1)
+
+
+@preview_app.command("open")
+def preview_open(latest_successful: bool = typer.Option(False, "--latest-successful"), json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
+    result = preview_alpha2.open_latest_preview(successful=latest_successful)
+    emit(result, json_output=json_output, plain=True, plain_text=_plain_lines(result) if plain else render.stable_json(result))
+
+
+@preview_app.command("latest")
+def preview_latest(json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
+    pointer = preview_alpha2.latest_pointer(successful=False)
+    emit(pointer, json_output=json_output, plain=True, plain_text=_plain_lines(pointer) if plain else render.stable_json(pointer))
+
+
+@preview_app.command("adapters")
+def preview_adapters(json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
+    from faster_raster.adapters.conformance import verify_adapter_conformance
+    result = verify_adapter_conformance(root=Path.cwd())
+    emit(result, json_output=json_output, plain=True, plain_text=_plain_lines(result) if plain else render.stable_json(result))
+    if result["verification_status"] != "PASS":
+        raise typer.Exit(code=1)
+
+
+@preview_app.command("sources")
+def preview_sources(json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
+    result = preview_alpha2.verify_source_allowlist(root=Path.cwd())
+    emit(result, json_output=json_output, plain=True, plain_text=_plain_lines(result) if plain else render.stable_json(result))
+    if result["verification_status"] != "PASS":
+        raise typer.Exit(code=1)
+
+
 def register_product_commands(app: typer.Typer) -> None:
     app.command("version")(version_command)
     app.command("doctor")(doctor_command)
@@ -1462,6 +1526,7 @@ def register_product_commands(app: typer.Typer) -> None:
     app.add_typer(materialize_app, name="materialize")
     app.add_typer(derive_app, name="derive")
     app.add_typer(metadata_app, name="metadata")
+    app.add_typer(preview_app, name="preview")
     app.command("cookplan")(cookplan)
     app.command("queue")(queue)
     app.command("cookdip")(cookdip)

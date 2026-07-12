@@ -1,0 +1,8 @@
+{
+  "operation_status": "completed",
+  "preview_path": "reports/previews/example_imagery_first_multipreview/preview_20260712T233652Z_188a18a1aa87/preview.png",
+  "preview_run_id": "preview_20260712T233652Z_188a18a1aa87",
+  "receipt_path": "reports/previews/example_imagery_first_multipreview/preview_20260712T233652Z_188a18a1aa87/preview_receipt.json",
+  "updated_at_utc": "2026-07-12T23:36:53Z",
+  "verification_path": "reports/previews/example_imagery_first_multipreview/preview_20260712T233652Z_188a18a1aa87/preview_verification.json"
+}

@@ -1,0 +1,387 @@
+{
+  "actual_imagery_pixel_status": true,
+  "adapter_count": 3,
+  "cloud_or_quality_mask_fraction": null,
+  "diagnostic_visible_fraction": 0.0,
+  "dominant_visual_role": "primary_imagery",
+  "duration_ms": 1213,
+  "failures": [],
+  "fallback_truthfulness_status": "PASS",
+  "fallback_visible_fraction": 0.05,
+  "finished_at_utc": "2026-07-12T23:36:53Z",
+  "imagery_coverage_fraction": 1.0,
+  "imagery_dominance_status": "PASS",
+  "imagery_presence_status": "PASS",
+  "layers": [
+    {
+      "CRS": "EPSG:4326",
+      "adapter_id": "arcgis_imageserver_preview",
+      "band_mapping": [
+        "red",
+        "green",
+        "blue"
+      ],
+      "blend_mode": "normal",
+      "bounds": [
+        -83.2,
+        39.8,
+        -83.18,
+        39.82
+      ],
+      "bytes_read": 473541,
+      "color_profile": "natural_color",
+      "compiled_order": 0,
+      "content_type": "image/png",
+      "contrast_stretch_policy": {
+        "band_order": [
+          "red",
+          "green",
+          "blue"
+        ],
+        "clipping_policy": "clip_to_percentiles",
+        "gamma": 1.0,
+        "nodata_behavior": "transparent",
+        "output_bit_depth": 8,
+        "percentile_range": [
+          2,
+          98
+        ],
+        "required_bands": [
+          "red",
+          "green",
+          "blue"
+        ],
+        "scale_source": "service_png_or_reflectance"
+      },
+      "exclusion_reason": null,
+      "failure_class": null,
+      "fallback_status": false,
+      "height": 512,
+      "layer_status": "real_pixels_rendered",
+      "legend_order": 0,
+      "mask_policy": "transparent_nodata_only",
+      "mode": "RGBA",
+      "nodata_policy": "transparent",
+      "nontransparent_fraction": 1.0,
+      "nontransparent_pixel_count": 4096,
+      "opacity": 1.0,
+      "real_pixel_status": true,
+      "real_raster_pixels_required": true,
+      "render_role": "primary_imagery",
+      "rendered_into_composite": true,
+      "resampling_method": "bilinear",
+      "resolution": "preview",
+      "source_id": "usgs_naip_imagery",
+      "source_sha256": "f2f375f9d7b5dd18384416028fef8325213de8210ceba7193154e6b3b00f949f",
+      "theme": "aerial_imagery",
+      "thumbnail_status": "actual_source_pixels",
+      "unique_sample_colors": 2302,
+      "width": 512,
+      "z_order": 0
+    },
+    {
+      "CRS": "EPSG:4326",
+      "adapter_id": "stac_api",
+      "band_mapping": [
+        "red",
+        "green",
+        "blue"
+      ],
+      "blend_mode": "normal",
+      "bounds": [
+        -83.2,
+        39.8,
+        -83.18,
+        39.82
+      ],
+      "color_profile": "natural_color",
+      "compiled_order": 1,
+      "contrast_stretch_policy": {
+        "band_order": [
+          "red",
+          "green",
+          "blue"
+        ],
+        "clipping_policy": "clip_to_percentiles",
+        "gamma": 1.0,
+        "nodata_behavior": "transparent",
+        "output_bit_depth": 8,
+        "percentile_range": [
+          2,
+          98
+        ],
+        "required_bands": [
+          "red",
+          "green",
+          "blue"
+        ],
+        "scale_source": "service_png_or_reflectance"
+      },
+      "failure_class": null,
+      "fallback_status": false,
+      "layer_status": "not_downloaded_alpha2",
+      "legend_order": 0,
+      "mask_policy": "transparent_nodata_only",
+      "nodata_policy": "transparent",
+      "opacity": 0.85,
+      "real_pixel_status": false,
+      "real_raster_pixels_required": true,
+      "render_role": "imagery_alternative",
+      "resampling_method": "bilinear",
+      "resolution": "preview",
+      "source_id": "sentinel_2_l2a_planetary_computer",
+      "theme": "optical_imagery",
+      "z_order": 5
+    },
+    {
+      "CRS": "EPSG:4326",
+      "adapter_id": "stac_api",
+      "band_mapping": [
+        "vv"
+      ],
+      "blend_mode": "normal",
+      "bounds": [
+        -83.2,
+        39.8,
+        -83.18,
+        39.82
+      ],
+      "color_profile": "radar_db_grayscale",
+      "compiled_order": 2,
+      "contrast_stretch_policy": {
+        "band_order": [
+          "vv"
+        ],
+        "clipping_policy": "documented_db_range",
+        "gamma": 1.0,
+        "natural_color_claim": false,
+        "nodata_behavior": "transparent",
+        "output_bit_depth": 8,
+        "percentile_range": [
+          2,
+          98
+        ],
+        "required_bands": [
+          "vv_or_vh"
+        ],
+        "scale_source": "decibel"
+      },
+      "failure_class": null,
+      "fallback_status": true,
+      "layer_status": "source_future_unverified",
+      "legend_order": 1,
+      "mask_policy": "transparent_nodata_only",
+      "nodata_policy": "transparent",
+      "opacity": 0.85,
+      "real_pixel_status": false,
+      "real_raster_pixels_required": true,
+      "render_role": "imagery_alternative",
+      "resampling_method": "bilinear",
+      "resolution": "preview",
+      "source_id": "sentinel_1_radar_scaffold",
+      "theme": "radar_imagery",
+      "z_order": 5
+    },
+    {
+      "CRS": "EPSG:4326",
+      "adapter_id": "arcgis_imageserver_preview",
+      "band_mapping": [
+        "band_1"
+      ],
+      "blend_mode": "multiply",
+      "bounds": [
+        -83.2,
+        39.8,
+        -83.18,
+        39.82
+      ],
+      "bytes_read": 89064,
+      "color_profile": "grayscale_single_band",
+      "compiled_order": 3,
+      "content_type": "image/png",
+      "contrast_stretch_policy": {
+        "band_order": [
+          "band_1"
+        ],
+        "clipping_policy": "clip_to_percentiles",
+        "gamma": 1.0,
+        "nodata_behavior": "transparent",
+        "output_bit_depth": 8,
+        "percentile_range": [
+          2,
+          98
+        ],
+        "required_bands": [
+          "band_1"
+        ],
+        "scale_source": "single_band"
+      },
+      "exclusion_reason": null,
+      "failure_class": null,
+      "fallback_status": false,
+      "height": 384,
+      "layer_status": "real_pixels_rendered",
+      "legend_order": 3,
+      "mask_policy": "transparent_nodata_only",
+      "mode": "RGBA",
+      "nodata_policy": "transparent",
+      "nontransparent_fraction": 1.0,
+      "nontransparent_pixel_count": 4096,
+      "opacity": 0.18,
+      "real_pixel_status": true,
+      "real_raster_pixels_required": true,
+      "render_role": "terrain_context",
+      "rendered_into_composite": true,
+      "resampling_method": "bilinear",
+      "resolution": "preview",
+      "source_id": "usgs_3dep_hillshade",
+      "source_sha256": "7137354c8e6b261a78e6eb7177c9aeff72ec7f70aa6b19d7369ed5b65600a975",
+      "theme": "hillshade",
+      "thumbnail_status": "actual_source_pixels",
+      "unique_sample_colors": 96,
+      "width": 384,
+      "z_order": 10
+    },
+    {
+      "CRS": "EPSG:4326",
+      "adapter_id": "arcgis_imageserver_preview",
+      "band_mapping": [
+        "class"
+      ],
+      "blend_mode": "normal",
+      "bounds": [
+        -83.2,
+        39.8,
+        -83.18,
+        39.82
+      ],
+      "bytes_read": 652,
+      "color_profile": "categorical_overlay",
+      "compiled_order": 4,
+      "content_type": "image/png",
+      "contrast_stretch_policy": {
+        "band_order": [
+          "class"
+        ],
+        "clipping_policy": "none",
+        "gamma": 1.0,
+        "nodata_behavior": "transparent",
+        "output_bit_depth": 8,
+        "percentile_range": null,
+        "required_bands": [
+          "class"
+        ],
+        "scale_source": "service_palette"
+      },
+      "exclusion_reason": "no_visible_pixels",
+      "failure_class": null,
+      "fallback_status": false,
+      "height": 384,
+      "layer_status": "no_visible_pixels",
+      "legend_order": 4,
+      "mask_policy": "transparent_nodata_only",
+      "mode": "RGBA",
+      "nodata_policy": "transparent",
+      "nontransparent_fraction": 0.0,
+      "nontransparent_pixel_count": 0,
+      "opacity": 0.3,
+      "real_pixel_status": false,
+      "real_raster_pixels_required": true,
+      "render_role": "thematic_overlay",
+      "rendered_into_composite": false,
+      "resampling_method": "nearest",
+      "resolution": "preview",
+      "source_id": "usda_cdl_imageserver",
+      "source_sha256": "9804a5f7293fddd774f968064a6485d1a91151a4dfbf83e738a5e05803991989",
+      "theme": "landcover_categorical",
+      "thumbnail_status": "diagnostic_no_visible_pixels",
+      "unique_sample_colors": 0,
+      "width": 384,
+      "z_order": 20
+    },
+    {
+      "CRS": "EPSG:4326",
+      "adapter_id": "static_verified_artifact",
+      "band_mapping": [
+        "band_1"
+      ],
+      "blend_mode": "multiply",
+      "bounds": [
+        -83.2,
+        39.8,
+        -83.18,
+        39.82
+      ],
+      "color_profile": "grayscale_single_band",
+      "compiled_order": 5,
+      "contrast_stretch_policy": {
+        "band_order": [
+          "band_1"
+        ],
+        "clipping_policy": "clip_to_percentiles",
+        "gamma": 1.0,
+        "nodata_behavior": "transparent",
+        "output_bit_depth": 8,
+        "percentile_range": [
+          2,
+          98
+        ],
+        "required_bands": [
+          "band_1"
+        ],
+        "scale_source": "single_band"
+      },
+      "failure_class": null,
+      "fallback_status": false,
+      "layer_status": "static_verified_not_rendered",
+      "legend_order": 5,
+      "mask_policy": "transparent_nodata_only",
+      "nodata_policy": "transparent",
+      "opacity": 0.18,
+      "real_pixel_status": false,
+      "real_raster_pixels_required": true,
+      "render_role": "environmental_context",
+      "resampling_method": "bilinear",
+      "resolution": "preview",
+      "source_id": "chirps_alpha1_derived_geotiff",
+      "theme": "climate_continuous",
+      "z_order": 30
+    }
+  ],
+  "network_run": true,
+  "nodata_fraction": 0.0,
+  "operation_status": "completed",
+  "output_image_height": 800,
+  "output_image_logical_path": "reports/previews/example_imagery_first_multipreview/preview_20260712T233652Z_188a18a1aa87/preview.png",
+  "output_image_sha256": "7f9024ca909c255180eaca29c33c9720c668a604ee1da6f23cad8a81b71084f8",
+  "output_image_size_bytes": 805914,
+  "output_image_width": 1200,
+  "overlay_count": 1,
+  "overlay_subordination_status": "PASS",
+  "overlay_total_alpha_budget": 0.18,
+  "preview_receipt_contract_sha256": "9474739678641b53bfb70c2ccf1ada06e7b587ddf9fb51b7501e5892f648da8c",
+  "preview_render_contract_sha256": "7bb020691db6bbbcc2441bea9b66b1ecddcdbc7c854f0a5ef166143cd7b75935",
+  "preview_run_id": "preview_20260712T233652Z_188a18a1aa87",
+  "preview_visual_policy_status": "PASS",
+  "primary_imagery_opacity": 1.0,
+  "primary_imagery_real_pixels": true,
+  "primary_imagery_source": "usgs_naip_imagery",
+  "primary_imagery_source_id": "usgs_naip_imagery",
+  "primary_imagery_theme": "aerial_imagery",
+  "primary_imagery_visible_fraction": 0.937,
+  "provenance": {
+    "faster_raster_preview_renderer": "1.0.0-alpha.2",
+    "source_allowlist_sha256": "c66fd07ffa25cb1d55b3b98f31935d9a7b302dc1f70df0ff4f4784adae7c2c15"
+  },
+  "rendered_layer_count": 2,
+  "schema_version": 1,
+  "source_count": 6,
+  "source_selection_contract_sha256": "77484cbd089b8c5881810e97d9ffb11b606a09afa20956e720c6604f612bf742",
+  "source_selection_receipt_path": "reports/previews/example_imagery_first_multipreview/preview_20260712T233652Z_188a18a1aa87/source_selection_receipt.json",
+  "source_selection_receipt_sha256": "d776f61fd2991d04b821cf80346f27f3b681fbd80f94ca72360826ebf9e6565a",
+  "started_at_utc": "2026-07-12T23:36:52Z",
+  "task_id": "example_imagery_first_multipreview",
+  "total_network_bytes": 563257,
+  "visible_thematic_coverage_fraction": 0.0,
+  "warnings": []
+}

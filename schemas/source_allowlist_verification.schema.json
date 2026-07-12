@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "classifications": {},
+    "failures": {},
+    "live_verified_source_count": {},
+    "schema_version": {},
+    "source_allowlist_sha256": {},
+    "source_allowlist_verification_status": {},
+    "source_count": {},
+    "verification_status": {},
+    "warnings": {}
+  },
+  "required": [
+    "schema_version",
+    "source_allowlist_verification_status",
+    "verification_status",
+    "source_allowlist_sha256",
+    "source_count",
+    "live_verified_source_count",
+    "classifications",
+    "failures",
+    "warnings"
+  ],
+  "schema_version": 1,
+  "type": "object"
+}

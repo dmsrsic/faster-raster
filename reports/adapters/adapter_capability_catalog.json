@@ -1,0 +1,284 @@
+{
+  "adapter_capability_catalog_sha256": "f8f8f384a7b8f56d6dd31d0c7f3d22acbab45c6ce6fd2bf098ff470627d72b79",
+  "adapter_count": 6,
+  "adapters": [
+    {
+      "adapter_capability_contract_sha256": "7eb508dc70f386d8e796cb7240347ec8727d6e0b240b6dd2ab956cc827de3ea6",
+      "adapter_id": "arcgis_imageserver_preview",
+      "adapter_version": "1.0.0-alpha.2",
+      "allowed_hosts": [
+        "imagery.nationalmap.gov",
+        "pdi.scinet.usda.gov",
+        "elevation.nationalmap.gov"
+      ],
+      "bounded_request_behavior": "single exportImage request with width, height, and byte caps",
+      "capabilities": {
+        "authentication": false,
+        "bounded_probe": true,
+        "discover": true,
+        "materialize": false,
+        "metadata": true,
+        "preview_tile": false,
+        "preview_window": true,
+        "range_request_support": false,
+        "redirect_support": true,
+        "resolve": true,
+        "spatial_subset_support": true,
+        "temporal_subset_support": true
+      },
+      "credential_requirement": "none",
+      "deterministic_resolution_behavior": "query parameters sorted; AOI and size from render contract",
+      "failure_taxonomy": [
+        "host_not_allowed",
+        "unsupported_media_type",
+        "preview_byte_cap_exceeded",
+        "preview_dimension_cap_exceeded",
+        "preview_render_failed"
+      ],
+      "maximum_redirects": 2,
+      "redirect_hosts": [
+        "imagery.nationalmap.gov",
+        "pdi.scinet.usda.gov",
+        "elevation.nationalmap.gov"
+      ],
+      "supported_asset_roles": [
+        "preview",
+        "natural_color",
+        "categorical_overlay",
+        "hillshade"
+      ],
+      "supported_media_types": [
+        "image/png",
+        "image/jpeg"
+      ],
+      "supported_source_categories": [
+        "aerial_imagery",
+        "categorical_landcover",
+        "elevation_hillshade"
+      ]
+    },
+    {
+      "adapter_capability_contract_sha256": "c55e0fbebcacfa2eca25e44bce86b5f5f60a9a174177487dc8f371235487aaef",
+      "adapter_id": "http_cog_geotiff_preview",
+      "adapter_version": "1.0.0-alpha.2",
+      "allowed_hosts": [],
+      "bounded_request_behavior": "range probe and bounded preview only when host allowlisted",
+      "capabilities": {
+        "authentication": true,
+        "bounded_probe": true,
+        "discover": false,
+        "materialize": false,
+        "metadata": true,
+        "preview_tile": false,
+        "preview_window": true,
+        "range_request_support": true,
+        "redirect_support": true,
+        "resolve": true,
+        "spatial_subset_support": true,
+        "temporal_subset_support": false
+      },
+      "credential_requirement": "source_specific",
+      "deterministic_resolution_behavior": "window from render contract; no arbitrary URL fetching",
+      "failure_taxonomy": [
+        "host_not_allowed",
+        "unsupported_media_type",
+        "preview_byte_cap_exceeded"
+      ],
+      "maximum_redirects": 2,
+      "redirect_hosts": [],
+      "supported_asset_roles": [
+        "preview",
+        "derived_geotiff"
+      ],
+      "supported_media_types": [
+        "image/tiff",
+        "image/tiff; application=geotiff"
+      ],
+      "supported_source_categories": [
+        "optical_satellite_imagery",
+        "climate_environmental_context"
+      ]
+    },
+    {
+      "adapter_capability_contract_sha256": "da754f08062aa1ee5d01f0481a1c4acd0df1ad9bdbac1de4a66d57090e3effcb",
+      "adapter_id": "ogc_wms_preview",
+      "adapter_version": "1.0.0-alpha.2",
+      "allowed_hosts": [],
+      "bounded_request_behavior": "GetCapabilities and GetMap only with allowlisted layer/style/CRS and dimensions",
+      "capabilities": {
+        "authentication": true,
+        "bounded_probe": true,
+        "discover": true,
+        "materialize": false,
+        "metadata": true,
+        "preview_tile": false,
+        "preview_window": true,
+        "range_request_support": false,
+        "redirect_support": true,
+        "resolve": true,
+        "spatial_subset_support": true,
+        "temporal_subset_support": true
+      },
+      "credential_requirement": "source_specific",
+      "deterministic_resolution_behavior": "tile order and GetMap parameters sorted from contract",
+      "failure_taxonomy": [
+        "host_not_allowed",
+        "unsupported_media_type",
+        "preview_dimension_cap_exceeded"
+      ],
+      "maximum_redirects": 2,
+      "redirect_hosts": [],
+      "supported_asset_roles": [
+        "preview"
+      ],
+      "supported_media_types": [
+        "image/png",
+        "image/jpeg"
+      ],
+      "supported_source_categories": [
+        "terrain",
+        "landcover",
+        "environmental_context"
+      ]
+    },
+    {
+      "adapter_capability_contract_sha256": "aab077ac248564d36945b60d02cc87ea797fd75567c73acfe258b278fa59f778",
+      "adapter_id": "ogc_wmts_preview",
+      "adapter_version": "1.0.0-alpha.2",
+      "allowed_hosts": [],
+      "bounded_request_behavior": "bounded tile count with deterministic matrix selection",
+      "capabilities": {
+        "authentication": true,
+        "bounded_probe": true,
+        "discover": true,
+        "materialize": false,
+        "metadata": true,
+        "preview_tile": true,
+        "preview_window": false,
+        "range_request_support": false,
+        "redirect_support": true,
+        "resolve": true,
+        "spatial_subset_support": true,
+        "temporal_subset_support": true
+      },
+      "credential_requirement": "source_specific",
+      "deterministic_resolution_behavior": "tile ordering by matrix, row, column",
+      "failure_taxonomy": [
+        "preview_tile_cap_exceeded",
+        "host_not_allowed",
+        "unsupported_media_type"
+      ],
+      "maximum_redirects": 2,
+      "redirect_hosts": [],
+      "supported_asset_roles": [
+        "preview_tile"
+      ],
+      "supported_media_types": [
+        "image/png",
+        "image/jpeg"
+      ],
+      "supported_source_categories": [
+        "imagery",
+        "terrain",
+        "landcover"
+      ]
+    },
+    {
+      "adapter_capability_contract_sha256": "eb62d1b6f5ec6c8e022d5c82314c89e3d6be8af1253ef2cca189a46c1a7fc961",
+      "adapter_id": "stac_api",
+      "adapter_version": "1.0.0-alpha.2",
+      "allowed_hosts": [
+        "planetarycomputer.microsoft.com",
+        "sentinel2l2a01.blob.core.windows.net",
+        "catalogue.dataspace.copernicus.eu"
+      ],
+      "bounded_request_behavior": "bounded search and deterministic asset selection; no full materialization in alpha.2",
+      "capabilities": {
+        "authentication": true,
+        "bounded_probe": true,
+        "discover": true,
+        "materialize": false,
+        "metadata": true,
+        "preview_tile": false,
+        "preview_window": false,
+        "range_request_support": false,
+        "redirect_support": true,
+        "resolve": true,
+        "spatial_subset_support": true,
+        "temporal_subset_support": true
+      },
+      "credential_requirement": "source_specific",
+      "deterministic_resolution_behavior": "sort by score then item id then asset key",
+      "failure_taxonomy": [
+        "stac_search_failed",
+        "stac_item_not_found",
+        "stac_asset_not_found",
+        "unsupported_asset_role",
+        "credentials_required"
+      ],
+      "maximum_redirects": 2,
+      "redirect_hosts": [
+        "planetarycomputer.microsoft.com",
+        "sentinel2l2a01.blob.core.windows.net",
+        "catalogue.dataspace.copernicus.eu"
+      ],
+      "supported_asset_roles": [
+        "data",
+        "red",
+        "green",
+        "blue",
+        "nir",
+        "vv",
+        "vh"
+      ],
+      "supported_media_types": [
+        "application/geo+json",
+        "image/tiff",
+        "image/tiff; application=geotiff"
+      ],
+      "supported_source_categories": [
+        "optical_satellite_imagery",
+        "radar_imagery"
+      ]
+    },
+    {
+      "adapter_capability_contract_sha256": "052dd5c113516c3ef5594c734e60c96c2a7fd5a2657b593263a4b8a6e31d75e4",
+      "adapter_id": "static_verified_artifact",
+      "adapter_version": "1.0.0-alpha.2",
+      "allowed_hosts": [],
+      "bounded_request_behavior": "offline verified artifact only",
+      "capabilities": {
+        "authentication": false,
+        "bounded_probe": false,
+        "discover": false,
+        "materialize": false,
+        "metadata": true,
+        "preview_tile": false,
+        "preview_window": true,
+        "range_request_support": false,
+        "redirect_support": false,
+        "resolve": true,
+        "spatial_subset_support": false,
+        "temporal_subset_support": false
+      },
+      "credential_requirement": "none",
+      "deterministic_resolution_behavior": "content-addressed alpha.1 artifact and metadata contract",
+      "failure_taxonomy": [
+        "source_not_allowlisted",
+        "preview_render_failed"
+      ],
+      "maximum_redirects": 0,
+      "redirect_hosts": [],
+      "supported_asset_roles": [
+        "derived_geotiff"
+      ],
+      "supported_media_types": [
+        "image/tiff"
+      ],
+      "supported_source_categories": [
+        "climate_environmental_context"
+      ]
+    }
+  ],
+  "schema_version": 1
+}

@@ -1,0 +1,12 @@
+{
+  "blocking_failures": [],
+  "failures": [],
+  "fallback_truthfulness_status": "PASS",
+  "imagery_dominance_status": "PASS",
+  "imagery_presence_status": "PASS",
+  "overlay_subordination_status": "PASS",
+  "preview_verification_status": "PASS",
+  "schema_version": 1,
+  "verification_status": "PASS",
+  "warnings": []
+}

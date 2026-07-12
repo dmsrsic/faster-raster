@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "entries": {},
+    "schema_version": {},
+    "source_allowlist_version": {}
+  },
+  "required": [
+    "schema_version",
+    "source_allowlist_version",
+    "entries"
+  ],
+  "schema_version": 1,
+  "type": "object"
+}

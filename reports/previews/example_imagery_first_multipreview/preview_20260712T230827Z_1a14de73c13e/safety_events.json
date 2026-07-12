@@ -1,0 +1,7 @@
+{
+  "events": [
+    {
+      "failure_class": "preview_contract_mismatch"
+    }
+  ]
+}

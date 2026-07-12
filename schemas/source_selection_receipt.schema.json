@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "candidate_ids": {},
+    "candidates": {},
+    "schema_version": {},
+    "selected_adapter_id": {},
+    "selected_asset": {},
+    "selected_collection": {},
+    "selected_imagery_timestamp": {},
+    "selected_item": {},
+    "source_selection_contract_sha256": {},
+    "source_selection_receipt_sha256": {},
+    "tie_break_rules": {}
+  },
+  "required": [
+    "schema_version",
+    "candidate_ids",
+    "candidates",
+    "selected_item",
+    "selected_asset",
+    "tie_break_rules",
+    "source_selection_contract_sha256",
+    "selected_adapter_id",
+    "selected_collection",
+    "selected_imagery_timestamp",
+    "source_selection_receipt_sha256"
+  ],
+  "schema_version": 1,
+  "type": "object"
+}

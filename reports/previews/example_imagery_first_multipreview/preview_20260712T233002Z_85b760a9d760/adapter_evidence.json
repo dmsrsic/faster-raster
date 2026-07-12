@@ -1,0 +1,16 @@
+{
+  "adapter_capability_hashes": {
+    "arcgis_imageserver_preview": "7eb508dc70f386d8e796cb7240347ec8727d6e0b240b6dd2ab956cc827de3ea6",
+    "http_cog_geotiff_preview": "c55e0fbebcacfa2eca25e44bce86b5f5f60a9a174177487dc8f371235487aaef",
+    "ogc_wms_preview": "da754f08062aa1ee5d01f0481a1c4acd0df1ad9bdbac1de4a66d57090e3effcb",
+    "ogc_wmts_preview": "aab077ac248564d36945b60d02cc87ea797fd75567c73acfe258b278fa59f778",
+    "stac_api": "eb62d1b6f5ec6c8e022d5c82314c89e3d6be8af1253ef2cca189a46c1a7fc961",
+    "static_verified_artifact": "052dd5c113516c3ef5594c734e60c96c2a7fd5a2657b593263a4b8a6e31d75e4"
+  },
+  "adapter_conformance_status": "PASS",
+  "adapter_count": 6,
+  "failures": [],
+  "schema_version": 1,
+  "verification_status": "PASS",
+  "warnings": []
+}

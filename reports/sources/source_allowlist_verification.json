@@ -1,0 +1,18 @@
+{
+  "classifications": {
+    "chirps_alpha1_derived_geotiff": "static_verified",
+    "sentinel_1_radar_scaffold": "future_unverified",
+    "sentinel_2_l2a_planetary_computer": "api_discovered",
+    "usda_cdl_imageserver": "service_discovered",
+    "usgs_3dep_hillshade": "service_discovered",
+    "usgs_naip_imagery": "service_discovered"
+  },
+  "failures": [],
+  "live_verified_source_count": 3,
+  "schema_version": 1,
+  "source_allowlist_sha256": "c66fd07ffa25cb1d55b3b98f31935d9a7b302dc1f70df0ff4f4784adae7c2c15",
+  "source_allowlist_verification_status": "PASS",
+  "source_count": 6,
+  "verification_status": "PASS",
+  "warnings": []
+}

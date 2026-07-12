@@ -1,0 +1,18 @@
+{
+  "blocking_failures": [
+    "real imagery unavailable",
+    "imagery dominance failed"
+  ],
+  "failures": [
+    "real imagery unavailable",
+    "imagery dominance failed"
+  ],
+  "fallback_truthfulness_status": "PASS",
+  "imagery_dominance_status": "FAIL",
+  "imagery_presence_status": "FAIL",
+  "overlay_subordination_status": "PASS",
+  "preview_verification_status": "FAIL",
+  "schema_version": 1,
+  "verification_status": "FAIL",
+  "warnings": []
+}

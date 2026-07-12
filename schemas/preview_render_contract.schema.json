@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "adapter_capability_hashes": {},
+    "aoi": {},
+    "byte_caps": {},
+    "layers": {},
+    "network_policy": {},
+    "preview_height": {},
+    "preview_render_contract_sha256": {},
+    "preview_width": {},
+    "primary_imagery_selection": {},
+    "renderer_implementation_version": {},
+    "schema_version": {},
+    "source_allowlist_hash": {},
+    "target_preview_crs": {},
+    "task_id": {}
+  },
+  "required": [
+    "schema_version",
+    "task_id",
+    "aoi",
+    "target_preview_crs",
+    "preview_width",
+    "preview_height",
+    "primary_imagery_selection",
+    "layers",
+    "byte_caps",
+    "network_policy",
+    "adapter_capability_hashes",
+    "source_allowlist_hash",
+    "renderer_implementation_version",
+    "preview_render_contract_sha256"
+  ],
+  "schema_version": 1,
+  "type": "object"
+}

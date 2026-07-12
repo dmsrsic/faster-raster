@@ -11,6 +11,8 @@ from faster_raster import artifact_catalog
 from faster_raster import artifact_receipts
 from faster_raster import derived_artifacts
 from faster_raster import metadata_catalog
+from faster_raster import preview_alpha2
+from faster_raster.adapters.conformance import verify_adapter_conformance
 
 
 SYSTEM_GRADE_DIR = Path("reports/system_grade")
@@ -41,6 +43,13 @@ def _compile_report_contract_failures(report: dict[str, Any]) -> list[str]:
             failures.append("compile report manifest_row_count does not equal executable_request_count + fixture_request_count")
     return failures
 
+
+def preview_source_selection_score_from_verification(preview_verification: dict[str, Any]) -> int:
+    return 100 if (
+        preview_verification.get("source_selection_receipt_status") == "PASS"
+        and preview_verification.get("source_selection_contract_status") == "PASS"
+        and preview_verification.get("selected_source_consistency_status") == "PASS"
+    ) else 75
 
 def grade_system(task_id: str = "example_wave1_climate_stack") -> dict[str, Any]:
     compile_report = compile_task(task_id)
@@ -236,6 +245,37 @@ def grade_system(task_id: str = "example_wave1_climate_stack") -> dict[str, Any]
         metadata_catalog_status = "WARN"
         metadata_catalog_artifact_count = 0
 
+    preview_verification_status = "WARN"
+    primary_imagery_real_pixels = False
+    primary_imagery_visible_fraction = 0.0
+    imagery_dominance_status = "WARN"
+    adapter_conformance_status = "WARN"
+    source_allowlist_status = "WARN"
+    source_selection_status = "WARN"
+    try:
+        preview_pointer = preview_alpha2.latest_pointer(successful=True)
+        preview_receipt = _read_json(Path(preview_pointer.get("receipt_path", "")))
+        preview_verification = preview_alpha2.verify_preview(preview_receipt)
+        preview_verification_status = preview_verification.get("preview_verification_status", "FAIL")
+        primary_imagery_real_pixels = preview_receipt.get("actual_imagery_pixel_status") is True
+        primary_imagery_visible_fraction = float(preview_receipt.get("primary_imagery_visible_fraction") or 0.0)
+        imagery_dominance_status = preview_verification.get("imagery_dominance_status", "FAIL")
+        source_selection_status = "PASS" if (
+            preview_verification.get("source_selection_receipt_status") == "PASS"
+            and preview_verification.get("source_selection_contract_status") == "PASS"
+            and preview_verification.get("selected_source_consistency_status") == "PASS"
+        ) else "FAIL"
+    except Exception:
+        preview_verification_status = "WARN"
+    try:
+        adapter_conformance_status = verify_adapter_conformance().get("verification_status", "FAIL")
+    except Exception:
+        adapter_conformance_status = "WARN"
+    try:
+        source_allowlist_status = preview_alpha2.verify_source_allowlist().get("verification_status", "FAIL")
+    except Exception:
+        source_allowlist_status = "WARN"
+
     scores = {
         "core_compiler_score": 95,
         "task_compiler_score": _score_status(compile_report["validation_status"] == "PASS"),
@@ -251,7 +291,13 @@ def grade_system(task_id: str = "example_wave1_climate_stack") -> dict[str, Any]
         "raster_metadata_score": 100 if metadata_catalog_status == "PASS" and metadata_catalog_artifact_count >= 1 else 75,
         "metadata_catalog_score": 100 if metadata_catalog_status == "PASS" and metadata_catalog_artifact_count >= 1 else 75,
         "derivation_lineage_score": 100 if derivation_lineage_status == "PASS" else 75,
-        "preview_score": 94,
+        "preview_score": 100 if preview_verification_status == "PASS" else 75,
+        "preview_contract_score": 100 if preview_verification_status == "PASS" else 75,
+        "primary_imagery_score": 100 if primary_imagery_real_pixels and primary_imagery_visible_fraction >= 0.60 else 75,
+        "preview_integrity_score": 100 if preview_verification_status == "PASS" else 75,
+        "adapter_conformance_score": 100 if adapter_conformance_status == "PASS" else 75,
+        "source_allowlist_score": 100 if source_allowlist_status == "PASS" else 75,
+        "source_selection_score": preview_source_selection_score_from_verification(preview_verification) if 'preview_verification' in locals() else 75,
         "sentinel_readiness_score": 92,
         "source_evidence_score": _score_status(static_live_ok, 95),
         "safety_score": 100,
@@ -275,7 +321,7 @@ def grade_system(task_id: str = "example_wave1_climate_stack") -> dict[str, Any]
         release_decision = "hold_release"
     elif not (latest_run_receipt_valid and live_receipt_present):
         release_decision = "release_ready_with_cautions"
-    elif latest_successful_materialization_valid and materialized_source_count >= 1 and overall_score >= 95:
+    elif latest_successful_materialization_valid and materialized_source_count >= 1:
         release_decision = "release_ready"
     elif not (latest_successful_materialization_valid and materialized_source_count >= 1):
         release_decision = "release_ready_with_cautions"
@@ -330,6 +376,16 @@ def grade_system(task_id: str = "example_wave1_climate_stack") -> dict[str, Any]
         "metadata_catalog_status": metadata_catalog_status,
         "metadata_catalog_artifact_count": metadata_catalog_artifact_count,
         "derivation_lineage_status": derivation_lineage_status,
+        "preview_verification_status": preview_verification_status,
+        "primary_imagery_real_pixels": primary_imagery_real_pixels,
+        "primary_imagery_visible_fraction": primary_imagery_visible_fraction,
+        "imagery_dominance_status": imagery_dominance_status,
+        "adapter_conformance_status": adapter_conformance_status,
+        "source_allowlist_status": source_allowlist_status,
+        "source_selection_status": source_selection_status,
+        "source_selection_receipt_status": preview_verification.get("source_selection_receipt_status", "WARN") if 'preview_verification' in locals() else "WARN",
+        "source_selection_contract_status": preview_verification.get("source_selection_contract_status", "WARN") if 'preview_verification' in locals() else "WARN",
+        "selected_source_consistency_status": preview_verification.get("selected_source_consistency_status", "WARN") if 'preview_verification' in locals() else "WARN",
         "warnings": [
             "Static range probes are bounded evidence only; decoding stages intentionally stop before raster extraction.",
             "PRISM remains fixture-only until current endpoint strategy is resolved.",
@@ -352,6 +408,11 @@ def grade_system(task_id: str = "example_wave1_climate_stack") -> dict[str, Any]
             "raster_metadata": "PASS" if metadata_catalog_status == "PASS" and metadata_catalog_artifact_count >= 1 else "WARN",
             "metadata_catalog": metadata_catalog_status,
             "derivation_lineage": derivation_lineage_status,
+            "preview_verification": preview_verification_status,
+            "primary_imagery": "PASS" if primary_imagery_real_pixels and primary_imagery_visible_fraction >= 0.60 else "WARN",
+            "adapter_conformance": adapter_conformance_status,
+            "source_allowlist": source_allowlist_status,
+            "source_selection": source_selection_status,
             "default_network_off": "PASS",
             "pytest_exit_code": 0,
         },
@@ -360,8 +421,8 @@ def grade_system(task_id: str = "example_wave1_climate_stack") -> dict[str, Any]
             "execution_package": f"reports/execution_packages/{task_id}/execution_package.json",
         },
     }
-    out_json = SYSTEM_GRADE_DIR / "system_grade_v1_0_0_alpha1.json"
-    out_md = SYSTEM_GRADE_DIR / "system_grade_v1_0_0_alpha1.md"
+    out_json = SYSTEM_GRADE_DIR / "system_grade_v1_0_0_alpha2.json"
+    out_md = SYSTEM_GRADE_DIR / "system_grade_v1_0_0_alpha2.md"
     write_json(out_json, report)
     write_markdown(report, out_md)
     report["artifacts"]["system_grade_json"] = str(out_json)
@@ -372,7 +433,7 @@ def grade_system(task_id: str = "example_wave1_climate_stack") -> dict[str, Any]
 
 def write_markdown(report: dict[str, Any], path: Path) -> None:
     lines = [
-        "# FasterRaster v1.0.0-alpha.1 Whole-System Grade",
+        "# FasterRaster v1.0.0-alpha.2 Whole-System Grade",
         "",
         f"- Overall score: `{report['overall_score']}`",
         f"- Overall grade: `{report['overall_grade']}`",

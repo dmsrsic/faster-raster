@@ -1,0 +1,59 @@
+{
+  "candidate_ids": [
+    "usgs_naip_imagery",
+    "sentinel_2_l2a_planetary_computer",
+    "sentinel_1_radar_scaffold",
+    "usgs_3dep_hillshade",
+    "usda_cdl_imageserver",
+    "chirps_alpha1_derived_geotiff"
+  ],
+  "candidates": [
+    {
+      "candidate_id": "usgs_naip_imagery",
+      "normalized_score": 100,
+      "rejection_reason": null,
+      "theme": "aerial_imagery"
+    },
+    {
+      "candidate_id": "usda_cdl_imageserver",
+      "normalized_score": 70,
+      "rejection_reason": null,
+      "theme": "landcover_categorical"
+    },
+    {
+      "candidate_id": "usgs_3dep_hillshade",
+      "normalized_score": 70,
+      "rejection_reason": null,
+      "theme": "hillshade"
+    },
+    {
+      "candidate_id": "chirps_alpha1_derived_geotiff",
+      "normalized_score": 20,
+      "rejection_reason": null,
+      "theme": "climate_continuous"
+    },
+    {
+      "candidate_id": "sentinel_1_radar_scaffold",
+      "normalized_score": 20,
+      "rejection_reason": "source_future_unverified",
+      "theme": "radar_imagery"
+    },
+    {
+      "candidate_id": "sentinel_2_l2a_planetary_computer",
+      "normalized_score": 20,
+      "rejection_reason": null,
+      "theme": "optical_imagery"
+    }
+  ],
+  "schema_version": 1,
+  "selected_asset": "exportImage png32 natural color",
+  "selected_collection": "USGSNAIPImagery",
+  "selected_imagery_timestamp": "service_metadata_2025-01-09",
+  "selected_item": "usgs_naip_imagery",
+  "source_selection_contract_sha256": "ad42ddd7306f95c9769ec528e1b9a4edb38ecda3794ad2daddf731c56dfb43ca",
+  "tie_break_rules": [
+    "real pixels before fallback",
+    "verification class",
+    "source_id lexical"
+  ]
+}

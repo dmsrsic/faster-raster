@@ -1,0 +1,15 @@
+{
+  "blocking_failures": [],
+  "failures": [],
+  "fallback_truthfulness_status": "PASS",
+  "imagery_dominance_status": "PASS",
+  "imagery_presence_status": "PASS",
+  "overlay_subordination_status": "PASS",
+  "preview_verification_status": "PASS",
+  "schema_version": 1,
+  "selected_source_consistency_status": "PASS",
+  "source_selection_contract_status": "PASS",
+  "source_selection_receipt_status": "PASS",
+  "verification_status": "PASS",
+  "warnings": []
+}

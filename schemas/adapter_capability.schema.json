@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "adapter_capability_contract_sha256": {},
+    "adapter_id": {},
+    "adapter_version": {},
+    "allowed_hosts": {},
+    "bounded_request_behavior": {},
+    "capabilities": {},
+    "credential_requirement": {},
+    "deterministic_resolution_behavior": {},
+    "failure_taxonomy": {},
+    "maximum_redirects": {},
+    "redirect_hosts": {},
+    "supported_asset_roles": {},
+    "supported_media_types": {},
+    "supported_source_categories": {}
+  },
+  "required": [
+    "adapter_id",
+    "adapter_version",
+    "supported_source_categories",
+    "supported_media_types",
+    "supported_asset_roles",
+    "credential_requirement",
+    "allowed_hosts",
+    "redirect_hosts",
+    "maximum_redirects",
+    "bounded_request_behavior",
+    "deterministic_resolution_behavior",
+    "failure_taxonomy",
+    "capabilities",
+    "adapter_capability_contract_sha256"
+  ],
+  "schema_version": 1,
+  "type": "object"
+}
