@@ -1448,15 +1448,15 @@ def preview_render(task_id: str, allow_network: bool = typer.Option(False, "--al
 
 
 @preview_app.command("inspect")
-def preview_inspect(latest_successful: bool = typer.Option(False, "--latest-successful"), json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
-    pointer = preview_alpha2.latest_pointer(successful=latest_successful)
+def preview_inspect(task_id: str = typer.Option("example_imagery_first_multipreview", "--task-id"), latest_successful: bool = typer.Option(False, "--latest-successful"), json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
+    pointer = preview_alpha2.latest_pointer(task_id=task_id, successful=latest_successful)
     receipt = json.loads(Path(pointer["receipt_path"]).read_text(encoding="utf-8"))
     emit(receipt, json_output=json_output, plain=True, plain_text=_plain_lines(receipt) if plain else render.stable_json(receipt))
 
 
 @preview_app.command("verify")
-def preview_verify(latest_successful: bool = typer.Option(False, "--latest-successful"), json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
-    pointer = preview_alpha2.latest_pointer(successful=latest_successful)
+def preview_verify(task_id: str = typer.Option("example_imagery_first_multipreview", "--task-id"), latest_successful: bool = typer.Option(False, "--latest-successful"), json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
+    pointer = preview_alpha2.latest_pointer(task_id=task_id, successful=latest_successful)
     receipt = json.loads(Path(pointer["receipt_path"]).read_text(encoding="utf-8"))
     verification = preview_alpha2.verify_preview(receipt)
     emit(verification, json_output=json_output, plain=True, plain_text=_plain_lines(verification) if plain else render.stable_json(verification))
@@ -1471,8 +1471,8 @@ def preview_open(latest_successful: bool = typer.Option(False, "--latest-success
 
 
 @preview_app.command("latest")
-def preview_latest(json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
-    pointer = preview_alpha2.latest_pointer(successful=False)
+def preview_latest(task_id: str = typer.Option("example_imagery_first_multipreview", "--task-id"), json_output: bool = typer.Option(False, "--json"), plain: bool = typer.Option(False, "--plain")) -> None:
+    pointer = preview_alpha2.latest_pointer(task_id=task_id, successful=False)
     emit(pointer, json_output=json_output, plain=True, plain_text=_plain_lines(pointer) if plain else render.stable_json(pointer))
 
 

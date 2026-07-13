@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "alpha_budget_policy": {},
+    "boundary_policy": {},
+    "categorical_policy": {},
+    "comparison_panel_policy": {},
+    "continuous_context_policy": {},
+    "default_profile_contract_sha256": {},
+    "imagery_enhancement_policy": {},
+    "legend_policy": {},
+    "primary_imagery_policy": {},
+    "profile_id": {},
+    "profile_version": {},
+    "schema_version": {},
+    "terrain_policy": {},
+    "visual_authority_thresholds": {}
+  },
+  "required": [
+    "schema_version",
+    "profile_id",
+    "profile_version",
+    "primary_imagery_policy",
+    "imagery_enhancement_policy",
+    "terrain_policy",
+    "categorical_policy",
+    "continuous_context_policy",
+    "boundary_policy",
+    "alpha_budget_policy",
+    "visual_authority_thresholds",
+    "comparison_panel_policy",
+    "legend_policy",
+    "default_profile_contract_sha256"
+  ],
+  "schema_version": 1,
+  "type": "object"
+}

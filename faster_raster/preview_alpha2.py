@@ -8,7 +8,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 from faster_raster.adapter_contract import stable_json
 from faster_raster.run_receipts import write_json, write_jsonl
-from faster_raster import preview_contracts, preview_themes
+from faster_raster import preview_balanced, preview_contracts, preview_themes
 from faster_raster.adapters.conformance import verify_adapter_conformance
 
 PREVIEW_ROOT = Path("reports/previews")
@@ -62,6 +62,8 @@ def verify_source_allowlist(*, root: Path | None = None) -> dict[str, Any]:
     return report
 
 def plan_preview(task_id: str, *, root: Path | None = None, max_total_bytes: int = 25_000_000) -> dict[str, Any]:
+    if task_id == "example_imagery_first_balanced_stack":
+        return preview_balanced.plan_preview(task_id, root=root, max_total_bytes=max_total_bytes)
     root = root or Path.cwd(); allowlist = load_allowlist(root)
     contract = preview_contracts.build_render_contract(task_id, allowlist, max_total_bytes=max_total_bytes, network_policy="network_allowed_when_flags_approved")
     run_dir = root / PREVIEW_ROOT / task_id / f"preview_plan_{contract['preview_render_contract_sha256'][:12]}"
@@ -157,6 +159,8 @@ def draw_dashboard(composite: Image.Image, thumbnails: list[tuple[str, Image.Ima
     path.parent.mkdir(parents=True, exist_ok=True); img.save(path)
 
 def render_preview(task_id: str, *, allow_network: bool, allow_preview: bool, approve_plan_sha256: str | None, max_total_bytes: int = 25_000_000, timeout_seconds: int = 30, retry_count: int = 0, root: Path | None = None) -> dict[str, Any]:
+    if task_id == "example_imagery_first_balanced_stack":
+        return preview_balanced.render_preview(task_id, allow_network=allow_network, allow_preview=allow_preview, approve_plan_sha256=approve_plan_sha256, max_total_bytes=max_total_bytes, timeout_seconds=timeout_seconds, retry_count=retry_count, root=root)
     root = root or Path.cwd(); started=now(); t0=time.monotonic(); allowlist=load_allowlist(root); entries=allowlist_entries(allowlist)
     contract=preview_contracts.build_render_contract(task_id, allowlist, max_total_bytes=max_total_bytes, network_policy="network_allowed_when_flags_approved")
     run_id=f"preview_{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}_{uuid.uuid4().hex[:12]}"; run_dir=root/PREVIEW_ROOT/task_id/run_id; run_dir.mkdir(parents=True, exist_ok=True)
@@ -225,6 +229,8 @@ def latest_pointer(task_id: str = "example_imagery_first_multipreview", *, succe
     root=root or Path.cwd(); name="latest_successful_preview.json" if successful else "latest_preview.json"; return json.loads((root/PREVIEW_ROOT/task_id/name).read_text(encoding="utf-8"))
 
 def verify_preview(receipt: dict[str, Any], *, contract: dict[str, Any] | None = None, root: Path | None = None) -> dict[str, Any]:
+    if receipt.get("task_id") == "example_imagery_first_balanced_stack":
+        return preview_balanced.verify_preview(receipt, contract=contract, root=root)
     root=root or Path.cwd(); failures=[]; path=root/receipt.get("output_image_logical_path","")
     source_selection_receipt_status = "PASS"
     source_selection_contract_status = "PASS"

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "faster-raster"
-version = "1.0.0a2"
+version = "1.0.0a3"
 description = "Deterministic raster URL planning and harmonization planning."
 readme = "README.md"
 requires-python = ">=3.12"

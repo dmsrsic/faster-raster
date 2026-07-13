@@ -3,10 +3,16 @@
   "additionalProperties": true,
   "properties": {
     "blocking_failures": {},
+    "boundary_restraint_status": {},
+    "categorical_balance_status": {},
     "fallback_truthfulness_status": {},
     "imagery_dominance_status": {},
     "imagery_presence_status": {},
+    "imagery_visual_authority_status": {},
+    "legend_truthfulness_status": {},
+    "overlay_alpha_budget_status": {},
     "overlay_subordination_status": {},
+    "preview_profile_binding_status": {},
     "preview_verification_status": {},
     "schema_version": {},
     "selected_source_consistency_status": {},
@@ -25,7 +31,13 @@
     "blocking_failures",
     "source_selection_receipt_status",
     "source_selection_contract_status",
-    "selected_source_consistency_status"
+    "selected_source_consistency_status",
+    "preview_profile_binding_status",
+    "imagery_visual_authority_status",
+    "categorical_balance_status",
+    "boundary_restraint_status",
+    "legend_truthfulness_status",
+    "overlay_alpha_budget_status"
   ],
   "schema_version": 1,
   "type": "object"

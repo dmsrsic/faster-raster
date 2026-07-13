@@ -7,7 +7,12 @@
     "byte_caps": {},
     "layers": {},
     "network_policy": {},
+    "overlay_alpha_budget": {},
     "preview_height": {},
+    "preview_profile": {},
+    "preview_profile_contract_sha256": {},
+    "preview_profile_id": {},
+    "preview_profile_version": {},
     "preview_render_contract_sha256": {},
     "preview_width": {},
     "primary_imagery_selection": {},
@@ -31,7 +36,10 @@
     "adapter_capability_hashes",
     "source_allowlist_hash",
     "renderer_implementation_version",
-    "preview_render_contract_sha256"
+    "preview_render_contract_sha256",
+    "preview_profile_id",
+    "preview_profile_version",
+    "preview_profile_contract_sha256"
   ],
   "schema_version": 1,
   "type": "object"

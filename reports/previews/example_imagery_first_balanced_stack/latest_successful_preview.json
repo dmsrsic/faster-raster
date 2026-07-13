@@ -1,0 +1,8 @@
+{
+  "operation_status": "completed",
+  "preview_path": "reports/previews/example_imagery_first_balanced_stack/preview_20260713T005036Z_c959897fd167/preview.png",
+  "preview_run_id": "preview_20260713T005036Z_c959897fd167",
+  "receipt_path": "reports/previews/example_imagery_first_balanced_stack/preview_20260713T005036Z_c959897fd167/preview_receipt.json",
+  "updated_at_utc": "2026-07-13T00:50:42Z",
+  "verification_path": "reports/previews/example_imagery_first_balanced_stack/preview_20260713T005036Z_c959897fd167/preview_verification.json"
+}

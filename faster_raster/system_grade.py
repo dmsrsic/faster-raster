@@ -253,7 +253,10 @@ def grade_system(task_id: str = "example_wave1_climate_stack") -> dict[str, Any]
     source_allowlist_status = "WARN"
     source_selection_status = "WARN"
     try:
-        preview_pointer = preview_alpha2.latest_pointer(successful=True)
+        try:
+            preview_pointer = preview_alpha2.latest_pointer(task_id="example_imagery_first_balanced_stack", successful=True)
+        except Exception:
+            preview_pointer = preview_alpha2.latest_pointer(successful=True)
         preview_receipt = _read_json(Path(preview_pointer.get("receipt_path", "")))
         preview_verification = preview_alpha2.verify_preview(preview_receipt)
         preview_verification_status = preview_verification.get("preview_verification_status", "FAIL")
@@ -298,6 +301,12 @@ def grade_system(task_id: str = "example_wave1_climate_stack") -> dict[str, Any]
         "adapter_conformance_score": 100 if adapter_conformance_status == "PASS" else 75,
         "source_allowlist_score": 100 if source_allowlist_status == "PASS" else 75,
         "source_selection_score": preview_source_selection_score_from_verification(preview_verification) if 'preview_verification' in locals() else 75,
+        "imagery_retention_score": 100 if ('preview_receipt' in locals() and preview_receipt.get("imagery_contrast_retention", 0) >= 0.65 and preview_receipt.get("imagery_edge_retention", 0) >= 0.65) else 75,
+        "categorical_balance_score": 100 if ('preview_verification' in locals() and preview_verification.get("categorical_balance_status") == "PASS") else 75,
+        "overlay_alpha_budget_score": 100 if ('preview_verification' in locals() and preview_verification.get("overlay_alpha_budget_status") == "PASS") else 75,
+        "boundary_restraint_score": 100 if ('preview_verification' in locals() and preview_verification.get("boundary_restraint_status") == "PASS") else 75,
+        "legend_truthfulness_score": 100 if ('preview_verification' in locals() and preview_verification.get("legend_truthfulness_status") == "PASS") else 75,
+        "preview_profile_score": 100 if ('preview_verification' in locals() and preview_verification.get("preview_profile_binding_status") == "PASS") else 75,
         "sentinel_readiness_score": 92,
         "source_evidence_score": _score_status(static_live_ok, 95),
         "safety_score": 100,
@@ -386,6 +395,11 @@ def grade_system(task_id: str = "example_wave1_climate_stack") -> dict[str, Any]
         "source_selection_receipt_status": preview_verification.get("source_selection_receipt_status", "WARN") if 'preview_verification' in locals() else "WARN",
         "source_selection_contract_status": preview_verification.get("source_selection_contract_status", "WARN") if 'preview_verification' in locals() else "WARN",
         "selected_source_consistency_status": preview_verification.get("selected_source_consistency_status", "WARN") if 'preview_verification' in locals() else "WARN",
+        "imagery_visual_authority_status": preview_verification.get("imagery_visual_authority_status", "WARN") if 'preview_verification' in locals() else "WARN",
+        "categorical_balance_status": preview_verification.get("categorical_balance_status", "WARN") if 'preview_verification' in locals() else "WARN",
+        "boundary_restraint_status": preview_verification.get("boundary_restraint_status", "WARN") if 'preview_verification' in locals() else "WARN",
+        "legend_truthfulness_status": preview_verification.get("legend_truthfulness_status", "WARN") if 'preview_verification' in locals() else "WARN",
+        "preview_profile_binding_status": preview_verification.get("preview_profile_binding_status", "WARN") if 'preview_verification' in locals() else "WARN",
         "warnings": [
             "Static range probes are bounded evidence only; decoding stages intentionally stop before raster extraction.",
             "PRISM remains fixture-only until current endpoint strategy is resolved.",
@@ -413,6 +427,12 @@ def grade_system(task_id: str = "example_wave1_climate_stack") -> dict[str, Any]
             "adapter_conformance": adapter_conformance_status,
             "source_allowlist": source_allowlist_status,
             "source_selection": source_selection_status,
+            "imagery_visual_authority": preview_verification.get("imagery_visual_authority_status", "WARN") if 'preview_verification' in locals() else "WARN",
+            "categorical_balance": preview_verification.get("categorical_balance_status", "WARN") if 'preview_verification' in locals() else "WARN",
+            "overlay_alpha_budget": preview_verification.get("overlay_alpha_budget_status", "WARN") if 'preview_verification' in locals() else "WARN",
+            "boundary_restraint": preview_verification.get("boundary_restraint_status", "WARN") if 'preview_verification' in locals() else "WARN",
+            "legend_truthfulness": preview_verification.get("legend_truthfulness_status", "WARN") if 'preview_verification' in locals() else "WARN",
+            "preview_profile_binding": preview_verification.get("preview_profile_binding_status", "WARN") if 'preview_verification' in locals() else "WARN",
             "default_network_off": "PASS",
             "pytest_exit_code": 0,
         },
@@ -421,8 +441,8 @@ def grade_system(task_id: str = "example_wave1_climate_stack") -> dict[str, Any]
             "execution_package": f"reports/execution_packages/{task_id}/execution_package.json",
         },
     }
-    out_json = SYSTEM_GRADE_DIR / "system_grade_v1_0_0_alpha2.json"
-    out_md = SYSTEM_GRADE_DIR / "system_grade_v1_0_0_alpha2.md"
+    out_json = SYSTEM_GRADE_DIR / "system_grade_v1_0_0_alpha3.json"
+    out_md = SYSTEM_GRADE_DIR / "system_grade_v1_0_0_alpha3.md"
     write_json(out_json, report)
     write_markdown(report, out_md)
     report["artifacts"]["system_grade_json"] = str(out_json)
@@ -433,7 +453,7 @@ def grade_system(task_id: str = "example_wave1_climate_stack") -> dict[str, Any]
 
 def write_markdown(report: dict[str, Any], path: Path) -> None:
     lines = [
-        "# FasterRaster v1.0.0-alpha.2 Whole-System Grade",
+        "# FasterRaster v1.0.0-alpha.3 Whole-System Grade",
         "",
         f"- Overall score: `{report['overall_score']}`",
         f"- Overall grade: `{report['overall_grade']}`",

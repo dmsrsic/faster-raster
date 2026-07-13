@@ -1,0 +1,40 @@
+{
+  "candidate_ids": [
+    "usgs_naip_imagery",
+    "usgs_3dep_hillshade",
+    "usda_cdl_imageserver"
+  ],
+  "candidates": [
+    {
+      "candidate_id": "usgs_naip_imagery",
+      "normalized_score": 100,
+      "rejection_reason": null,
+      "theme": "aerial_imagery"
+    },
+    {
+      "candidate_id": "usda_cdl_imageserver",
+      "normalized_score": 70,
+      "rejection_reason": null,
+      "theme": "landcover_categorical"
+    },
+    {
+      "candidate_id": "usgs_3dep_hillshade",
+      "normalized_score": 70,
+      "rejection_reason": null,
+      "theme": "hillshade"
+    }
+  ],
+  "schema_version": 1,
+  "selected_adapter_id": "arcgis_imageserver_preview",
+  "selected_asset": "exportImage png32 natural color",
+  "selected_collection": "USGSNAIPImagery",
+  "selected_imagery_timestamp": "service_metadata_2025-01-09",
+  "selected_item": "usgs_naip_imagery",
+  "source_selection_contract_sha256": "999a162fdb0b2a3f2dd656c392469e3ea8cf7aea5b986b9dd6c2d3312fb5aae6",
+  "source_selection_receipt_sha256": "013147b6ea4ae5fdae122005bef0bb0953fe34fe1beb7ff26f58d54b54639891",
+  "tie_break_rules": [
+    "real pixels before fallback",
+    "verification class",
+    "source_id lexical"
+  ]
+}
