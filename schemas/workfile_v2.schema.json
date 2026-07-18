@@ -1,0 +1,330 @@
+{
+  "$defs": {
+    "AreaSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "bbox": {
+          "maxItems": 4,
+          "minItems": 4,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Bbox",
+          "type": "array"
+        }
+      },
+      "required": [
+        "bbox"
+      ],
+      "title": "AreaSpec",
+      "type": "object"
+    },
+    "DataSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "allow_network": {
+          "default": false,
+          "title": "Allow Network",
+          "type": "boolean"
+        },
+        "reuse": {
+          "default": "auto",
+          "enum": [
+            "auto",
+            "only",
+            "never"
+          ],
+          "title": "Reuse",
+          "type": "string"
+        }
+      },
+      "title": "DataSpec",
+      "type": "object"
+    },
+    "HumanDevelopmentEpochSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "imperviousness_path": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Imperviousness Path"
+        },
+        "land_cover_path": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Land Cover Path"
+        },
+        "year": {
+          "maximum": 2200,
+          "minimum": 1985,
+          "title": "Year",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "year"
+      ],
+      "title": "HumanDevelopmentEpochSpec",
+      "type": "object"
+    },
+    "HumanDevelopmentProcessingSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "resolution_m": {
+          "const": 30.0,
+          "default": 30.0,
+          "title": "Resolution M",
+          "type": "number"
+        },
+        "service_tile_size": {
+          "default": 2048,
+          "maximum": 4097,
+          "minimum": 64,
+          "title": "Service Tile Size",
+          "type": "integer"
+        },
+        "target_crs": {
+          "const": "EPSG:5070",
+          "default": "EPSG:5070",
+          "title": "Target Crs",
+          "type": "string"
+        },
+        "window_size": {
+          "default": 512,
+          "maximum": 4096,
+          "minimum": 16,
+          "title": "Window Size",
+          "type": "integer"
+        }
+      },
+      "title": "HumanDevelopmentProcessingSpec",
+      "type": "object"
+    },
+    "HumanDevelopmentSourcesSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "collection": {
+          "anyOf": [
+            {
+              "const": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 1,
+          "title": "Collection"
+        },
+        "context_imagery_source_id": {
+          "anyOf": [
+            {
+              "const": "usgs_naip_imageserver",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Context Imagery Source Id"
+        },
+        "context_year": {
+          "anyOf": [
+            {
+              "maximum": 2200,
+              "minimum": 1985,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Context Year"
+        },
+        "mapping_id": {
+          "default": "annual_nlcd_development_v1",
+          "enum": [
+            "annual_nlcd_development_v1",
+            "usda_cdl_development_proxy_v1"
+          ],
+          "title": "Mapping Id",
+          "type": "string"
+        },
+        "policy": {
+          "default": "pinned",
+          "enum": [
+            "pinned",
+            "service_discovered"
+          ],
+          "title": "Policy",
+          "type": "string"
+        },
+        "region": {
+          "anyOf": [
+            {
+              "const": "CU",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": "CU",
+          "title": "Region"
+        },
+        "source_id": {
+          "default": "usgs_annual_nlcd",
+          "enum": [
+            "usgs_annual_nlcd",
+            "usda_nass_cdl_imageserver"
+          ],
+          "title": "Source Id",
+          "type": "string"
+        },
+        "version": {
+          "anyOf": [
+            {
+              "const": 2,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 2,
+          "title": "Version"
+        }
+      },
+      "title": "HumanDevelopmentSourcesSpec",
+      "type": "object"
+    },
+    "LimitsSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "maximum_download_mb": {
+          "default": 250.0,
+          "exclusiveMinimum": 0,
+          "maximum": 20000,
+          "title": "Maximum Download Mb",
+          "type": "number"
+        }
+      },
+      "title": "LimitsSpec",
+      "type": "object"
+    },
+    "OutputSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "include_context_imagery": {
+          "default": false,
+          "title": "Include Context Imagery",
+          "type": "boolean"
+        },
+        "open_when_complete": {
+          "default": false,
+          "title": "Open When Complete",
+          "type": "boolean"
+        },
+        "preview": {
+          "default": true,
+          "title": "Preview",
+          "type": "boolean"
+        },
+        "preview_emphasis": {
+          "default": "development",
+          "enum": [
+            "development",
+            "all_transitions"
+          ],
+          "title": "Preview Emphasis",
+          "type": "string"
+        }
+      },
+      "title": "OutputSpec",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "area": {
+      "$ref": "#/$defs/AreaSpec"
+    },
+    "data": {
+      "$ref": "#/$defs/DataSpec"
+    },
+    "epochs": {
+      "items": {
+        "$ref": "#/$defs/HumanDevelopmentEpochSpec"
+      },
+      "minItems": 2,
+      "title": "Epochs",
+      "type": "array"
+    },
+    "limits": {
+      "$ref": "#/$defs/LimitsSpec"
+    },
+    "name": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$",
+      "title": "Name",
+      "type": "string"
+    },
+    "outputs": {
+      "$ref": "#/$defs/OutputSpec"
+    },
+    "processing": {
+      "$ref": "#/$defs/HumanDevelopmentProcessingSpec"
+    },
+    "schema_version": {
+      "const": "fasterraster.work/v2",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "sources": {
+      "$ref": "#/$defs/HumanDevelopmentSourcesSpec"
+    },
+    "workflow": {
+      "const": "human_development_change",
+      "title": "Workflow",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "name",
+    "workflow",
+    "area",
+    "epochs"
+  ],
+  "title": "FasterRaster human-development Markdown workfile v2 front matter",
+  "type": "object"
+}

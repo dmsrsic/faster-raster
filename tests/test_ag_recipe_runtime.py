@@ -355,4 +355,3 @@ def test_selective_execution_requests_only_missing_ndvi(tmp_path, monkeypatch, r
         renderer=_fake_renderer,
     )
     assert requested == ["ndvi"]
-

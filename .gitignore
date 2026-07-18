@@ -35,3 +35,6 @@ cache/
 *.tar.gz
 !.github/
 /.beta-tools/
+# Personal terminal study playground
+/studies/*
+!/studies/README.md

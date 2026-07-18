@@ -104,6 +104,9 @@ def open_local_preview(
 def inspect_handoff(handoff: Path) -> dict[str, Any]:
     manifest = _read_json(handoff / "manifest.json")
     receipt_path = next(iter(sorted(handoff.glob("**/recipe_receipt.json"))), None)
+    if receipt_path is None:
+        workflow_receipt = handoff / "workflow_receipt.json"
+        receipt_path = workflow_receipt if workflow_receipt.is_file() else None
     receipt = _read_json(receipt_path) if receipt_path else {}
     resolution = _read_json(handoff / "source_resolution.json")
     preview: str | None
@@ -144,6 +147,27 @@ def inspect_handoff(handoff: Path) -> dict[str, Any]:
             }
             for item in resolution.get("decisions", [])
         ]
+    if manifest.get("workflow") == "human_development_change":
+        asset_plan = _read_json(handoff / "asset_plan.json")
+        asset_status = []
+        for epoch in asset_plan.get("epochs", []):
+            for logical_asset, key in (
+                ("land_cover", "land_cover_path"),
+                ("fractional_imperviousness", "imperviousness_path"),
+            ):
+                if not epoch.get(key):
+                    continue
+                asset_status.append(
+                    {
+                        "logical_asset": f"{logical_asset}_{epoch.get('year')}",
+                        "selected_source": "usgs_annual_nlcd_local_pinned",
+                        "local_asset_readiness": "ready_exact",
+                        "remote_source_status": "credential_missing",
+                        "action": "reuse_direct",
+                        "reused": True,
+                        "acquired": False,
+                    }
+                )
     source_choices = [
         {
             "logical_asset": row["logical_asset"],
@@ -157,7 +181,7 @@ def inspect_handoff(handoff: Path) -> dict[str, Any]:
         "handoff": str(handoff),
         "status": manifest.get("operation_status") or receipt.get("final_status") or receipt.get("status") or "unknown",
         "network_bytes": manifest.get("network_bytes", receipt.get("total_network_bytes", receipt.get("network_bytes", 0))),
-        "reused_bytes": receipt.get("total_reused_bytes", 0),
+        "reused_bytes": manifest.get("reused_bytes", receipt.get("total_reused_bytes", 0)),
         "source_choices": source_choices,
         "asset_status": asset_status,
         "preview": preview,

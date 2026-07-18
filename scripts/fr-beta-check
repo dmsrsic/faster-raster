@@ -1,6 +1,23 @@
-#!/usr/bin/env python3
-from faster_raster.beta_check import main
+#!/usr/bin/env sh
+set -eu
 
+script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+repository_root=$(CDPATH= cd -- "$script_dir/.." && pwd)
 
-if __name__ == "__main__":
-    raise SystemExit(main())
+if [ -n "${FASTERRASTER_PYTHON:-}" ]; then
+    python_runtime=$FASTERRASTER_PYTHON
+elif command -v python3.12 >/dev/null 2>&1; then
+    python_runtime=$(command -v python3.12)
+elif [ -x "$repository_root/.beta-tools/recipe-env/bin/python" ]; then
+    python_runtime="$repository_root/.beta-tools/recipe-env/bin/python"
+elif [ -x "$repository_root/.beta-tools/human-development-live-env/bin/python" ]; then
+    python_runtime="$repository_root/.beta-tools/human-development-live-env/bin/python"
+elif command -v python3 >/dev/null 2>&1 && python3 -c 'import sys; raise SystemExit(sys.version_info < (3, 12))'; then
+    python_runtime=$(command -v python3)
+else
+    echo "ERROR: fr-beta-check requires Python 3.12 or newer." >&2
+    echo "Set FASTERRASTER_PYTHON to a compatible installed interpreter." >&2
+    exit 2
+fi
+
+exec "$python_runtime" -m faster_raster.beta_check "$@"

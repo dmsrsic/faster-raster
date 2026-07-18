@@ -41,11 +41,51 @@ from faster_raster.source_capabilities import (
     write_profile_atomic,
 )
 from faster_raster.study_planning import compile_study_plan
-from faster_raster.workfiles import WorkfileError, load_workfile, workfile_template
+from faster_raster.study_templates import (
+    get_study_template,
+    list_study_templates,
+    render_study_template,
+    show_study_template,
+)
+from faster_raster.workfiles import (
+    HumanDevelopmentWorkfileSpec,
+    WorkfileError,
+    load_workfile,
+    workfile_template,
+)
 
 
 class CommandError(ValueError):
     pass
+
+
+def _human_execute() -> Any:
+    try:
+        from faster_raster.human_development_workflow import execute_human_development
+    except (ImportError, ModuleNotFoundError) as exc:
+        missing = getattr(exc, "name", None) or type(exc).__name__
+        raise CommandError(
+            "human_development_change requires the installed NumPy and Rasterio dependencies "
+            f"(missing or unloadable: {missing}); install FasterRaster through its package metadata"
+        ) from exc
+    return execute_human_development
+
+
+def _human_publisher() -> tuple[Any, Any]:
+    try:
+        from faster_raster.human_development_publication import (
+            PublicationOptions,
+            publish_human_development_hybrid,
+        )
+    except (ImportError, ModuleNotFoundError) as exc:
+        missing = getattr(exc, "name", None) or type(exc).__name__
+        raise CommandError(
+            "human-development publication requires NumPy, Rasterio, and "
+            f"Pillow (missing or unloadable: {missing})"
+        ) from exc
+    return PublicationOptions, publish_human_development_hybrid
+
+
 FRIENDLY_REMOTE_STATUS = {
     "available": "Available",
     "available_unverified_auth": "Available (authentication not exercised)",
@@ -185,6 +225,40 @@ def _print_sources(
 
 def _plan_text(plan: Mapping[str, Any], *, verbose: bool = False) -> None:
     print(f"Study: {plan['study_name']}")
+    if plan.get("explanation"):
+        request_count = int(plan.get("network_requests", 0))
+        if request_count:
+            print(
+                f"Planning made {request_count} bounded metadata/catalog requests; "
+                "no raster pixels were transferred."
+            )
+        else:
+            print("Planning used complete verified cache evidence. No network requests were made.")
+        asset_plan = plan["asset_plan"]
+        print(
+            f"Source: {asset_plan['source_id']}; mapping: {asset_plan['mapping_id']}; "
+            f"ceiling: {asset_plan['maximum_download_bytes']:,} bytes"
+        )
+        for epoch in asset_plan["epochs"]:
+            print(
+                f"{epoch['year']}: coverage={epoch['exact_coverage_status']} "
+                f"records={epoch['catalog_record_ids']} action={epoch['planned_action']} "
+                f"cache={epoch['cache_state']}; semantic={epoch['source_semantic_type']}; "
+                f"{epoch['source_crs']} -> {epoch['expected_export_crs']} "
+                f"{epoch['expected_width']}x{epoch['expected_height']} @ "
+                f"{epoch['expected_resolution_m']} m, {epoch['expected_resampling']}; "
+                f"max={epoch['estimated_maximum_bytes']:,} bytes, "
+                f"cumulative={epoch['cumulative_estimated_raster_bytes']:,} bytes"
+            )
+        context = asset_plan["context_imagery"]
+        print(
+            f"Context: year={context['year']} source={context['source_id']} "
+            f"role={context['role']} action={context['planned_action']}"
+        )
+        if plan["blocking"]:
+            print("BLOCKING: " + "; ".join(plan.get("blocking_reasons", [])))
+        print(f"Plan artifacts: {plan['artifacts']['directory']}")
+        return
     print("Planning used saved local evidence. No network requests were made.")
     print(f"{'DATA':24} {'LOCAL READINESS':34} {'REMOTE SOURCE':34} NEXT STEP")
     for row in plan["rows"]:
@@ -229,6 +303,23 @@ def _refresh_if_requested(args: argparse.Namespace, paths: LocalPaths, config: A
     )
 
 
+def command_templates(args: argparse.Namespace) -> int:
+    if args.templates_command == "list":
+        templates = list_study_templates()
+        if args.json:
+            _json({"templates": templates})
+        else:
+            for item in templates:
+                print(f"{item['template_id']:<32} {item['summary']}")
+        return 0
+    template = get_study_template(args.template_id)
+    if args.json:
+        _json({"template": template.as_dict(), "workfile": show_study_template(args.template_id)})
+    else:
+        print(show_study_template(args.template_id), end="")
+    return 0
+
+
 def command_init(args: argparse.Namespace) -> int:
     destination = args.workfile.resolve()
     if destination.exists() and not args.force:
@@ -239,8 +330,21 @@ def command_init(args: argparse.Namespace) -> int:
         if name.endswith(suffix):
             name = name[: -len(suffix)]
             break
-    destination.write_text(workfile_template(name), encoding="utf-8")
+    if args.template:
+        content = render_study_template(
+            args.template,
+            name=args.name or name,
+            bbox=args.bbox,
+            years=args.years,
+        )
+    else:
+        if args.name is not None or args.bbox is not None or args.years is not None:
+            raise CommandError("--name, --bbox, and --years require --template")
+        content = workfile_template(name)
+    destination.write_text(content, encoding="utf-8")
     print(f"Created study workfile: {destination}")
+    if args.template:
+        print(f"Template: {args.template}")
     if args.project_config:
         paths = _paths(destination.parent)
         assert paths.project_config is not None
@@ -406,7 +510,20 @@ def command_plan(args: argparse.Namespace) -> int:
 def command_explain(args: argparse.Namespace) -> int:
     _, _, _, plan = _load_and_plan(args)
     if args.json:
-        _json({"resolved_config": plan["resolved_config"], "source_resolution": plan["source_resolution"], "asset_plan": plan["asset_plan"]})
+        _json({"resolved_config": plan["resolved_config"], "source_resolution": plan["source_resolution"], "asset_plan": plan["asset_plan"], "explanation": plan.get("explanation"), "source_discovery": plan.get("source_discovery")})
+        return 2 if plan["blocking"] else 0
+    if plan.get("explanation"):
+        explanation = plan["explanation"]
+        print(explanation["scientific_claim"])
+        for key in ("source_selection", "mapping", "invalid_values", "year_acceptance", "resampling", "grid", "context", "outputs"):
+            print(f"{key.replace('_', ' ').title()}: {explanation[key]}")
+        print("Unsupported statements: " + "; ".join(explanation["unsupported"]))
+        print(f"Metadata/catalog requests: {plan['network_requests']}; no raster pixels were transferred.")
+        for epoch in plan["asset_plan"]["epochs"]:
+            print(
+                f"{epoch['year']}: coverage={epoch['exact_coverage_status']} "
+                f"records={epoch['catalog_record_ids']} action={epoch['planned_action']}"
+            )
         return 2 if plan["blocking"] else 0
     print("FasterRaster resolved the study without making network requests.")
     if args.verbose:
@@ -429,7 +546,7 @@ def command_explain(args: argparse.Namespace) -> int:
         if args.verbose:
             print(f"  Selected source: {row['source'] or 'none'}")
             print(f"  Decision reason: {row['reason']}")
-            for rejected in decisions[row["logical_asset"]]["candidates_rejected"]:
+            for rejected in decisions[row["logical_asset"]].get("candidates_rejected", []):
                 print(f"  Rejected {rejected['source_id']}: {'; '.join(rejected['rejection_reasons'])}")
     return 2 if plan["blocking"] else 0
 
@@ -455,6 +572,19 @@ def command_cook(args: argparse.Namespace) -> int:
     root, workfile, _, plan = _load_and_plan(args)
     if plan["blocking"]:
         raise CommandError("study plan is blocked; run fr explain for source and reuse details")
+    if isinstance(workfile.spec, HumanDevelopmentWorkfileSpec):
+        values = plan["resolved_config"]["values"]
+        execute_human_development = _human_execute()
+        preview = execute_human_development(
+            root,
+            workfile=workfile,
+            plan=plan,
+            open_preview=bool(values["open_when_complete"]["value"]),
+        )
+        final = _handoff_from_preview(preview, configured_handoff_root(root))
+        result = {"status": "PASS", "handoff": str(final), "preview": str(preview), "network_plan": plan["rows"]}
+        _json(result) if args.json else print(f"Cook complete: {final}\nPreview: {preview}")
+        return 0
     recipe = load_named_recipe(root, workfile.spec.workflow_id)
     recipe_raw = json.loads((root / "recipes" / "ag" / f"{recipe.recipe_id}.json").read_text(encoding="utf-8"))
     values = plan["resolved_config"]["values"]
@@ -517,6 +647,34 @@ def command_open(args: argparse.Namespace) -> int:
     return 0
 
 
+def command_publish(args: argparse.Namespace) -> int:
+    options_type, publisher = _human_publisher()
+    options = options_type(
+        mode=args.mode,
+        imagery_year=args.imagery_year,
+        regional_resolution_m=args.regional_resolution_m,
+        hotspot_resolution_m=args.hotspot_resolution_m,
+        hotspot_size_m=args.hotspot_size_m,
+        maximum_download_mb=args.maximum_download_mb,
+        workers=args.workers,
+        reuse=args.reuse,
+        allow_network=args.allow_network,
+        open_when_complete=args.open_when_complete,
+    )
+    preview = publisher(repository_root(), args.handoff, options)
+    publication = preview.parent.parent
+    if args.json:
+        _json({
+            "status": "PASS",
+            "publication": str(publication),
+            "preview": str(preview),
+        })
+    else:
+        print(f"Published human-development hybrid: {publication}")
+        print(f"Preview: {preview}")
+    return 0
+
+
 def _add_plan_options(parser: argparse.ArgumentParser, *, include_out: bool = True) -> None:
     parser.add_argument("workfile", type=Path)
     parser.add_argument("--json", action="store_true", help="emit structured JSON")
@@ -536,8 +694,28 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--debug", action="store_true", help="show tracebacks for unexpected failures")
     commands = parser.add_subparsers(dest="command", required=True)
 
+    templates = commands.add_parser("templates", help="discover and inspect built-in study templates")
+    template_commands = templates.add_subparsers(dest="templates_command", required=True)
+    templates_list = template_commands.add_parser("list", help="list built-in template IDs")
+    templates_list.add_argument("--json", action="store_true")
+    templates_list.set_defaults(handler=command_templates)
+    templates_show = template_commands.add_parser("show", help="show a deterministic template workfile")
+    templates_show.add_argument("template_id")
+    templates_show.add_argument("--json", action="store_true")
+    templates_show.set_defaults(handler=command_templates)
+
     init = commands.add_parser("init", help="create a valid Markdown study workfile")
     init.add_argument("workfile", type=Path)
+    init.add_argument("--template", help="built-in template ID from 'fr templates list'")
+    init.add_argument("--name", help="study name rendered into the selected template")
+    init.add_argument(
+        "--bbox",
+        type=float,
+        nargs=4,
+        metavar=("MINX", "MINY", "MAXX", "MAXY"),
+        help="EPSG:4326 bounding box rendered into the selected template",
+    )
+    init.add_argument("--years", type=int, nargs="+", help="ordered epoch years rendered into the selected template")
     init.add_argument("--project-config", action="store_true", help="also initialize .fasterraster/config.toml")
     init.add_argument("--force", action="store_true", help="overwrite existing initialized files")
     init.set_defaults(handler=command_init)
@@ -600,7 +778,7 @@ def build_parser() -> argparse.ArgumentParser:
     _add_plan_options(explain)
     explain.set_defaults(handler=command_explain)
 
-    cook = commands.add_parser("cook", help="execute a validated workfile through the shared agricultural runtime")
+    cook = commands.add_parser("cook", help="execute a validated workfile through its workflow-specific runtime")
     _add_plan_options(cook, include_out=False)
     cook.add_argument("--open", dest="open_when_complete", action="store_true")
     cook.add_argument("--no-open", dest="open_when_complete", action="store_false")
@@ -616,6 +794,38 @@ def build_parser() -> argparse.ArgumentParser:
     open_command.add_argument("target", help="latest or an explicit finalized handoff path")
     open_command.add_argument("--json", action="store_true")
     open_command.set_defaults(handler=command_open)
+
+    publish = commands.add_parser(
+        "publish", help="create a finalized publication from a handoff"
+    )
+    publish_commands = publish.add_subparsers(
+        dest="publish_command", required=True
+    )
+    hybrid = publish_commands.add_parser(
+        "human-development-hybrid",
+        help="create a classification-first NAIP hybrid publication",
+    )
+    hybrid.add_argument("handoff", type=Path)
+    hybrid.add_argument(
+        "--mode",
+        choices=("regional-change", "developed-state", "hotspot", "combined"),
+        default="combined",
+    )
+    hybrid.add_argument("--imagery-year", type=int, default=2021)
+    hybrid.add_argument("--regional-resolution-m", type=float, default=4.2)
+    hybrid.add_argument("--hotspot-resolution-m", type=float, default=1.0)
+    hybrid.add_argument("--hotspot-size-m", type=float, default=1024.0)
+    hybrid.add_argument("--maximum-download-mb", type=float, default=75.0)
+    hybrid.add_argument("--workers", type=int, default=2)
+    hybrid.add_argument(
+        "--reuse", choices=("auto", "only", "never"), default="auto"
+    )
+    hybrid.add_argument("--allow-network", action="store_true")
+    hybrid.add_argument(
+        "--open", dest="open_when_complete", action="store_true"
+    )
+    hybrid.add_argument("--json", action="store_true")
+    hybrid.set_defaults(handler=command_publish, open_when_complete=False)
     return parser
 
 

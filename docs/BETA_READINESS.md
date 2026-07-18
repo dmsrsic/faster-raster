@@ -1,6 +1,6 @@
 # Beta Gate 1 readiness rubric
 
-Current score: **100/100**  
+Current score: **100/100**
 Decision: **beta ready**
 
 The source-level, packaging, and operational gate passes. Isolated managed CPython 3.12.13 built both release artifacts; a fresh Python 3.12 environment installed the wheel and passed the installed `faster-raster`, `fr`, and `fr-beta-check` command proofs outside the checkout. Offline doctor, workfile initialization, validation, planning, and explanation made zero raster-service requests. Required package data passed verification, the complete suite passed 579 tests, tracked reports were unchanged, and the exact post-change system grader remained 99.03 (`excellent`, safety 100, `release_ready`, no blockers). Verification reports and artifacts are retained under the ignored `.beta-tools` review directory.

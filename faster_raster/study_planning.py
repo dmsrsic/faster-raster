@@ -22,7 +22,7 @@ from faster_raster.source_capabilities import (
     source_evidence_state,
     write_profile_atomic,
 )
-from faster_raster.workfiles import Workfile
+from faster_raster.workfiles import HumanDevelopmentWorkfileSpec, Workfile
 
 
 ASSET_LABELS = {
@@ -357,6 +357,22 @@ def compile_study_plan(
     inventory_root: Path | None = None,
     now: datetime | None = None,
 ) -> dict[str, Any]:
+    if isinstance(workfile.spec, HumanDevelopmentWorkfileSpec):
+        try:
+            from faster_raster.human_development_workflow import compile_human_development_plan
+        except (ImportError, ModuleNotFoundError) as exc:
+            missing = getattr(exc, "name", None) or type(exc).__name__
+            raise RuntimeError(
+                "human_development_change requires the installed NumPy and Rasterio dependencies "
+                f"(missing or unloadable: {missing}); install FasterRaster through its package metadata"
+            ) from exc
+        return compile_human_development_plan(
+            repository_root,
+            workfile,
+            paths,
+            cli_overrides=cli_overrides,
+            output_dir=output_dir,
+        )
     resolved, config = compile_resolved_configuration(
         repository_root,
         workfile,
