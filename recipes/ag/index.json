@@ -1,0 +1,28 @@
+{
+  "execution": "scripts/fr-cook-ag",
+  "library": "FasterRaster Agricultural Recipe Library",
+  "recipes": [
+    {
+      "file": "crop_class_area_inventory.json",
+      "recipe_id": "crop_class_area_inventory"
+    },
+    {
+      "file": "crop_terrain_relationship.json",
+      "recipe_id": "crop_terrain_relationship"
+    },
+    {
+      "file": "crop_vigor_classification.json",
+      "recipe_id": "crop_vigor_classification"
+    },
+    {
+      "file": "irrigation_field_structure.json",
+      "recipe_id": "irrigation_field_structure"
+    }
+  ],
+  "reuse_modes": {
+    "auto": "Reuse a compatible handoff or acquire data when none exists.",
+    "never": "Ignore compatible handoffs and acquire a fresh bundle.",
+    "only": "Require compatible local data and prohibit acquisition."
+  },
+  "schema_version": 2
+}

@@ -1,0 +1,54 @@
+name: beta-gate
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  python-312-beta-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install GDAL runtime
+        run: sudo apt-get update && sudo apt-get install -y gdal-bin libgdal-dev
+
+      - name: Build source and wheel artifacts
+        run: |
+          python -m pip install --upgrade pip build
+          python -m build
+
+      - name: Clean wheel install and entry-point smoke test
+        run: |
+          python -m venv "$RUNNER_TEMP/fr-wheel"
+          "$RUNNER_TEMP/fr-wheel/bin/pip" install dist/*.whl
+          cd "$RUNNER_TEMP"
+          "$RUNNER_TEMP/fr-wheel/bin/fr" --help
+          "$RUNNER_TEMP/fr-wheel/bin/faster-raster" version
+          "$RUNNER_TEMP/fr-wheel/bin/fr-beta-check" --help
+
+      - name: Install test dependencies
+        run: python -m pip install -e '.[dev]'
+
+      - name: Run complete tests without tracked report mutation
+        env:
+          FASTERRASTER_REPORT_ROOT: ${{ runner.temp }}/pytest-reports
+        run: python -m pytest -q
+
+      - name: Run Beta Gate 1 check
+        env:
+          FASTERRASTER_REPORT_ROOT: ${{ runner.temp }}/beta-reports
+          FASTERRASTER_HANDOFF_ROOT: ${{ runner.temp }}/beta-handoffs
+        run: fr-beta-check --output "$RUNNER_TEMP/beta-gate-1"
+
+      - name: Upload beta evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: beta-gate-1-evidence
+          path: ${{ runner.temp }}/beta-gate-1

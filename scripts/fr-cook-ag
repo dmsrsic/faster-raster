@@ -1,0 +1,2029 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+
+# BEGIN FASTERRASTER AG RECIPE BOOTSTRAP
+import sys as _fr_recipe_sys
+from pathlib import Path as _fr_recipe_Path
+
+_fr_recipe_lib = (
+    _fr_recipe_Path(__file__).resolve().parent
+    / "lib"
+)
+
+if str(_fr_recipe_lib) not in _fr_recipe_sys.path:
+    _fr_recipe_sys.path.insert(
+        0,
+        str(_fr_recipe_lib),
+    )
+
+from fr_ag_recipe_runtime import bootstrap as _fr_recipe_bootstrap
+
+_fr_recipe_bootstrap(
+    _fr_recipe_Path(__file__).resolve().parent.parent,
+    _fr_recipe_sys.argv,
+)
+# END FASTERRASTER AG RECIPE BOOTSTRAP
+
+import argparse
+import csv
+import hashlib
+import json
+import math
+import shutil
+import subprocess
+import sys
+import tarfile
+import time
+import urllib.error
+import urllib.parse
+import urllib.request
+from collections import Counter
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any
+
+from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
+
+_PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(_PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(_PROJECT_ROOT))
+
+from faster_raster.ag_geography import (
+    BBoxValidationError,
+    SourceCoverageError,
+    asset_safety_profile,
+    catalog_years,
+    normalize_gdalinfo_paths,
+    parse_requested_assets,
+    required_source_families,
+    validate_3dep_catalog,
+    validate_aoi_safety,
+    validate_bbox_text,
+    validate_cdl_catalog,
+    validate_naip_catalog,
+    validate_service_extent,
+)
+
+
+NAIP = (
+    "https://imagery.nationalmap.gov/arcgis/rest/services/"
+    "USGSNAIPImagery/ImageServer"
+)
+THREEDEP = (
+    "https://elevation.nationalmap.gov/arcgis/rest/services/"
+    "3DEPElevation/ImageServer"
+)
+CDL = (
+    "https://pdi.scinet.usda.gov/image/rest/services/"
+    "CDL_WM/ImageServer"
+)
+
+ALL_ASSETS = {
+    "natural",
+    "ndvi",
+    "cdl_classes",
+    "cdl_color",
+    "hillshade",
+}
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Cook an agricultural FasterRaster handoff tray."
+    )
+    parser.add_argument("--name", required=True)
+    parser.add_argument(
+        "--recipe",
+        help="Agricultural recipe ID; enables asset-level recipe execution.",
+    )
+    parser.add_argument(
+        "--reuse",
+        choices=["auto", "only", "never"],
+        default="auto",
+        help="Recipe cache policy (default: auto).",
+    )
+    parser.add_argument("--bbox", required=True)
+    parser.add_argument("--start", required=True)
+    parser.add_argument("--end", required=True)
+    parser.add_argument("--cdl-year", required=True, type=int)
+    parser.add_argument(
+        "--portion",
+        choices=["native", "overview"],
+        default="native",
+    )
+    parser.add_argument(
+        "--max-total-bytes",
+        type=int,
+        default=2_000_000_000,
+    )
+    parser.add_argument(
+        "--preview-width",
+        type=int,
+        default=3840,
+    )
+    parser.add_argument(
+        "--naip-resolution",
+        type=float,
+        default=None,
+        help="Output NAIP resolution in meters; omit for catalog-native.",
+    )
+    parser.add_argument(
+        "--service-tile-size",
+        type=int,
+        default=1800,
+        help="Maximum width and height of each service export request.",
+    )
+    parser.add_argument("--open", action="store_true")
+    parser.add_argument(
+        "--asset-only",
+        action="store_true",
+        help=argparse.SUPPRESS,
+    )
+    parser.add_argument(
+        "--preflight-only",
+        action="store_true",
+        help="run bounded source coverage checks without raster transfer",
+    )
+
+    parser.add_argument(
+        "--assets",
+        default=None,
+        help=argparse.SUPPRESS,
+    )
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=None,
+        help=argparse.SUPPRESS,
+    )
+    return parser.parse_args()
+
+
+ARGS = parse_args()
+
+try:
+    WEST, SOUTH, EAST, NORTH = validate_bbox_text(ARGS.bbox)
+except BBoxValidationError as error:
+    raise SystemExit(f"Invalid agricultural bbox: {error}") from error
+
+try:
+    START = datetime.fromisoformat(ARGS.start).replace(tzinfo=timezone.utc)
+    END = datetime.fromisoformat(ARGS.end).replace(tzinfo=timezone.utc)
+except ValueError as error:
+    raise SystemExit(
+        "The agricultural timeframe must use valid ISO-8601 dates."
+    ) from error
+
+if START >= END:
+    raise SystemExit("The timeframe start must precede its end.")
+
+if START.year != ARGS.cdl_year or END.year != ARGS.cdl_year:
+    raise SystemExit("The growing-season dates must match --cdl-year.")
+
+try:
+    if not 0 < ARGS.max_total_bytes <= 20_000_000_000:
+        raise BBoxValidationError(
+            "--max-total-bytes must be between 1 and 20,000,000,000"
+        )
+    if not 64 <= ARGS.service_tile_size <= 10_000:
+        raise BBoxValidationError(
+            "--service-tile-size must be between 64 and 10,000"
+        )
+    if not 320 <= ARGS.preview_width <= 16_384:
+        raise BBoxValidationError(
+            "--preview-width must be between 320 and 16,384"
+        )
+    REQUESTED_ASSETS = parse_requested_assets(
+        ARGS.asset_only,
+        ARGS.assets,
+    )
+    AOI_SAFETY = validate_aoi_safety(
+        (WEST, SOUTH, EAST, NORTH),
+        maximum_network_bytes=ARGS.max_total_bytes,
+        asset_resolutions=asset_safety_profile(
+            REQUESTED_ASSETS,
+            ARGS.naip_resolution,
+        ),
+    )
+except BBoxValidationError as error:
+    raise SystemExit(f"Unsafe agricultural request: {error}") from error
+
+for executable in (
+    "gdalinfo",
+    "gdal_translate",
+    "gdalbuildvrt",
+    "gdalwarp",
+):
+    if shutil.which(executable) is None:
+        raise SystemExit(f"Missing required executable: {executable}")
+
+STAMP = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+ROOT = Path.cwd()
+TRAY = (
+    ARGS.output_dir.resolve()
+    if ARGS.output_dir is not None
+    else ROOT / "outputs" / "handoffs" / f"{ARGS.name}_{STAMP}"
+)
+WORK = TRAY / "_work"
+DATA = TRAY / "data"
+PREVIEW = TRAY / "preview"
+METADATA = TRAY / "metadata"
+VERIFY = TRAY / "verification"
+ANALYSIS = TRAY / "analysis"
+KITCHEN = TRAY / "kitchen"
+
+for directory in (
+    WORK,
+    DATA,
+    PREVIEW,
+    METADATA,
+    VERIFY,
+    ANALYSIS,
+    KITCHEN,
+):
+    directory.mkdir(parents=True, exist_ok=True)
+
+network_bytes = 0
+request_receipts: list[dict[str, Any]] = []
+
+
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def write_json(path: Path, value: Any) -> None:
+    path.write_text(
+        json.dumps(value, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+
+def run(
+    command: list[str],
+    *,
+    capture: bool = False,
+    check: bool = True,
+) -> str:
+    print("+", " ".join(command), flush=True)
+    result = subprocess.run(
+        command,
+        check=check,
+        text=True,
+        stdout=subprocess.PIPE if capture else None,
+        stderr=subprocess.STDOUT if capture else None,
+    )
+    return result.stdout if capture else ""
+
+
+def request(
+    endpoint: str,
+    params: dict[str, Any],
+    *,
+    label: str,
+) -> bytes:
+    global network_bytes
+
+    encoded_params = {
+        key: (
+            json.dumps(value, separators=(",", ":"))
+            if isinstance(value, (dict, list))
+            else str(value)
+        )
+        for key, value in params.items()
+    }
+
+    encoded_query = urllib.parse.urlencode(encoded_params)
+    is_json_request = encoded_params.get("f") in {
+        "json",
+        "pjson",
+    }
+
+    retryable_statuses = {
+        408,
+        425,
+        429,
+        500,
+        502,
+        503,
+        504,
+    }
+
+    maximum_attempts = 7
+    last_error: Exception | None = None
+
+    for attempt in range(1, maximum_attempts + 1):
+        started = time.monotonic()
+
+        if is_json_request:
+            separator = "&" if "?" in endpoint else "?"
+            request_url = endpoint + separator + encoded_query
+
+            req = urllib.request.Request(
+                request_url,
+                headers={
+                    "User-Agent": (
+                        "FasterRaster-Agricultural-Cook/1.2"
+                    ),
+                    "Accept": "application/json",
+                },
+                method="GET",
+            )
+
+            request_method = "GET"
+        else:
+            body = encoded_query.encode("utf-8")
+
+            req = urllib.request.Request(
+                endpoint,
+                data=body,
+                headers={
+                    "User-Agent": (
+                        "FasterRaster-Agricultural-Cook/1.2"
+                    ),
+                    "Content-Type": (
+                        "application/x-www-form-urlencoded"
+                    ),
+                    "Accept": (
+                        "image/tiff,image/png,"
+                        "application/octet-stream,"
+                        "application/json"
+                    ),
+                },
+                method="POST",
+            )
+
+            request_method = "POST"
+
+        try:
+            chunks: list[bytes] = []
+            received = 0
+
+            with urllib.request.urlopen(
+                req,
+                timeout=240,
+            ) as response:
+                content_type = response.headers.get(
+                    "Content-Type",
+                    "",
+                )
+
+                while True:
+                    chunk = response.read(1024 * 1024)
+
+                    if not chunk:
+                        break
+
+                    received += len(chunk)
+
+                    if (
+                        network_bytes + received
+                        > ARGS.max_total_bytes
+                    ):
+                        raise RuntimeError(
+                            "Expanded network ceiling exceeded: "
+                            f"{ARGS.max_total_bytes:,} bytes"
+                        )
+
+                    chunks.append(chunk)
+
+            payload = b"".join(chunks)
+            network_bytes += len(payload)
+
+            request_receipts.append(
+                {
+                    "label": label,
+                    "endpoint": endpoint,
+                    "method": request_method,
+                    "attempt": attempt,
+                    "parameters": encoded_params,
+                    "bytes": len(payload),
+                    "sha256": hashlib.sha256(
+                        payload
+                    ).hexdigest(),
+                    "content_type": content_type,
+                    "duration_seconds": round(
+                        time.monotonic() - started,
+                        3,
+                    ),
+                }
+            )
+
+            if payload.lstrip().startswith(b"{"):
+                try:
+                    response_json = json.loads(payload)
+                except json.JSONDecodeError:
+                    response_json = None
+
+                if (
+                    isinstance(response_json, dict)
+                    and "error" in response_json
+                ):
+                    error = response_json["error"]
+                    code = error.get("code")
+
+                    if (
+                        code in retryable_statuses
+                        and attempt < maximum_attempts
+                    ):
+                        delay = min(45, 2 ** attempt)
+
+                        print(
+                            f"{label}: ArcGIS {code}; "
+                            f"retry {attempt}/"
+                            f"{maximum_attempts} "
+                            f"in {delay}s",
+                            flush=True,
+                        )
+
+                        time.sleep(delay)
+                        continue
+
+                    raise RuntimeError(
+                        f"{label}: ArcGIS error: {error}"
+                    )
+
+            return payload
+
+        except urllib.error.HTTPError as error:
+            last_error = error
+
+            if (
+                error.code not in retryable_statuses
+                or attempt == maximum_attempts
+            ):
+                raise
+
+            retry_after = error.headers.get(
+                "Retry-After"
+            )
+
+            try:
+                delay = int(retry_after)
+            except (TypeError, ValueError):
+                delay = min(45, 2 ** attempt)
+
+            print(
+                f"{label}: HTTP {error.code}; "
+                f"retry {attempt}/{maximum_attempts} "
+                f"in {delay}s",
+                flush=True,
+            )
+
+            time.sleep(delay)
+
+        except (
+            urllib.error.URLError,
+            TimeoutError,
+            ConnectionError,
+        ) as error:
+            last_error = error
+
+            if attempt == maximum_attempts:
+                raise
+
+            delay = min(45, 2 ** attempt)
+
+            print(
+                f"{label}: {type(error).__name__}; "
+                f"retry {attempt}/{maximum_attempts} "
+                f"in {delay}s",
+                flush=True,
+            )
+
+            time.sleep(delay)
+
+    raise RuntimeError(
+        f"{label}: request failed after "
+        f"{maximum_attempts} attempts"
+    ) from last_error
+
+def request_json(
+    endpoint: str,
+    params: dict[str, Any],
+    *,
+    label: str,
+) -> dict[str, Any]:
+    payload = request(
+        endpoint,
+        {**params, "f": "json"},
+        label=label,
+    )
+    return json.loads(payload.decode("utf-8"))
+
+
+def source_request_json(
+    endpoint: str,
+    params: dict[str, Any],
+    *,
+    label: str,
+    source: str,
+) -> dict[str, Any]:
+    try:
+        return request_json(endpoint, params, label=label)
+    except json.JSONDecodeError as error:
+        raise SourceCoverageError(
+            source,
+            "invalid_response",
+            f"{label} did not return valid JSON",
+        ) from error
+    except (
+        urllib.error.HTTPError,
+        urllib.error.URLError,
+        TimeoutError,
+        ConnectionError,
+        RuntimeError,
+    ) as error:
+        raise SourceCoverageError(
+            source,
+            "service_unavailable",
+            f"{label} request failed: {error}",
+        ) from error
+
+
+def lon_to_webmercator(lon: float) -> float:
+    return lon * 20037508.342789244 / 180.0
+
+
+def lat_to_webmercator(lat: float) -> float:
+    bounded = max(min(lat, 85.05112878), -85.05112878)
+    return (
+        math.log(
+            math.tan((90.0 + bounded) * math.pi / 360.0)
+        )
+        / (math.pi / 180.0)
+        * 20037508.342789244
+        / 180.0
+    )
+
+
+XMIN = lon_to_webmercator(WEST)
+YMIN = lat_to_webmercator(SOUTH)
+XMAX = lon_to_webmercator(EAST)
+YMAX = lat_to_webmercator(NORTH)
+
+
+def kitchen_capture() -> None:
+    commands = {
+        "menu_lingo.txt": [
+            "faster-raster",
+            "menu",
+            "lingo",
+            "--plain",
+        ],
+        "goods.txt": [
+            "faster-raster",
+            "goods",
+            "--plain",
+        ],
+        "cdl_sauce.txt": [
+            "faster-raster",
+            "sauce",
+            "cdl_arcgis_tiny_export",
+            "--plain",
+        ],
+        "cdl_dip_plan.txt": [
+            "faster-raster",
+            "cook",
+            "dip",
+            "cdl_arcgis_tiny_export",
+            "--dry-run",
+            "--plain",
+        ],
+    }
+
+    for filename, command in commands.items():
+        try:
+            output = run(command, capture=True, check=False)
+        except OSError as error:
+            output = f"Command unavailable: {error}\n"
+
+        (KITCHEN / filename).write_text(output, encoding="utf-8")
+
+
+def service_metadata(
+    endpoint: str,
+    name: str,
+    source: str,
+) -> dict[str, Any]:
+    value = source_request_json(
+        endpoint,
+        {"f": "pjson"},
+        label=f"{name}_service_metadata",
+        source=source,
+    )
+    write_json(METADATA / f"{name}_service_metadata.json", value)
+    return value
+
+
+def stop_source_coverage(error: SourceCoverageError) -> None:
+    failure = {
+        "schema_version": "fasterraster.ag-source-failure/v1",
+        "status": "FAIL",
+        "source": error.source,
+        "code": error.code,
+        "detail": error.detail,
+        "evidence": error.evidence or {},
+        "requested_bbox": [WEST, SOUTH, EAST, NORTH],
+        "requested_year": ARGS.cdl_year,
+        "requested_assets": sorted(REQUESTED_ASSETS),
+        "network_bytes": network_bytes,
+        "requests": request_receipts,
+        "failed_at_utc": datetime.now(timezone.utc).isoformat(),
+    }
+    write_json(METADATA / "source_coverage_failure.json", failure)
+    write_json(TRAY / "source_coverage_failure.json", failure)
+    shutil.rmtree(WORK, ignore_errors=True)
+    raise SystemExit(str(error))
+
+
+def require_source_coverage(operation: Any) -> Any:
+    try:
+        return operation()
+    except SourceCoverageError as error:
+        stop_source_coverage(error)
+
+
+def build_cog(
+    tiles: list[Path],
+    destination: Path,
+    *,
+    resolution: float,
+) -> str:
+    if not tiles:
+        raise RuntimeError(f"No tiles produced for {destination.name}")
+
+    source: Path
+
+    if len(tiles) == 1:
+        source = tiles[0]
+    else:
+        source = WORK / f"{destination.stem}.vrt"
+        run(
+            [
+                "gdalbuildvrt",
+                "-overwrite",
+                "-resolution",
+                "user",
+                "-tr",
+                str(resolution),
+                str(resolution),
+                str(source),
+                *[str(tile) for tile in tiles],
+            ]
+        )
+
+    formats = run(["gdalinfo", "--formats"], capture=True)
+    has_cog = "\n  COG " in formats or "\nCOG " in formats
+
+    if has_cog:
+        driver = "COG"
+        command = [
+            "gdal_translate",
+            "-q",
+            "-of",
+            "COG",
+            "-co",
+            "COMPRESS=DEFLATE",
+            "-co",
+            "BIGTIFF=IF_SAFER",
+            "-co",
+            "BLOCKSIZE=512",
+            "-co",
+            "NUM_THREADS=ALL_CPUS",
+            str(source),
+            str(destination),
+        ]
+    else:
+        driver = "GTiff"
+        command = [
+            "gdal_translate",
+            "-q",
+            "-of",
+            "GTiff",
+            "-co",
+            "TILED=YES",
+            "-co",
+            "COMPRESS=DEFLATE",
+            "-co",
+            "BIGTIFF=IF_SAFER",
+            str(source),
+            str(destination),
+        ]
+
+    run(command)
+    return driver
+
+
+def download_tiled_layer(
+    *,
+    name: str,
+    endpoint: str,
+    resolution: float,
+    max_width: int,
+    max_height: int,
+    rendering_rule: dict[str, Any] | None,
+    mosaic_rule: dict[str, Any] | None,
+    time_value: str | None,
+    interpolation: str,
+    destination: Path,
+) -> dict[str, Any]:
+    if ARGS.service_tile_size <= 0:
+        raise RuntimeError("Service tile size must be positive")
+
+    max_width = min(max_width, ARGS.service_tile_size)
+    max_height = min(max_height, ARGS.service_tile_size)
+
+    columns = math.ceil((XMAX - XMIN) / resolution)
+    rows = math.ceil((YMAX - YMIN) / resolution)
+
+    expanded_xmax = XMIN + columns * resolution
+    expanded_ymin = YMAX - rows * resolution
+
+    tile_columns = math.ceil(columns / max_width)
+    tile_rows = math.ceil(rows / max_height)
+
+    tile_directory = WORK / name
+    tile_directory.mkdir(parents=True, exist_ok=True)
+
+    tiles: list[Path] = []
+
+    print(
+        f"{name}: {columns:,} × {rows:,} pixels; "
+        f"{tile_columns} × {tile_rows} tiles; "
+        f"{resolution:g} m output pixels"
+    )
+
+    for tile_row in range(tile_rows):
+        row_offset = tile_row * max_height
+        tile_height = min(max_height, rows - row_offset)
+
+        tile_ymax = YMAX - row_offset * resolution
+        tile_ymin = tile_ymax - tile_height * resolution
+
+        for tile_column in range(tile_columns):
+            column_offset = tile_column * max_width
+            tile_width = min(max_width, columns - column_offset)
+
+            tile_xmin = XMIN + column_offset * resolution
+            tile_xmax = tile_xmin + tile_width * resolution
+
+            raw_path = tile_directory / (
+                f"r{tile_row:03d}_c{tile_column:03d}.raw.tif"
+            )
+            tile_path = tile_directory / (
+                f"r{tile_row:03d}_c{tile_column:03d}.tif"
+            )
+
+            params: dict[str, Any] = {
+                "bbox": (
+                    f"{tile_xmin},{tile_ymin},"
+                    f"{tile_xmax},{tile_ymax}"
+                ),
+                "bboxSR": "3857",
+                "imageSR": "3857",
+                "size": f"{tile_width},{tile_height}",
+                "format": "tiff",
+                "interpolation": interpolation,
+                "transparent": "true",
+                "f": "image",
+            }
+
+            if rendering_rule is not None:
+                params["renderingRule"] = rendering_rule
+
+            if mosaic_rule is not None:
+                params["mosaicRule"] = mosaic_rule
+
+            if time_value is not None:
+                params["time"] = time_value
+
+            payload = request(
+                endpoint.rstrip("/") + "/exportImage",
+                params,
+                label=(
+                    f"{name}_r{tile_row:03d}_"
+                    f"c{tile_column:03d}"
+                ),
+            )
+
+            raw_path.write_bytes(payload)
+
+            run(
+                [
+                    "gdal_translate",
+                    "-q",
+                    "-of",
+                    "GTiff",
+                    "-a_srs",
+                    "EPSG:3857",
+                    "-a_ullr",
+                    str(tile_xmin),
+                    str(tile_ymax),
+                    str(tile_xmax),
+                    str(tile_ymin),
+                    str(raw_path),
+                    str(tile_path),
+                ]
+            )
+
+            raw_path.unlink()
+            tiles.append(tile_path)
+
+    driver = build_cog(
+        tiles,
+        destination,
+        resolution=resolution,
+    )
+
+    return {
+        "name": name,
+        "resolution_meters": resolution,
+        "columns": columns,
+        "rows": rows,
+        "tile_columns": tile_columns,
+        "tile_rows": tile_rows,
+        "tile_count": len(tiles),
+        "service_max_width": max_width,
+        "service_max_height": max_height,
+        "extent_epsg_3857": [
+            XMIN,
+            expanded_ymin,
+            expanded_xmax,
+            YMAX,
+        ],
+        "output": str(destination.relative_to(TRAY)),
+        "output_bytes": destination.stat().st_size,
+        "output_sha256": sha256_file(destination),
+        "output_driver": driver,
+    }
+
+
+def warp_preview(
+    source: Path,
+    destination: Path,
+    *,
+    width: int,
+    height: int,
+    resampling: str,
+) -> None:
+    temporary = destination.with_suffix(".warp.tif")
+
+    run(
+        [
+            "gdalwarp",
+            "-q",
+            "-overwrite",
+            "-of",
+            "GTiff",
+            "-t_srs",
+            "EPSG:3857",
+            "-te",
+            str(XMIN),
+            str(YMIN),
+            str(XMAX),
+            str(YMAX),
+            "-ts",
+            str(width),
+            str(height),
+            "-r",
+            resampling,
+            str(source),
+            str(temporary),
+        ]
+    )
+
+    run(
+        [
+            "gdal_translate",
+            "-q",
+            "-of",
+            "PNG",
+            "-ot",
+            "Byte",
+            str(temporary),
+            str(destination),
+        ]
+    )
+
+    temporary.unlink(missing_ok=True)
+
+
+def load_font(size: int, bold: bool = False) -> ImageFont.ImageFont:
+    paths = [
+        (
+            "/usr/share/fonts/truetype/dejavu/"
+            + (
+                "DejaVuSans-Bold.ttf"
+                if bold
+                else "DejaVuSans.ttf"
+            )
+        ),
+        (
+            "/usr/share/fonts/truetype/liberation2/"
+            + (
+                "LiberationSans-Bold.ttf"
+                if bold
+                else "LiberationSans-Regular.ttf"
+            )
+        ),
+    ]
+
+    for path in paths:
+        try:
+            return ImageFont.truetype(path, size)
+        except OSError:
+            pass
+
+    return ImageFont.load_default()
+
+
+def fit_dimensions(
+    source_width: float,
+    source_height: float,
+    maximum_width: int,
+    maximum_height: int,
+) -> tuple[int, int]:
+    scale = min(
+        maximum_width / source_width,
+        maximum_height / source_height,
+    )
+    return (
+        max(1, round(source_width * scale)),
+        max(1, round(source_height * scale)),
+    )
+
+
+def clean_cdl(image: Image.Image, opacity: float) -> Image.Image:
+    source = image.convert("RGBA")
+    output: list[tuple[int, int, int, int]] = []
+
+    for red, green, blue, alpha in source.getdata():
+        empty = (
+            alpha == 0
+            or (red >= 250 and green >= 250 and blue >= 250)
+            or (red <= 2 and green <= 2 and blue <= 2)
+        )
+
+        output.append(
+            (
+                red,
+                green,
+                blue,
+                0 if empty else round(alpha * opacity),
+            )
+        )
+
+    result = Image.new("RGBA", source.size)
+    result.putdata(output)
+    return result
+
+
+def create_preview(
+    natural_path: Path,
+    ndvi_path: Path,
+    hillshade_path: Path,
+    cdl_color_path: Path,
+    *,
+    native_resolution: float,
+    layer_reports: list[dict[str, Any]],
+) -> Path:
+    dashboard_width = ARGS.preview_width
+    dashboard_height = round(dashboard_width * 9 / 16)
+
+    map_width, map_height = fit_dimensions(
+        XMAX - XMIN,
+        YMAX - YMIN,
+        round(dashboard_width * 0.64),
+        round(dashboard_height * 0.73),
+    )
+
+    previews = {
+        "natural": WORK / "natural_preview.png",
+        "ndvi": WORK / "ndvi_preview.png",
+        "hillshade": WORK / "hillshade_preview.png",
+        "cdl": WORK / "cdl_preview.png",
+    }
+
+    warp_preview(
+        natural_path,
+        previews["natural"],
+        width=map_width,
+        height=map_height,
+        resampling="cubic",
+    )
+    warp_preview(
+        ndvi_path,
+        previews["ndvi"],
+        width=map_width,
+        height=map_height,
+        resampling="cubic",
+    )
+    warp_preview(
+        hillshade_path,
+        previews["hillshade"],
+        width=map_width,
+        height=map_height,
+        resampling="bilinear",
+    )
+    warp_preview(
+        cdl_color_path,
+        previews["cdl"],
+        width=map_width,
+        height=map_height,
+        resampling="near",
+    )
+
+    natural = Image.open(previews["natural"]).convert("RGB")
+    ndvi = Image.open(previews["ndvi"]).convert("RGB")
+    hillshade = Image.open(previews["hillshade"]).convert("L")
+    cdl_codes = Image.open(previews["cdl"]).convert("L")
+
+    natural = ImageOps.autocontrast(
+        natural,
+        cutoff=1,
+    )
+    natural = ImageEnhance.Contrast(
+        natural
+    ).enhance(1.12)
+    natural = ImageEnhance.Color(
+        natural
+    ).enhance(1.10)
+    natural = ImageEnhance.Sharpness(
+        natural
+    ).enhance(1.08)
+
+    ndvi = ImageOps.autocontrast(
+        ndvi,
+        cutoff=1,
+    )
+    ndvi = ImageEnhance.Contrast(
+        ndvi
+    ).enhance(1.10)
+    ndvi = ImageEnhance.Color(
+        ndvi
+    ).enhance(1.08)
+
+    cdl_palette = {
+        1: (255, 212, 0),
+        2: (255, 38, 38),
+        3: (0, 168, 232),
+        4: (255, 127, 0),
+        5: (38, 115, 0),
+        6: (255, 204, 102),
+        21: (230, 230, 0),
+        22: (216, 216, 0),
+        23: (211, 211, 0),
+        24: (168, 112, 0),
+        26: (115, 115, 0),
+        28: (214, 158, 188),
+        29: (115, 40, 40),
+        31: (214, 255, 127),
+        36: (255, 165, 226),
+        37: (165, 245, 141),
+        41: (168, 0, 132),
+        42: (165, 40, 40),
+        43: (115, 70, 40),
+        44: (0, 175, 77),
+        54: (242, 163, 119),
+        57: (175, 223, 115),
+        61: (191, 191, 119),
+        111: (79, 129, 189),
+        112: (212, 231, 245),
+        121: (225, 225, 225),
+        122: (209, 209, 209),
+        123: (179, 179, 179),
+        124: (153, 153, 153),
+        131: (204, 191, 163),
+        141: (56, 129, 78),
+        142: (45, 107, 63),
+        143: (79, 138, 91),
+        152: (196, 180, 84),
+        176: (232, 209, 125),
+        190: (127, 157, 185),
+        195: (156, 207, 216),
+    }
+
+    cdl_names = {
+        1: "Corn",
+        2: "Cotton",
+        3: "Rice",
+        4: "Sorghum",
+        5: "Soybeans",
+        6: "Sunflower",
+        21: "Barley",
+        22: "Durum wheat",
+        23: "Spring wheat",
+        24: "Winter wheat",
+        26: "Double crop wheat/soy",
+        28: "Oats",
+        29: "Millet",
+        31: "Canola",
+        36: "Alfalfa",
+        37: "Other hay",
+        41: "Sugarbeets",
+        42: "Dry beans",
+        43: "Potatoes",
+        44: "Other crops",
+        54: "Tomatoes",
+        57: "Herbs",
+        61: "Fallow/idle cropland",
+        111: "Open water",
+        121: "Developed/open",
+        122: "Developed/low",
+        123: "Developed/medium",
+        124: "Developed/high",
+        131: "Barren",
+        141: "Deciduous forest",
+        142: "Evergreen forest",
+        143: "Mixed forest",
+        152: "Shrubland",
+        176: "Grassland/pasture",
+        190: "Woody wetlands",
+        195: "Herbaceous wetlands",
+    }
+
+    def color_for_cdl(code: int) -> tuple[int, int, int]:
+        known = cdl_palette.get(code)
+
+        if known is not None:
+            return known
+
+        return (
+            45 + (code * 47) % 170,
+            45 + (code * 83) % 170,
+            45 + (code * 131) % 170,
+        )
+
+    cdl_values = list(cdl_codes.getdata())
+
+    cdl = Image.new(
+        "RGBA",
+        cdl_codes.size,
+    )
+
+    cdl.putdata(
+        [
+            (
+                *color_for_cdl(code),
+                0 if code == 0 else 255,
+            )
+            for code in cdl_values
+        ]
+    )
+
+    cdl_counts = Counter(
+        code
+        for code in cdl_values
+        if code != 0
+    )
+
+    top_codes = [
+        code
+        for code, _count
+        in cdl_counts.most_common(5)
+    ]
+
+    top_summary = ", ".join(
+        f"{code} {cdl_names.get(code, 'class')}"
+        for code in top_codes
+    ) or "none"
+
+    write_json(
+        METADATA / "cdl_preview_palette.json",
+        {
+            "palette_status": "local_diagnostic_from_raw_classes",
+            "resampling": "nearest",
+            "class_names": cdl_names,
+            "class_colors_rgb": cdl_palette,
+            "visible_top_codes": top_codes,
+        },
+    )
+
+    hillshade_rgb = Image.merge(
+        "RGB",
+        (hillshade, hillshade, hillshade),
+    )
+
+    terrain = Image.blend(
+        natural,
+        ImageChops.multiply(natural, hillshade_rgb),
+        0.08,
+    ).convert("RGBA")
+
+    composite = Image.alpha_composite(
+        terrain,
+        clean_cdl(cdl, 0.30),
+    ).convert("RGB")
+
+    composite_path = PREVIEW / "ag_composite.png"
+    composite.save(composite_path, optimize=True)
+
+    canvas = Image.new(
+        "RGB",
+        (dashboard_width, dashboard_height),
+        (244, 247, 250),
+    )
+    draw = ImageDraw.Draw(canvas)
+
+    margin = round(dashboard_width * 0.014)
+    title_y = round(dashboard_height * 0.015)
+    main_y = round(dashboard_height * 0.065)
+
+    draw.text(
+        (margin, title_y),
+        "FasterRaster Cook — Agricultural Study",
+        font=load_font(round(dashboard_width * 0.009), bold=True),
+        fill=(24, 39, 54),
+    )
+    draw.text(
+        (margin, title_y + round(dashboard_height * 0.024)),
+        (
+            f"{ARGS.cdl_year} growing season · NAIP natural color and NDVI · "
+            "USDA CDL · USGS 3DEP"
+        ),
+        font=load_font(round(dashboard_width * 0.0047)),
+        fill=(68, 82, 96),
+    )
+
+    canvas.paste(composite, (margin, main_y))
+    draw.rectangle(
+        (
+            margin,
+            main_y,
+            margin + map_width,
+            main_y + map_height,
+        ),
+        outline=(55, 72, 89),
+        width=2,
+    )
+
+    panel_x = margin + map_width + round(dashboard_width * 0.018)
+    panel_width = dashboard_width - panel_x - margin
+
+    draw.rounded_rectangle(
+        (
+            panel_x,
+            main_y,
+            dashboard_width - margin,
+            main_y + map_height,
+        ),
+        radius=16,
+        fill=(250, 252, 253),
+        outline=(203, 213, 222),
+    )
+
+    text_x = panel_x + 30
+    text_y = main_y + 28
+    heading = load_font(round(dashboard_width * 0.0055), bold=True)
+    body = load_font(round(dashboard_width * 0.0041))
+
+    draw.text(
+        (text_x, text_y),
+        "COOK RECEIPT",
+        font=heading,
+        fill=(25, 43, 59),
+    )
+    text_y += 55
+
+    lines = [
+        f"Order: {ARGS.name}",
+        f"Crop-cookie: [{WEST}, {SOUTH}, {EAST}, {NORTH}]",
+        f"CRS: EPSG:4326",
+        f"Timeframe: {ARGS.start} through {ARGS.end}",
+        f"CDL thematic year: {ARGS.cdl_year}",
+        f"Portion: {ARGS.portion}",
+        f"NAIP pixel size: {native_resolution:g} m",
+        f"Network ceiling: {ARGS.max_total_bytes:,} bytes",
+        f"Network consumed: {network_bytes:,} bytes",
+        "",
+        "INGREDIENTS",
+        f"NAIP {ARGS.cdl_year} natural color",
+        f"NAIP {ARGS.cdl_year} NDVI color",
+        f"USDA CDL {ARGS.cdl_year} raw classes",
+        f"USDA CDL {ARGS.cdl_year} color rendering",
+        "USGS 3DEP hillshade",
+        "",
+        "VISUAL POLICY",
+        "Imagery opacity: 1.00",
+        "Hillshade multiply: 0.12",
+        "CDL overlay: 0.30",
+        "Categorical resampling: nearest",
+        "",
+        "CDL SUMMARY",
+        f"Top classes: {top_summary}",
+        "Preview colors use raw CDL class values",
+        "",
+        "HANDOFF",
+        "Cloud-optimized GeoTIFFs",
+        "CDL class-count table",
+        "4K inspection dashboard",
+        "Service metadata and requests",
+        "GDAL verification",
+        "SHA256 manifest",
+    ]
+
+    for line in lines:
+        if line in {"INGREDIENTS", "VISUAL POLICY", "CDL SUMMARY", "HANDOFF"}:
+            draw.text(
+                (text_x, text_y),
+                line,
+                font=heading,
+                fill=(25, 43, 59),
+            )
+        else:
+            draw.text(
+                (text_x, text_y),
+                line,
+                font=body,
+                fill=(46, 61, 76),
+            )
+
+        text_y += round(dashboard_height * 0.017)
+
+    strip_y = main_y + map_height + round(dashboard_height * 0.025)
+    strip_height = dashboard_height - strip_y - margin
+    gap = round(dashboard_width * 0.012)
+    strip_width = (dashboard_width - 2 * margin - 2 * gap) // 3
+
+    panels = [
+        (natural, f"NAIP {ARGS.cdl_year} natural color"),
+        (ndvi, f"NAIP {ARGS.cdl_year} NDVI color"),
+        (cdl.convert("RGB"), f"USDA CDL {ARGS.cdl_year}"),
+    ]
+
+    for index, (panel_image, label) in enumerate(panels):
+        left = margin + index * (strip_width + gap)
+        image_height = strip_height - 36
+
+        fitted = ImageOps.fit(
+            panel_image,
+            (strip_width, image_height),
+            method=Image.Resampling.LANCZOS,
+        )
+        canvas.paste(fitted, (left, strip_y))
+
+        draw.rectangle(
+            (
+                left,
+                strip_y,
+                left + strip_width,
+                strip_y + strip_height,
+            ),
+            outline=(120, 132, 144),
+            width=1,
+        )
+        draw.text(
+            (left + 10, strip_y + image_height + 8),
+            label,
+            font=body,
+            fill=(35, 50, 64),
+        )
+
+    destination = PREVIEW / "agricultural_inspection_4k.png"
+    canvas.save(destination, optimize=True)
+    return destination
+
+
+def write_aoi() -> None:
+    geojson = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "properties": {
+                    "name": ARGS.name,
+                    "time_start": ARGS.start,
+                    "time_end": ARGS.end,
+                    "cdl_year": ARGS.cdl_year,
+                },
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [
+                        [
+                            [WEST, SOUTH],
+                            [EAST, SOUTH],
+                            [EAST, NORTH],
+                            [WEST, NORTH],
+                            [WEST, SOUTH],
+                        ]
+                    ],
+                },
+            }
+        ],
+    }
+    write_json(TRAY / "aoi.geojson", geojson)
+
+
+def write_class_counts(cdl_path: Path) -> None:
+    xyz = WORK / "cdl.xyz"
+
+    run(
+        [
+            "gdal_translate",
+            "-q",
+            "-of",
+            "XYZ",
+            str(cdl_path),
+            str(xyz),
+        ]
+    )
+
+    counts: Counter[int] = Counter()
+
+    with xyz.open("r", encoding="utf-8") as stream:
+        for line in stream:
+            fields = line.split()
+            if len(fields) != 3:
+                continue
+
+            try:
+                code = int(round(float(fields[2])))
+            except ValueError:
+                continue
+
+            if code != 0:
+                counts[code] += 1
+
+    destination = ANALYSIS / "cdl_class_counts.csv"
+
+    with destination.open("w", newline="", encoding="utf-8") as stream:
+        writer = csv.writer(stream)
+        writer.writerow(
+            [
+                "cdl_class_code",
+                "pixel_count",
+                "approximate_hectares",
+            ]
+        )
+
+        for code, count in sorted(
+            counts.items(),
+            key=lambda item: (-item[1], item[0]),
+        ):
+            writer.writerow(
+                [
+                    code,
+                    count,
+                    round(count * 30 * 30 / 10_000, 3),
+                ]
+            )
+
+
+def download_source_layer(source: str, **kwargs: Any) -> dict[str, Any]:
+    try:
+        return download_tiled_layer(**kwargs)
+    except SystemExit:
+        raise
+    except Exception as error:
+        stop_source_coverage(
+            SourceCoverageError(
+                source,
+                "export_failure",
+                f"{kwargs.get('name', 'source layer')} export failed: {error}",
+                {"layer": kwargs.get("name")},
+            )
+        )
+
+
+requested_assets = set(REQUESTED_ASSETS)
+
+print("===== FASTERRASTER AGRICULTURAL COOK =====")
+print("bbox:", [WEST, SOUTH, EAST, NORTH])
+print("timeframe:", ARGS.start, "through", ARGS.end)
+print("expanded network ceiling:", f"{ARGS.max_total_bytes:,}")
+print("portion:", ARGS.portion)
+print("requested assets:", ", ".join(sorted(requested_assets)))
+
+kitchen_capture()
+write_aoi()
+
+needs_naip = bool(requested_assets & {"natural", "ndvi"})
+needs_cdl = bool(requested_assets & {"cdl_classes", "cdl_color"})
+needs_terrain = "hillshade" in requested_assets
+
+source_preflight: dict[str, Any] = {
+    "schema_version": "fasterraster.ag-source-preflight/v1",
+    "status": "PASS",
+    "requested_bbox": [WEST, SOUTH, EAST, NORTH],
+    "requested_year": ARGS.cdl_year,
+    "requested_assets": sorted(requested_assets),
+    "required_source_families": list(
+        required_source_families(requested_assets)
+    ),
+    "aoi_safety": AOI_SAFETY,
+    "sources": {},
+}
+
+naip_metadata: dict[str, Any] = {}
+dep_metadata: dict[str, Any] = {}
+cdl_metadata: dict[str, Any] = {}
+features: list[dict[str, Any]] = []
+catalog_native_resolution = ARGS.naip_resolution or 0.6
+native_resolution = ARGS.naip_resolution or catalog_native_resolution
+naip_rule: dict[str, Any] | None = None
+
+if needs_naip:
+    naip_metadata = require_source_coverage(
+        lambda: service_metadata(NAIP, "naip", "USGS_NAIP")
+    )
+    source_preflight["sources"]["USGS_NAIP"] = {
+        "service_extent": require_source_coverage(
+            lambda: validate_service_extent(
+                naip_metadata,
+                (WEST, SOUTH, EAST, NORTH),
+                source="USGS_NAIP",
+            )
+        )
+    }
+    naip_catalog = require_source_coverage(
+        lambda: source_request_json(
+        NAIP.rstrip("/") + "/query",
+        {
+            "where": f"Year = {ARGS.cdl_year}",
+            "geometry": {
+                "xmin": WEST,
+                "ymin": SOUTH,
+                "xmax": EAST,
+                "ymax": NORTH,
+                "spatialReference": {"wkid": 4326},
+            },
+            "geometryType": "esriGeometryEnvelope",
+            "inSR": "4326",
+            "spatialRel": "esriSpatialRelIntersects",
+            "outFields": (
+                "OBJECTID,Name,Year,acquisition_date,"
+                "download_url,resolution_value,resolution_units"
+            ),
+            "returnGeometry": "false",
+            "resultRecordCount": "50",
+        },
+            label=f"naip_{ARGS.cdl_year}_catalog_query",
+            source="USGS_NAIP",
+        )
+    )
+    write_json(
+        METADATA / f"naip_{ARGS.cdl_year}_catalog.json",
+        naip_catalog,
+    )
+    features = naip_catalog.get("features", [])
+    available: dict[str, Any] | None = None
+    if not features:
+        available = require_source_coverage(
+            lambda: source_request_json(
+            NAIP.rstrip("/") + "/query",
+            {
+                "where": "1=1",
+                "geometry": {
+                    "xmin": WEST,
+                    "ymin": SOUTH,
+                    "xmax": EAST,
+                    "ymax": NORTH,
+                    "spatialReference": {"wkid": 4326},
+                },
+                "geometryType": "esriGeometryEnvelope",
+                "inSR": "4326",
+                "spatialRel": "esriSpatialRelIntersects",
+                "outFields": "Year",
+                "returnGeometry": "false",
+                "resultRecordCount": "50",
+            },
+                label="naip_available_years_query",
+                source="USGS_NAIP",
+            )
+        )
+
+    naip_validation = require_source_coverage(
+        lambda: validate_naip_catalog(
+            naip_catalog,
+            requested_year=ARGS.cdl_year,
+            available_response=available,
+        )
+    )
+    source_preflight["sources"]["USGS_NAIP"]["catalog"] = (
+        naip_validation
+    )
+
+    resolutions: list[float] = []
+    for feature in features:
+        attributes = feature.get("attributes", {})
+        try:
+            resolution = float(attributes.get("resolution_value"))
+        except (TypeError, ValueError):
+            continue
+        units = str(attributes.get("resolution_units", "")).lower()
+        if resolution > 0 and (
+            not units or units.startswith("m") or "meter" in units
+        ):
+            resolutions.append(resolution)
+    catalog_native_resolution = min(resolutions) if resolutions else 0.6
+    native_resolution = (
+        ARGS.naip_resolution
+        if ARGS.naip_resolution is not None
+        else catalog_native_resolution
+    )
+    if native_resolution <= 0:
+        raise SystemExit("NAIP output resolution must be positive")
+    if native_resolution < catalog_native_resolution:
+        raise SystemExit(
+            "Requested NAIP resolution is finer than the catalog source"
+        )
+    naip_rule = {
+        "mosaicMethod": "esriMosaicAttribute",
+        "where": f"Year = {ARGS.cdl_year}",
+        "sortField": "Year",
+        "sortValue": str(ARGS.cdl_year),
+        "ascending": True,
+        "mosaicOperation": "MT_FIRST",
+    }
+
+if needs_terrain:
+    dep_metadata = require_source_coverage(
+        lambda: service_metadata(
+            THREEDEP, "three_dep", "USGS_3DEP"
+        )
+    )
+    dep_extent = require_source_coverage(
+        lambda: validate_service_extent(
+            dep_metadata,
+            (WEST, SOUTH, EAST, NORTH),
+            source="USGS_3DEP",
+        )
+    )
+    dep_catalog = require_source_coverage(
+        lambda: source_request_json(
+            THREEDEP.rstrip("/") + "/query",
+            {
+                "where": "1=1",
+                "geometry": {
+                    "xmin": WEST,
+                    "ymin": SOUTH,
+                    "xmax": EAST,
+                    "ymax": NORTH,
+                    "spatialReference": {"wkid": 4326},
+                },
+                "geometryType": "esriGeometryEnvelope",
+                "inSR": "4326",
+                "spatialRel": "esriSpatialRelIntersects",
+                "outFields": "*",
+                "returnGeometry": "false",
+                "resultRecordCount": "10",
+            },
+            label="three_dep_bbox_catalog_query",
+            source="USGS_3DEP",
+        )
+    )
+    write_json(METADATA / "three_dep_bbox_catalog.json", dep_catalog)
+    source_preflight["sources"]["USGS_3DEP"] = {
+        "service_extent": dep_extent,
+        "catalog": require_source_coverage(
+            lambda: validate_3dep_catalog(dep_catalog)
+        ),
+    }
+
+if needs_cdl:
+    cdl_metadata = require_source_coverage(
+        lambda: service_metadata(CDL, "cdl", "USDA_CDL")
+    )
+    cdl_extent = require_source_coverage(
+        lambda: validate_service_extent(
+            cdl_metadata,
+            (WEST, SOUTH, EAST, NORTH),
+            source="USDA_CDL",
+        )
+    )
+    cdl_available = require_source_coverage(
+        lambda: source_request_json(
+            CDL.rstrip("/") + "/query",
+            {
+                "where": "1=1",
+                "outFields": "Year",
+                "returnDistinctValues": "true",
+                "returnGeometry": "false",
+                "resultRecordCount": "500",
+            },
+            label="cdl_available_years_query",
+            source="USDA_CDL",
+        )
+    )
+    cdl_catalog = require_source_coverage(
+        lambda: source_request_json(
+            CDL.rstrip("/") + "/query",
+            {
+                "where": f"Year = {ARGS.cdl_year}",
+                "geometry": {
+                    "xmin": WEST,
+                    "ymin": SOUTH,
+                    "xmax": EAST,
+                    "ymax": NORTH,
+                    "spatialReference": {"wkid": 4326},
+                },
+                "geometryType": "esriGeometryEnvelope",
+                "inSR": "4326",
+                "spatialRel": "esriSpatialRelIntersects",
+                "outFields": "*",
+                "returnGeometry": "false",
+                "resultRecordCount": "10",
+            },
+            label=f"cdl_{ARGS.cdl_year}_bbox_catalog_query",
+            source="USDA_CDL",
+        )
+    )
+    write_json(
+        METADATA / "cdl_available_years_catalog.json",
+        cdl_available,
+    )
+    write_json(
+        METADATA / f"cdl_{ARGS.cdl_year}_bbox_catalog.json",
+        cdl_catalog,
+    )
+    source_preflight["sources"]["USDA_CDL"] = {
+        "service_extent": cdl_extent,
+        "catalog": require_source_coverage(
+            lambda: validate_cdl_catalog(
+                cdl_catalog,
+                cdl_available,
+                requested_year=ARGS.cdl_year,
+            )
+        ),
+    }
+
+source_preflight["network_bytes"] = network_bytes
+source_preflight["requests"] = request_receipts
+write_json(METADATA / "source_preflight.json", source_preflight)
+
+if ARGS.preflight_only:
+    write_json(TRAY / "source_preflight.json", source_preflight)
+    shutil.rmtree(WORK, ignore_errors=True)
+    print(
+        json.dumps(
+            {
+                "status": "PASS",
+                "evidence": str(TRAY / "source_preflight.json"),
+                "sources": sorted(source_preflight["sources"]),
+            },
+            sort_keys=True,
+        )
+    )
+    raise SystemExit(0)
+
+year_start = int(
+    datetime(ARGS.cdl_year, 1, 1, tzinfo=timezone.utc).timestamp()
+    * 1000
+)
+year_end = int(
+    datetime(ARGS.cdl_year + 1, 1, 1, tzinfo=timezone.utc).timestamp()
+    * 1000
+) - 1
+cdl_rule = {
+    "mosaicMethod": "esriMosaicAttribute",
+    "where": f"Year = {ARGS.cdl_year}",
+    "sortField": "Year",
+    "sortValue": str(ARGS.cdl_year),
+    "ascending": True,
+    "mosaicOperation": "MT_FIRST",
+}
+
+reports: list[dict[str, Any]] = []
+natural = DATA / f"naip_{ARGS.cdl_year}_natural_color.cog.tif"
+ndvi = DATA / f"naip_{ARGS.cdl_year}_ndvi_color.cog.tif"
+hillshade = DATA / "three_dep_hillshade.cog.tif"
+cdl_raw = DATA / f"cdl_{ARGS.cdl_year}_classes.cog.tif"
+cdl_color = DATA / f"cdl_{ARGS.cdl_year}_color.cog.tif"
+
+if "natural" in requested_assets:
+    reports.append(
+        download_source_layer("USGS_NAIP",
+            name="naip_natural",
+            endpoint=NAIP,
+            resolution=native_resolution,
+            max_width=int(naip_metadata.get("maxImageWidth", 4000)),
+            max_height=int(naip_metadata.get("maxImageHeight", 4000)),
+            rendering_rule={"rasterFunction": "NaturalColor"},
+            mosaic_rule=naip_rule,
+            time_value=None,
+            interpolation="RSP_BilinearInterpolation",
+            destination=natural,
+        )
+    )
+
+if "ndvi" in requested_assets:
+    reports.append(
+        download_source_layer("USGS_NAIP",
+            name="naip_ndvi",
+            endpoint=NAIP,
+            resolution=native_resolution,
+            max_width=int(naip_metadata.get("maxImageWidth", 4000)),
+            max_height=int(naip_metadata.get("maxImageHeight", 4000)),
+            rendering_rule={"rasterFunction": "NDVI_Color"},
+            mosaic_rule=naip_rule,
+            time_value=None,
+            interpolation="RSP_BilinearInterpolation",
+            destination=ndvi,
+        )
+    )
+
+if "hillshade" in requested_assets:
+    reports.append(
+        download_source_layer("USGS_3DEP",
+            name="three_dep_hillshade",
+            endpoint=THREEDEP,
+            resolution=10.0,
+            max_width=int(dep_metadata.get("maxImageWidth", 8000)),
+            max_height=int(dep_metadata.get("maxImageHeight", 8000)),
+            rendering_rule={"rasterFunction": "Hillshade Gray"},
+            mosaic_rule=None,
+            time_value=None,
+            interpolation="RSP_BilinearInterpolation",
+            destination=hillshade,
+        )
+    )
+
+if "cdl_classes" in requested_assets:
+    reports.append(
+        download_source_layer("USDA_CDL",
+            name="cdl_raw",
+            endpoint=CDL,
+            resolution=30.0,
+            max_width=int(cdl_metadata.get("maxImageWidth", 4097)),
+            max_height=int(cdl_metadata.get("maxImageHeight", 4097)),
+            rendering_rule=None,
+            mosaic_rule=cdl_rule,
+            time_value=f"{year_start},{year_end}",
+            interpolation="RSP_NearestNeighbor",
+            destination=cdl_raw,
+        )
+    )
+
+if "cdl_color" in requested_assets:
+    reports.append(
+        download_source_layer("USDA_CDL",
+            name="cdl_color",
+            endpoint=CDL,
+            resolution=30.0,
+            max_width=int(cdl_metadata.get("maxImageWidth", 4097)),
+            max_height=int(cdl_metadata.get("maxImageHeight", 4097)),
+            rendering_rule={"rasterFunction": "croptypes"},
+            mosaic_rule=cdl_rule,
+            time_value=f"{year_start},{year_end}",
+            interpolation="RSP_NearestNeighbor",
+            destination=cdl_color,
+        )
+    )
+
+if cdl_raw.is_file():
+    write_class_counts(cdl_raw)
+
+inspection: Path | None = None
+if not ARGS.asset_only:
+    inspection = create_preview(
+        natural,
+        ndvi,
+        hillshade,
+        cdl_raw,
+        native_resolution=native_resolution,
+        layer_reports=reports,
+    )
+
+for report in reports:
+    source = TRAY / report["output"]
+    info = run(["gdalinfo", "-json", str(source)], capture=True)
+    write_json(
+        VERIFY / f"{source.stem}_gdalinfo.json",
+        normalize_gdalinfo_paths(json.loads(info), TRAY),
+    )
+
+manifest = {
+    "schema_version": 2 if ARGS.asset_only else 1,
+    "operation_status": (
+        "asset_acquisition_partial" if ARGS.asset_only else "completed"
+    ),
+    "verification_status": "PASS",
+    "order": {
+        "name": ARGS.name,
+        "bbox_epsg_4326": [WEST, SOUTH, EAST, NORTH],
+        "time_start": ARGS.start,
+        "time_end": ARGS.end,
+        "cdl_year": ARGS.cdl_year,
+        "portion": ARGS.portion,
+        "network_ceiling_bytes": ARGS.max_total_bytes,
+        "requested_assets": sorted(requested_assets),
+    },
+    "aoi_safety": AOI_SAFETY,
+    "source_preflight": source_preflight,
+    "naip": {
+        "requested_year": ARGS.cdl_year,
+        "catalog_match_count": len(features),
+        "catalog_resolution_meters": catalog_native_resolution,
+        "output_resolution_meters": native_resolution,
+        "catalog_features": features,
+    },
+    "layers": reports,
+    "network_bytes": network_bytes,
+    "requests": request_receipts,
+    "inspection_preview": (
+        {
+            "path": str(inspection.relative_to(TRAY)),
+            "width": ARGS.preview_width,
+            "height": round(ARGS.preview_width * 9 / 16),
+            "sha256": sha256_file(inspection),
+        }
+        if inspection is not None
+        else None
+    ),
+    "blocking_failures": [],
+    "completed_at_utc": datetime.now(timezone.utc).isoformat(),
+}
+write_json(TRAY / "manifest.json", manifest)
+
+shutil.rmtree(WORK, ignore_errors=True)
+
+if ARGS.asset_only:
+    print()
+    print("SELECTIVE ASSET ACQUISITION: PASS")
+    print("assets:", ", ".join(sorted(requested_assets)))
+    print("network consumed:", f"{network_bytes:,}")
+    print("staging:", TRAY)
+    print("manifest:", TRAY / "manifest.json")
+else:
+    README = f"""# FasterRaster Agricultural Study
+
+## Crop-cookie
+
+`[{WEST}, {SOUTH}, {EAST}, {NORTH}]` in EPSG:4326.
+
+## Timeframe
+
+- Growing season: {ARGS.start} through {ARGS.end}
+- USDA CDL thematic year: {ARGS.cdl_year}
+- NAIP imagery selection: catalog records where Year = {ARGS.cdl_year}
+
+## Handoff data
+
+- `{natural.name}`
+- `{ndvi.name}`
+- `{hillshade.name}`
+- `{cdl_raw.name}`
+- `{cdl_color.name}`
+
+## Execution envelope
+
+- Portion: {ARGS.portion}
+- Source-derived NAIP resolution: {native_resolution:g} meters
+- Maximum network bytes: {ARGS.max_total_bytes:,}
+- Actual network bytes: {network_bytes:,}
+"""
+    (TRAY / "README.md").write_text(README, encoding="utf-8")
+
+    checksum_path = TRAY / "checksums.sha256"
+    with checksum_path.open("w", encoding="utf-8") as stream:
+        for path in sorted(TRAY.rglob("*")):
+            if path.is_file() and path != checksum_path:
+                stream.write(
+                    f"{sha256_file(path)}  {path.relative_to(TRAY)}\n"
+                )
+
+    archive = TRAY.with_suffix(".tar")
+    with tarfile.open(archive, "w") as tar:
+        tar.add(TRAY, arcname=TRAY.name)
+    archive_checksum = archive.with_suffix(".tar.sha256")
+    archive_checksum.write_text(
+        f"{sha256_file(archive)}  {archive.name}\n",
+        encoding="utf-8",
+    )
+
+    if (
+        ARGS.open
+        and inspection is not None
+        and shutil.which("explorer.exe")
+        and shutil.which("wslpath")
+    ):
+        windows_path = run(
+            ["wslpath", "-w", str(inspection)],
+            capture=True,
+        ).strip()
+        subprocess.Popen(
+            ["explorer.exe", windows_path],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+
+    print()
+    print("================================================")
+    print("AGRICULTURAL COOK: PASS")
+    print("================================================")
+    print("crop-cookie:", [WEST, SOUTH, EAST, NORTH])
+    print("timeframe:", ARGS.start, "through", ARGS.end)
+    print("CDL year:", ARGS.cdl_year)
+    print("NAIP resolution:", native_resolution, "meters")
+    print("network ceiling:", f"{ARGS.max_total_bytes:,}")
+    print("network consumed:", f"{network_bytes:,}")
+    print("tray:", TRAY)
+    print("archive:", archive)
+    print("inspection:", inspection)
+    print("manifest:", TRAY / "manifest.json")
+    print("checksums:", checksum_path)

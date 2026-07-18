@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from collections import Counter
 from pathlib import Path
 from typing import Any
@@ -13,8 +14,9 @@ from faster_raster.manifest import write_manifest
 from faster_raster.task_builder import load_task, validate_task
 
 
-TASK_COMPILE_ROOT = Path("reports/task_compiles")
-EXECUTION_PACKAGE_ROOT = Path("reports/execution_packages")
+REPORT_ROOT = Path(os.environ.get("FASTERRASTER_REPORT_ROOT", "reports"))
+TASK_COMPILE_ROOT = REPORT_ROOT / "task_compiles"
+EXECUTION_PACKAGE_ROOT = REPORT_ROOT / "execution_packages"
 STATIC_RANGE_STAGES = [
     "resolve_request",
     "bounded_fetch",

@@ -22,3 +22,16 @@ cache/staging/materialization/
 
 # FasterRaster runtime artifacts
 cache/
+
+# Beta release/runtime boundaries
+/outputs/
+/recipes/ag/orders/
+/scripts/*.backup.*
+/build/
+/dist/
+/.fasterraster/
+/.local-state/
+*.whl
+*.tar.gz
+!.github/
+/.beta-tools/

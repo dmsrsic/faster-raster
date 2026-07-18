@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fasterraster.local/schemas/capability_profile_v1.schema.json",
+  "title": "FasterRaster local capability profile v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "fasterraster_version",
+    "profile_name",
+    "created_at",
+    "last_refresh_at",
+    "machine_fingerprint",
+    "python",
+    "gdal",
+    "raster_drivers",
+    "local_resources",
+    "recommended_execution_settings",
+    "sources",
+    "staleness_policy",
+    "warnings",
+    "final_bootstrap_status",
+    "evaluation"
+  ],
+  "properties": {
+    "schema_version": {"const": "fasterraster.capabilities/v1"},
+    "fasterraster_version": {"type": "string"},
+    "profile_name": {"type": "string"},
+    "created_at": {"type": "string", "format": "date-time"},
+    "last_refresh_at": {"type": "string", "format": "date-time"},
+    "machine_fingerprint": {"type": "object"},
+    "python": {"type": "object"},
+    "gdal": {"type": "object"},
+    "raster_drivers": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "local_resources": {"type": "object"},
+    "local_checks": {"type": "object"},
+    "recommended_execution_settings": {"type": "object"},
+    "sources": {
+      "type": "object",
+      "additionalProperties": {"$ref": "#/$defs/source_result"}
+    },
+    "staleness_policy": {"type": "object"},
+    "warnings": {"type": "array", "items": {"type": "string"}},
+    "final_bootstrap_status": {"enum": ["PASS", "WARN", "FAIL"]},
+    "evaluation": {"type": "object"}
+  },
+  "$defs": {
+    "source_result": {
+      "type": "object",
+      "required": [
+        "source_id",
+        "access_category",
+        "probe_timestamp",
+        "probe_duration_seconds",
+        "probe_implementation_version",
+        "bytes_transferred",
+        "requests_made",
+        "status",
+        "credential_state",
+        "format_compatibility",
+        "evidence"
+      ],
+      "properties": {
+        "source_id": {"type": "string"},
+        "access_category": {
+          "enum": ["static_verified", "service_discovered", "api_discovered", "credential_gated", "future_unverified"]
+        },
+        "probe_timestamp": {"type": "string", "format": "date-time"},
+        "probe_duration_seconds": {"type": "number", "minimum": 0},
+        "probe_implementation_version": {"type": "string"},
+        "bytes_transferred": {"type": "integer", "minimum": 0},
+        "requests_made": {"type": "integer", "minimum": 0},
+        "status": {
+          "enum": [
+            "available",
+            "available_unverified_auth",
+            "credential_missing",
+            "credential_present_unverified",
+            "authentication_failed",
+            "unreachable",
+            "timeout",
+            "rate_limited",
+            "service_error",
+            "unsupported_local_format",
+            "unsupported_local_driver",
+            "invalid_response",
+            "probe_not_supported",
+            "skipped_offline",
+            "disabled_by_user",
+            "future_unverified",
+            "stale",
+            "unknown"
+          ]
+        },
+        "credential_state": {"enum": ["not_required", "unknown", "missing", "present"]},
+        "credential_env": {"type": ["string", "null"]},
+        "format_compatibility": {"type": "object"},
+        "evidence": {"type": "array", "items": {"type": "string"}},
+        "warnings": {"type": "array", "items": {"type": "string"}}
+      }
+    }
+  }
+}

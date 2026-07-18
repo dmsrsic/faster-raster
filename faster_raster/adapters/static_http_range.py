@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import string
 import urllib.error
 import urllib.request
@@ -15,7 +16,7 @@ from faster_raster.content_magic import detect_content_magic
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_WAVE1_CONFIG = PROJECT_ROOT / "configs/static_http_range_wave1.yaml"
-DEFAULT_REPORT_DIR = Path("reports/static_http_range")
+DEFAULT_REPORT_DIR = Path(os.environ.get("FASTERRASTER_REPORT_ROOT", "reports")) / "static_http_range"
 DEFAULT_MAX_BYTES = 65_536
 DEFAULT_TIMEOUT_SECONDS = 20
 WAVE1_SOURCE_IDS = {

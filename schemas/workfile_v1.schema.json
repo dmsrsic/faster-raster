@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fasterraster.local/schemas/workfile_v1.schema.json",
+  "title": "FasterRaster Markdown workfile v1 front matter",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "name", "area", "time"],
+  "oneOf": [
+    {"required": ["workflow"], "not": {"required": ["recipe"]}},
+    {"required": ["recipe"], "not": {"required": ["workflow"]}}
+  ],
+  "properties": {
+    "schema_version": {"const": "fasterraster.work/v1"},
+    "name": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$"},
+    "workflow": {"type": "string"},
+    "recipe": {"type": "string"},
+    "area": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bbox"],
+      "properties": {
+        "bbox": {
+          "type": "array",
+          "prefixItems": [{"type": "number"}, {"type": "number"}, {"type": "number"}, {"type": "number"}],
+          "minItems": 4,
+          "maxItems": 4
+        }
+      }
+    },
+    "time": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start", "end", "crop_year"],
+      "properties": {
+        "start": {"type": "string", "format": "date"},
+        "end": {"type": "string", "format": "date"},
+        "crop_year": {"type": "integer", "minimum": 1900, "maximum": 2200}
+      }
+    },
+    "sources": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "policy": {"enum": ["auto", "pinned", "preferred"]},
+        "prefer": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "deny": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "natural_imagery": {"type": "string"},
+        "crop_classes": {"type": "string"},
+        "terrain": {"type": "string"},
+        "natural": {"type": "string"},
+        "ndvi": {"type": "string"},
+        "cdl_classes": {"type": "string"},
+        "cdl_color": {"type": "string"},
+        "hillshade": {"type": "string"}
+      }
+    },
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {"reuse": {"enum": ["auto", "only", "never"]}}
+    },
+    "processing": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "resolution_m": {"type": "number", "exclusiveMinimum": 0},
+        "service_tile_size": {"type": "integer", "minimum": 64, "maximum": 10000},
+        "maximum_parallel_tasks": {"type": "integer", "minimum": 1, "maximum": 256}
+      }
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {"maximum_download_mb": {"type": "number", "exclusiveMinimum": 0}}
+    },
+    "outputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "preview": {"type": "boolean"},
+        "open_when_complete": {"type": "boolean"}
+      }
+    }
+  }
+}

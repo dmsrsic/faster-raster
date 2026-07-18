@@ -23,5 +23,16 @@ dev = [
 [project.scripts]
 faster-raster = "faster_raster.cli:app"
 
+fr = "faster_raster.fr_cli:main"
+fr-beta-check = "faster_raster.beta_check:main"
+
+[tool.hatch.build.targets.wheel.force-include]
+"configs" = "configs"
+"examples" = "examples"
+"recipes" = "recipes"
+"schemas" = "schemas"
+"scripts/fr-cook-ag" = "scripts/fr-cook-ag"
+"scripts/lib" = "scripts/lib"
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]

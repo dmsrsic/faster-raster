@@ -1,0 +1,197 @@
+{
+  "$defs": {
+    "RecipeDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "max_total_bytes": {
+          "exclusiveMinimum": 0,
+          "maximum": 20000000000,
+          "title": "Max Total Bytes",
+          "type": "integer"
+        },
+        "naip_resolution_meters": {
+          "exclusiveMinimum": 0,
+          "maximum": 100,
+          "title": "Naip Resolution Meters",
+          "type": "number"
+        },
+        "portion": {
+          "enum": [
+            "native",
+            "overview"
+          ],
+          "title": "Portion",
+          "type": "string"
+        },
+        "preview_width": {
+          "maximum": 16384,
+          "minimum": 640,
+          "title": "Preview Width",
+          "type": "integer"
+        },
+        "service_tile_size": {
+          "maximum": 10000,
+          "minimum": 64,
+          "title": "Service Tile Size",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "max_total_bytes",
+        "naip_resolution_meters",
+        "portion",
+        "preview_width",
+        "service_tile_size"
+      ],
+      "title": "RecipeDefaults",
+      "type": "object"
+    },
+    "RecipeResampling": {
+      "additionalProperties": false,
+      "properties": {
+        "categorical": {
+          "enum": [
+            "nearest",
+            "mode",
+            "bilinear",
+            "cubic",
+            "lanczos",
+            "average"
+          ],
+          "title": "Categorical",
+          "type": "string"
+        },
+        "imagery": {
+          "enum": [
+            "nearest",
+            "mode",
+            "bilinear",
+            "cubic",
+            "lanczos",
+            "average"
+          ],
+          "title": "Imagery",
+          "type": "string"
+        },
+        "terrain": {
+          "anyOf": [
+            {
+              "enum": [
+                "nearest",
+                "mode",
+                "bilinear",
+                "cubic",
+                "lanczos",
+                "average"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Terrain"
+        }
+      },
+      "required": [
+        "categorical",
+        "imagery"
+      ],
+      "title": "RecipeResampling",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "defaults": {
+      "$ref": "#/$defs/RecipeDefaults"
+    },
+    "inspection_focus": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Inspection Focus",
+      "type": "array"
+    },
+    "maximum_naip_pixel_size_m": {
+      "exclusiveMinimum": 0,
+      "maximum": 100,
+      "title": "Maximum Naip Pixel Size M",
+      "type": "number"
+    },
+    "preview": {
+      "enum": [
+        "ndvi_cdl_boundaries",
+        "field_structure",
+        "class_inventory",
+        "crop_terrain"
+      ],
+      "title": "Preview",
+      "type": "string"
+    },
+    "purpose": {
+      "minLength": 1,
+      "title": "Purpose",
+      "type": "string"
+    },
+    "recipe_id": {
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "title": "Recipe Id",
+      "type": "string"
+    },
+    "required_assets": {
+      "items": {
+        "enum": [
+          "natural",
+          "ndvi",
+          "cdl_classes",
+          "cdl_color",
+          "hillshade"
+        ],
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Required Assets",
+      "type": "array"
+    },
+    "required_output_artifacts": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Required Output Artifacts",
+      "type": "array"
+    },
+    "resampling": {
+      "$ref": "#/$defs/RecipeResampling"
+    },
+    "schema_version": {
+      "const": 2,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "title": {
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "recipe_id",
+    "title",
+    "purpose",
+    "required_assets",
+    "maximum_naip_pixel_size_m",
+    "resampling",
+    "preview",
+    "inspection_focus",
+    "defaults",
+    "required_output_artifacts"
+  ],
+  "title": "FasterRaster agricultural recipe v2",
+  "type": "object"
+}

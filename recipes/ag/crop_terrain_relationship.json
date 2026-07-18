@@ -1,0 +1,39 @@
+{
+  "defaults": {
+    "max_total_bytes": 2000000000,
+    "naip_resolution_meters": 1.0,
+    "portion": "overview",
+    "preview_width": 3840,
+    "service_tile_size": 1000
+  },
+  "inspection_focus": [
+    "crop placement across terrain",
+    "field boundaries relative to terrain",
+    "vegetation response",
+    "cropland exclusions"
+  ],
+  "maximum_naip_pixel_size_m": 1.2,
+  "preview": "crop_terrain",
+  "purpose": "Inspect crop placement and vegetation response relative to terrain structure.",
+  "recipe_id": "crop_terrain_relationship",
+  "required_assets": [
+    "natural",
+    "ndvi",
+    "cdl_classes",
+    "hillshade"
+  ],
+  "required_output_artifacts": [
+    "asset_plan.json",
+    "recipe_receipt.json",
+    "class_inventory.csv",
+    "preview_4k_png",
+    "checksums.sha256"
+  ],
+  "resampling": {
+    "categorical": "nearest",
+    "imagery": "cubic",
+    "terrain": "bilinear"
+  },
+  "schema_version": 2,
+  "title": "Crop Pattern \u00d7 Terrain Relationship"
+}

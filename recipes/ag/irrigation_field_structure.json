@@ -1,0 +1,37 @@
+{
+  "defaults": {
+    "max_total_bytes": 2000000000,
+    "naip_resolution_meters": 1.0,
+    "portion": "overview",
+    "preview_width": 3840,
+    "service_tile_size": 1000
+  },
+  "inspection_focus": [
+    "irrigation geometry",
+    "field-edge structure",
+    "within-field vegetation variation",
+    "crop-class agreement"
+  ],
+  "maximum_naip_pixel_size_m": 1.2,
+  "preview": "field_structure",
+  "purpose": "Inspect irrigation geometry, field boundaries, vegetation response, and crop identity.",
+  "recipe_id": "irrigation_field_structure",
+  "required_assets": [
+    "natural",
+    "ndvi",
+    "cdl_classes"
+  ],
+  "required_output_artifacts": [
+    "asset_plan.json",
+    "recipe_receipt.json",
+    "class_inventory.csv",
+    "preview_4k_png",
+    "checksums.sha256"
+  ],
+  "resampling": {
+    "categorical": "nearest",
+    "imagery": "cubic"
+  },
+  "schema_version": 2,
+  "title": "Irrigation and Field-Structure Inspection"
+}

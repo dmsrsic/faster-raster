@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 from typing import Any
 
@@ -15,7 +16,7 @@ from faster_raster import preview_alpha2
 from faster_raster.adapters.conformance import verify_adapter_conformance
 
 
-SYSTEM_GRADE_DIR = Path("reports/system_grade")
+SYSTEM_GRADE_DIR = Path(os.environ.get("FASTERRASTER_REPORT_ROOT", "reports")) / "system_grade"
 RUN_ROOT = Path("reports/runs")
 MATERIALIZATION_ROOT = Path("reports/materializations")
 

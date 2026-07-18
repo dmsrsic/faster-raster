@@ -5,6 +5,7 @@ from pathlib import Path
 
 from typer.testing import CliRunner
 
+from faster_raster.adapters import static_http_range
 from faster_raster.cli import app
 
 
@@ -31,7 +32,7 @@ def test_range_plan_dry_run_writes_reports(monkeypatch, tmp_path):
     assert "runnable_source_count: 4" in output
     assert "fixture_source_count: 1" in output
     assert "network_run: False" in output
-    assert Path("reports/static_http_range/static_http_range_wave1_plan.json").exists()
+    assert (static_http_range.DEFAULT_REPORT_DIR / "static_http_range_wave1_plan.json").exists()
 
 
 def test_range_probe_dry_run_no_network(monkeypatch):
