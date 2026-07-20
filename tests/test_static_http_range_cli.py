@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
 from typer.testing import CliRunner
 
 from faster_raster.adapters import static_http_range
@@ -11,6 +12,11 @@ from faster_raster.cli import app
 
 runner = CliRunner()
 ROOT = Path(__file__).resolve().parent.parent
+
+
+@pytest.fixture(autouse=True)
+def isolate_static_range_reports(monkeypatch, tmp_path):
+    monkeypatch.setattr(static_http_range, "DEFAULT_REPORT_DIR", tmp_path / "reports")
 
 
 def ok(args):
@@ -28,7 +34,6 @@ def test_range_sources_plain():
 
 def test_range_plan_dry_run_writes_reports(monkeypatch, tmp_path):
     monkeypatch.chdir(ROOT)
-    monkeypatch.setattr(static_http_range, "DEFAULT_REPORT_DIR", tmp_path / "reports")
     output = ok(["range", "plan", "--plain"])
     assert "skipped_dry_run" in output
     assert "runnable_source_count: 4" in output
