@@ -10,7 +10,8 @@ from faster_raster.source_registry import load_registry
 from faster_raster.validation import load_spec
 
 
-PROJECT_SPEC = Path("/home/dmsrsic/raster-work/projects/ohio_cdl_edges/research_spec.json")
+ROOT = Path(__file__).resolve().parent.parent
+PROJECT_SPEC = ROOT / "tests" / "fixtures" / "ohio_cdl_edges" / "research_spec.json"
 
 
 @pytest.fixture()

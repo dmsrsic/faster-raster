@@ -5,7 +5,7 @@
   "expected_total_max_bytes": 262144,
   "fail_fast": false,
   "fixture_request_count": 1,
-  "manifest_artifact_sha256": "3d05aabe247a5d6c168620fba3e704480be7dd7864e3e24b859524386cae0c03",
+  "manifest_artifact_sha256": "127584ca071b9462735a772cf59dda11abc93a7502b8fca72be3a50a4575d9e7",
   "manifest_sha256": "e99b0a3fd94756f3f9e58db63ee4fc79bc8da1707bcd33b6ae22f8ba2c1c5c85",
   "max_bytes_per_source": 65536,
   "max_total_bytes": 1048576,
@@ -19,7 +19,7 @@
   "planned_job_count": 33,
   "planned_network_job_count": 4,
   "retry_limit": 1,
-  "run_plan_contract_sha256": "a8e4b655440d9d3a7a82de0c5c73ec795d8e310ab92895da99fc3835211d8e1f",
+  "run_plan_contract_sha256": "4e00475d3cb9c14529dfb4e8237bc0a77c6ceb25167a9a2301b17d8e2323a31e",
   "safety_checks": [
     "explicit_network_opt_in",
     "bounded_range_request",

@@ -285,7 +285,7 @@ def verify_preview(receipt: dict[str, Any], *, contract: dict[str, Any] | None =
     if receipt.get("primary_imagery_visible_fraction",0)<0.60: failures.append("imagery dominance failed")
     if any(l.get("opacity",0)>receipt.get("primary_imagery_opacity",1.0) and l.get("source_id")!="usgs_naip_imagery" for l in receipt.get("layers",[])): failures.append("overlay opacity exceeds imagery")
     serialized=json.dumps(receipt, sort_keys=True).lower()
-    for marker in ["/tmp/pytest-","/home/dmsrsic/","authorization","password","secret","token"]:
+    for marker in ["/tmp/pytest-", "/home/", "C:\\Users\\", "C:/Users/", "authorization", "password", "secret", "token"]:
         if marker in serialized: failures.append(f"forbidden marker present: {marker}")
     return {"schema_version":1,"preview_verification_status":"PASS" if not failures else "FAIL","verification_status":"PASS" if not failures else "FAIL","imagery_presence_status":"PASS" if receipt.get("actual_imagery_pixel_status") else "FAIL","imagery_dominance_status":"PASS" if receipt.get("primary_imagery_visible_fraction",0)>=0.60 else "FAIL","overlay_subordination_status":"PASS" if not any("overlay" in f for f in failures) else "FAIL","fallback_truthfulness_status":"PASS","source_selection_receipt_status":source_selection_receipt_status,"source_selection_contract_status":source_selection_contract_status,"selected_source_consistency_status":selected_source_consistency_status,"blocking_failures":failures,"failures":failures,"warnings":[]}
 

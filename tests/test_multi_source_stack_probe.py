@@ -7,8 +7,9 @@ from pathlib import Path
 import pytest
 import yaml
 
-SCRIPT_PATH = Path('/home/dmsrsic/raster-work/faster-raster/scripts/multi_source_stack_probe.py')
-SPEC_PATH = Path('/home/dmsrsic/raster-work/faster-raster/research/multi_source_stack_probe_spec.yaml')
+ROOT = Path(__file__).resolve().parent.parent
+SCRIPT_PATH = ROOT / "scripts" / "multi_source_stack_probe.py"
+SPEC_PATH = ROOT / "research" / "multi_source_stack_probe_spec.yaml"
 
 
 def load_module():

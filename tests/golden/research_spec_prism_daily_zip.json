@@ -2,7 +2,7 @@
   "aoi": {
     "bbox_policy": "tile_to_source_limits",
     "input_crs": "EPSG:4326",
-    "path": "/home/dmsrsic/raster-work/projects/ohio_cdl_edges/inputs/aoi.geojson"
+    "path": "tests/fixtures/ohio_cdl_edges/inputs/aoi.geojson"
   },
   "outputs": {
     "manifest_dir": "manifests",

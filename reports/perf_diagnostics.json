@@ -210,7 +210,7 @@
     "missing": [],
     "present": 23
   },
-  "harmonization_plan_path": "/home/dmsrsic/raster-work/projects/ohio_cdl_edges/plans/harmonization_plan.json",
+  "harmonization_plan_path": "tests/fixtures/ohio_cdl_edges/plans/harmonization_plan.json",
   "harmonization_plan_sha256": "4493ea4f494d589fc098bdb7744e07caef4bb15141a1877d12c9044205e4e2c6",
   "harmonization_summary": {
     "inputs": 2,
@@ -313,7 +313,7 @@
   "inspect_contract_time_seconds": 0.067219,
   "inspect_time_seconds": 0.000253,
   "manifest_file_size_bytes": 1798,
-  "manifest_path": "/home/dmsrsic/raster-work/projects/ohio_cdl_edges/manifests/acquisition_manifest.jsonl",
+  "manifest_path": "tests/fixtures/ohio_cdl_edges/manifests/acquisition_manifest.jsonl",
   "manifest_row_count": 2,
   "manifest_sha256": "fd46106cde9e8c51b0aae26296b46a48ec75d65ca47ed4e911329723693151cc",
   "manifest_summary": {
@@ -379,7 +379,7 @@
       },
       "job_count": 8,
       "notes": "Scheduler exports are dry-run artifacts only; no downloads are executed.",
-      "output_directory": "/home/dmsrsic/raster-work/faster-raster/reports/diagnostic_scheduler_local_dry_run",
+      "output_directory": "reports/diagnostic_scheduler_local_dry_run",
       "package_id": "fr_exec_51438d1287b43021",
       "request_count": 2,
       "scheduler": "local-dry-run",
@@ -401,7 +401,7 @@
       },
       "job_count": 8,
       "notes": "Scheduler exports are dry-run artifacts only; no downloads are executed.",
-      "output_directory": "/home/dmsrsic/raster-work/faster-raster/reports/diagnostic_scheduler_slurm",
+      "output_directory": "reports/diagnostic_scheduler_slurm",
       "package_id": "fr_exec_51438d1287b43021",
       "request_count": 2,
       "scheduler": "slurm",
@@ -452,31 +452,31 @@
     "expected": 5,
     "items": [
       {
-        "path": "/home/dmsrsic/raster-work/faster-raster/schemas/research_spec.schema.json",
+        "path": "schemas/research_spec.schema.json",
         "present": true,
         "required_count": 5,
         "valid": true
       },
       {
-        "path": "/home/dmsrsic/raster-work/faster-raster/schemas/source_registry.schema.json",
+        "path": "schemas/source_registry.schema.json",
         "present": true,
         "required_count": 1,
         "valid": true
       },
       {
-        "path": "/home/dmsrsic/raster-work/faster-raster/schemas/acquisition_manifest_row.schema.json",
+        "path": "schemas/acquisition_manifest_row.schema.json",
         "present": true,
         "required_count": 26,
         "valid": true
       },
       {
-        "path": "/home/dmsrsic/raster-work/faster-raster/schemas/harmonization_plan.schema.json",
+        "path": "schemas/harmonization_plan.schema.json",
         "present": true,
         "required_count": 4,
         "valid": true
       },
       {
-        "path": "/home/dmsrsic/raster-work/faster-raster/schemas/inspect_contract_report.schema.json",
+        "path": "schemas/inspect_contract_report.schema.json",
         "present": true,
         "required_count": 6,
         "valid": true
@@ -486,7 +486,7 @@
     "valid": 5
   },
   "schema_structural_validation_status": "PASS",
-  "spec_path": "/home/dmsrsic/raster-work/projects/ohio_cdl_edges/research_spec.json",
+  "spec_path": "tests/fixtures/ohio_cdl_edges/research_spec.json",
   "synthetic_performance": [
     {
       "first_request_id": "cdl_2023_crop_type_00000_tile_000001",
@@ -519,5 +519,5 @@
   "total_time_seconds": 0.130337,
   "validate_outputs_time_seconds": 0.001206,
   "validate_time_seconds": 0.000118,
-  "working_directory": "/home/dmsrsic/raster-work/faster-raster"
+  "working_directory": "."
 }

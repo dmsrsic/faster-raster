@@ -5,6 +5,7 @@ from pathlib import Path
 
 from faster_raster import stack_preview, task_builder
 
+ROOT = Path(__file__).resolve().parent.parent
 
 def example_task():
     return task_builder.default_task(
@@ -47,5 +48,5 @@ def test_preview_does_not_mutate_registry_or_atlas(tmp_path, monkeypatch):
     atlas = Path("research/source_atlas_v0_4.yaml").read_bytes()
     monkeypatch.chdir(tmp_path)
     stack_preview.create_preview(example_task())
-    assert Path("/home/dmsrsic/raster-work/faster-raster/configs/source_registry.yaml").read_bytes() == registry
-    assert Path("/home/dmsrsic/raster-work/faster-raster/research/source_atlas_v0_4.yaml").read_bytes() == atlas
+    assert (ROOT / "configs" / "source_registry.yaml").read_bytes() == registry
+    assert (ROOT / "research" / "source_atlas_v0_4.yaml").read_bytes() == atlas

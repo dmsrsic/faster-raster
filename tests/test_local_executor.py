@@ -9,7 +9,7 @@ import pytest
 from typer.testing import CliRunner
 
 from faster_raster.cli import app
-from faster_raster import local_executor, system_grade, run_receipts
+from faster_raster import local_executor, system_grade, run_receipts, task_compiler
 
 
 TASK_ID = "example_wave1_climate_stack"
@@ -70,10 +70,19 @@ def counting_urlopen(counter):
 
 @pytest.fixture(autouse=True)
 def isolate_report_roots(monkeypatch, tmp_path):
-    run_root = tmp_path / "reports" / "runs"
+    report_root = tmp_path / "reports"
+    monkeypatch.setattr(task_compiler, "REPORT_ROOT", report_root)
+    monkeypatch.setattr(task_compiler, "TASK_COMPILE_ROOT", report_root / "task_compiles")
+    monkeypatch.setattr(task_compiler, "EXECUTION_PACKAGE_ROOT", report_root / "execution_packages")
+    task_compiler.compile_task(TASK_ID)
+    task_compiler.package_task(TASK_ID)
+    monkeypatch.setattr(local_executor, "COMPILE_ROOT", task_compiler.TASK_COMPILE_ROOT)
+    monkeypatch.setattr(local_executor, "PACKAGE_ROOT", task_compiler.EXECUTION_PACKAGE_ROOT)
+    run_root = report_root / "runs"
     monkeypatch.setattr(local_executor, "RUN_ROOT", run_root)
     monkeypatch.setattr(system_grade, "RUN_ROOT", run_root)
-    monkeypatch.setattr(system_grade, "MATERIALIZATION_ROOT", tmp_path / "reports" / "materializations")
+    monkeypatch.setattr(system_grade, "MATERIALIZATION_ROOT", report_root / "materializations")
+    monkeypatch.setattr(system_grade, "SYSTEM_GRADE_DIR", report_root / "system_grade")
 
 
 def deterministic_clock():

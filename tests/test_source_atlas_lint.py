@@ -6,7 +6,8 @@ import yaml
 
 from scripts import lint_source_atlas as lint
 
-ATLAS = Path('/home/dmsrsic/raster-work/faster-raster/research/source_atlas_v0_4.yaml')
+ROOT = Path(__file__).resolve().parent.parent
+ATLAS = ROOT / "research" / "source_atlas_v0_4.yaml"
 
 
 def test_source_atlas_parses_and_has_25_entries():

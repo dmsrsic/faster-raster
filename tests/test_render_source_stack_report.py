@@ -6,8 +6,9 @@ import json
 from scripts import render_source_stack_report as render
 from scripts import lint_source_atlas as lint
 
-ATLAS = Path('/home/dmsrsic/raster-work/faster-raster/research/source_atlas_v0_4.yaml')
-STACK = Path('/home/dmsrsic/raster-work/faster-raster/reports/multi_source_stack_probe.json')
+ROOT = Path(__file__).resolve().parent.parent
+ATLAS = ROOT / "research" / "source_atlas_v0_4.yaml"
+STACK = ROOT / "reports" / "multi_source_stack_probe.json"
 
 
 def test_build_matrix_shape():

@@ -6,7 +6,7 @@
     {
       "artifact_extension": ".tif.gz",
       "artifact_id": "sha256:975aa6e54a75551d76b4390a7a30c6fc813e86eabd967e5f65a9db2e0b4cb4d8",
-      "artifact_path": "/home/dmsrsic/raster-work/faster-raster/cache/artifacts/sha256/97/5a/975aa6e54a75551d76b4390a7a30c6fc813e86eabd967e5f65a9db2e0b4cb4d8.tif.gz",
+      "artifact_path": "cache/artifacts/sha256/97/5a/975aa6e54a75551d76b4390a7a30c6fc813e86eabd967e5f65a9db2e0b4cb4d8.tif.gz",
       "artifact_receipt_paths": [
         "reports/materializations/example_wave1_climate_stack/fr_mat_20260711T041204Z_2e016fbe065e/artifact_receipt_1.json"
       ],

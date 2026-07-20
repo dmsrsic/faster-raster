@@ -14,7 +14,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Iterable
 
-from faster_raster import artifact_catalog, artifact_store
+from faster_raster import __version__, artifact_catalog, artifact_store
 from faster_raster.artifact_receipts import (
     compute_artifact_receipt_sha256,
     compute_materialization_plan_sha256,
@@ -33,7 +33,7 @@ DEFAULT_MINIMUM_FREE_DISK_BYTES = 0
 DEFAULT_DISK_SAFETY_MARGIN_BYTES = 64 * 1024 * 1024
 DEFAULT_TIMEOUT_SECONDS = 30
 DEFAULT_RETRY_LIMIT = 1
-USER_AGENT = "FasterRaster/0.9.0 verified-materialization"
+USER_AGENT = f"FasterRaster/{__version__} verified-materialization"
 RETRY_HTTP = {429, 500, 502, 503, 504}
 
 

@@ -6,6 +6,12 @@ __pycache__/
 .coverage
 htmlcov/
 .DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+.idea/
+.vscode/
 .ipynb_checkpoints/
 *.egg-info/
 .env
@@ -33,6 +39,7 @@ cache/
 /.local-state/
 *.whl
 *.tar.gz
+site/
 !.github/
 /.beta-tools/
 # Personal terminal study playground

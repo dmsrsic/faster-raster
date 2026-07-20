@@ -7,7 +7,7 @@ from pathlib import Path
 from typer.testing import CliRunner
 import pytest
 
-from faster_raster import materialization, artifact_catalog, artifact_receipts, local_executor, system_grade, run_receipts
+from faster_raster import materialization, artifact_catalog, artifact_receipts, local_executor, system_grade, run_receipts, task_compiler
 from faster_raster.cli import app
 
 
@@ -51,8 +51,21 @@ class FakeResponse:
 
 @pytest.fixture(autouse=True)
 def isolate_materialization_roots(monkeypatch, tmp_path):
-    monkeypatch.setattr(materialization, "MATERIALIZATION_ROOT", tmp_path / "reports" / "materializations")
-    monkeypatch.setattr(system_grade, "MATERIALIZATION_ROOT", tmp_path / "reports" / "materializations")
+    report_root = tmp_path / "reports"
+    monkeypatch.setattr(task_compiler, "REPORT_ROOT", report_root)
+    monkeypatch.setattr(task_compiler, "TASK_COMPILE_ROOT", report_root / "task_compiles")
+    monkeypatch.setattr(task_compiler, "EXECUTION_PACKAGE_ROOT", report_root / "execution_packages")
+    task_compiler.compile_task(TASK_ID)
+    task_compiler.package_task(TASK_ID)
+    monkeypatch.setattr(local_executor, "COMPILE_ROOT", task_compiler.TASK_COMPILE_ROOT)
+    monkeypatch.setattr(local_executor, "PACKAGE_ROOT", task_compiler.EXECUTION_PACKAGE_ROOT)
+    monkeypatch.setattr(materialization, "COMPILE_ROOT", task_compiler.TASK_COMPILE_ROOT)
+    monkeypatch.setattr(materialization, "PACKAGE_ROOT", task_compiler.EXECUTION_PACKAGE_ROOT)
+    monkeypatch.setattr(local_executor, "RUN_ROOT", report_root / "runs")
+    monkeypatch.setattr(system_grade, "RUN_ROOT", report_root / "runs")
+    monkeypatch.setattr(materialization, "MATERIALIZATION_ROOT", report_root / "materializations")
+    monkeypatch.setattr(system_grade, "MATERIALIZATION_ROOT", report_root / "materializations")
+    monkeypatch.setattr(system_grade, "SYSTEM_GRADE_DIR", report_root / "system_grade")
 
 
 def _payload() -> bytes:
@@ -453,17 +466,18 @@ def test_materialize_verify_cli_reports_failed_components(monkeypatch, tmp_path)
     assert "artifact_store_error" in result.output
 
 
-def test_successful_materialization_followed_by_blocked_policy_still_grades_release_ready(monkeypatch, tmp_path):
+def test_successful_materialization_followed_by_blocked_policy_preserves_evidence_without_local_run(monkeypatch, tmp_path):
     success, blocked = _create_success_then_blocked(monkeypatch, tmp_path)
     assert success["run_status"] == "completed"
     assert blocked["run_status"] == "blocked_policy"
     monkeypatch.setattr(system_grade.artifact_catalog, "verify_artifact_catalog", lambda: {"verification_status": "PASS"})
     monkeypatch.setattr(system_grade, "MATERIALIZATION_ROOT", tmp_path / "materializations")
-    monkeypatch.setattr(system_grade, "RUN_ROOT", Path("reports/runs"))
+    monkeypatch.setattr(system_grade, "RUN_ROOT", tmp_path / "reports" / "runs")
 
     report = system_grade.grade_system(TASK_ID)
 
-    assert report["release_decision"] == "release_ready"
+    assert report["release_decision"] == "release_ready_with_cautions"
+    assert "no_live_local_execution_receipt" in report["warnings"]
     assert report["latest_successful_materialization_present"] is True
     assert report["latest_successful_materialization_valid"] is True
     assert report["latest_successful_materialization_run_id"] == success["materialization_run_id"]

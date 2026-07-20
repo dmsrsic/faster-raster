@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+from pathlib import Path
 
 from typer.testing import CliRunner
 
@@ -9,6 +10,7 @@ from faster_raster.cli import app
 
 runner = CliRunner()
 ANSI_RE = re.compile(r'\[[0-9;]*m')
+ROOT = Path(__file__).resolve().parent.parent
 
 
 def invoke(args):
@@ -69,5 +71,5 @@ def test_help_style_and_tree_plain():
 
 
 def test_old_cli_validate_still_works():
-    output = invoke(['validate', '/home/dmsrsic/raster-work/projects/ohio_cdl_edges/research_spec.json'])
+    output = invoke(["validate", str(ROOT / "tests" / "fixtures" / "ohio_cdl_edges" / "research_spec.json")])
     assert 'valid:' in output

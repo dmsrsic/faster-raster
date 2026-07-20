@@ -9,7 +9,7 @@
   },
   "job_count": 8,
   "notes": "Scheduler exports are dry-run artifacts only; no downloads are executed.",
-  "output_directory": "/home/dmsrsic/raster-work/faster-raster/reports/diagnostic_scheduler_local_dry_run",
+  "output_directory": "reports/diagnostic_scheduler_local_dry_run",
   "package_id": "fr_exec_51438d1287b43021",
   "request_count": 2,
   "scheduler": "local-dry-run",

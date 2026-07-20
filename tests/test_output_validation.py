@@ -11,7 +11,8 @@ from faster_raster.output_validation import validate_harmonization, validate_man
 from faster_raster.harmonization_planner import read_harmonization_plan, write_harmonization_plan
 
 runner = CliRunner()
-PROJECT = Path('/home/dmsrsic/raster-work/projects/ohio_cdl_edges')
+ROOT = Path(__file__).resolve().parent.parent
+PROJECT = ROOT / "tests" / "fixtures" / "ohio_cdl_edges"
 MANIFEST = PROJECT / 'manifests' / 'acquisition_manifest.jsonl'
 PLAN = PROJECT / 'plans' / 'harmonization_plan.json'
 

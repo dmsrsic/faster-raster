@@ -6,8 +6,9 @@ import json
 from scripts import lint_source_atlas as lint
 from scripts import plan_source_unlocks as planner
 
-ATLAS = Path('/home/dmsrsic/raster-work/faster-raster/research/source_atlas_v0_4.yaml')
-STACK = Path('/home/dmsrsic/raster-work/faster-raster/reports/multi_source_stack_probe.json')
+ROOT = Path(__file__).resolve().parent.parent
+ATLAS = ROOT / "research" / "source_atlas_v0_4.yaml"
+STACK = ROOT / "reports" / "multi_source_stack_probe.json"
 
 
 def test_unlock_plan_has_ranked_items():

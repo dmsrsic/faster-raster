@@ -9,7 +9,8 @@ from faster_raster.adapters.thredds_ncss import ThreddsNcssAdapter
 from faster_raster.url_planner import ADAPTERS
 
 
-SPEC_PATH = Path("/home/dmsrsic/raster-work/faster-raster/research/daymet_ncss_probe_spec.yaml")
+ROOT = Path(__file__).resolve().parent.parent
+SPEC_PATH = ROOT / "research" / "daymet_ncss_probe_spec.yaml"
 
 
 def load_probe_spec() -> dict:

@@ -30,6 +30,14 @@ RUNNABLE_CLASSIFICATION = "runnable"
 FIXTURE_CLASSIFICATION = "fixture_only"
 
 
+def portable_project_path(path: Path | str) -> str:
+    candidate = Path(path)
+    try:
+        return candidate.resolve().relative_to(PROJECT_ROOT.resolve()).as_posix()
+    except ValueError:
+        return str(candidate)
+
+
 def utc_now() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 

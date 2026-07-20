@@ -16,6 +16,13 @@ from faster_raster.workfiles import workfile_template
 ROOT = Path(__file__).resolve().parent.parent
 
 
+def test_fr_version(capsys):
+    with pytest.raises(SystemExit) as raised:
+        fr_cli.main(["--version"])
+    assert raised.value.code == 0
+    assert capsys.readouterr().out == "fr 1.0.0b1\n"
+
+
 def isolate(monkeypatch, tmp_path: Path) -> None:
     monkeypatch.setenv("FASTERRASTER_CONFIG_HOME", str(tmp_path / "config"))
     monkeypatch.setenv("FASTERRASTER_STATE_HOME", str(tmp_path / "state"))

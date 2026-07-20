@@ -1,0 +1,23 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "ohio_test_bbox"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-83.2, 39.8],
+            [-82.9, 39.8],
+            [-82.9, 40.1],
+            [-83.2, 40.1],
+            [-83.2, 39.8]
+          ]
+        ]
+      }
+    }
+  ]
+}

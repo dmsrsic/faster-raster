@@ -67,9 +67,9 @@
     }
   },
   "execution_profile_path": null,
-  "harmonization_plan_path": "/home/dmsrsic/raster-work/projects/ohio_cdl_edges/plans/harmonization_plan.json",
+  "harmonization_plan_path": "tests/fixtures/ohio_cdl_edges/plans/harmonization_plan.json",
   "harmonization_plan_sha256": "4493ea4f494d589fc098bdb7744e07caef4bb15141a1877d12c9044205e4e2c6",
-  "manifest_path": "/home/dmsrsic/raster-work/projects/ohio_cdl_edges/manifests/acquisition_manifest.jsonl",
+  "manifest_path": "tests/fixtures/ohio_cdl_edges/manifests/acquisition_manifest.jsonl",
   "manifest_sha256": "fd46106cde9e8c51b0aae26296b46a48ec75d65ca47ed4e911329723693151cc",
   "outputs": {
     "cache_plan": "cache_plan.json",
@@ -100,9 +100,9 @@
       "error_count": 0,
       "errors": [],
       "input_count": 2,
-      "manifest_path": "/home/dmsrsic/raster-work/projects/ohio_cdl_edges/manifests/acquisition_manifest.jsonl",
+      "manifest_path": "tests/fixtures/ohio_cdl_edges/manifests/acquisition_manifest.jsonl",
       "manifest_row_count": 2,
-      "path": "/home/dmsrsic/raster-work/projects/ohio_cdl_edges/plans/harmonization_plan.json",
+      "path": "tests/fixtures/ohio_cdl_edges/plans/harmonization_plan.json",
       "status": "PASS",
       "warning_count": 0,
       "warnings": []
@@ -110,7 +110,7 @@
     "manifest": {
       "error_count": 0,
       "errors": [],
-      "path": "/home/dmsrsic/raster-work/projects/ohio_cdl_edges/manifests/acquisition_manifest.jsonl",
+      "path": "tests/fixtures/ohio_cdl_edges/manifests/acquisition_manifest.jsonl",
       "row_count": 2,
       "status": "PASS",
       "warning_count": 0,

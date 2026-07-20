@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 
+import pytest
 from typer.testing import CliRunner
 
 from faster_raster.cli import app
@@ -10,6 +11,17 @@ from faster_raster import system_grade
 
 TASK_ID = "example_wave1_climate_stack"
 runner = CliRunner()
+
+
+@pytest.fixture(autouse=True)
+def isolate_compiler_reports(monkeypatch, tmp_path):
+    report_root = tmp_path / "reports"
+    monkeypatch.setattr(task_compiler, "REPORT_ROOT", report_root)
+    monkeypatch.setattr(task_compiler, "TASK_COMPILE_ROOT", report_root / "task_compiles")
+    monkeypatch.setattr(task_compiler, "EXECUTION_PACKAGE_ROOT", report_root / "execution_packages")
+    monkeypatch.setattr(system_grade, "SYSTEM_GRADE_DIR", report_root / "system_grade")
+    monkeypatch.setattr(system_grade, "RUN_ROOT", report_root / "runs")
+    monkeypatch.setattr(system_grade, "MATERIALIZATION_ROOT", report_root / "materializations")
 
 
 def test_task_compile_static_range_manifest_counts():
@@ -36,7 +48,7 @@ def test_task_compile_static_range_manifest_counts():
 
 def test_prism_compiles_as_fixture_only_not_fetch_job():
     task_compiler.package_task(TASK_ID)
-    jobs = json.loads(Path(f"reports/execution_packages/{TASK_ID}/execution_jobs.json").read_text())["jobs"]
+    jobs = json.loads((task_compiler.EXECUTION_PACKAGE_ROOT / TASK_ID / "execution_jobs.json").read_text())["jobs"]
     prism_jobs = [job for job in jobs if job["source_id"] == "prism_daily_ppt_static_zip"]
 
     assert [job["stage"] for job in prism_jobs] == ["record_fixture_evidence"]

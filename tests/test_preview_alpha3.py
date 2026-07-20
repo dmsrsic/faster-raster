@@ -9,7 +9,7 @@ from PIL import Image
 
 from faster_raster import preview_alpha2, preview_balanced, preview_contracts, preview_profiles
 
-ROOT = Path('/home/dmsrsic/raster-work/faster-raster')
+ROOT = Path(__file__).resolve().parent.parent
 
 
 def make_root(tmp_path: Path) -> Path:

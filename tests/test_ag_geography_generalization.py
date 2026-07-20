@@ -431,17 +431,8 @@ def test_renderer_does_not_claim_completion_before_publication():
     assert "FASTERRASTER AG RECIPE: PASS" in publisher
 
 
-def test_timestamped_backup_scripts_are_unchanged():
-    expected = {
-        "fr-cook-ag.backup.20260714T203054Z": (
-            "ee5ad5ba7fd8804371066e1469a306bf117bf142cadf6bf785e93ea8db9decfc"
-        ),
-        "fr-cook-ag.backup.20260714T203213Z": (
-            "1b888348dca0cae1a7a630517c0fe71e49012e72aff9155b700c489b3dacd4ee"
-        ),
-    }
-    for name, digest in expected.items():
-        assert hashlib.sha256((ROOT / "scripts" / name).read_bytes()).hexdigest() == digest
+def test_timestamped_backup_scripts_are_not_in_the_release_surface():
+    assert list((ROOT / "scripts").glob("*.backup.*")) == []
 
 
 def test_legacy_direct_nonrecipe_help_remains_compatible():

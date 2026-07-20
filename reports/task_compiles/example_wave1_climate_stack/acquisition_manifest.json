@@ -21,7 +21,7 @@
       "max_bytes": 65536,
       "network_required": true,
       "provenance": {
-        "config": "/home/dmsrsic/raster-work/faster-raster/configs/static_http_range_wave1.yaml",
+        "config": "configs/static_http_range_wave1.yaml",
         "container": "gzip",
         "expected_inner_format": "geotiff",
         "planning_index": 0
@@ -74,7 +74,7 @@
       "max_bytes": 65536,
       "network_required": true,
       "provenance": {
-        "config": "/home/dmsrsic/raster-work/faster-raster/configs/static_http_range_wave1.yaml",
+        "config": "configs/static_http_range_wave1.yaml",
         "container": "hdf5_netcdf4",
         "expected_inner_format": null,
         "planning_index": 1
@@ -121,7 +121,7 @@
       "max_bytes": null,
       "network_required": false,
       "provenance": {
-        "config": "/home/dmsrsic/raster-work/faster-raster/configs/static_http_range_wave1.yaml",
+        "config": "configs/static_http_range_wave1.yaml",
         "container": "zip",
         "current_endpoint_status": "unresolved_or_stale",
         "expected_inner_format": null,
@@ -172,7 +172,7 @@
       "max_bytes": 65536,
       "network_required": true,
       "provenance": {
-        "config": "/home/dmsrsic/raster-work/faster-raster/configs/static_http_range_wave1.yaml",
+        "config": "configs/static_http_range_wave1.yaml",
         "container": "hdf5_netcdf4",
         "expected_inner_format": null,
         "planning_index": 2
@@ -219,7 +219,7 @@
       "max_bytes": 65536,
       "network_required": true,
       "provenance": {
-        "config": "/home/dmsrsic/raster-work/faster-raster/configs/static_http_range_wave1.yaml",
+        "config": "configs/static_http_range_wave1.yaml",
         "container": "zip",
         "expected_inner_format": null,
         "planning_index": 3

@@ -1,0 +1,52 @@
+{
+  "inputs": [
+    {
+      "bbox_crs": "EPSG:4326",
+      "export_image_crs": "EPSG:3857",
+      "forbidden_resampling": ["bilinear", "cubic", "lanczos"],
+      "planned_output": "data/grid/cdl_2023_crop_type_tile_000001_epsg5070_30m.tif",
+      "request_id": "cdl_2023_crop_type_tile_000001",
+      "resampling": "nearest",
+      "semantic_type": "categorical",
+      "source_bbox": [-83.2, 39.8, -82.9, 40.1],
+      "source_crs": "EPSG:3857",
+      "target_crs": "EPSG:5070",
+      "target_grid_crs": "EPSG:5070",
+      "tile_height_pixels": 1453,
+      "tile_planning_crs": "EPSG:3857",
+      "tile_width_pixels": 1114
+    },
+    {
+      "bbox_crs": "EPSG:4326",
+      "export_image_crs": "EPSG:3857",
+      "forbidden_resampling": ["bilinear", "cubic", "lanczos"],
+      "planned_output": "data/grid/cdl_2024_crop_type_tile_000001_epsg5070_30m.tif",
+      "request_id": "cdl_2024_crop_type_tile_000001",
+      "resampling": "nearest",
+      "semantic_type": "categorical",
+      "source_bbox": [-83.2, 39.8, -82.9, 40.1],
+      "source_crs": "EPSG:3857",
+      "target_crs": "EPSG:5070",
+      "target_grid_crs": "EPSG:5070",
+      "tile_height_pixels": 1453,
+      "tile_planning_crs": "EPSG:3857",
+      "tile_width_pixels": 1114
+    }
+  ],
+  "project_id": "ohio_cdl_edge_dynamics_v001",
+  "target_grid": {
+    "crs": "EPSG:5070",
+    "nodata": 255,
+    "resolution_m": 30,
+    "snap": "aoi_bounds"
+  },
+  "validation_checks": [
+    "manifest_request_id_present",
+    "bbox_crs_present",
+    "export_image_crs_present",
+    "target_grid_crs_present",
+    "categorical_resampling_safe",
+    "tile_pixel_size_present",
+    "tile_alignment_policy_present"
+  ]
+}

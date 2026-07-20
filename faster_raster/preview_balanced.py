@@ -637,7 +637,7 @@ def verify_preview(receipt: dict[str, Any], *, contract: dict[str, Any] | None =
     if receipt.get("displayed_selected_opacity") is not None and round(float(receipt.get("displayed_selected_opacity")), 4) != round(float(receipt.get("cdl_compiled_opacity", -1)), 4):
         failures.append("displayed selected opacity mismatch")
     serialized = json.dumps(receipt, sort_keys=True).lower()
-    for marker in ["/tmp/pytest-", "/home/dmsrsic/", "authorization", "password", "secret", "token"]:
+    for marker in ["/tmp/pytest-", "/home/", "C:\\Users\\", "C:/Users/", "authorization", "password", "secret", "token"]:
         if marker in serialized:
             failures.append(f"forbidden marker present: {marker}")
     failures.extend([f"{key} failed" for key, value in statuses.items() if value == "FAIL"])
@@ -654,4 +654,3 @@ def verify_preview(receipt: dict[str, Any], *, contract: dict[str, Any] | None =
         "failures": failures,
         "warnings": [],
     }
-

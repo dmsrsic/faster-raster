@@ -11,7 +11,8 @@ from faster_raster.url_planner import plan_urls
 from faster_raster.validation import validate_spec
 
 
-GOLDEN = Path("/home/dmsrsic/raster-work/faster-raster/tests/golden")
+ROOT = Path(__file__).resolve().parent.parent
+GOLDEN = ROOT / "tests" / "golden"
 
 
 def load_case(name: str, registry_key: str):

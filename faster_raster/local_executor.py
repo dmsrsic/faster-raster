@@ -12,6 +12,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
 
+from faster_raster import __version__
 from faster_raster.adapter_contract import stable_json
 from faster_raster.content_magic import detect_content_magic
 from faster_raster.run_receipts import compute_receipt_contract_sha256, sha256_file, write_json, write_jsonl
@@ -24,7 +25,7 @@ RUN_ROOT = Path("reports/runs")
 PACKAGE_ROOT = Path("reports/execution_packages")
 COMPILE_ROOT = Path("reports/task_compiles")
 RUNTIME_CACHE_ROOT = Path("cache/runtime/static_http_range")
-USER_AGENT = "FasterRaster/0.8.0 local-bounded-executor"
+USER_AGENT = f"FasterRaster/{__version__} local-bounded-executor"
 CACHE_CONTRACT_VERSION = 1
 SUPPORTED_STAGES = {
     "resolve_request",
@@ -184,6 +185,7 @@ def build_run_plan(
     fail_fast: bool = False,
     allow_network: bool = False,
     write_artifacts: bool = True,
+    run_root: Path | None = None,
 ) -> dict[str, Any]:
     options = RuntimeOptions(max_bytes_per_source, max_total_bytes, timeout_seconds, retry_limit, fail_fast, allow_network)
     _validate_options(options)
@@ -239,7 +241,7 @@ def build_run_plan(
     }
     plan["run_plan_contract_sha256"] = _contract_hash({key: value for key, value in plan.items() if key != "run_plan_contract_sha256"})
     if write_artifacts:
-        out_dir = RUN_ROOT / task_id
+        out_dir = (run_root or RUN_ROOT) / task_id
         write_json(out_dir / "run_plan.json", plan)
         write_run_plan_markdown(plan, out_dir / "run_plan.md")
     return plan
@@ -339,6 +341,7 @@ def execute_local(
         fail_fast=fail_fast,
         allow_network=allow_network,
         write_artifacts=True,
+        run_root=run_root,
     )
     package = inputs["package"]
     package_hash_short = package["package_sha256"][:12]

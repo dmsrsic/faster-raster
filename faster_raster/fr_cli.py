@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
+from faster_raster import __version__
 from faster_raster.ag_execution import (
     RecipeExecutionError,
     _regenerate_checksums,
@@ -691,6 +692,7 @@ def _add_plan_options(parser: argparse.ArgumentParser, *, include_out: bool = Tr
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="fr", description="FasterRaster local studies, capabilities, plans, and results")
+    parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     parser.add_argument("--debug", action="store_true", help="show tracebacks for unexpected failures")
     commands = parser.add_subparsers(dest="command", required=True)
 

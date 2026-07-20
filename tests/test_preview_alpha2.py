@@ -10,7 +10,7 @@ from faster_raster import preview_alpha2, preview_contracts, preview_themes
 from faster_raster.adapters import capabilities
 from faster_raster.adapters.conformance import verify_adapter_conformance
 
-ROOT = Path('/home/dmsrsic/raster-work/faster-raster')
+ROOT = Path(__file__).resolve().parent.parent
 
 def make_root(tmp_path: Path) -> Path:
     (tmp_path / 'configs').mkdir()

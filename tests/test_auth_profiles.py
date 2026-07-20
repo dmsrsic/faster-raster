@@ -12,7 +12,8 @@ from faster_raster.auth_profiles import (
     validate_auth_profiles,
 )
 
-EXAMPLE = Path('/home/dmsrsic/raster-work/faster-raster/configs/auth_profiles.example.yaml')
+ROOT = Path(__file__).resolve().parent.parent
+EXAMPLE = ROOT / "configs" / "auth_profiles.example.yaml"
 
 
 def test_example_profiles_validate():

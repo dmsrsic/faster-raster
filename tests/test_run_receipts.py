@@ -3,9 +3,24 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from faster_raster import local_executor, run_receipts
+import pytest
+
+from faster_raster import local_executor, run_receipts, task_compiler
 
 TASK_ID = "example_wave1_climate_stack"
+
+
+@pytest.fixture(autouse=True)
+def isolate_compiled_inputs(monkeypatch, tmp_path):
+    report_root = tmp_path / "compiled"
+    monkeypatch.setattr(task_compiler, "REPORT_ROOT", report_root)
+    monkeypatch.setattr(task_compiler, "TASK_COMPILE_ROOT", report_root / "task_compiles")
+    monkeypatch.setattr(task_compiler, "EXECUTION_PACKAGE_ROOT", report_root / "execution_packages")
+    task_compiler.compile_task(TASK_ID)
+    task_compiler.package_task(TASK_ID)
+    monkeypatch.setattr(local_executor, "COMPILE_ROOT", task_compiler.TASK_COMPILE_ROOT)
+    monkeypatch.setattr(local_executor, "PACKAGE_ROOT", task_compiler.EXECUTION_PACKAGE_ROOT)
+    monkeypatch.setattr(local_executor, "RUN_ROOT", tmp_path / "production-runs")
 
 
 class FakeHeaders(dict):
@@ -165,7 +180,7 @@ def test_committed_deterministic_run_fixtures_do_not_contain_machine_paths():
         for fixture in fixtures
         for path in fixture.rglob("*")
         if path.is_file()
-        and any(token in path.read_text(encoding="utf-8", errors="ignore") for token in ("/tmp/pytest-", "/home/dmsrsic/"))
+        and any(token in path.read_text(encoding="utf-8", errors="ignore") for token in ("/tmp/pytest-", "/home/", "C:\\Users\\", "C:/Users/"))
     ]
     assert offenders == []
 

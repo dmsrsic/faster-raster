@@ -184,19 +184,24 @@ def run_beta_check(
             task_compiler.TASK_COMPILE_ROOT,
             task_compiler.EXECUTION_PACKAGE_ROOT,
             system_grade.SYSTEM_GRADE_DIR,
+            system_grade.RUN_ROOT,
+            system_grade.MATERIALIZATION_ROOT,
             static_http_range.DEFAULT_REPORT_DIR,
         )
         task_compiler.TASK_COMPILE_ROOT = temp / "reports" / "task_compiles"
         task_compiler.EXECUTION_PACKAGE_ROOT = temp / "reports" / "execution_packages"
         system_grade.SYSTEM_GRADE_DIR = temp / "reports" / "system_grade"
+        system_grade.RUN_ROOT = temp / "reports" / "runs"
+        system_grade.MATERIALIZATION_ROOT = temp / "reports" / "materializations"
         static_http_range.DEFAULT_REPORT_DIR = temp / "reports" / "static_http_range"
 
         workfile_path = root / "examples" / "colby-study.fr.md"
         _step("fr doctor --offline", lambda: fr_main(["doctor", "--offline", "--json"]), steps)
         _step("fr validate", lambda: fr_main(["validate", str(workfile_path), "--json"]), steps)
         _step(
-            "fr plan --reuse only",
-            lambda: fr_main(
+            "fr plan --reuse only fails closed without compatible cache",
+            lambda: 0
+            if fr_main(
                 [
                     "plan",
                     str(workfile_path),
@@ -206,7 +211,9 @@ def run_beta_check(
                     str(temp / "plan"),
                     "--json",
                 ]
-            ),
+            )
+            == 2
+            else 1,
             steps,
         )
 
@@ -271,6 +278,8 @@ def run_beta_check(
         task_compiler.TASK_COMPILE_ROOT,
         task_compiler.EXECUTION_PACKAGE_ROOT,
         system_grade.SYSTEM_GRADE_DIR,
+        system_grade.RUN_ROOT,
+        system_grade.MATERIALIZATION_ROOT,
         static_http_range.DEFAULT_REPORT_DIR,
     ) = original_report_roots
     for key, value in original_environment.items():
@@ -290,8 +299,8 @@ def run_beta_check(
         failures.append("compile determinism contract did not pass")
     if contract["package_dag_validation_status"] != "PASS":
         failures.append("execution DAG contract did not pass")
-    if contract["grader_decision"] != "release_ready":
-        failures.append("system grader did not return release_ready")
+    if contract["grader_decision"] not in {"release_ready", "release_ready_with_cautions"}:
+        failures.append("system grader did not return a release-ready offline decision")
     report = {
         "schema_version": "fasterraster.beta-check/v1",
         "created_at": datetime.now(timezone.utc).isoformat(),

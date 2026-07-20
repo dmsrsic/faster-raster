@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from faster_raster import __version__
+from faster_raster import task_compiler
 from faster_raster.task_compiler import compile_task, package_task, write_json
 from faster_raster import run_receipts
 from faster_raster import artifact_catalog
@@ -17,8 +18,10 @@ from faster_raster.adapters.conformance import verify_adapter_conformance
 
 
 SYSTEM_GRADE_DIR = Path(os.environ.get("FASTERRASTER_REPORT_ROOT", "reports")) / "system_grade"
-RUN_ROOT = Path("reports/runs")
-MATERIALIZATION_ROOT = Path("reports/materializations")
+RUN_ROOT = Path(os.environ.get("FASTERRASTER_RUN_ROOT", "reports/runs"))
+MATERIALIZATION_ROOT = Path(
+    os.environ.get("FASTERRASTER_MATERIALIZATION_ROOT", "reports/materializations")
+)
 
 
 def _read_json(path: Path) -> dict[str, Any]:
@@ -94,9 +97,9 @@ def grade_system(task_id: str = "example_wave1_climate_stack") -> dict[str, Any]
             live_receipt_present = bool(receipt.get("network_run")) and receipt.get("run_status") == "completed"
             receipt_verification = run_receipts.verify_run_receipt(
                 receipt_path,
-                package_path=Path(f"reports/execution_packages/{task_id}/execution_package.json"),
-                manifest_path=Path(f"reports/task_compiles/{task_id}/acquisition_manifest.jsonl"),
-                dag_path=Path(f"reports/execution_packages/{task_id}/dag.json"),
+                package_path=task_compiler.EXECUTION_PACKAGE_ROOT / task_id / "execution_package.json",
+                manifest_path=task_compiler.TASK_COMPILE_ROOT / task_id / "acquisition_manifest.jsonl",
+                dag_path=task_compiler.EXECUTION_PACKAGE_ROOT / task_id / "dag.json",
             )
             latest_run_receipt_valid = receipt_verification["verification_status"] == "PASS"
             live_requirements_ok = (
@@ -442,8 +445,8 @@ def grade_system(task_id: str = "example_wave1_climate_stack") -> dict[str, Any]
             "execution_package": f"reports/execution_packages/{task_id}/execution_package.json",
         },
     }
-    out_json = SYSTEM_GRADE_DIR / "system_grade_v1_0_0_alpha3.json"
-    out_md = SYSTEM_GRADE_DIR / "system_grade_v1_0_0_alpha3.md"
+    out_json = SYSTEM_GRADE_DIR / "system_grade_v1_0_0_beta1.json"
+    out_md = SYSTEM_GRADE_DIR / "system_grade_v1_0_0_beta1.md"
     write_json(out_json, report)
     write_markdown(report, out_md)
     report["artifacts"]["system_grade_json"] = str(out_json)
@@ -454,7 +457,7 @@ def grade_system(task_id: str = "example_wave1_climate_stack") -> dict[str, Any]
 
 def write_markdown(report: dict[str, Any], path: Path) -> None:
     lines = [
-        "# FasterRaster v1.0.0-alpha.3 Whole-System Grade",
+        "# FasterRaster v1.0.0-beta.1 Whole-System Grade",
         "",
         f"- Overall score: `{report['overall_score']}`",
         f"- Overall grade: `{report['overall_grade']}`",

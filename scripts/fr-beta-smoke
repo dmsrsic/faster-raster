@@ -44,6 +44,11 @@ fi
 temporary_root=$(mktemp -d "${TMPDIR:-/tmp}/fasterraster-beta-smoke.XXXXXX")
 trap 'rm -rf -- "$temporary_root"' EXIT HUP INT TERM
 
+export XDG_CONFIG_HOME="$temporary_root/xdg-config"
+export XDG_CACHE_HOME="$temporary_root/xdg-cache"
+export XDG_STATE_HOME="$temporary_root/xdg-state"
+export PYTHONDONTWRITEBYTECODE=1
+
 cd "$repository_root"
 index_count_before=$(git diff --cached --name-only | wc -l | tr -d ' ')
 index_hash_before=$(git diff --cached --binary | sha256sum | awk '{print $1}')
@@ -104,9 +109,12 @@ if [ "$mode" = "--full" ]; then
     echo "[smoke] complete pytest suite"
     "$python_runtime" -m pytest -q
     echo "[smoke] beta check"
-    FASTERRASTER_PYTHON="$python_runtime" "$script_dir/fr-beta-check"
+    FASTERRASTER_PYTHON="$python_runtime" "$script_dir/fr-beta-check" --output "$temporary_root/beta-check"
     echo "[smoke] system grader"
-    "$faster_raster_cli" grade system --plain
+    FASTERRASTER_REPORT_ROOT="$temporary_root/reports" \
+        FASTERRASTER_RUN_ROOT="$temporary_root/reports/runs" \
+        FASTERRASTER_MATERIALIZATION_ROOT="$temporary_root/reports/materializations" \
+        "$faster_raster_cli" grade system --plain
 fi
 
 index_count_after=$(git diff --cached --name-only | wc -l | tr -d ' ')

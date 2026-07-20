@@ -1321,7 +1321,7 @@
       "diag": {
         "bytes": 158,
         "cache_path": "reports/task_previews/cdl_manual_audit/export_task_original_mosaic_year_string_2023_png32_567987e96a1df41e.png",
-        "image_error": "UnidentifiedImageError(\"cannot identify image file '/home/dmsrsic/raster-work/faster-raster/reports/task_previews/cdl_manual_audit/export_task_original_mosaic_year_string_2023_png32_567987e96a1df41e.png'\")",
+        "image_error": "UnidentifiedImageError(\"cannot identify image file 'reports/task_previews/cdl_manual_audit/export_task_original_mosaic_year_string_2023_png32_567987e96a1df41e.png'\")",
         "is_image": false,
         "sha256": "567987e96a1df41e984f92ea3790a379d6e581d7fbc606d1d0414500eb997671"
       },
@@ -1338,7 +1338,7 @@
       "diag": {
         "bytes": 158,
         "cache_path": "reports/task_previews/cdl_manual_audit/export_task_original_mosaic_year_string_2023_png_567987e96a1df41e.png",
-        "image_error": "UnidentifiedImageError(\"cannot identify image file '/home/dmsrsic/raster-work/faster-raster/reports/task_previews/cdl_manual_audit/export_task_original_mosaic_year_string_2023_png_567987e96a1df41e.png'\")",
+        "image_error": "UnidentifiedImageError(\"cannot identify image file 'reports/task_previews/cdl_manual_audit/export_task_original_mosaic_year_string_2023_png_567987e96a1df41e.png'\")",
         "is_image": false,
         "sha256": "567987e96a1df41e984f92ea3790a379d6e581d7fbc606d1d0414500eb997671"
       },
@@ -2219,7 +2219,7 @@
       "diag": {
         "bytes": 158,
         "cache_path": "reports/task_previews/cdl_manual_audit/export_task_expand10_mosaic_year_string_2023_png32_567987e96a1df41e.png",
-        "image_error": "UnidentifiedImageError(\"cannot identify image file '/home/dmsrsic/raster-work/faster-raster/reports/task_previews/cdl_manual_audit/export_task_expand10_mosaic_year_string_2023_png32_567987e96a1df41e.png'\")",
+        "image_error": "UnidentifiedImageError(\"cannot identify image file 'reports/task_previews/cdl_manual_audit/export_task_expand10_mosaic_year_string_2023_png32_567987e96a1df41e.png'\")",
         "is_image": false,
         "sha256": "567987e96a1df41e984f92ea3790a379d6e581d7fbc606d1d0414500eb997671"
       },
@@ -2236,7 +2236,7 @@
       "diag": {
         "bytes": 158,
         "cache_path": "reports/task_previews/cdl_manual_audit/export_task_expand10_mosaic_year_string_2023_png_567987e96a1df41e.png",
-        "image_error": "UnidentifiedImageError(\"cannot identify image file '/home/dmsrsic/raster-work/faster-raster/reports/task_previews/cdl_manual_audit/export_task_expand10_mosaic_year_string_2023_png_567987e96a1df41e.png'\")",
+        "image_error": "UnidentifiedImageError(\"cannot identify image file 'reports/task_previews/cdl_manual_audit/export_task_expand10_mosaic_year_string_2023_png_567987e96a1df41e.png'\")",
         "is_image": false,
         "sha256": "567987e96a1df41e984f92ea3790a379d6e581d7fbc606d1d0414500eb997671"
       },
@@ -3117,7 +3117,7 @@
       "diag": {
         "bytes": 158,
         "cache_path": "reports/task_previews/cdl_manual_audit/export_iowa_known_ag_mosaic_year_string_2023_png32_567987e96a1df41e.png",
-        "image_error": "UnidentifiedImageError(\"cannot identify image file '/home/dmsrsic/raster-work/faster-raster/reports/task_previews/cdl_manual_audit/export_iowa_known_ag_mosaic_year_string_2023_png32_567987e96a1df41e.png'\")",
+        "image_error": "UnidentifiedImageError(\"cannot identify image file 'reports/task_previews/cdl_manual_audit/export_iowa_known_ag_mosaic_year_string_2023_png32_567987e96a1df41e.png'\")",
         "is_image": false,
         "sha256": "567987e96a1df41e984f92ea3790a379d6e581d7fbc606d1d0414500eb997671"
       },
@@ -3134,7 +3134,7 @@
       "diag": {
         "bytes": 158,
         "cache_path": "reports/task_previews/cdl_manual_audit/export_iowa_known_ag_mosaic_year_string_2023_png_567987e96a1df41e.png",
-        "image_error": "UnidentifiedImageError(\"cannot identify image file '/home/dmsrsic/raster-work/faster-raster/reports/task_previews/cdl_manual_audit/export_iowa_known_ag_mosaic_year_string_2023_png_567987e96a1df41e.png'\")",
+        "image_error": "UnidentifiedImageError(\"cannot identify image file 'reports/task_previews/cdl_manual_audit/export_iowa_known_ag_mosaic_year_string_2023_png_567987e96a1df41e.png'\")",
         "is_image": false,
         "sha256": "567987e96a1df41e984f92ea3790a379d6e581d7fbc606d1d0414500eb997671"
       },
@@ -4015,7 +4015,7 @@
       "diag": {
         "bytes": 158,
         "cache_path": "reports/task_previews/cdl_manual_audit/export_illinois_known_ag_mosaic_year_string_2023_png32_567987e96a1df41e.png",
-        "image_error": "UnidentifiedImageError(\"cannot identify image file '/home/dmsrsic/raster-work/faster-raster/reports/task_previews/cdl_manual_audit/export_illinois_known_ag_mosaic_year_string_2023_png32_567987e96a1df41e.png'\")",
+        "image_error": "UnidentifiedImageError(\"cannot identify image file 'reports/task_previews/cdl_manual_audit/export_illinois_known_ag_mosaic_year_string_2023_png32_567987e96a1df41e.png'\")",
         "is_image": false,
         "sha256": "567987e96a1df41e984f92ea3790a379d6e581d7fbc606d1d0414500eb997671"
       },
@@ -4032,7 +4032,7 @@
       "diag": {
         "bytes": 158,
         "cache_path": "reports/task_previews/cdl_manual_audit/export_illinois_known_ag_mosaic_year_string_2023_png_567987e96a1df41e.png",
-        "image_error": "UnidentifiedImageError(\"cannot identify image file '/home/dmsrsic/raster-work/faster-raster/reports/task_previews/cdl_manual_audit/export_illinois_known_ag_mosaic_year_string_2023_png_567987e96a1df41e.png'\")",
+        "image_error": "UnidentifiedImageError(\"cannot identify image file 'reports/task_previews/cdl_manual_audit/export_illinois_known_ag_mosaic_year_string_2023_png_567987e96a1df41e.png'\")",
         "is_image": false,
         "sha256": "567987e96a1df41e984f92ea3790a379d6e581d7fbc606d1d0414500eb997671"
       },

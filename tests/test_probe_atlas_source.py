@@ -6,8 +6,9 @@ from pathlib import Path
 
 import pytest
 
-SCRIPT = Path('/home/dmsrsic/raster-work/faster-raster/scripts/probe_atlas_source.py')
-ATLAS = Path('/home/dmsrsic/raster-work/faster-raster/research/source_atlas_v0_4.yaml')
+ROOT = Path(__file__).resolve().parent.parent
+SCRIPT = ROOT / "scripts" / "probe_atlas_source.py"
+ATLAS = ROOT / "research" / "source_atlas_v0_4.yaml"
 
 
 def load_module():

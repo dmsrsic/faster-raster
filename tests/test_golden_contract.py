@@ -11,7 +11,8 @@ from faster_raster.url_planner import plan_urls
 from faster_raster.validation import load_spec
 
 
-GOLDEN_DIR = Path("/home/dmsrsic/raster-work/faster-raster/tests/golden")
+ROOT = Path(__file__).resolve().parent.parent
+GOLDEN_DIR = ROOT / "tests" / "golden"
 REQUIRED_MANIFEST_FIELDS = {
     "bbox_crs",
     "export_image_crs",

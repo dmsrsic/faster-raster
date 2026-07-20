@@ -7,6 +7,7 @@ import pytest
 
 from faster_raster import real_preview, task_builder
 
+ROOT = Path(__file__).resolve().parent.parent
 
 class FakeHeaders(dict):
     def get(self, key, default=None):
@@ -139,8 +140,8 @@ def test_registry_and_atlas_unchanged_by_real_preview(tmp_path, monkeypatch):
     atlas = Path("research/source_atlas_v0_4.yaml").read_bytes()
     monkeypatch.chdir(tmp_path)
     real_preview.create_real_preview(task_with_sources(["cdl_arcgis_tiny_export"]))
-    assert Path("/home/dmsrsic/raster-work/faster-raster/configs/source_registry.yaml").read_bytes() == registry
-    assert Path("/home/dmsrsic/raster-work/faster-raster/research/source_atlas_v0_4.yaml").read_bytes() == atlas
+    assert (ROOT / "configs" / "source_registry.yaml").read_bytes() == registry
+    assert (ROOT / "research" / "source_atlas_v0_4.yaml").read_bytes() == atlas
 
 
 def test_image_diagnostics_single_color():

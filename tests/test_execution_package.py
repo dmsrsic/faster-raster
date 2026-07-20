@@ -12,11 +12,12 @@ from faster_raster.manifest import read_manifest, write_manifest
 from faster_raster.scheduler_export import export_scheduler_package
 
 runner = CliRunner()
-PROJECT = Path('/home/dmsrsic/raster-work/projects/ohio_cdl_edges')
+ROOT = Path(__file__).resolve().parent.parent
+PROJECT = ROOT / "tests" / "fixtures" / "ohio_cdl_edges"
 MANIFEST = PROJECT / 'manifests' / 'acquisition_manifest.jsonl'
 PLAN = PROJECT / 'plans' / 'harmonization_plan.json'
-GOLDEN = Path('/home/dmsrsic/raster-work/faster-raster/tests/golden')
-PROFILE = Path('/home/dmsrsic/raster-work/faster-raster/configs/execution_profiles/default_hpc.yaml')
+GOLDEN = ROOT / "tests" / "golden"
+PROFILE = ROOT / "configs" / "execution_profiles" / "default_hpc.yaml"
 STAGES = ['fetch', 'validate_download', 'harmonize', 'inspect_output']
 
 

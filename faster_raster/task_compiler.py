@@ -157,7 +157,7 @@ def _planned_request_for_static_spec(
     temporal_key = _temporal_key(spec, params)
     request_id = f"{task_id}__{source_id}__{temporal_key}"
     provenance = {
-        "config": str(static_http_range.DEFAULT_WAVE1_CONFIG),
+        "config": static_http_range.portable_project_path(static_http_range.DEFAULT_WAVE1_CONFIG),
         "container": _container(source_id),
         "expected_inner_format": "geotiff" if source_id == "chirps_daily_precipitation" else None,
         "planning_index": index,

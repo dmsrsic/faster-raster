@@ -10,6 +10,7 @@ from faster_raster.cli import app
 
 
 runner = CliRunner()
+ROOT = Path(__file__).resolve().parent.parent
 
 
 def test_cli_validate_success(project_spec_path):
@@ -93,7 +94,7 @@ def test_cli_inspect_contract_passes_for_example(project_spec_path):
 
 
 def test_cli_inspect_contract_invalid_capability_returns_nonzero(project_spec_path, tmp_path):
-    registry = Path("/home/dmsrsic/raster-work/faster-raster/configs/source_registry.yaml")
+    registry = ROOT / "configs" / "source_registry.yaml"
     broken = tmp_path / "source_registry.yaml"
     broken.write_text(registry.read_text(encoding="utf-8").replace("adapter: arcgis_imageserver", "adapter: stac"), encoding="utf-8")
 
@@ -126,7 +127,7 @@ def test_cli_inspect_contract_check_goldens_detects_present_goldens(project_spec
 
 def test_cli_inspect_contract_check_goldens_detects_drift(project_spec_path, tmp_path):
     golden_dir = tmp_path / "golden"
-    shutil.copytree("/home/dmsrsic/raster-work/faster-raster/tests/golden", golden_dir)
+    shutil.copytree(ROOT / "tests" / "golden", golden_dir)
     manifest = golden_dir / "acquisition_manifest_preserve_bbox.jsonl"
     manifest.write_text(manifest.read_text(encoding="utf-8") + "\n", encoding="utf-8")
 

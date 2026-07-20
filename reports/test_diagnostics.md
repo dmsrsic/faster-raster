@@ -4,14 +4,14 @@
 
 - Python: `3.10.12 (main, Mar  3 2026, 11:56:32) [GCC 11.4.0]`
 - Platform: `Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.35`
-- Working directory: `/home/dmsrsic/raster-work/faster-raster`
+- Working directory: `.`
 - Package version: `0.6.0`
 
 ## Artifacts
 
-- Spec: `/home/dmsrsic/raster-work/projects/ohio_cdl_edges/research_spec.json`
-- Manifest: `/home/dmsrsic/raster-work/projects/ohio_cdl_edges/manifests/acquisition_manifest.jsonl`
-- Harmonization plan: `/home/dmsrsic/raster-work/projects/ohio_cdl_edges/plans/harmonization_plan.json`
+- Spec: `tests/fixtures/ohio_cdl_edges/research_spec.json`
+- Manifest: `tests/fixtures/ohio_cdl_edges/manifests/acquisition_manifest.jsonl`
+- Harmonization plan: `tests/fixtures/ohio_cdl_edges/plans/harmonization_plan.json`
 
 ## Correctness Summary
 
@@ -141,7 +141,7 @@
     },
     "job_count": 8,
     "notes": "Scheduler exports are dry-run artifacts only; no downloads are executed.",
-    "output_directory": "/home/dmsrsic/raster-work/faster-raster/reports/diagnostic_scheduler_local_dry_run",
+    "output_directory": "reports/diagnostic_scheduler_local_dry_run",
     "package_id": "fr_exec_51438d1287b43021",
     "request_count": 2,
     "scheduler": "local-dry-run",
@@ -163,7 +163,7 @@
     },
     "job_count": 8,
     "notes": "Scheduler exports are dry-run artifacts only; no downloads are executed.",
-    "output_directory": "/home/dmsrsic/raster-work/faster-raster/reports/diagnostic_scheduler_slurm",
+    "output_directory": "reports/diagnostic_scheduler_slurm",
     "package_id": "fr_exec_51438d1287b43021",
     "request_count": 2,
     "scheduler": "slurm",
@@ -251,11 +251,11 @@
 
 | Schema | Present | Valid | Required Count |
 |---|---:|---:|---:|
-| `/home/dmsrsic/raster-work/faster-raster/schemas/research_spec.schema.json` | True | True | 5 |
-| `/home/dmsrsic/raster-work/faster-raster/schemas/source_registry.schema.json` | True | True | 1 |
-| `/home/dmsrsic/raster-work/faster-raster/schemas/acquisition_manifest_row.schema.json` | True | True | 26 |
-| `/home/dmsrsic/raster-work/faster-raster/schemas/harmonization_plan.schema.json` | True | True | 4 |
-| `/home/dmsrsic/raster-work/faster-raster/schemas/inspect_contract_report.schema.json` | True | True | 6 |
+| `schemas/research_spec.schema.json` | True | True | 5 |
+| `schemas/source_registry.schema.json` | True | True | 1 |
+| `schemas/acquisition_manifest_row.schema.json` | True | True | 26 |
+| `schemas/harmonization_plan.schema.json` | True | True | 4 |
+| `schemas/inspect_contract_report.schema.json` | True | True | 6 |
 
 ## Schema Hashes
 

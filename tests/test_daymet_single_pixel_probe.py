@@ -6,8 +6,9 @@ from pathlib import Path
 
 import pytest
 
-SCRIPT_PATH = Path("/home/dmsrsic/raster-work/faster-raster/scripts/daymet_single_pixel_probe.py")
-SPEC_PATH = Path("/home/dmsrsic/raster-work/faster-raster/research/daymet_single_pixel_probe_spec.yaml")
+ROOT = Path(__file__).resolve().parent.parent
+SCRIPT_PATH = ROOT / "scripts" / "daymet_single_pixel_probe.py"
+SPEC_PATH = ROOT / "research" / "daymet_single_pixel_probe_spec.yaml"
 
 
 def load_script_module():

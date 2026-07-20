@@ -8,7 +8,17 @@ from faster_raster.artifact_store import sha256_file
 from faster_raster.derived_artifacts import derived_content_addressed_path, read_geotiff_info, repo_root
 from faster_raster.raster_metadata import compute_metadata_contract_sha256
 
-SECRET_MARKERS = ("/tmp/pytest-", "/home/dmsrsic", "authorization", "credential", "token", "password", "secret")
+SECRET_MARKERS = (
+    "/tmp/pytest-",
+    "/home/",
+    "C:\\Users\\",
+    "C:/Users/",
+    "authorization",
+    "credential",
+    "token",
+    "password",
+    "secret",
+)
 
 
 def _status(failures: list[str], prefix: str) -> str:

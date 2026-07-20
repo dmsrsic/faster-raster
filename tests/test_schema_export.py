@@ -12,10 +12,12 @@ from faster_raster.schema_export import SCHEMA_FILENAMES, export_schemas, schema
 
 
 runner = CliRunner()
-SCHEMA_DIR = Path("/home/dmsrsic/raster-work/faster-raster/schemas")
-PROJECT_SPEC = Path("/home/dmsrsic/raster-work/projects/ohio_cdl_edges/research_spec.json")
-MANIFEST = Path("/home/dmsrsic/raster-work/projects/ohio_cdl_edges/manifests/acquisition_manifest.jsonl")
-PLAN = Path("/home/dmsrsic/raster-work/projects/ohio_cdl_edges/plans/harmonization_plan.json")
+ROOT = Path(__file__).resolve().parent.parent
+PROJECT = ROOT / "tests" / "fixtures" / "ohio_cdl_edges"
+SCHEMA_DIR = ROOT / "schemas"
+PROJECT_SPEC = PROJECT / "research_spec.json"
+MANIFEST = PROJECT / "manifests" / "acquisition_manifest.jsonl"
+PLAN = PROJECT / "plans" / "harmonization_plan.json"
 
 
 def load_schema(path: Path) -> dict:

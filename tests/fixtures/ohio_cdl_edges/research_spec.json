@@ -1,10 +1,10 @@
 {
   "project": {
-    "id": "perf_cdl_url_planning_v001",
+    "id": "ohio_cdl_edge_dynamics_v001",
     "created": "2026-07-06"
   },
   "aoi": {
-    "path": "tests/fixtures/ohio_cdl_edges/inputs/aoi.geojson",
+    "path": "inputs/aoi.geojson",
     "input_crs": "EPSG:4326",
     "bbox_policy": "tile_to_source_limits"
   },
@@ -19,18 +19,7 @@
       "id": "cdl",
       "registry_key": "usda_nass_cdl_imageserver",
       "years": [2023, 2024],
-      "thematic_layers": [
-        "crop_type_00",
-        "crop_type_01",
-        "crop_type_02",
-        "crop_type_03",
-        "crop_type_04",
-        "crop_type_05",
-        "crop_type_06",
-        "crop_type_07",
-        "crop_type_08",
-        "crop_type_09"
-      ],
+      "thematic_layers": ["crop_type"],
       "acquisition_mode": "arcgis_export_image",
       "semantic_type": "categorical",
       "resampling": "nearest"

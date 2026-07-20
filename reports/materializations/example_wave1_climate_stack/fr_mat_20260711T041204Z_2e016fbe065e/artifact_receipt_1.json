@@ -8,7 +8,7 @@
   "adapter": "static_http_range",
   "artifact_extension": ".tif.gz",
   "artifact_id": "sha256:975aa6e54a75551d76b4390a7a30c6fc813e86eabd967e5f65a9db2e0b4cb4d8",
-  "artifact_path": "/home/dmsrsic/raster-work/faster-raster/cache/artifacts/sha256/97/5a/975aa6e54a75551d76b4390a7a30c6fc813e86eabd967e5f65a9db2e0b4cb4d8.tif.gz",
+  "artifact_path": "cache/artifacts/sha256/97/5a/975aa6e54a75551d76b4390a7a30c6fc813e86eabd967e5f65a9db2e0b4cb4d8.tif.gz",
   "artifact_receipt_contract_sha256": "87bd117580983123083cc8038726e65b53a5e9309cede508ecd90d6a35f2436f",
   "artifact_receipt_version": 1,
   "authorization_headers_present": false,

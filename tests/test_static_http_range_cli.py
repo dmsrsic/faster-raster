@@ -10,6 +10,7 @@ from faster_raster.cli import app
 
 
 runner = CliRunner()
+ROOT = Path(__file__).resolve().parent.parent
 
 
 def ok(args):
@@ -26,7 +27,8 @@ def test_range_sources_plain():
 
 
 def test_range_plan_dry_run_writes_reports(monkeypatch, tmp_path):
-    monkeypatch.chdir(Path("/home/dmsrsic/raster-work/faster-raster"))
+    monkeypatch.chdir(ROOT)
+    monkeypatch.setattr(static_http_range, "DEFAULT_REPORT_DIR", tmp_path / "reports")
     output = ok(["range", "plan", "--plain"])
     assert "skipped_dry_run" in output
     assert "runnable_source_count: 4" in output
