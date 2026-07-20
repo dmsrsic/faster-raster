@@ -1,0 +1,26 @@
+{
+  "schema_version": "fasterraster.documentation-preview-provenance/v1",
+  "derivation": "Pillow LANCZOS downsample from a project-generated publication_4k.png; no analytical content was recomputed",
+  "assets": [
+    {
+      "path": "buckeye-verrado-publication.png",
+      "dimensions": [1600, 900],
+      "bytes": 551029,
+      "sha256": "e5d772207043c6b995a7fcbc41bdfd6ed2dc91b2cbf509acaaa28ef4926682a9",
+      "source_preview_sha256": "1029805b4623a568bc6953400998c3c6dec67e47d94e7d36fecf67c67e19daa1",
+      "analysis_years": [2008, 2016, 2021],
+      "imagery_year": 2023,
+      "context_note": "2023 NAIP is later visual context, not evidence of conditions in 2021"
+    },
+    {
+      "path": "star-idaho-publication.png",
+      "dimensions": [1600, 900],
+      "bytes": 555309,
+      "sha256": "c3c475a6ea312ef39212a4a5a00211029309515ad3789486bd415a6ff8a4b5b0",
+      "source_preview_sha256": "a6de2c22eebc2569e14b3a38199f1db942a7baaf45abb16f2c18b21b0c70a727",
+      "analysis_years": [2008, 2016, 2021],
+      "imagery_year": 2021,
+      "context_note": "2021 NAIP is visual context; CDL classes remain a mapped-development proxy"
+    }
+  ]
+}

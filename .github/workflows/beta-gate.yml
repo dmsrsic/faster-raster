@@ -1,54 +1,103 @@
-name: beta-gate
+name: offline-beta-gate
 
 on:
   push:
   pull_request:
 
-jobs:
-  python-312-beta-gate:
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@v4
+permissions:
+  contents: read
 
-      - uses: actions/setup-python@v5
+concurrency:
+  group: offline-beta-gate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python-312:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      PIP_DISABLE_PIP_VERSION_CHECK: "1"
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - name: Check out source
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
           python-version: "3.12"
 
-      - name: Install GDAL runtime
-        run: sudo apt-get update && sudo apt-get install -y gdal-bin libgdal-dev
-
-      - name: Build source and wheel artifacts
+      - name: Install the GDAL command-line runtime
         run: |
-          python -m pip install --upgrade pip build
-          python -m build
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y gdal-bin
 
-      - name: Clean wheel install and entry-point smoke test
+      - name: Install release tooling
+        run: python -m pip install '.[dev,docs]'
+
+      - name: Compile Python sources
+        run: python -m compileall -q faster_raster
+
+      - name: Build wheel and source distribution
+        run: python -m build
+
+      - name: Verify the built wheel outside the checkout
         run: |
+          wheel=$(find "$GITHUB_WORKSPACE/dist" -maxdepth 1 -name '*.whl' -print -quit)
+          test -n "$wheel"
           python -m venv "$RUNNER_TEMP/fr-wheel"
-          "$RUNNER_TEMP/fr-wheel/bin/pip" install dist/*.whl
-          cd "$RUNNER_TEMP"
-          "$RUNNER_TEMP/fr-wheel/bin/fr" --help
-          "$RUNNER_TEMP/fr-wheel/bin/faster-raster" version
-          "$RUNNER_TEMP/fr-wheel/bin/fr-beta-check" --help
+          "$RUNNER_TEMP/fr-wheel/bin/python" -m pip install "$wheel"
+          mkdir "$RUNNER_TEMP/fr-wheel-check"
+          cd "$RUNNER_TEMP/fr-wheel-check"
+          "$RUNNER_TEMP/fr-wheel/bin/fr" --help >/dev/null
+          test "$("$RUNNER_TEMP/fr-wheel/bin/fr" --version)" = "fr 1.0.0b1"
+          "$RUNNER_TEMP/fr-wheel/bin/faster-raster" version --plain
+          "$RUNNER_TEMP/fr-wheel/bin/fr" doctor --offline
+          "$RUNNER_TEMP/fr-wheel/bin/fr" templates list
+          "$RUNNER_TEMP/fr-wheel/bin/fr" init meridian.fr.md \
+            --template human-development-cdl \
+            --name meridian-cdl-development \
+            --bbox -116.45 43.58 -116.35 43.68 \
+            --years 2008 2016 2021
+          "$RUNNER_TEMP/fr-wheel/bin/fr" validate meridian.fr.md
+          "$RUNNER_TEMP/fr-wheel/bin/python" -c \
+            'import faster_raster; from faster_raster import fr_cli, human_development, human_development_publication; assert faster_raster.__version__ == "1.0.0b1"'
 
-      - name: Install test dependencies
-        run: python -m pip install -e '.[dev]'
+      - name: Verify schema determinism
+        run: |
+          python -c 'import os; from pathlib import Path; from faster_raster.schema_export import export_schemas; export_schemas(Path(os.environ["RUNNER_TEMP"]) / "schema-a")'
+          python -c 'import os; from pathlib import Path; from faster_raster.schema_export import export_schemas; export_schemas(Path(os.environ["RUNNER_TEMP"]) / "schema-b")'
+          diff -qr "$RUNNER_TEMP/schema-a" "$RUNNER_TEMP/schema-b"
 
-      - name: Run complete tests without tracked report mutation
+      - name: Run quick beta smoke
         env:
-          FASTERRASTER_REPORT_ROOT: ${{ runner.temp }}/pytest-reports
+          FASTERRASTER_PYTHON: ${{ env.pythonLocation }}/bin/python
+        run: ./scripts/fr-beta-smoke --quick
+
+      - name: Run complete offline test suite
         run: python -m pytest -q
 
-      - name: Run Beta Gate 1 check
+      - name: Run beta readiness check
         env:
-          FASTERRASTER_REPORT_ROOT: ${{ runner.temp }}/beta-reports
-          FASTERRASTER_HANDOFF_ROOT: ${{ runner.temp }}/beta-handoffs
-        run: fr-beta-check --output "$RUNNER_TEMP/beta-gate-1"
+          FASTERRASTER_PYTHON: ${{ env.pythonLocation }}/bin/python
+        run: ./scripts/fr-beta-check --skip-tests --output "$RUNNER_TEMP/beta-check"
 
-      - name: Upload beta evidence
-        if: always()
-        uses: actions/upload-artifact@v4
+      - name: Build documentation
+        run: mkdocs build --strict
+
+      - name: Verify clean patches and tracked outputs
+        run: |
+          git diff --check
+          test -z "$(git status --porcelain --untracked-files=no)"
+
+      - name: Retain local-build evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: beta-gate-1-evidence
-          path: ${{ runner.temp }}/beta-gate-1
+          name: faster-raster-1.0.0b1-offline-gate
+          path: |
+            dist/*
+            ${{ runner.temp }}/beta-check/*
+          if-no-files-found: error
+          retention-days: 14
