@@ -55,5 +55,10 @@ fr-beta-check = "faster_raster.beta_check:main"
 "scripts/fr-cook-ag" = "scripts/fr-cook-ag"
 "scripts/lib" = "scripts/lib"
 
+[tool.hatch.build.targets.sdist]
+exclude = [
+  "/reports",
+]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]

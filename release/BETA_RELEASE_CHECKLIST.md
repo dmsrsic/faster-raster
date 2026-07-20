@@ -4,21 +4,21 @@ Target release: `v1.0.0-beta.1` / package `1.0.0b1`
 
 ## Local release candidate
 
-- [ ] Starting commit and protected original-worktree changes verified.
-- [ ] Release worktree is separate and clean.
-- [ ] Current-tree and history secret/path/large-file audits reviewed.
-- [ ] No raw raster, cache, handoff, publication directory, credential, or local environment is tracked.
-- [ ] Wheel and source distribution build successfully.
-- [ ] Built wheel installs into a fresh Python 3.12 environment.
-- [ ] Installed `fr` help/version/doctor/templates/init/validate checks pass outside the checkout.
-- [ ] Complete offline pytest suite passes.
-- [ ] Quick and full beta smoke checks pass.
-- [ ] Beta check passes without tracked-report mutation.
-- [ ] Documentation builds with `mkdocs build --strict`.
-- [ ] `git diff --check` passes.
-- [ ] README, license, changelog, citation, contributing, security, and release notes are current.
-- [ ] Example captions distinguish analytical years, imagery year, context role, and proxy limitations.
-- [ ] No remote or release tag exists.
+- [x] Starting commit and protected original-worktree changes verified.
+- [x] Release worktree is separate and clean after the local evidence commit.
+- [x] Current-tree and history secret/path/large-file audits reviewed.
+- [x] No raw raster, cache, handoff, publication directory, credential, or local environment is tracked.
+- [x] Wheel and source distribution build successfully.
+- [x] Built wheel installs into a fresh Python 3.12 environment.
+- [x] Installed `fr` help/version/doctor/templates/init/validate checks pass outside the checkout.
+- [x] Complete offline pytest suite passes.
+- [x] Quick and full beta smoke checks pass.
+- [x] Beta check passes without tracked-report mutation.
+- [x] Documentation builds with `mkdocs build --strict`.
+- [x] `git diff --check` passes.
+- [x] README, license, notice, changelog, citation, contributing, security, and release notes are current.
+- [x] Example captions distinguish analytical years, imagery year, context role, and proxy limitations.
+- [x] No remote or release tag exists.
 
 ## Manual publication boundary
 

@@ -1,121 +1,63 @@
 {
-  "schema_version": "fasterraster.beta-readiness/v1",
-  "gate": "Beta Gate 1",
-  "score": 100,
-  "maximum_score": 100,
-  "decision": "beta_ready",
-  "items": [
-    {
-      "name": "Baseline freeze and preservation",
-      "score": 8,
-      "maximum_score": 8,
-      "evidence": "outputs/beta_gate_1/baseline_20260717T183539Z/baseline_manifest.json; baseline grader 99.03 and 529 tests",
-      "blocker": false,
-      "remaining_work": "None"
+  "schema_version": "fasterraster.public-beta-readiness/v1",
+  "release_label": "v1.0.0-beta.1",
+  "package_version": "1.0.0b1",
+  "validation_date": "2026-07-20",
+  "starting_commit": "900a61ecec85a1e0b368af7d211cad4c77e7a092",
+  "decision": "public_beta_local_ready",
+  "checks": {
+    "complete_offline_pytest": {
+      "status": "PASS",
+      "passed": 626,
+      "warnings": 3
     },
-    {
-      "name": "Deterministic release inventory",
-      "score": 8,
-      "maximum_score": 8,
-      "evidence": "faster_raster/release_inventory.py and outputs/beta_gate_1/latest/release_inventory.json",
-      "blocker": false,
-      "remaining_work": "None"
+    "quick_beta_smoke": {
+      "status": "PASS",
+      "focused_tests_passed": 46
     },
-    {
-      "name": "Narrow ignore and release boundaries",
-      "score": 5,
-      "maximum_score": 5,
-      "evidence": ".gitignore and docs/BETA_SCOPE.md",
-      "blocker": false,
-      "remaining_work": "None"
+    "full_beta_smoke": {
+      "status": "PASS"
     },
-    {
-      "name": "Local readiness, remote status, and action separation",
-      "score": 10,
-      "maximum_score": 10,
-      "evidence": "faster_raster/study_planning.py, faster_raster/preview_open.py, and tests/test_beta_gate.py",
-      "blocker": false,
-      "remaining_work": "None"
+    "beta_check": {
+      "status": "PASS",
+      "tracked_reports_unchanged": true
     },
-    {
-      "name": "Stable finalized handoff provenance",
-      "score": 10,
-      "maximum_score": 10,
-      "evidence": "faster_raster/ag_assets.py, faster_raster/ag_execution.py, scripts/lib/fr_ag_recipe_runtime.py, provenance regression tests, and the finalized Meridian irrigation/crop-vigor handoffs",
-      "blocker": false,
-      "remaining_work": "None"
+    "isolated_system_grade": {
+      "status": "PASS",
+      "release_decision": "release_ready_with_cautions",
+      "blocking_failures": [],
+      "cautions": [
+        "no_live_local_execution_receipt",
+        "no_live_materialization_receipt"
+      ]
     },
-    {
-      "name": "Friendly CLI with exact verbose and JSON contracts",
-      "score": 7,
-      "maximum_score": 7,
-      "evidence": "faster_raster/fr_cli.py and tests/test_fr_cli.py",
-      "blocker": false,
-      "remaining_work": "None"
+    "package_build": {
+      "status": "PASS",
+      "wheel": "dist/faster_raster-1.0.0b1-py3-none-any.whl",
+      "source_distribution": "dist/faster_raster-1.0.0b1.tar.gz"
     },
-    {
-      "name": "Transparent doctor recommendations",
-      "score": 7,
-      "maximum_score": 7,
-      "evidence": "faster_raster/local_diagnostics.py and tests/test_beta_gate.py",
-      "blocker": false,
-      "remaining_work": "None"
+    "clean_wheel_install": {
+      "status": "PASS",
+      "outside_checkout": true,
+      "editable_install": false
     },
-    {
-      "name": "Installed console entry declarations and wheel data",
-      "score": 5,
-      "maximum_score": 5,
-      "evidence": "pyproject.toml declarations plus .beta-tools/reports/python312_beta_gate/clean_install_smoke.json: all three installed entry points and required wheel data PASS outside the checkout",
-      "blocker": false,
-      "remaining_work": "None"
+    "documentation_build": {
+      "status": "PASS",
+      "strict": true
     },
-    {
-      "name": "Python 3.12 build and clean-install validation",
-      "score": 10,
-      "maximum_score": 10,
-      "evidence": "Isolated managed CPython 3.12.13; final wheel and sdist build; fresh wheel install; offline installed-command proof; package-data verification; and 579-test Python 3.12 suite retained under .beta-tools",
-      "blocker": false,
-      "remaining_work": "None"
-    },
-    {
-      "name": "One-command isolated beta check",
-      "score": 10,
-      "maximum_score": 10,
-      "evidence": ".beta-tools/reports/geography_generalization/beta_check/beta_check.json: PASS, cached cook PASS, tracked reports unchanged, grader release_ready, 579 tests",
-      "blocker": false,
-      "remaining_work": "None"
-    },
-    {
-      "name": "Tracked report non-mutation",
-      "score": 5,
-      "maximum_score": 5,
-      "evidence": "beta_check.json reports tracked_reports_unchanged=true and tests/test_beta_gate.py proves the contract",
-      "blocker": false,
-      "remaining_work": "None"
-    },
-    {
-      "name": "Python 3.12 CI gate",
-      "score": 5,
-      "maximum_score": 5,
-      "evidence": ".github/workflows/beta-gate.yml",
-      "blocker": false,
-      "remaining_work": "CI will provide an independent Python 3.12 run when pushed by the operator"
-    },
-    {
-      "name": "Beta scope and operator documentation",
-      "score": 5,
-      "maximum_score": 5,
-      "evidence": "docs/BETA_SCOPE.md and docs/BETA_READINESS.md",
-      "blocker": false,
-      "remaining_work": "None"
-    },
-    {
-      "name": "Complete regression suite and post-change grader",
-      "score": 5,
-      "maximum_score": 5,
-      "evidence": "579 tests passed; post grader 99.03, excellent, safety 100, release_ready, no blockers; Meridian live transfer remained within the agricultural domain",
-      "blocker": false,
-      "remaining_work": "None"
+    "ci_configuration": {
+      "status": "CONFIGURED_NOT_RUN_REMOTELY",
+      "python": "3.12",
+      "live_raster_requests": false,
+      "publishes_release": false
     }
-  ]
+  },
+  "external_activity": {
+    "git_remote_present": false,
+    "release_tag_created": false,
+    "pushed": false,
+    "published": false,
+    "pages_deployed": false,
+    "pypi_uploaded": false
+  }
 }

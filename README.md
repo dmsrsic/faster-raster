@@ -109,6 +109,6 @@ Public-source adapters and core orchestration are part of the community beta. Ma
 - [Security](SECURITY.md)
 - [Citation](docs/citation.md) and [`CITATION.cff`](CITATION.cff)
 
-FasterRaster is licensed under the [Mozilla Public License 2.0](LICENSE).
+FasterRaster is licensed under the [Mozilla Public License 2.0](LICENSE); see [NOTICE](NOTICE) for the repository copyright notice.
 
 After the public repository exists, use its issue tracker for reproducible bugs and feature discussions. Commercial or managed-service interest can also begin in a public issue or Discussion; the beta does not publish or invent a private contact address.

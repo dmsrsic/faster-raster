@@ -1,45 +1,20 @@
-# FasterRaster Beta Gate 1 scope
+# FasterRaster public beta scope
 
-Beta Gate 1 makes the existing FasterRaster alpha-3 stack installable, inspectable, and release-checkable without changing the scientific scope.
+`v1.0.0-beta.1` packages the existing FasterRaster scientific and orchestration scope for public technical evaluation. It improves installation, portability, release validation, documentation, and repository hygiene without adding new source families or changing scientific semantics.
 
 ## Included
 
-- The existing `faster-raster` evaluator and operational commands.
-- The installed `fr` local-study workflow: doctor, source capabilities, workfile validation, planning, explanation, cooking, inspection, and preview opening.
-- The four validated agricultural recipe contracts and their shared runtime.
-- State-neutral agricultural bbox validation and bounded, source-driven
-  coverage checks for the exact NAIP/CDL year and required 3DEP assets before
-  raster acquisition.
-- Stable handoff provenance based on final handoff IDs and handoff-relative paths.
-- Explicit local asset readiness, remote source status, and action fields in JSON output.
-- Friendly default terminal output, with exact identifiers and reasons available through `--verbose` or `--json`.
-- A deterministic release inventory, isolated beta validation report, complete tests, wheel build, and clean-install smoke checks.
+- The public `fr` lifecycle: doctor, templates, init, validate, plan, cook, inspect, publish, and reuse-only verification.
+- Deterministic source and harmonization planning, exact-year checks, byte ceilings, checksums, provenance, bounded workers, transactional handoffs, and strict zero-network reuse.
+- Live USDA CDL acquisition and the CDL mapped-development proxy workflow, including regional and deterministic hotspot hybrid publication.
+- Implemented agricultural CDL/NAIP workflows and bounded public-source contracts.
+- Python 3.12 wheel and source distributions, offline release gates, and a static documentation site.
 
 ## Excluded
 
-- New source families, scientific algorithms, raster products, or recipe semantics.
-- Automatic execution of future-unverified sources.
-- Unbounded network probes, full remote dataset extraction, or source tests that exceed configured byte ceilings.
-- Global agricultural coverage claims. Actual support remains bounded by
-  source-reported geography, requested year, required assets, resolution,
-  local capability, and configured execution limits.
-- Generated handoffs, reports, baseline evidence, operator orders, backups, local capability profiles, caches, and build artifacts from the source release.
-- Performance promises. Doctor recommendations are conservative heuristics and are not applied unless the operator explicitly runs `fr configure --apply-recommendations`.
+- Authoritative urbanization, population, economic, construction-date, occupancy, cadastral, or causal claims.
+- New source adapters, provider integrations, credentials, paid or restricted sources, classifiers, execution engines, Slurm support, or architectural redesigns.
+- Silent imagery-year substitution, unbounded network access, weakened validation, or performance guarantees.
+- Automatic release publication, GitHub Pages deployment, PyPI upload, custom-domain setup, or any account-specific configuration.
 
-## Release checks
-
-From a Python 3.12 environment with GDAL available:
-
-```text
-python -m build
-python -m pytest -q
-fr-beta-check
-```
-
-`fr-beta-check` redirects generated grader and compiler reports to a temporary root, verifies tracked reports are unchanged, compiles and packages the example task, runs the full system grader, validates a workfile and plan, performs a zero-network reuse-only cook when compatible local cache evidence exists, inspects that handoff, and writes JSON and Markdown evidence beneath `outputs/beta_gate_1/latest/`.
-
-## Known bounded warnings
-
-- Static HTTP range evidence remains deliberately bounded and stops before full extraction.
-- The PRISM path remains fixture-only until a currently verified endpoint is promoted through the existing source policy.
-- A latest materialization attempt may be policy-blocked while the latest successful materialization remains valid release evidence.
+Roadmap material describes possible directions, not implemented functionality or promises. Live integration remains explicit, bounded, and separate from routine offline CI.
