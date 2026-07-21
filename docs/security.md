@@ -1,5 +1,5 @@
 # Security
 
-Do not place a suspected vulnerability, credential, private endpoint, or sensitive dataset in a public issue. Follow the private reporting path published by the repository host once one exists. Until then, disclose only through a private channel you already trust with the maintainer.
+Do not place a suspected vulnerability, credential, private endpoint, or sensitive dataset in a public issue. Follow the repository's private vulnerability-reporting path when enabled; otherwise disclose only through a private channel you already trust with the maintainer.
 
-The repository-level `SECURITY.md` defines the supported beta line, report contents, response expectations, and scope boundaries.
+The repository-level [security policy](https://github.com/dmsrsic/faster-raster/security/policy) defines the supported beta line, report contents, response expectations, and scope boundaries.

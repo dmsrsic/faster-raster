@@ -6,4 +6,4 @@ It packages the existing source-aware compiler and public `fr` lifecycle as a lo
 
 The release does not add source adapters, scientific classifiers, managed services, authentication systems, or cluster execution. Live integration remains an explicit, bounded manual concern.
 
-The repository-level `CHANGELOG.md`, `release/v1.0.0-beta.1.md`, and `release/BETA_RELEASE_CHECKLIST.md` carry the detailed history and release evidence.
+The repository-level [changelog](https://github.com/dmsrsic/faster-raster/blob/main/CHANGELOG.md), [beta release notes](https://github.com/dmsrsic/faster-raster/blob/main/release/v1.0.0-beta.1.md), and [release checklist](https://github.com/dmsrsic/faster-raster/blob/main/release/BETA_RELEASE_CHECKLIST.md) carry the detailed history and release evidence.

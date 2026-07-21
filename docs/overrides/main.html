@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block htmltitle %}
+  {% if page and page.is_homepage %}
+    <title>FasterRaster - deterministic raster workflows</title>
+  {% else %}
+    {{ super() }}
+  {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+  {{ super() }}
+  {% if page and page.is_homepage %}
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="FasterRaster - deterministic raster workflows">
+    <meta property="og:description" content="{{ config.site_description }}">
+    <meta property="og:url" content="{{ page.canonical_url }}">
+    <meta property="og:image" content="{{ config.site_url }}assets/images/faster-raster-social.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Satellite above Earth projecting raster grids into a geospatial workflow">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="FasterRaster - deterministic raster workflows">
+    <meta name="twitter:description" content="{{ config.site_description }}">
+    <meta name="twitter:image" content="{{ config.site_url }}assets/images/faster-raster-social.jpg">
+  {% endif %}
+{% endblock %}

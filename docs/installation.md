@@ -43,4 +43,4 @@ The wheel installation must work outside the source checkout. An editable instal
 mkdocs build --strict
 ```
 
-The generated site is local under `site/`; no deployment is configured.
+The generated site is local under `site/`. The Pages workflow deploys that directory only from the future `main` branch; builds from release-preparation branches never deploy.

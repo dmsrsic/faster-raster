@@ -1,6 +1,12 @@
 # FasterRaster
 
-FasterRaster turns a small, explicit raster study contract into bounded source acquisitions, harmonized analysis, reproducible evidence, and publication-ready outputs.
+<p align="center">
+  <img src="docs/assets/images/faster-raster-hero.webp" alt="Satellite above Earth projecting a bounded raster grid into a reproducible geospatial workflow" width="1600" height="900">
+</p>
+
+**Deterministic raster acquisition and harmonization.**
+
+FasterRaster turns public raster sources into bounded, reproducible, and publication-ready geospatial workflows. It compiles explicit source contracts, validates inputs, harmonizes grids, and preserves the evidence required to reproduce every output.
 
 **Public beta:** `v1.0.0-beta.1` (`1.0.0b1` as a Python package). The beta is suitable for technical evaluation and reproducible local studies; interfaces and output contracts may still change before a stable `v1.0.0` release.
 
@@ -111,4 +117,4 @@ Public-source adapters and core orchestration are part of the community beta. Ma
 
 FasterRaster is licensed under the [Mozilla Public License 2.0](LICENSE); see [NOTICE](NOTICE) for the repository copyright notice.
 
-After the public repository exists, use its issue tracker for reproducible bugs and feature discussions. Commercial or managed-service interest can also begin in a public issue or Discussion; the beta does not publish or invent a private contact address.
+Use the [GitHub issue tracker](https://github.com/dmsrsic/faster-raster/issues) for reproducible bugs and feature discussions after the repository becomes public. Commercial or managed-service interest can also begin in a public issue or Discussion; the beta does not publish or invent a private contact address.

@@ -4,7 +4,7 @@ Thank you for helping improve the public beta. Small, reviewable changes with te
 
 ## Before opening a change
 
-Open an issue once the public repository exists when a proposal changes a source contract, scientific interpretation, network policy, output schema, or public CLI. Security reports follow [SECURITY.md](SECURITY.md), not the issue tracker.
+Open an [issue](https://github.com/dmsrsic/faster-raster/issues) after the repository becomes public when a proposal changes a source contract, scientific interpretation, network policy, output schema, or public CLI. Security reports follow [SECURITY.md](SECURITY.md), not the issue tracker.
 
 Do not include credentials, private endpoints, downloaded rasters, local caches, generated handoffs, publications, or machine-specific paths.
 

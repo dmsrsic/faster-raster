@@ -7,6 +7,8 @@ authors:
 version: "1.0.0b1"
 date-released: 2026-07-20
 license: MPL-2.0
+repository-code: "https://github.com/dmsrsic/faster-raster"
+url: "https://dmsrsic.github.io/faster-raster/"
 abstract: "A source-aware raster orchestration compiler that turns explicit study contracts into bounded acquisitions, harmonized analyses, reproducible evidence, and publication-ready outputs."
 keywords:
   - GIS

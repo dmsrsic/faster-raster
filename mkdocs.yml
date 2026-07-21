@@ -1,5 +1,9 @@
 site_name: FasterRaster
-site_description: Source-aware raster orchestration for bounded, reproducible local studies.
+site_description: Deterministic raster acquisition and harmonization for bounded, reproducible, publication-ready geospatial workflows.
+site_url: https://dmsrsic.github.io/faster-raster/
+repo_name: dmsrsic/faster-raster
+repo_url: https://github.com/dmsrsic/faster-raster
+copyright: Copyright &copy; 2026 Duncan. FasterRaster is available under the MPL-2.0.
 docs_dir: docs
 site_dir: site
 strict: true
@@ -7,30 +11,60 @@ use_directory_urls: true
 exclude_docs: |
   [A-Z]*.md
 theme:
-  name: mkdocs
-  color_mode: auto
-  user_color_mode_toggle: true
+  name: material
+  custom_dir: docs/overrides
+  language: en
+  font: false
+  icon:
+    repo: fontawesome/brands/github
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: blue grey
+      accent: teal
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: blue grey
+      accent: teal
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
 nav:
   - Home: index.md
-  - Installation: installation.md
-  - Five-minute quickstart: quickstart.md
-  - Terminal playground: terminal-playground.md
-  - Concepts and architecture: concepts.md
-  - Supported sources: supported-sources.md
-  - Human-development workflow: human-development.md
-  - Hybrid publication: hybrid-publication.md
-  - Determinism, provenance, and reuse: determinism.md
-  - Network and byte budgets: network-byte-budgets.md
-  - Errors and recovery: errors-recovery.md
-  - Examples: examples.md
-  - Known limitations: limitations.md
-  - Roadmap: roadmap.md
-  - CI and release validation: ci.md
-  - Contributing: contributing.md
-  - Citation: citation.md
-  - Security: security.md
-  - Release notes: release-notes.md
+  - Start:
+      - Installation: installation.md
+      - Five-minute quickstart: quickstart.md
+      - Terminal playground: terminal-playground.md
+  - Workflows:
+      - Concepts and architecture: concepts.md
+      - Supported sources: supported-sources.md
+      - Human-development workflow: human-development.md
+      - Hybrid publication: hybrid-publication.md
+      - Examples: examples.md
+  - Reproducibility:
+      - Determinism, provenance, and reuse: determinism.md
+      - Network and byte budgets: network-byte-budgets.md
+      - Errors and recovery: errors-recovery.md
+  - Project:
+      - Known limitations: limitations.md
+      - Roadmap: roadmap.md
+      - CI and release validation: ci.md
+      - Contributing: contributing.md
+      - Citation: citation.md
+      - Security: security.md
+      - Release notes: release-notes.md
+extra_css:
+  - stylesheets/extra.css
 markdown_extensions:
   - admonition
   - attr_list
+  - md_in_html
   - tables
