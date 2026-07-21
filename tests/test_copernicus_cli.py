@@ -3,11 +3,30 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from click import unstyle
+from typer.main import get_command
 from typer.testing import CliRunner
 
 from faster_raster.cli import app
 
 runner = CliRunner()
+HELP_ENV = {"COLUMNS": "120"}
+REQUIRED_PREVIEW_OPTIONS = {
+    "--visibility-mode", "--sample-grid-size", "--grid-size",
+    "--preview-expand-factor", "--cdl-render-mode", "--cdl-verify-samples",
+}
+
+
+def command_option_names(*command_path):
+    command = get_command(app)
+    for command_name in command_path:
+        command = command.commands[command_name]
+    return {
+        option_name
+        for parameter in command.params
+        for option_name in (*parameter.opts, *parameter.secondary_opts)
+    }
+
 
 
 def ok(args):
@@ -51,7 +70,7 @@ def test_sentinel_search_live_requires_allow_network(tmp_path, monkeypatch):
     make_task(tmp_path, monkeypatch)
     result = runner.invoke(app, ["copernicus", "sentinel", "search-live", "cli_sentinel_task", "--plain"])
     assert result.exit_code != 0
-    assert "allow-network" in result.output
+    assert "allow-network" in unstyle(result.output)
 
 
 def test_preview_real_layout_cli_json(tmp_path, monkeypatch):
@@ -75,17 +94,20 @@ def test_preview_real_layout_cli_json(tmp_path, monkeypatch):
 
 
 def test_auth_check_help_includes_live_and_allow_network():
-    result = runner.invoke(app, ["copernicus", "auth-check", "--help"])
+    assert {"--live", "--allow-network"} <= command_option_names("copernicus", "auth-check")
+    assert {"--allow-network"} <= command_option_names("copernicus", "sentinel", "search-live")
+    result = runner.invoke(app, ["copernicus", "auth-check", "--help"], env=HELP_ENV)
     assert result.exit_code == 0
-    assert "--live" in result.output
-    assert "--allow-network" in result.output
+    output = unstyle(result.output)
+    assert "--live" in output
+    assert "--allow-network" in output
 
 
 def test_auth_check_live_requires_allow_network(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     result = runner.invoke(app, ["copernicus", "auth-check", "--live", "--plain"])
     assert result.exit_code != 0
-    assert "allow-network" in result.output
+    assert "allow-network" in unstyle(result.output)
 
 
 def test_auth_check_live_mocked_redacts_token(tmp_path, monkeypatch):
@@ -118,7 +140,10 @@ def test_auth_check_live_mocked_redacts_token(tmp_path, monkeypatch):
 
 
 def test_preview_real_help_contains_visibility_options():
-    result = runner.invoke(app, ["task", "preview-real", "--help"])
+    assert REQUIRED_PREVIEW_OPTIONS <= command_option_names("task", "preview-real")
+    assert REQUIRED_PREVIEW_OPTIONS <= command_option_names("stack", "preview-real")
+    result = runner.invoke(app, ["task", "preview-real", "--help"], env=HELP_ENV)
     assert result.exit_code == 0
-    assert "--visibility-mode" in result.output
-    assert "--overlay-streng" in result.output
+    output = unstyle(result.output)
+    assert "--visibility-mode" in output
+    assert "--overlay-strength" in output

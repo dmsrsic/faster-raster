@@ -37,6 +37,11 @@ jobs:
       - name: Install release tooling
         run: python -m pip install '.[dev,docs]'
 
+      - name: Report runner versions
+        run: |
+          python --version
+          python -c 'from importlib.metadata import version; print("\n".join(f"{name} {version(name)}" for name in ("typer", "click", "rich", "pytest")))'
+
       - name: Compile Python sources
         run: python -m compileall -q faster_raster
 

@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from click import unstyle
 from typer.testing import CliRunner
 
 from faster_raster.cli import app
@@ -66,10 +67,12 @@ def test_task_preview_real_debug_no_cache_flags_dry_run(tmp_path, monkeypatch):
 
 
 def assert_help_has(command_prefix):
-    result = runner.invoke(app, command_prefix + ["--help"], env={"COLUMNS": "220"})
+    # Keep the public help contract stable at a typical wide-terminal width.
+    result = runner.invoke(app, command_prefix + ["--help"], env={"COLUMNS": "120"})
     assert result.exit_code == 0, result.output
-    for option in ["sample-grid-size", "grid-size", "preview-expand-factor", "cdl-render-mode", "cdl-verify-samples"]:
-        assert option in result.output
+    output = unstyle(result.output)
+    for option in ["--sample-grid-size", "--grid-size", "--preview-expand-factor", "--cdl-render-mode", "--cdl-verify-samples"]:
+        assert option in output
 
 
 def test_preview_real_help_includes_cdl_sample_options():
