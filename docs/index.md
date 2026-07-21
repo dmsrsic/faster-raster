@@ -22,7 +22,7 @@ hide:
   <div class="fr-hero__scrim" aria-hidden="true"></div>
   <div class="fr-hero__content">
     <p class="fr-eyebrow">Deterministic raster acquisition and harmonization</p>
-    <h1 id="fr-hero-title">FasterRaster</h1>
+    <h2 id="fr-hero-title">FasterRaster</h2>
     <p class="fr-hero__lead">Turn public raster sources into bounded, reproducible, and publication-ready geospatial workflows.</p>
     <p class="fr-hero__support">Compile source contracts, validate inputs, harmonize grids, and preserve the evidence required to reproduce every output.</p>
     <div class="fr-actions" aria-label="Primary actions">
