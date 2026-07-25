@@ -4,12 +4,21 @@ All notable changes are documented here. Versions follow [Semantic Versioning](h
 
 ## Unreleased
 
+- No changes yet.
+
+## 1.0.0-beta.2 - 2026-07-25
+
 ### Added
 
 - Auditable `naip_cdl_classification_audit` workflow with raw four-band NAIP
   features, CDL weak supervision, deterministic spatial holdout, confidence
   and disagreement COGs, finalized inspection summaries, and
   publication-only rerendering.
+
+### Fixed
+
+- Install the optional classification dependency in the complete GitHub
+  Actions test environment.
 
 ## 1.0.0-beta.1 - 2026-07-20
 
