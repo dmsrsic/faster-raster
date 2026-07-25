@@ -6,6 +6,10 @@ repository_root=$(CDPATH= cd -- "$script_dir/.." && pwd)
 
 if [ -n "${FASTERRASTER_PYTHON:-}" ]; then
     python_runtime=$FASTERRASTER_PYTHON
+elif [ -n "${VIRTUAL_ENV:-}" ] && [ -x "$VIRTUAL_ENV/bin/python" ]; then
+    python_runtime="$VIRTUAL_ENV/bin/python"
+elif [ -x "$repository_root/.venv/bin/python" ]; then
+    python_runtime="$repository_root/.venv/bin/python"
 elif command -v python3.12 >/dev/null 2>&1; then
     python_runtime=$(command -v python3.12)
 elif [ -x "$repository_root/.beta-tools/recipe-env/bin/python" ]; then

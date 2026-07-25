@@ -12,7 +12,7 @@ def validate_raw_naip_acquisition_evidence(
     *,
     requested_year: int,
 ) -> dict[str, Any]:
-    """Fail closed unless acquisition proves a same-year, unrendered 4-band request."""
+    """Fail closed unless acquisition proves the requested imagery-year raw bands."""
     errors: list[str] = []
     naip = manifest.get("naip")
     naip_evidence = naip if isinstance(naip, Mapping) else {}

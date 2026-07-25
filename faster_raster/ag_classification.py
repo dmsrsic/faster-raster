@@ -9,7 +9,7 @@ import sys
 from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterator, Sequence
+from typing import Any, Iterator, Mapping, Sequence
 
 import numpy as np
 import rasterio
@@ -24,6 +24,8 @@ from faster_raster.ag_classification_contracts import (
     ClassificationMapping,
 )
 from faster_raster.ag_recipes import AgriculturalRecipeV3, ClassificationSpec
+from faster_raster.aoi_geometry import raster_aoi_mask
+from faster_raster.contract_repair import intervention_reference
 
 
 FEATURE_EPSILON = np.float32(1e-6)
@@ -595,10 +597,13 @@ def extract_training_samples(
     naip_path: Path,
     training_core_path: Path,
     spec: ClassificationSpec,
+    *,
+    analysis_aoi_epsg_4326: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     retained: dict[int, dict[str, np.ndarray]] = {}
     eligible = Counter()
     invalid_source_pixels = 0
+    aoi_excluded_source_pixels = 0
     with rasterio.open(naip_path) as naip, rasterio.open(
         training_core_path
     ) as cores:
@@ -625,6 +630,16 @@ def extract_training_samples(
                 source_mask=masks,
             )
             invalid_source_pixels += int((~source_valid).sum())
+            if analysis_aoi_epsg_4326 is not None:
+                aoi_valid = raster_aoi_mask(
+                    naip,
+                    analysis_aoi_epsg_4326,
+                    window=window,
+                )
+                aoi_excluded_source_pixels += int(
+                    (source_valid & ~aoi_valid).sum()
+                )
+                source_valid &= aoi_valid
             labels = cores.read(1, window=window)
             for class_code in range(1, 7):
                 local_rows, local_columns = np.nonzero(
@@ -705,7 +720,7 @@ def extract_training_samples(
         holdout_count = int(holdout.sum())
         selected_counts[str(class_code)] = {
             "eligible": int(eligible[class_code]),
-            "selected": int(len(holdout)),
+            "selected": int(len(sample["folds"])),
             "train": train_count,
             "holdout": holdout_count,
         }
@@ -790,6 +805,7 @@ def extract_training_samples(
         },
         "selected_samples_per_class": selected_counts,
         "invalid_source_pixels_seen": invalid_source_pixels,
+        "aoi_excluded_source_pixels_seen": aoi_excluded_source_pixels,
         "train_block_ids": sorted(train_block_ids),
         "holdout_block_ids": sorted(holdout_block_ids),
         "coordinate_digest_sha256": coordinate_digest,
@@ -944,6 +960,7 @@ def run_inference(
     data_directory: Path,
     *,
     year: int,
+    analysis_aoi_epsg_4326: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     data_directory.mkdir(parents=True, exist_ok=True)
     classification_path = (
@@ -957,6 +974,8 @@ def run_inference(
     raw_counts = Counter()
     final_counts = Counter()
     valid_source_pixels = 0
+    source_valid_pixels_before_aoi = 0
+    aoi_excluded_pixels = 0
     with rasterio.open(naip_path) as naip:
         grid = RasterGrid.from_dataset(naip)
         with rasterio.open(
@@ -980,6 +999,15 @@ def run_inference(
                     spec.features,
                     source_mask=masks,
                 )
+                source_valid_pixels_before_aoi += int(valid.sum())
+                if analysis_aoi_epsg_4326 is not None:
+                    aoi_valid = raster_aoi_mask(
+                        naip,
+                        analysis_aoi_epsg_4326,
+                        window=window,
+                    )
+                    aoi_excluded_pixels += int((valid & ~aoi_valid).sum())
+                    valid &= aoi_valid
                 shape = valid.shape
                 classes = np.zeros(shape, dtype=np.uint8)
                 confidence = np.zeros(shape, dtype=np.uint8)
@@ -1035,6 +1063,8 @@ def run_inference(
         "classification_path": classification_path,
         "confidence_path": confidence_path,
         "valid_source_pixels": valid_source_pixels,
+        "source_valid_pixels_before_aoi": source_valid_pixels_before_aoi,
+        "aoi_excluded_pixels": aoi_excluded_pixels,
         "raw_model_class_counts": {
             str(code): int(raw_counts[code]) for code in range(0, 7)
         },
@@ -1074,6 +1104,9 @@ def audit_cdl_agreement(
     superclass_path: Path,
     data_directory: Path,
     analysis_directory: Path,
+    *,
+    analysis_aoi_epsg_4326: Mapping[str, Any] | None = None,
+    analysis_context: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     grid: RasterGrid = inference["grid"]
     agreement_path = (
@@ -1100,7 +1133,12 @@ def audit_cdl_agreement(
             predicted = predicted_source.read(1, window=window)
             weak = cdl_source.read(1, window=window)
             state = np.zeros(predicted.shape, dtype=np.uint8)
-            comparable = weak > 0
+            aoi_valid = raster_aoi_mask(
+                predicted_source,
+                analysis_aoi_epsg_4326,
+                window=window,
+            )
+            comparable = (weak > 0) & aoi_valid
             unknown = comparable & (predicted == 0)
             agrees = comparable & (predicted == weak)
             disagrees = comparable & (predicted > 0) & (predicted != weak)
@@ -1159,6 +1197,17 @@ def audit_cdl_agreement(
         ),
         "pre_sieve_class_counts": inference["pre_sieve_class_counts"],
         "post_sieve_class_counts": inference["post_sieve_class_counts"],
+        "analysis_aoi_mask_applied": (
+            analysis_aoi_epsg_4326 is not None
+        ),
+        "aoi_excluded_source_pixels": int(
+            inference.get("aoi_excluded_pixels", 0)
+        ),
+        "analysis_context": (
+            dict(analysis_context)
+            if analysis_context is not None
+            else None
+        ),
     }
     matrix_document = {
         "row_order_cdl_superclass": list(range(1, 7)),
@@ -1219,7 +1268,11 @@ def execute_classification(
     recipe: AgriculturalRecipeV3,
     *,
     year: int,
+    cdl_year: int | None = None,
+    analysis_aoi_epsg_4326: Mapping[str, Any] | None = None,
+    contract_repair: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
+    resolved_cdl_year = cdl_year if cdl_year is not None else year
     _, _, _ = _load_sklearn()
     source_validation = validate_naip_multispectral(naip_path)
     analysis = staging / "analysis" / "classification"
@@ -1236,11 +1289,28 @@ def execute_classification(
         naip_path,
         labels["training_core_path"],
         recipe.classification,
+        analysis_aoi_epsg_4326=analysis_aoi_epsg_4326,
     )
     model, metrics, model_receipt = fit_and_evaluate(
         samples,
         recipe.classification,
     )
+    repair_provenance = intervention_reference(contract_repair)
+    analysis_context = {
+        "imagery_year": year,
+        "cdl_year": resolved_cdl_year,
+        "temporal_mismatch": year != resolved_cdl_year,
+        "analysis_aoi_mask_applied": (
+            analysis_aoi_epsg_4326 is not None
+        ),
+        "repair_provenance": repair_provenance,
+        "interpretation": (
+            "Metrics measure spatial holdout agreement with weak CDL "
+            "labels, not independent ground-truth accuracy."
+        ),
+    }
+    model_receipt.update(analysis_context)
+    metrics = {**metrics, "analysis_context": analysis_context}
     _write_confusion_matrix(analysis, metrics)
     _write_json(analysis / "weak_label_metrics.json", metrics)
     training_receipt = {
@@ -1284,7 +1354,15 @@ def execute_classification(
         "source_masks": {
             "policy": "all four NAIP band masks must be valid",
             "invalid_pixels_seen": samples["invalid_source_pixels_seen"],
+            "analysis_aoi_mask_applied": analysis_aoi_epsg_4326 is not None,
+            "aoi_excluded_source_pixels": samples[
+                "aoi_excluded_source_pixels_seen"
+            ],
         },
+        "imagery_year": year,
+        "cdl_year": resolved_cdl_year,
+        "temporal_mismatch": year != resolved_cdl_year,
+        "repair_provenance": repair_provenance,
         "sample_coordinate_digest_sha256": samples[
             "coordinate_digest_sha256"
         ],
@@ -1344,15 +1422,26 @@ def execute_classification(
         recipe.classification,
         data,
         year=year,
+        analysis_aoi_epsg_4326=analysis_aoi_epsg_4326,
     )
     agreement = audit_cdl_agreement(
         inference,
         labels["superclass_path"],
         data,
         analysis,
+        analysis_aoi_epsg_4326=analysis_aoi_epsg_4326,
+        analysis_context=analysis_context,
     )
     return {
         "source_validation": source_validation,
+        "analysis_aoi": {
+            "geometry_epsg_4326": analysis_aoi_epsg_4326,
+            "mask_applied": analysis_aoi_epsg_4326 is not None,
+            "imagery_year": year,
+            "cdl_year": resolved_cdl_year,
+            "temporal_mismatch": year != resolved_cdl_year,
+        },
+        "repair_provenance": repair_provenance,
         "label_receipt": {
             key: value
             for key, value in labels.items()

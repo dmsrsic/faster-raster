@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
@@ -365,11 +366,66 @@ def catalog_years(response: Mapping[str, Any], *, source: str) -> list[int]:
     return sorted(years)
 
 
+def parse_catalog_acquisition_date(value: Any) -> date | None:
+    if isinstance(value, bool) or value is None:
+        return None
+    if isinstance(value, (int, float)):
+        if not math.isfinite(float(value)):
+            return None
+        seconds = float(value)
+        if abs(seconds) >= 10_000_000_000:
+            seconds /= 1000.0
+        try:
+            return datetime.fromtimestamp(seconds, timezone.utc).date()
+        except (OSError, OverflowError, ValueError):
+            return None
+    text = str(value).strip()
+    if not text:
+        return None
+    if text.isdigit():
+        return parse_catalog_acquisition_date(int(text))
+    normalized = text[:-1] + "+00:00" if text.endswith("Z") else text
+    try:
+        return datetime.fromisoformat(normalized).date()
+    except ValueError:
+        try:
+            return date.fromisoformat(text)
+        except ValueError:
+            return None
+
+
+def catalog_acquisition_dates(
+    response: Mapping[str, Any],
+    *,
+    source: str,
+    year: int | None = None,
+) -> list[date]:
+    values: set[date] = set()
+    for feature in catalog_features(response, source=source):
+        attributes = feature.get("attributes")
+        if not isinstance(attributes, Mapping):
+            continue
+        if year is not None:
+            try:
+                if int(attributes.get("Year")) != year:
+                    continue
+            except (TypeError, ValueError):
+                continue
+        parsed = parse_catalog_acquisition_date(
+            attributes.get("acquisition_date")
+        )
+        if parsed is not None:
+            values.add(parsed)
+    return sorted(values)
+
+
 def validate_naip_catalog(
     response: Mapping[str, Any],
     *,
     requested_year: int,
     available_response: Mapping[str, Any] | None = None,
+    requested_start: date | str | None = None,
+    requested_end: date | str | None = None,
 ) -> dict[str, Any]:
     source = "USGS_NAIP"
     features = catalog_features(response, source=source)
@@ -378,7 +434,72 @@ def validate_naip_catalog(
         if available_response is not None
         else []
     )
+    start = (
+        date.fromisoformat(requested_start)
+        if isinstance(requested_start, str)
+        else requested_start
+    )
+    end = (
+        date.fromisoformat(requested_end)
+        if isinstance(requested_end, str)
+        else requested_end
+    )
+    if bool(start) != bool(end):
+        raise ValueError(
+            "requested NAIP date validation requires both start and end"
+        )
+    if start is not None and end is not None:
+        if start >= end:
+            raise ValueError("requested NAIP start must precede end")
+        if start.year != requested_year or end.year != requested_year:
+            raise ValueError(
+                "requested NAIP date range must match requested imagery year"
+            )
     if not features:
+        available_dates = (
+            catalog_acquisition_dates(
+                available_response,
+                source=source,
+                year=requested_year,
+            )
+            if available_response is not None
+            else []
+        )
+        if start is not None and requested_year in available_years:
+            if available_dates:
+                raise SourceCoverageError(
+                    source,
+                    "date_range_unavailable",
+                    f"no NAIP {requested_year} catalog records intersect the "
+                    f"requested date range {start.isoformat()} through "
+                    f"{end.isoformat()}",
+                    {
+                        "requested_year": requested_year,
+                        "requested_date_range": {
+                            "start": start.isoformat(),
+                            "end": end.isoformat(),
+                        },
+                        "available_acquisition_dates": [
+                            value.isoformat() for value in available_dates
+                        ],
+                        "available_intersecting_years": available_years,
+                    },
+                )
+            raise SourceCoverageError(
+                source,
+                "invalid_response",
+                "NAIP reported same-year intersecting records but did not "
+                "provide parseable acquisition dates; availability cannot "
+                "be classified safely",
+                {
+                    "requested_year": requested_year,
+                    "requested_date_range": {
+                        "start": start.isoformat(),
+                        "end": end.isoformat(),
+                    },
+                    "available_intersecting_years": available_years,
+                },
+            )
         raise SourceCoverageError(
             source,
             "no_intersecting_imagery",
@@ -388,6 +509,7 @@ def validate_naip_catalog(
         )
     wrong_years: set[int] = set()
     resolutions: list[float] = []
+    selected_dates: list[date] = []
     for feature in features:
         attributes = feature.get("attributes") or {}
         try:
@@ -400,6 +522,32 @@ def validate_naip_catalog(
             ) from exc
         if feature_year != requested_year:
             wrong_years.add(feature_year)
+        if start is not None and end is not None:
+            acquisition_date = parse_catalog_acquisition_date(
+                attributes.get("acquisition_date")
+            )
+            if acquisition_date is None:
+                raise SourceCoverageError(
+                    source,
+                    "invalid_response",
+                    "an intersecting NAIP catalog record did not report a "
+                    "parseable acquisition_date",
+                )
+            if not start <= acquisition_date <= end:
+                raise SourceCoverageError(
+                    source,
+                    "invalid_response",
+                    "NAIP catalog returned a record outside the requested "
+                    "date range",
+                    {
+                        "requested_date_range": {
+                            "start": start.isoformat(),
+                            "end": end.isoformat(),
+                        },
+                        "returned_acquisition_date": acquisition_date.isoformat(),
+                    },
+                )
+            selected_dates.append(acquisition_date)
         try:
             resolution = float(attributes.get("resolution_value"))
         except (TypeError, ValueError):
@@ -418,6 +566,14 @@ def validate_naip_catalog(
         "requested_year": requested_year,
         "catalog_match_count": len(features),
         "available_intersecting_years": available_years or [requested_year],
+        "requested_date_range": (
+            {"start": start.isoformat(), "end": end.isoformat()}
+            if start is not None and end is not None
+            else None
+        ),
+        "selected_acquisition_dates": [
+            value.isoformat() for value in sorted(set(selected_dates))
+        ],
         "source_native_resolution_meters": min(resolutions) if resolutions else None,
         "selected_records": [feature.get("attributes", {}) for feature in features],
     }

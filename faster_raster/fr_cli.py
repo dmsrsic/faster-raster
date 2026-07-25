@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import sys
@@ -9,10 +10,16 @@ from typing import Any, Mapping, Sequence
 
 from faster_raster import __version__
 from faster_raster.ag_execution import (
+    RecoverableRecipeExecutionError,
     RecipeExecutionError,
     _regenerate_checksums,
     configured_handoff_root,
     execute_recipe,
+)
+from faster_raster.ag_geography import (
+    BBoxValidationError,
+    asset_safety_profile,
+    validate_aoi_safety,
 )
 from faster_raster.ag_recipes import RecipeLoadError, load_named_recipe
 from faster_raster.local_config import (
@@ -48,6 +55,17 @@ from faster_raster.study_templates import (
     render_study_template,
     show_study_template,
 )
+from faster_raster.contract_repair import (
+    ClassificationRuntimeRequest,
+    PromptSession,
+    RepairAttemptsExceeded,
+    RepairCancelled,
+    amended_workfile,
+    build_intervention_record,
+    prompt_repair_candidate,
+    stable_plan_hash,
+    terminal_interaction_enabled,
+)
 from faster_raster.workfiles import (
     HumanDevelopmentWorkfileSpec,
     WorkfileError,
@@ -58,6 +76,10 @@ from faster_raster.workfiles import (
 
 class CommandError(ValueError):
     pass
+
+
+class BlockedCommandError(CommandError):
+    """Raised when a valid command cannot safely begin execution."""
 
 
 def _human_execute() -> Any:
@@ -618,10 +640,293 @@ def _handoff_from_preview(preview: Path, handoff_root: Path) -> Path:
     raise CommandError(f"execution returned a preview outside the handoff root: {preview}")
 
 
+def _execute_classification_request(
+    root: Path,
+    workfile: Any,
+    plan: Mapping[str, Any],
+    request: ClassificationRuntimeRequest,
+    *,
+    recipe: Any,
+    recipe_raw: dict[str, Any],
+    contract_repair: Mapping[str, Any] | None = None,
+) -> Path:
+    values = plan["resolved_config"]["values"]
+    return execute_recipe(
+        root,
+        recipe=recipe,
+        recipe_raw=recipe_raw,
+        name=workfile.spec.name,
+        bbox=request.request_bbox_epsg_4326,
+        start=request.imagery_start.isoformat(),
+        end=request.imagery_end.isoformat(),
+        year=request.cdl_year,
+        imagery_year=request.imagery_year,
+        reuse_mode=values["reuse_mode"]["value"],
+        open_preview=bool(values["open_when_complete"]["value"]),
+        max_total_bytes=int(
+            values["maximum_download_mb"]["value"] * 1_000_000
+        ),
+        service_tile_size=int(values["service_tile_size"]["value"]),
+        renderer=_recipe_renderer(),
+        naip_resolution_m=(
+            float(values["resolution_m"]["value"])
+            if "resolution_m" in values
+            else None
+        ),
+        analysis_aoi_epsg_4326=request.analysis_aoi_epsg_4326,
+        contract_repair=contract_repair,
+    )
+
+
+def _request_candidate_directory(
+    plan: Mapping[str, Any],
+    request: ClassificationRuntimeRequest,
+) -> Path:
+    digest = hashlib.sha256(
+        json.dumps(
+            request.as_dict(),
+            sort_keys=True,
+            separators=(",", ":"),
+            default=str,
+        ).encode("utf-8")
+    ).hexdigest()[:16]
+    return (
+        Path(plan["resolved_config"]["values"]["state_root"]["value"])
+        / "plans"
+        / str(plan["study_name"])
+        / f"interactive-repair-{digest}"
+    )
+
+
+def _show_proposed_repair(
+    session: PromptSession,
+    original: ClassificationRuntimeRequest,
+    resolved: ClassificationRuntimeRequest,
+    plan: Mapping[str, Any],
+) -> None:
+    session.write("")
+    session.write("Proposed repair:")
+    if original.imagery_year != resolved.imagery_year:
+        session.write(
+            f"  Imagery year: {original.imagery_year} -> "
+            f"{resolved.imagery_year}"
+        )
+    if (
+        original.imagery_start,
+        original.imagery_end,
+    ) != (
+        resolved.imagery_start,
+        resolved.imagery_end,
+    ):
+        session.write(
+            "  Imagery date range: "
+            f"{original.imagery_start.isoformat()}.."
+            f"{original.imagery_end.isoformat()} -> "
+            f"{resolved.imagery_start.isoformat()}.."
+            f"{resolved.imagery_end.isoformat()}"
+        )
+    if (
+        original.request_bbox_epsg_4326
+        != resolved.request_bbox_epsg_4326
+    ):
+        session.write(
+            "  Request bbox: "
+            + ", ".join(
+                str(value) for value in original.request_bbox_epsg_4326
+            )
+            + " -> "
+            + ", ".join(
+                str(value) for value in resolved.request_bbox_epsg_4326
+            )
+        )
+    session.write(f"  Crop-label year: {resolved.cdl_year}")
+    session.write(
+        "  Temporal mismatch: "
+        + ("yes" if resolved.temporal_mismatch else "no")
+    )
+    if resolved.acquisition_geometry_differs:
+        session.write(
+            "  Geometry: source retrieval uses the rectangular request "
+            "envelope; analysis and publication use the generated AOI."
+        )
+        envelope_only = (
+            resolved.spatial_construction or {}
+        ).get("envelope_only_area_square_meters")
+        if envelope_only is not None:
+            session.write(
+                "  Envelope-only area masked from analysis: "
+                f"{float(envelope_only):,.0f} m²"
+            )
+    estimated = (
+        (plan.get("classification") or {}).get(
+            "estimated_uncompressed_transfer_bytes"
+        )
+    )
+    if estimated is not None:
+        session.write(
+            f"  Estimated uncompressed assets: {int(estimated):,} bytes"
+        )
+    session.write(
+        f"  Configured network ceiling: "
+        f"{int(plan['maximum_download_bytes']):,} bytes"
+    )
+
+
+def _repair_classification_cook(
+    args: argparse.Namespace,
+    *,
+    root: Path,
+    workfile: Any,
+    paths: LocalPaths,
+    original_plan: dict[str, Any],
+    recipe: Any,
+    recipe_raw: dict[str, Any],
+    initial_error: RecoverableRecipeExecutionError,
+) -> tuple[Path, dict[str, Any]]:
+    session = PromptSession()
+    original_request = ClassificationRuntimeRequest.from_workfile(workfile)
+    current_request = original_request
+    failure = initial_error.recoverable_failure
+    alternatives_shown: list[Any] = list(failure.compatible_alternatives)
+    original_plan_sha256 = stable_plan_hash(original_plan)
+    source_evidence: dict[str, Any] = dict(failure.evidence)
+    candidate_count = 0
+
+    while True:
+        candidate_count += 1
+        if candidate_count > session.maximum_invalid_attempts:
+            raise RepairAttemptsExceeded(
+                "interactive repair candidate limit reached"
+            )
+        candidate = prompt_repair_candidate(
+            failure,
+            current_request,
+            session,
+        )
+        repaired_workfile = amended_workfile(workfile, candidate)
+        values = original_plan["resolved_config"]["values"]
+        try:
+            safety = validate_aoi_safety(
+                candidate.request_bbox_epsg_4326,
+                maximum_network_bytes=int(
+                    values["maximum_download_mb"]["value"] * 1_000_000
+                ),
+                asset_resolutions=asset_safety_profile(
+                    recipe.required_assets,
+                    float(values["resolution_m"]["value"]),
+                ),
+            )
+            resolved_plan = compile_study_plan(
+                root,
+                repaired_workfile,
+                paths,
+                cli_overrides=_cli_overrides(args),
+                output_dir=_request_candidate_directory(
+                    original_plan,
+                    candidate,
+                ),
+                runtime_request=candidate.as_dict(),
+            )
+        except (BBoxValidationError, WorkfileError, ValueError) as exc:
+            session.invalid(str(exc))
+            current_request = candidate
+            continue
+        if resolved_plan["blocking"]:
+            session.invalid(
+                "recompiled plan remains blocked by source, dependency, "
+                "or reuse policy"
+            )
+            current_request = candidate
+            continue
+        resolved_plan.setdefault("classification", {})["aoi_safety"] = safety
+        session.write(
+            "Candidate passed local validation and plan compilation. "
+            "Source catalog coverage will be checked after confirmation, "
+            "before any raster transfer."
+        )
+        _show_proposed_repair(
+            session,
+            original_request,
+            candidate,
+            resolved_plan,
+        )
+        if candidate.temporal_mismatch:
+            session.write("")
+            session.write(
+                "WARNING: resolved NAIP imagery and CDL weak labels use "
+                "different years. The imagery does not represent the "
+                "originally requested year."
+            )
+            if not session.confirm(
+                "Accept this temporal mismatch? [y/N]: "
+            ):
+                raise RepairCancelled("temporal mismatch was not accepted")
+        if candidate.acquisition_geometry_differs:
+            session.write("")
+            session.write(
+                "WARNING: acquisition uses the rectangular envelope. Pixels "
+                "outside the generated analysis AOI will be masked and "
+                "excluded from metrics, inventories, rasters, and previews."
+            )
+        if not session.confirm(
+            "Continue with source validation and raster acquisition/reuse? "
+            "[y/N]: "
+        ):
+            raise RepairCancelled("final repair confirmation declined")
+        resolved_plan_sha256 = stable_plan_hash(resolved_plan)
+        confirmed_source_evidence = {
+            **source_evidence,
+            "candidate_catalog_validation": {
+                "status": "deferred_until_after_explicit_confirmation",
+                "raster_transfer_before_validation": False,
+            },
+        }
+        intervention = build_intervention_record(
+            original_request=original_request,
+            resolved_request=candidate,
+            failure=initial_error.recoverable_failure,
+            alternatives_shown=alternatives_shown,
+            source_evidence=confirmed_source_evidence,
+            original_plan_sha256=original_plan_sha256,
+            resolved_plan_sha256=resolved_plan_sha256,
+            confirmation_outcome="accepted",
+        )
+        try:
+            preview = _execute_classification_request(
+                root,
+                repaired_workfile,
+                resolved_plan,
+                candidate,
+                recipe=recipe,
+                recipe_raw=recipe_raw,
+                contract_repair=intervention,
+            )
+        except RecoverableRecipeExecutionError as exc:
+            failure = exc.recoverable_failure
+            alternatives_shown.extend(failure.compatible_alternatives)
+            source_evidence = {
+                **source_evidence,
+                "latest_candidate_failure": failure.as_dict(),
+            }
+            session.invalid(
+                "replacement is still unsupported: " + failure.detail
+            )
+            current_request = candidate
+            continue
+        return preview, resolved_plan
+
+
 def command_cook(args: argparse.Namespace) -> int:
-    root, workfile, _, plan = _load_and_plan(args)
+    if bool(getattr(args, "json", False)) and getattr(
+        args, "interactive", None
+    ) is True:
+        raise CommandError("--interactive cannot be combined with --json")
+    root, workfile, paths, plan = _load_and_plan(args)
     if plan["blocking"]:
-        raise CommandError("study plan is blocked; run fr explain for source and reuse details")
+        raise BlockedCommandError(
+            "study plan is blocked; run fr explain for source and reuse "
+            "details"
+        )
     if isinstance(workfile.spec, HumanDevelopmentWorkfileSpec):
         values = plan["resolved_config"]["values"]
         execute_human_development = _human_execute()
@@ -637,27 +942,36 @@ def command_cook(args: argparse.Namespace) -> int:
         return 0
     recipe = load_named_recipe(root, workfile.spec.workflow_id)
     recipe_raw = json.loads((root / "recipes" / "ag" / f"{recipe.recipe_id}.json").read_text(encoding="utf-8"))
-    values = plan["resolved_config"]["values"]
-    preview = execute_recipe(
-        root,
-        recipe=recipe,
-        recipe_raw=recipe_raw,
-        name=workfile.spec.name,
-        bbox=tuple(workfile.spec.area.bbox),
-        start=workfile.spec.time.start.isoformat(),
-        end=workfile.spec.time.end.isoformat(),
-        year=workfile.spec.time.crop_year,
-        reuse_mode=values["reuse_mode"]["value"],
-        open_preview=bool(values["open_when_complete"]["value"]),
-        max_total_bytes=int(values["maximum_download_mb"]["value"] * 1_000_000),
-        service_tile_size=int(values["service_tile_size"]["value"]),
-        renderer=_recipe_renderer(),
-        naip_resolution_m=(
-            float(values["resolution_m"]["value"])
-            if "resolution_m" in values
-            else None
-        ),
-    )
+    request = ClassificationRuntimeRequest.from_workfile(workfile)
+    try:
+        preview = _execute_classification_request(
+            root,
+            workfile,
+            plan,
+            request,
+            recipe=recipe,
+            recipe_raw=recipe_raw,
+        )
+    except RecoverableRecipeExecutionError as exc:
+        interactive = terminal_interaction_enabled(
+            getattr(args, "interactive", None),
+            json_output=bool(args.json),
+        )
+        if recipe.recipe_id != "naip_cdl_classification_audit" or not interactive:
+            raise
+        try:
+            preview, plan = _repair_classification_cook(
+                args,
+                root=root,
+                workfile=workfile,
+                paths=paths,
+                original_plan=plan,
+                recipe=recipe,
+                recipe_raw=recipe_raw,
+                initial_error=exc,
+            )
+        except (RepairCancelled, RepairAttemptsExceeded) as repair_error:
+            raise CommandError(str(repair_error)) from repair_error
     final = _handoff_from_preview(preview, configured_handoff_root(root))
     write_profile_atomic(final / "resolved_config.json", plan["resolved_config"])
     write_profile_atomic(final / "source_resolution.json", plan["source_resolution"])
@@ -678,6 +992,51 @@ def command_inspect(args: argparse.Namespace) -> int:
         print(f"Network bytes: {report['network_bytes']}")
         print(f"Reused bytes: {report['reused_bytes']}")
         print(f"Preview: {report['preview'] or 'none'}")
+        repair = report.get("contract_repair") or {}
+        if repair.get("human_repair_occurred"):
+            temporal = repair.get("temporal_mismatch") or {}
+            location = repair.get("resolved_location") or {}
+            print(
+                "Human contract repair: yes "
+                f"({repair.get('intervention_id') or 'unknown id'})"
+            )
+            print(
+                "Temporal mismatch: "
+                + ("yes" if temporal.get("present") else "no")
+            )
+            print(
+                "Acquisition envelope differs from analysis AOI: "
+                + (
+                    "yes"
+                    if location.get(
+                        "acquisition_uses_request_envelope"
+                    )
+                    else "no"
+                )
+            )
+            if args.verbose:
+                original = repair.get("original_request") or {}
+                resolved = repair.get("resolved_request") or {}
+                print(
+                    "  Original imagery / CDL years: "
+                    f"{original.get('imagery_year', 'unknown')} / "
+                    f"{original.get('cdl_year', 'unknown')}"
+                )
+                print(
+                    "  Resolved imagery / CDL years: "
+                    f"{resolved.get('imagery_year', 'unknown')} / "
+                    f"{resolved.get('cdl_year', 'unknown')}"
+                )
+                print(
+                    "  Resolved request bbox: "
+                    + ", ".join(
+                        str(value)
+                        for value in (
+                            resolved.get("request_bbox_epsg_4326")
+                            or []
+                        )
+                    )
+                )
         for asset in report["asset_status"]:
             local = _friendly(
                 FRIENDLY_READINESS,
@@ -933,7 +1292,28 @@ def build_parser() -> argparse.ArgumentParser:
     _add_plan_options(cook, include_out=False)
     cook.add_argument("--open", dest="open_when_complete", action="store_true")
     cook.add_argument("--no-open", dest="open_when_complete", action="store_false")
-    cook.set_defaults(handler=command_cook, open_when_complete=None, out=None)
+    interaction = cook.add_mutually_exclusive_group()
+    interaction.add_argument(
+        "--interactive",
+        dest="interactive",
+        action="store_true",
+        help=(
+            "allow bounded contract repair prompts even when terminal "
+            "detection is unavailable"
+        ),
+    )
+    interaction.add_argument(
+        "--non-interactive",
+        dest="interactive",
+        action="store_false",
+        help="fail closed without prompting",
+    )
+    cook.set_defaults(
+        handler=command_cook,
+        open_when_complete=None,
+        out=None,
+        interactive=None,
+    )
 
     inspect = commands.add_parser("inspect", help="summarize a finalized handoff")
     inspect.add_argument("target", help="latest or an explicit finalized handoff path")
@@ -985,8 +1365,50 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
     try:
         return int(args.handler(args))
-    except (CommandError, ConfigError, WorkfileError, PreviewOpenError, RecipeLoadError, RecipeExecutionError, ValueError) as exc:
-        print(f"ERROR: {exc}", file=sys.stderr)
+    except RecoverableRecipeExecutionError as exc:
+        payload = {
+            "status": "BLOCKED",
+            "message": (
+                "recoverable classification contract failure; rerun in an "
+                "interactive terminal or use --interactive"
+            ),
+            "recoverable_failure": exc.recoverable_failure.as_dict(),
+        }
+        if getattr(args, "json", False):
+            _json(payload)
+        else:
+            print(f"ERROR: {payload['message']}", file=sys.stderr)
+            print(
+                json.dumps(
+                    payload["recoverable_failure"],
+                    sort_keys=True,
+                ),
+                file=sys.stderr,
+            )
+        return 2
+    except (
+        CommandError,
+        ConfigError,
+        WorkfileError,
+        PreviewOpenError,
+        RecipeLoadError,
+        RecipeExecutionError,
+        ValueError,
+    ) as exc:
+        if getattr(args, "json", False):
+            _json(
+                {
+                    "status": (
+                        "BLOCKED"
+                        if isinstance(exc, BlockedCommandError)
+                        else "ERROR"
+                    ),
+                    "error_type": type(exc).__name__,
+                    "message": str(exc),
+                }
+            )
+        else:
+            print(f"ERROR: {exc}", file=sys.stderr)
         return 2
     except KeyboardInterrupt:
         print("ERROR: interrupted", file=sys.stderr)

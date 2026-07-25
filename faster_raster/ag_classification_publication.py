@@ -4,7 +4,7 @@ import json
 import textwrap
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Mapping
 
 import numpy as np
 import rasterio
@@ -17,10 +17,12 @@ from faster_raster.ag_classification import (
     FEATURE_EPSILON,
 )
 from faster_raster.ag_classification_contracts import (
-    CLASSIFICATION_SCIENTIFIC_CLAIM,
     CDL_SURFACE_SUPERCLASSES,
+    classification_scientific_claim,
 )
 from faster_raster.ag_recipes import AgriculturalRecipeV3
+from faster_raster.aoi_geometry import raster_aoi_mask
+from faster_raster.contract_repair import intervention_reference
 
 
 CLASSIFICATION_PALETTE = {
@@ -104,16 +106,32 @@ def interpret_naip_date_evidence(raw: Any) -> dict[str, Any]:
             text = value.strip()
         else:
             return result
-        if not text.isdigit() or len(text) not in {10, 13}:
-            return result
-        unit = "milliseconds" if len(text) == 13 else "seconds"
-        seconds = int(text) / (1000 if unit == "milliseconds" else 1)
-        try:
-            interpreted.append(
-                datetime.fromtimestamp(seconds, tz=timezone.utc).date().isoformat()
+        if text.isdigit() and len(text) in {10, 13}:
+            unit = "milliseconds" if len(text) == 13 else "seconds"
+            seconds = int(text) / (
+                1000 if unit == "milliseconds" else 1
             )
-        except (OverflowError, OSError, ValueError):
-            return result
+            try:
+                interpreted.append(
+                    datetime.fromtimestamp(
+                        seconds,
+                        tz=timezone.utc,
+                    ).date().isoformat()
+                )
+            except (OverflowError, OSError, ValueError):
+                return result
+        else:
+            try:
+                interpreted.append(
+                    datetime.fromisoformat(
+                        text[:-1] + "+00:00"
+                        if text.endswith("Z")
+                        else text
+                    ).date().isoformat()
+                )
+            except ValueError:
+                return result
+            unit = "iso8601"
         units.add(unit)
     unique_dates = sorted(set(interpreted))
     if len(unique_dates) != 1:
@@ -121,9 +139,13 @@ def interpret_naip_date_evidence(raw: Any) -> dict[str, Any]:
         return result
     result["interpreted_naip_date_utc"] = unique_dates[0]
     result["naip_evidence_interpretation"] = (
-        f"parsed_unix_epoch_{next(iter(units))}"
+        (
+            "parsed_iso8601"
+            if units == {"iso8601"}
+            else f"parsed_unix_epoch_{next(iter(units))}"
+        )
         if len(units) == 1
-        else "parsed_equivalent_unix_epochs"
+        else "parsed_equivalent_date_encodings"
     )
     return result
 
@@ -182,6 +204,7 @@ def _read_naip(
     path: Path,
     width: int,
     height: int,
+    analysis_aoi_epsg_4326: Mapping[str, Any] | None = None,
 ) -> tuple[Image.Image, Image.Image, Image.Image, dict[str, Any]]:
     with rasterio.open(path) as source:
         bands = source.read(
@@ -197,7 +220,12 @@ def _read_naip(
             )
             > 0
         )
-    valid = np.all(masks, axis=0)
+        aoi_valid = raster_aoi_mask(
+            source,
+            analysis_aoi_epsg_4326,
+            out_shape=(height, width),
+        )
+    valid = np.all(masks, axis=0) & aoi_valid
     natural = Image.fromarray(_stretch_rgb(bands[[0, 1, 2]], valid), "RGB")
     cir = Image.fromarray(_stretch_rgb(bands[[3, 0, 1]], valid), "RGB")
     red = bands[0].astype(np.float32) / 255.0
@@ -226,10 +254,29 @@ def _read_single(
         )
 
 
-def _classification_image(values: np.ndarray) -> Image.Image:
+def _read_aoi_mask(
+    path: Path,
+    width: int,
+    height: int,
+    analysis_aoi_epsg_4326: Mapping[str, Any] | None,
+) -> np.ndarray:
+    with rasterio.open(path) as source:
+        return raster_aoi_mask(
+            source,
+            analysis_aoi_epsg_4326,
+            out_shape=(height, width),
+        )
+
+
+def _classification_image(
+    values: np.ndarray,
+    aoi_valid: np.ndarray | None = None,
+) -> Image.Image:
     rgb = np.zeros((*values.shape, 3), dtype=np.uint8)
     for code, color in CLASSIFICATION_PALETTE.items():
         rgb[values == code] = color
+    if aoi_valid is not None:
+        rgb[~aoi_valid] = BACKGROUND
     return Image.fromarray(rgb, "RGB")
 
 
@@ -352,7 +399,17 @@ def render_classification_audit(
     acquisition_evidence: dict[str, Any],
     network_bytes: int,
     reused_bytes: int,
+    cdl_year: int | None = None,
+    analysis_aoi_epsg_4326: Mapping[str, Any] | None = None,
+    contract_repair: Mapping[str, Any] | None = None,
 ) -> tuple[Path, dict[str, Any]]:
+    resolved_cdl_year = cdl_year if cdl_year is not None else year
+    temporal_mismatch_accepted = bool(
+        (
+            (contract_repair or {}).get("temporal_mismatch")
+            or {}
+        ).get("explicitly_accepted", False)
+    )
     destination.parent.mkdir(parents=True, exist_ok=True)
     width, height = 3840, 2160
     canvas = Image.new("RGB", (width, height), BACKGROUND)
@@ -373,6 +430,7 @@ def render_classification_audit(
         naip_path,
         main_width,
         main_height,
+        analysis_aoi_epsg_4326,
     )
     paths = classification_result["paths"]
     predicted = _read_single(
@@ -452,6 +510,17 @@ def render_classification_audit(
             f"{classification_result['mapping_sha256'][:12]}",
         ),
         ("Source year", str(year)),
+        ("CDL label year", str(resolved_cdl_year)),
+        (
+            "Temporal mismatch",
+            (
+                "yes · explicitly accepted"
+                if temporal_mismatch_accepted
+                else "yes"
+            )
+            if year != resolved_cdl_year
+            else "no",
+        ),
         (
             "NAIP evidence",
             evidence_display,
@@ -492,8 +561,13 @@ def render_classification_audit(
     draw.text((x, y), "Scientific limitation", fill=ACCENT, font=label_font)
     y += 38
     limitation = (
-        "Spatial holdout metrics measure agreement with same-year CDL weak "
-        "labels. They are not independent ground-truth accuracy and this "
+        "Spatial holdout metrics measure agreement with CDL weak labels"
+        + (
+            f" from {resolved_cdl_year}, while imagery is from {year}. "
+            if year != resolved_cdl_year
+            else " from the same year. "
+        )
+        + "They are not independent ground-truth accuracy and this "
         "single-date product is not authoritative land cover, parcel evidence, "
         "irrigation status, yield, or change."
     )
@@ -509,6 +583,7 @@ def render_classification_audit(
         naip_path,
         panel_width,
         panel_height - 54,
+        analysis_aoi_epsg_4326,
     )
     panel_predicted = _read_single(
         paths["classification"],
@@ -526,6 +601,12 @@ def render_classification_audit(
         panel_width,
         panel_height - 54,
     )
+    panel_aoi_valid = _read_aoi_mask(
+        paths["classification"],
+        panel_width,
+        panel_height - 54,
+        analysis_aoi_epsg_4326,
+    )
     lower = (
         ("1 · NAIP natural color", panel_natural, ()),
         ("2 · NAIP color infrared", panel_cir, ()),
@@ -540,7 +621,7 @@ def render_classification_audit(
         ),
         (
             "4 · Predicted surface classes · raw",
-            _classification_image(panel_predicted),
+            _classification_image(panel_predicted, panel_aoi_valid),
             (
                 ("0 ?", CLASSIFICATION_PALETTE[0]),
                 ("1 crop", CLASSIFICATION_PALETTE[1]),
@@ -617,7 +698,24 @@ def render_classification_audit(
         "legend": legend_path.relative_to(destination.parents[2]).as_posix(),
         "dimensions": [3840, 2160],
         "panels": [item[0] for item in lower],
-        "scientific_claim": CLASSIFICATION_SCIENTIFIC_CLAIM,
+        "scientific_claim": classification_scientific_claim(
+            year,
+            resolved_cdl_year,
+        ),
+        "scientific_claim_temporal_status": (
+            "temporally_mismatched_weak_supervision"
+            if year != resolved_cdl_year
+            else "same_year_weak_supervision"
+        ),
+        "imagery_year": year,
+        "cdl_year": resolved_cdl_year,
+        "temporal_mismatch": year != resolved_cdl_year,
+        "temporal_mismatch_explicitly_accepted": (
+            temporal_mismatch_accepted
+        ),
+        "analysis_aoi_epsg_4326": analysis_aoi_epsg_4326,
+        "analysis_aoi_mask_applied": analysis_aoi_epsg_4326 is not None,
+        "repair_provenance": intervention_reference(contract_repair),
         "legacy_universal_cdl_boundary_overlay_used": False,
         "palette": legend["palette"],
         "disagreement_rendering_mode": (

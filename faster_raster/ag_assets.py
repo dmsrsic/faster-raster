@@ -182,6 +182,9 @@ def _manifest_evidence(handoff: Path) -> tuple[dict[str, Any], dict[str, dict[st
             layers[Path(output).name] = {
                 **layer,
                 "_manifest_cdl_year": order.get("cdl_year"),
+                "_manifest_imagery_year": order.get(
+                    "imagery_year", order.get("cdl_year")
+                ),
                 "_manifest_time_start": order.get("time_start"),
                 "_manifest_time_end": order.get("time_end"),
             }
@@ -232,7 +235,11 @@ def inspect_asset(
     filename_year = YEAR_RE.search(path.name)
     filename_temporal_key = int(filename_year.group(1)) if filename_year else None
     layer_evidence = layer_evidence or {}
-    manifest_temporal_key = layer_evidence.get("_manifest_cdl_year")
+    manifest_temporal_key = layer_evidence.get(
+        "_manifest_imagery_year"
+        if asset_name in {"natural", "naip_multispectral", "ndvi"}
+        else "_manifest_cdl_year"
+    )
     try:
         manifest_temporal_key = (
             int(manifest_temporal_key)
@@ -399,6 +406,7 @@ def compile_asset_plan(
     year: int,
     reuse_mode: Literal["auto", "only", "never"],
     *,
+    imagery_year: int | None = None,
     target_crs: str = "EPSG:3857",
     tolerance: float = 1e-6,
 ) -> list[AssetDecision]:
@@ -422,11 +430,17 @@ def compile_asset_plan(
 
         compatible: list[tuple[int, float, str, AssetRecord, SpatialRelationship]] = []
         rejected: list[dict[str, Any]] = []
+        requested_year = (
+            imagery_year
+            if imagery_year is not None
+            and asset_name in {"natural", "naip_multispectral", "ndvi"}
+            else year
+        )
         for record in inventory:
             if record.asset_name != asset_name:
                 continue
             reasons, relationship = _candidate_rejections(
-                record, recipe, requested_bbox, year, tolerance
+                record, recipe, requested_bbox, requested_year, tolerance
             )
             if reasons:
                 stable = record.stable_source_reference()
@@ -504,6 +518,7 @@ def asset_plan_document(
     end: str,
     year: int,
     reuse_mode: str,
+    imagery_year: int | None = None,
     requested_resolution_m: float | None = None,
 ) -> dict[str, Any]:
     return {
@@ -513,6 +528,7 @@ def asset_plan_document(
         "requested_bbox_epsg_4326": list(bbox),
         "requested_timeframe": {"start": start, "end": end},
         "requested_cdl_year": year,
+        "requested_imagery_year": imagery_year if imagery_year is not None else year,
         "reuse_mode": reuse_mode,
         "spatial_tolerance_degrees": 1e-6,
         "effective_naip_resolution_m": (

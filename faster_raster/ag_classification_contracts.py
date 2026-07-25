@@ -14,6 +14,22 @@ CLASSIFICATION_SCIENTIFIC_CLAIM = (
     "supervised by same-year USDA CDL superclasses. Spatial holdout metrics "
     "measure agreement with weak labels, not independent ground-truth accuracy."
 )
+
+
+def classification_scientific_claim(
+    imagery_year: int,
+    cdl_year: int,
+) -> str:
+    if imagery_year == cdl_year:
+        return CLASSIFICATION_SCIENTIFIC_CLAIM
+    return (
+        "Single-date high-resolution NAIP spectral surface classification "
+        f"using {imagery_year} imagery, weakly supervised by {cdl_year} USDA "
+        "CDL superclasses. The sources are temporally mismatched; spatial "
+        "holdout metrics measure cross-year agreement with weak labels, not "
+        "independent ground-truth accuracy or conditions in the originally "
+        "requested imagery year."
+    )
 CLASSIFICATION_UNSUPPORTED_CLAIMS = (
     "crop species truth from one NAIP acquisition",
     "authoritative land-cover replacement",

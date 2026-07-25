@@ -109,6 +109,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--end", required=True)
     parser.add_argument("--cdl-year", required=True, type=int)
     parser.add_argument(
+        "--imagery-year",
+        type=int,
+        default=None,
+        help="resolved NAIP imagery year; defaults to --cdl-year",
+    )
+    parser.add_argument(
         "--portion",
         choices=["native", "overview"],
         default="native",
@@ -162,6 +168,11 @@ def parse_args() -> argparse.Namespace:
 
 
 ARGS = parse_args()
+IMAGERY_YEAR = (
+    ARGS.imagery_year
+    if ARGS.imagery_year is not None
+    else ARGS.cdl_year
+)
 
 try:
     WEST, SOUTH, EAST, NORTH = validate_bbox_text(ARGS.bbox)
@@ -179,8 +190,16 @@ except ValueError as error:
 if START >= END:
     raise SystemExit("The timeframe start must precede its end.")
 
-if START.year != ARGS.cdl_year or END.year != ARGS.cdl_year:
-    raise SystemExit("The growing-season dates must match --cdl-year.")
+if START.year != IMAGERY_YEAR or END.year != IMAGERY_YEAR:
+    raise SystemExit(
+        "The imagery timeframe dates must match --imagery-year."
+    )
+
+NAIP_DATE_WHERE = (
+    f"Year = {IMAGERY_YEAR} "
+    f"AND acquisition_date >= DATE '{ARGS.start}' "
+    f"AND acquisition_date <= DATE '{ARGS.end}'"
+)
 
 try:
     if not 0 < ARGS.max_total_bytes <= 20_000_000_000:
@@ -630,7 +649,11 @@ def stop_source_coverage(error: SourceCoverageError) -> None:
         "detail": error.detail,
         "evidence": error.evidence or {},
         "requested_bbox": [WEST, SOUTH, EAST, NORTH],
-        "requested_year": ARGS.cdl_year,
+        "requested_year": IMAGERY_YEAR,
+        "requested_imagery_year": IMAGERY_YEAR,
+        "requested_cdl_year": ARGS.cdl_year,
+        "requested_start": ARGS.start,
+        "requested_end": ARGS.end,
         "requested_assets": sorted(REQUESTED_ASSETS),
         "network_bytes": network_bytes,
         "requests": request_receipts,
@@ -1260,7 +1283,7 @@ def create_preview(
     draw.text(
         (margin, title_y + round(dashboard_height * 0.024)),
         (
-            f"{ARGS.cdl_year} growing season · NAIP natural color and NDVI · "
+            f"{IMAGERY_YEAR} imagery · NAIP natural color and NDVI · "
             "USDA CDL · USGS 3DEP"
         ),
         font=load_font(round(dashboard_width * 0.0047)),
@@ -1319,8 +1342,8 @@ def create_preview(
         f"Network consumed: {network_bytes:,} bytes",
         "",
         "INGREDIENTS",
-        f"NAIP {ARGS.cdl_year} natural color",
-        f"NAIP {ARGS.cdl_year} NDVI color",
+        f"NAIP {IMAGERY_YEAR} natural color",
+        f"NAIP {IMAGERY_YEAR} NDVI color",
         f"USDA CDL {ARGS.cdl_year} raw classes",
         f"USDA CDL {ARGS.cdl_year} color rendering",
         "USGS 3DEP hillshade",
@@ -1368,8 +1391,8 @@ def create_preview(
     strip_width = (dashboard_width - 2 * margin - 2 * gap) // 3
 
     panels = [
-        (natural, f"NAIP {ARGS.cdl_year} natural color"),
-        (ndvi, f"NAIP {ARGS.cdl_year} NDVI color"),
+        (natural, f"NAIP {IMAGERY_YEAR} natural color"),
+        (ndvi, f"NAIP {IMAGERY_YEAR} NDVI color"),
         (cdl.convert("RGB"), f"USDA CDL {ARGS.cdl_year}"),
     ]
 
@@ -1527,7 +1550,12 @@ source_preflight: dict[str, Any] = {
     "schema_version": "fasterraster.ag-source-preflight/v1",
     "status": "PASS",
     "requested_bbox": [WEST, SOUTH, EAST, NORTH],
-    "requested_year": ARGS.cdl_year,
+    "requested_imagery_year": IMAGERY_YEAR,
+    "requested_cdl_year": ARGS.cdl_year,
+    "requested_imagery_timeframe": {
+        "start": ARGS.start,
+        "end": ARGS.end,
+    },
     "requested_assets": sorted(requested_assets),
     "required_source_families": list(
         required_source_families(requested_assets)
@@ -1561,7 +1589,7 @@ if needs_naip:
         lambda: source_request_json(
         NAIP.rstrip("/") + "/query",
         {
-            "where": f"Year = {ARGS.cdl_year}",
+            "where": NAIP_DATE_WHERE,
             "geometry": {
                 "xmin": WEST,
                 "ymin": SOUTH,
@@ -1579,12 +1607,12 @@ if needs_naip:
             "returnGeometry": "false",
             "resultRecordCount": "50",
         },
-            label=f"naip_{ARGS.cdl_year}_catalog_query",
+            label=f"naip_{IMAGERY_YEAR}_catalog_query",
             source="USGS_NAIP",
         )
     )
     write_json(
-        METADATA / f"naip_{ARGS.cdl_year}_catalog.json",
+        METADATA / f"naip_{IMAGERY_YEAR}_catalog.json",
         naip_catalog,
     )
     features = naip_catalog.get("features", [])
@@ -1605,7 +1633,7 @@ if needs_naip:
                 "geometryType": "esriGeometryEnvelope",
                 "inSR": "4326",
                 "spatialRel": "esriSpatialRelIntersects",
-                "outFields": "Year",
+                "outFields": "Year,acquisition_date",
                 "returnGeometry": "false",
                 "resultRecordCount": "50",
             },
@@ -1617,8 +1645,10 @@ if needs_naip:
     naip_validation = require_source_coverage(
         lambda: validate_naip_catalog(
             naip_catalog,
-            requested_year=ARGS.cdl_year,
+            requested_year=IMAGERY_YEAR,
             available_response=available,
+            requested_start=ARGS.start,
+            requested_end=ARGS.end,
         )
     )
     source_preflight["sources"]["USGS_NAIP"]["catalog"] = (
@@ -1651,9 +1681,9 @@ if needs_naip:
         )
     naip_rule = {
         "mosaicMethod": "esriMosaicAttribute",
-        "where": f"Year = {ARGS.cdl_year}",
-        "sortField": "Year",
-        "sortValue": str(ARGS.cdl_year),
+        "where": NAIP_DATE_WHERE,
+        "sortField": "acquisition_date",
+        "sortValue": str(int(START.timestamp() * 1000)),
         "ascending": True,
         "mosaicOperation": "MT_FIRST",
     }
@@ -1806,9 +1836,9 @@ cdl_rule = {
 }
 
 reports: list[dict[str, Any]] = []
-natural = DATA / f"naip_{ARGS.cdl_year}_natural_color.cog.tif"
-multispectral = DATA / f"naip_{ARGS.cdl_year}_multispectral.cog.tif"
-ndvi = DATA / f"naip_{ARGS.cdl_year}_ndvi_color.cog.tif"
+natural = DATA / f"naip_{IMAGERY_YEAR}_natural_color.cog.tif"
+multispectral = DATA / f"naip_{IMAGERY_YEAR}_multispectral.cog.tif"
+ndvi = DATA / f"naip_{IMAGERY_YEAR}_ndvi_color.cog.tif"
 hillshade = DATA / "three_dep_hillshade.cog.tif"
 cdl_raw = DATA / f"cdl_{ARGS.cdl_year}_classes.cog.tif"
 cdl_color = DATA / f"cdl_{ARGS.cdl_year}_color.cog.tif"
@@ -1945,6 +1975,7 @@ manifest = {
         "time_start": ARGS.start,
         "time_end": ARGS.end,
         "cdl_year": ARGS.cdl_year,
+        "imagery_year": IMAGERY_YEAR,
         "portion": ARGS.portion,
         "network_ceiling_bytes": ARGS.max_total_bytes,
         "requested_assets": sorted(requested_assets),
@@ -1952,7 +1983,17 @@ manifest = {
     "aoi_safety": AOI_SAFETY,
     "source_preflight": source_preflight,
     "naip": {
-        "requested_year": ARGS.cdl_year,
+        "requested_year": IMAGERY_YEAR,
+        "requested_date_range": {
+            "start": ARGS.start,
+            "end": ARGS.end,
+        },
+        "selected_acquisition_dates": (
+            source_preflight.get("sources", {})
+            .get("USGS_NAIP", {})
+            .get("catalog", {})
+            .get("selected_acquisition_dates", [])
+        ),
         "catalog_match_count": len(features),
         "catalog_resolution_meters": catalog_native_resolution,
         "output_resolution_meters": native_resolution,
@@ -1996,7 +2037,7 @@ else:
 
 - Growing season: {ARGS.start} through {ARGS.end}
 - USDA CDL thematic year: {ARGS.cdl_year}
-- NAIP imagery selection: catalog records where Year = {ARGS.cdl_year}
+- NAIP imagery selection: {IMAGERY_YEAR}, {ARGS.start} through {ARGS.end}
 
 ## Handoff data
 

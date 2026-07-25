@@ -8,6 +8,7 @@ import subprocess
 from pathlib import Path, PurePosixPath
 from typing import Any, Callable, Sequence
 
+from faster_raster.contract_repair import intervention_reference
 from faster_raster.local_diagnostics import detect_wsl
 
 
@@ -352,6 +353,41 @@ def inspect_handoff(handoff: Path) -> dict[str, Any]:
         }
         for row in asset_status
     ]
+    raw_intervention = receipt.get(
+        "contract_repair",
+        manifest.get("contract_repair"),
+    )
+    raw_intervention = (
+        raw_intervention
+        if isinstance(raw_intervention, dict)
+        else None
+    )
+    repair = intervention_reference(raw_intervention)
+    resolved_location = receipt.get(
+        "resolved_location",
+        manifest.get("resolved_location"),
+    )
+    resolved_location = (
+        resolved_location
+        if isinstance(resolved_location, dict)
+        else {}
+    )
+    repair["actual_imagery"] = receipt.get(
+        "actual_imagery",
+        manifest.get("actual_imagery"),
+    )
+    repair["resolved_location"] = {
+        "request_bbox_epsg_4326": resolved_location.get(
+            "request_bbox_epsg_4326"
+        ),
+        "analysis_aoi_recorded": (
+            resolved_location.get("analysis_aoi_epsg_4326") is not None
+        ),
+        "acquisition_uses_request_envelope": resolved_location.get(
+            "acquisition_uses_request_envelope",
+            False,
+        ),
+    }
     return {
         "schema_version": "fasterraster.handoff-inspection/v2",
         "handoff": str(handoff),
@@ -369,4 +405,5 @@ def inspect_handoff(handoff: Path) -> dict[str, Any]:
         ],
         "output_paths": receipt.get("generated_output_paths", []),
         "classification": _classification_summary(handoff, receipt),
+        "contract_repair": repair,
     }

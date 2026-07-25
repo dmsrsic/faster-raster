@@ -11,7 +11,7 @@ import sys
 import uuid
 from datetime import date, datetime, timezone
 from pathlib import Path
-from typing import Any, Callable, Iterator, Sequence
+from typing import Any, Callable, Iterator, Mapping, Sequence
 
 from faster_raster.ag_assets import (
     ASSET_PATTERNS,
@@ -62,6 +62,22 @@ class RecipeExecutionError(RuntimeError):
     pass
 
 
+class RecoverableRecipeExecutionError(RecipeExecutionError):
+    def __init__(self, failure_document: Mapping[str, Any]) -> None:
+        from faster_raster.contract_repair import (
+            recoverable_failure_from_document,
+        )
+
+        failure = recoverable_failure_from_document(failure_document)
+        if failure is None:
+            raise ValueError(
+                "failure document does not describe a supported repair"
+            )
+        self.failure_document = dict(failure_document)
+        self.recoverable_failure = failure
+        super().__init__(str(failure_document.get("detail") or failure.detail))
+
+
 def _write_json(path: Path, value: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
@@ -109,7 +125,7 @@ def _validate_dates(start: str, end: str, year: int) -> None:
     if start_date >= end_date:
         raise RecipeExecutionError("timeframe start must precede end")
     if start_date.year != year or end_date.year != year:
-        raise RecipeExecutionError("growing-season dates must match --cdl-year")
+        raise RecipeExecutionError("imagery timeframe dates must match imagery year")
 
 
 @contextlib.contextmanager
@@ -202,13 +218,23 @@ def _resolve_reused(
     staging: Path,
     bbox: tuple[float, float, float, float],
     year: int,
+    imagery_year: int,
 ) -> dict[str, Path]:
     resolved: dict[str, Path] = {}
     for decision in decisions:
         if not decision.action.startswith("reuse_") or decision.candidate is None:
             continue
         source = Path(decision.candidate.local_path)
-        destination = staging / "data" / ASSET_FILENAMES[decision.asset_name].format(year=year)
+        asset_year = (
+            imagery_year
+            if decision.asset_name in {"natural", "naip_multispectral", "ndvi"}
+            else year
+        )
+        destination = (
+            staging
+            / "data"
+            / ASSET_FILENAMES[decision.asset_name].format(year=asset_year)
+        )
         if decision.action == "reuse_direct":
             _link_or_copy(source, destination)
         else:
@@ -217,7 +243,7 @@ def _resolve_reused(
     return resolved
 
 
-def _run_selective_acquisition(
+def _acquisition_command(
     root: Path,
     staging: Path,
     assets: Sequence[str],
@@ -230,12 +256,10 @@ def _run_selective_acquisition(
     recipe: AgriculturalRecipe,
     max_total_bytes: int,
     service_tile_size: int,
+    imagery_year: int | None = None,
     naip_resolution_m: float | None = None,
-    runner: Callable[..., subprocess.CompletedProcess[str]] = subprocess.run,
-) -> dict[str, Any]:
-    if not assets:
-        return {"network_bytes": 0, "requests": [], "layers": []}
-    command = [
+) -> list[str]:
+    return [
         sys.executable,
         str(root / "scripts" / "fr-cook-ag"),
         "--asset-only",
@@ -252,6 +276,8 @@ def _run_selective_acquisition(
         end,
         "--cdl-year",
         str(year),
+        "--imagery-year",
+        str(imagery_year),
         "--portion",
         recipe.defaults.portion,
         "--naip-resolution",
@@ -267,13 +293,80 @@ def _run_selective_acquisition(
         "--preview-width",
         str(recipe.defaults.preview_width),
     ]
+
+
+def _source_failure_document(staging: Path) -> dict[str, Any] | None:
+    for path in (
+        staging / "source_coverage_failure.json",
+        staging / "metadata" / "source_coverage_failure.json",
+    ):
+        try:
+            value = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        if isinstance(value, dict):
+            return value
+    return None
+
+
+def _raise_acquisition_failure(
+    staging: Path,
+    result: subprocess.CompletedProcess[str],
+) -> None:
+    document = _source_failure_document(staging)
+    if document is not None:
+        from faster_raster.contract_repair import (
+            recoverable_failure_from_document,
+        )
+
+        if recoverable_failure_from_document(document) is not None:
+            raise RecoverableRecipeExecutionError(document)
+    raise RecipeExecutionError(
+        "selective acquisition failed: "
+        + (result.stderr or result.stdout or "unknown error").strip()
+    )
+
+
+def _run_selective_acquisition(
+    root: Path,
+    staging: Path,
+    assets: Sequence[str],
+    *,
+    name: str,
+    bbox: tuple[float, float, float, float],
+    start: str,
+    end: str,
+    year: int,
+    recipe: AgriculturalRecipe,
+    max_total_bytes: int,
+    service_tile_size: int,
+    imagery_year: int | None = None,
+    naip_resolution_m: float | None = None,
+    runner: Callable[..., subprocess.CompletedProcess[str]] = subprocess.run,
+) -> dict[str, Any]:
+    if not assets:
+        return {"network_bytes": 0, "requests": [], "layers": []}
+    resolved_imagery_year = imagery_year if imagery_year is not None else year
+    command = _acquisition_command(
+        root,
+        staging,
+        assets,
+        name=name,
+        bbox=bbox,
+        start=start,
+        end=end,
+        year=year,
+        imagery_year=resolved_imagery_year,
+        recipe=recipe,
+        max_total_bytes=max_total_bytes,
+        service_tile_size=service_tile_size,
+        naip_resolution_m=naip_resolution_m,
+    )
     result = runner(command, cwd=root, check=False, capture_output=True, text=True)
     if result.stdout:
         print(result.stdout, end="")
     if result.returncode != 0:
-        raise RecipeExecutionError(
-            "selective acquisition failed: " + (result.stderr or result.stdout or "unknown error").strip()
-        )
+        _raise_acquisition_failure(staging, result)
     manifest_path = staging / "manifest.json"
     try:
         return json.loads(manifest_path.read_text(encoding="utf-8"))
@@ -281,10 +374,24 @@ def _run_selective_acquisition(
         raise RecipeExecutionError("selective acquisition did not write a valid manifest") from exc
 
 
-def _find_resolved_paths(staging: Path, year: int, names: Sequence[str]) -> dict[str, Path]:
+def _find_resolved_paths(
+    staging: Path,
+    year: int,
+    names: Sequence[str],
+    *,
+    imagery_year: int | None = None,
+) -> dict[str, Path]:
     result: dict[str, Path] = {}
     for name in names:
-        expected = staging / "data" / ASSET_FILENAMES[name].format(year=year)
+        expected_year = (
+            imagery_year
+            if imagery_year is not None
+            and name in {"natural", "naip_multispectral", "ndvi"}
+            else year
+        )
+        expected = (
+            staging / "data" / ASSET_FILENAMES[name].format(year=expected_year)
+        )
         if expected.is_file():
             result[name] = expected
             continue
@@ -301,8 +408,15 @@ def _verify_resolved(
     recipe: AgriculturalRecipe,
     bbox: tuple[float, float, float, float],
     year: int,
+    imagery_year: int | None = None,
 ) -> dict[str, AssetRecord]:
-    paths = _find_resolved_paths(staging, year, list(recipe.required_assets))
+    resolved_imagery_year = imagery_year if imagery_year is not None else year
+    paths = _find_resolved_paths(
+        staging,
+        year,
+        list(recipe.required_assets),
+        imagery_year=resolved_imagery_year,
+    )
     missing = sorted(set(recipe.required_assets) - set(paths))
     if missing:
         raise RecipeExecutionError(f"resolved asset verification missing: {', '.join(missing)}")
@@ -314,13 +428,18 @@ def _verify_resolved(
             raise RecipeExecutionError(
                 f"resolved {name} failed validation: {record.validation_errors}; spatial={relationship}"
             )
+        expected_year = (
+            resolved_imagery_year
+            if name in {"natural", "naip_multispectral", "ndvi"}
+            else year
+        )
         if name in {
             "natural",
             "naip_multispectral",
             "ndvi",
             "cdl_classes",
             "cdl_color",
-        } and record.temporal_key != year:
+        } and record.temporal_key != expected_year:
             raise RecipeExecutionError(f"resolved {name} has wrong year {record.temporal_key}")
         if name in {"natural", "naip_multispectral", "ndvi"} and (
             record.pixel_size_m is None
@@ -484,11 +603,26 @@ def execute_recipe(
     max_total_bytes: int,
     service_tile_size: int,
     renderer: Callable[..., Path],
+    imagery_year: int | None = None,
     naip_resolution_m: float | None = None,
+    analysis_aoi_epsg_4326: Mapping[str, Any] | None = None,
+    contract_repair: Mapping[str, Any] | None = None,
 ) -> Path:
+    resolved_imagery_year = (
+        int(imagery_year) if imagery_year is not None else int(year)
+    )
+    _validate_dates(start, end, resolved_imagery_year)
+    runtime_scientific_claim: str | None = None
     if isinstance(recipe, AgriculturalRecipeV3):
+        from faster_raster.ag_classification_contracts import (
+            classification_scientific_claim,
+        )
         from faster_raster.ag_classification import classification_dependency_status
 
+        runtime_scientific_claim = classification_scientific_claim(
+            resolved_imagery_year,
+            year,
+        )
         if not classification_dependency_status()["available"]:
             raise RecipeExecutionError(
                 "This recipe requires the FasterRaster classification extra: "
@@ -511,6 +645,7 @@ def execute_recipe(
         bbox,
         year,
         reuse_mode,  # type: ignore[arg-type]
+        imagery_year=resolved_imagery_year,
     )
     plan = asset_plan_document(
         recipe,
@@ -519,9 +654,20 @@ def execute_recipe(
         start=start,
         end=end,
         year=year,
+        imagery_year=resolved_imagery_year,
         reuse_mode=reuse_mode,
         requested_resolution_m=naip_resolution_m,
     )
+    plan["runtime_request"] = {
+        "request_bbox_epsg_4326": list(bbox),
+        "imagery_timeframe": {"start": start, "end": end},
+        "imagery_year": resolved_imagery_year,
+        "cdl_year": year,
+        "analysis_aoi_epsg_4326": analysis_aoi_epsg_4326,
+        "human_repair_occurred": contract_repair is not None,
+    }
+    if contract_repair is not None:
+        plan["contract_repair"] = dict(contract_repair)
     handoff_root = configured_handoff_root(root)
     final = handoff_root / f"{_safe_name(name)}_{_stamp()}"
     plan["published_handoff_id"] = final.name
@@ -541,7 +687,13 @@ def execute_recipe(
                 "REUSE_ONLY: network prohibited; unavailable or incompatible assets: "
                 + ", ".join(blocking)
             )
-        _resolve_reused(decisions, staging, bbox, year)
+        _resolve_reused(
+            decisions,
+            staging,
+            bbox,
+            year,
+            resolved_imagery_year,
+        )
         acquisition_manifest = (
             _run_selective_acquisition(
                 root,
@@ -552,6 +704,7 @@ def execute_recipe(
                 start=start,
                 end=end,
                 year=year,
+                imagery_year=resolved_imagery_year,
                 recipe=recipe,
                 max_total_bytes=max_total_bytes,
                 service_tile_size=service_tile_size,
@@ -570,15 +723,31 @@ def execute_recipe(
             try:
                 raw_acquisition_evidence = validate_raw_naip_acquisition_evidence(
                     acquisition_manifest,
-                    requested_year=year,
+                    requested_year=resolved_imagery_year,
                 )
             except RawNaipEvidenceError as exc:
                 raise RecipeExecutionError(
                     f"acquired naip_multispectral failed evidence validation: {exc}"
                 ) from exc
-        resolved = _verify_resolved(staging, recipe, bbox, year)
+        if resolved_imagery_year == year:
+            resolved = _verify_resolved(staging, recipe, bbox, year)
+        else:
+            resolved = _verify_resolved(
+                staging,
+                recipe,
+                bbox,
+                year,
+                imagery_year=resolved_imagery_year,
+            )
         compatibility_assets = {
-            key: str(_find_resolved_paths(staging, year, [key]).get(key))
+            key: str(
+                _find_resolved_paths(
+                    staging,
+                    year,
+                    [key],
+                    imagery_year=resolved_imagery_year,
+                ).get(key)
+            )
             if key in recipe.required_assets
             else None
             for key in ASSET_PATTERNS
@@ -617,7 +786,10 @@ def execute_recipe(
                 Path(resolved["cdl_classes"].local_path),
                 staging,
                 recipe,
-                year=year,
+                year=resolved_imagery_year,
+                cdl_year=year,
+                analysis_aoi_epsg_4326=analysis_aoi_epsg_4326,
+                contract_repair=contract_repair,
             )
             output_dir = staging / "preview" / recipe.recipe_id
             preview_path = (
@@ -646,7 +818,10 @@ def execute_recipe(
                 naip_path=Path(resolved["naip_multispectral"].local_path),
                 classification_result=classification_result,
                 recipe=recipe,
-                year=year,
+                year=resolved_imagery_year,
+                cdl_year=year,
+                analysis_aoi_epsg_4326=analysis_aoi_epsg_4326,
+                contract_repair=contract_repair,
                 acquisition_evidence={
                     "acquisition_date_evidence": acquisition_dates or None,
                 },
@@ -705,6 +880,18 @@ def execute_recipe(
                     "validation_result": "PASS",
                 }
             )
+        if contract_repair is not None:
+            intervention_path = staging / "interventions.jsonl"
+            intervention_path.write_text(
+                json.dumps(
+                    dict(contract_repair),
+                    sort_keys=True,
+                    separators=(",", ":"),
+                    default=str,
+                )
+                + "\n",
+                encoding="utf-8",
+            )
         generated_output_paths = sorted(
             {
                 path.relative_to(staging).as_posix()
@@ -729,6 +916,52 @@ def execute_recipe(
             "requested_bbox_epsg_4326": list(bbox),
             "requested_timeframe": {"start": start, "end": end},
             "requested_cdl_year": year,
+            "actual_imagery": {
+                "year": resolved_imagery_year,
+                "resolved_requested_date_range": {
+                    "start": start,
+                    "end": end,
+                },
+                "catalog_acquisition_dates": (
+                    acquisition_manifest.get("naip", {}).get(
+                        "selected_acquisition_dates", []
+                    )
+                    if isinstance(acquisition_manifest.get("naip"), dict)
+                    else []
+                ),
+                "catalog_acquisition_date_status": (
+                    "source_catalog_evidence"
+                    if any(
+                        name
+                        in {
+                            "natural",
+                            "naip_multispectral",
+                            "ndvi",
+                        }
+                        for name in acquired_names
+                    )
+                    else "not_available_for_reused_asset"
+                ),
+            },
+            "resolved_location": {
+                "request_bbox_epsg_4326": list(bbox),
+                "analysis_aoi_epsg_4326": analysis_aoi_epsg_4326,
+                "acquisition_uses_request_envelope": (
+                    bool(
+                        (
+                            (contract_repair or {}).get("resolved_request")
+                            or {}
+                        ).get(
+                            "acquisition_geometry_differs_from_analysis_aoi",
+                            False,
+                        )
+                    )
+                ),
+            },
+            "human_repair_occurred": contract_repair is not None,
+            "contract_repair": (
+                dict(contract_repair) if contract_repair is not None else None
+            ),
             "effective_naip_resolution_m": (
                 naip_resolution_m
                 if naip_resolution_m is not None
@@ -746,7 +979,7 @@ def execute_recipe(
         if classification_result is not None:
             receipt.update(
                 {
-                    "scientific_claim": recipe.scientific_claim,
+                    "scientific_claim": runtime_scientific_claim,
                     "unsupported_claims": recipe.unsupported_claims,
                     "mapping": {
                         "mapping_id": classification_result["mapping"]["mapping_id"],
@@ -783,12 +1016,12 @@ def execute_recipe(
                             "data/cdl_training_cores.cog.tif",
                         ],
                         "model_products": [
-                            f"data/naip_{year}_surface_classification.cog.tif",
-                            f"data/naip_{year}_classification_confidence.cog.tif",
+                            f"data/naip_{resolved_imagery_year}_surface_classification.cog.tif",
+                            f"data/naip_{resolved_imagery_year}_classification_confidence.cog.tif",
                             "analysis/classification/model_receipt.json",
                         ],
                         "qa_products": [
-                            f"data/naip_{year}_cdl_agreement_state.cog.tif",
+                            f"data/naip_{resolved_imagery_year}_cdl_agreement_state.cog.tif",
                             "analysis/classification/holdout_confusion_matrix.csv",
                             "analysis/classification/holdout_confusion_matrix.json",
                             "analysis/classification/weak_label_metrics.json",
@@ -819,6 +1052,7 @@ def execute_recipe(
                 "time_start": start,
                 "time_end": end,
                 "cdl_year": year,
+                "imagery_year": resolved_imagery_year,
                 "reuse_mode": reuse_mode,
                 "recipe_id": recipe.recipe_id,
                 "effective_naip_resolution_m": (
@@ -827,7 +1061,15 @@ def execute_recipe(
                     else recipe.defaults.naip_resolution_meters
                 ),
                 "network_ceiling_bytes": max_total_bytes,
+                "request_bbox_epsg_4326": list(bbox),
+                "analysis_aoi_epsg_4326": analysis_aoi_epsg_4326,
             },
+            "human_repair_occurred": contract_repair is not None,
+            "contract_repair": (
+                dict(contract_repair) if contract_repair is not None else None
+            ),
+            "actual_imagery": receipt["actual_imagery"],
+            "resolved_location": receipt["resolved_location"],
             "layers": [
                 {
                     "name": item["asset_name"],
@@ -857,12 +1099,15 @@ def execute_recipe(
                     "contract_version"
                 ],
                 "mapping_sha256": classification_result["mapping_sha256"],
-                "scientific_claim": recipe.scientific_claim,
+                "scientific_claim": runtime_scientific_claim,
                 "weak_label_spatial_holdout_agreement": (
                     classification_result["metrics"]
                 ),
                 "artifact_accounting": receipt["artifact_accounting"],
                 "four_band_source_verification": receipt["four_band_source_verification"],
+                "actual_imagery": receipt["actual_imagery"],
+                "resolved_location": receipt["resolved_location"],
+                "human_repair_occurred": contract_repair is not None,
             }
         _write_json(staging / "manifest.json", manifest)
         _regenerate_checksums(staging)
@@ -894,6 +1139,7 @@ def _recipe_parser() -> argparse.ArgumentParser:
     parser.add_argument("--start", required=True)
     parser.add_argument("--end", required=True)
     parser.add_argument("--cdl-year", required=True, type=int)
+    parser.add_argument("--imagery-year", type=int)
     parser.add_argument("--max-total-bytes", type=int)
     parser.add_argument("--service-tile-size", type=int)
     parser.add_argument("--open", action="store_true")
@@ -914,7 +1160,8 @@ def run_recipe_cli(
         recipe_path = root / "recipes" / "ag" / f"{args.recipe}.json"
         recipe_raw = json.loads(recipe_path.read_text(encoding="utf-8"))
         bbox = _parse_bbox(args.bbox)
-        _validate_dates(args.start, args.end, args.cdl_year)
+        imagery_year = args.imagery_year or args.cdl_year
+        _validate_dates(args.start, args.end, imagery_year)
         max_total_bytes = args.max_total_bytes or recipe.defaults.max_total_bytes
         service_tile_size = args.service_tile_size or recipe.defaults.service_tile_size
         if max_total_bytes <= 0 or max_total_bytes > 20_000_000_000:
@@ -930,6 +1177,7 @@ def run_recipe_cli(
             start=args.start,
             end=args.end,
             year=args.cdl_year,
+            imagery_year=imagery_year,
             reuse_mode=args.reuse,
             open_preview=args.open,
             max_total_bytes=max_total_bytes,

@@ -7,9 +7,9 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from faster_raster.ag_classification_contracts import (
-    CLASSIFICATION_SCIENTIFIC_CLAIM,
     CLASSIFICATION_UNSUPPORTED_CLAIMS,
     CDL_SURFACE_SUPERCLASSES,
+    classification_scientific_claim,
 )
 from faster_raster.ag_assets import asset_plan_document, compile_asset_plan, discover_cached_assets
 from faster_raster.ag_geography import (
@@ -367,6 +367,7 @@ def compile_study_plan(
     output_dir: Path | None = None,
     inventory_root: Path | None = None,
     now: datetime | None = None,
+    runtime_request: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     if isinstance(workfile.spec, HumanDevelopmentWorkfileSpec):
         try:
@@ -391,6 +392,21 @@ def compile_study_plan(
         cli_overrides=cli_overrides,
     )
     recipe = load_named_recipe(repository_root, workfile.spec.workflow_id)
+    runtime = dict(runtime_request or {})
+    request_bbox = tuple(
+        runtime.get("request_bbox_epsg_4326", workfile.spec.area.bbox)
+    )
+    imagery_timeframe = dict(runtime.get("imagery_timeframe") or {})
+    imagery_start = str(
+        imagery_timeframe.get("start", workfile.spec.time.start.isoformat())
+    )
+    imagery_end = str(
+        imagery_timeframe.get("end", workfile.spec.time.end.isoformat())
+    )
+    imagery_year = int(
+        runtime.get("imagery_year", workfile.spec.time.crop_year)
+    )
+    cdl_year = int(workfile.spec.time.crop_year)
     profile = load_capability_profile(paths.capability_profile)
     resolution = resolve_study_sources(
         workfile,
@@ -407,17 +423,19 @@ def compile_study_plan(
     asset_decisions = compile_asset_plan(
         recipe,
         inventory,
-        tuple(workfile.spec.area.bbox),
-        workfile.spec.time.crop_year,
+        request_bbox,
+        cdl_year,
         resolved["values"]["reuse_mode"]["value"],
+        imagery_year=imagery_year,
     )
     asset_plan = asset_plan_document(
         recipe,
         asset_decisions,
-        bbox=tuple(workfile.spec.area.bbox),
-        start=workfile.spec.time.start.isoformat(),
-        end=workfile.spec.time.end.isoformat(),
-        year=workfile.spec.time.crop_year,
+        bbox=request_bbox,
+        start=imagery_start,
+        end=imagery_end,
+        year=cdl_year,
+        imagery_year=imagery_year,
         reuse_mode=resolved["values"]["reuse_mode"]["value"],
         requested_resolution_m=float(resolved["values"]["resolution_m"]["value"]),
     )
@@ -462,6 +480,26 @@ def compile_study_plan(
         "rows": rows,
         "asset_plan": asset_plan,
         "maximum_download_bytes": int(resolved["values"]["maximum_download_mb"]["value"] * 1_000_000),
+        "runtime_request": {
+            "request_bbox_epsg_4326": list(request_bbox),
+            "imagery_timeframe": {
+                "start": imagery_start,
+                "end": imagery_end,
+            },
+            "imagery_year": imagery_year,
+            "cdl_year": cdl_year,
+            "analysis_aoi_epsg_4326": runtime.get(
+                "analysis_aoi_epsg_4326"
+            ),
+            "spatial_construction": runtime.get("spatial_construction"),
+            "temporal_mismatch": imagery_year != cdl_year,
+            "acquisition_geometry_differs_from_analysis_aoi": bool(
+                runtime.get(
+                    "acquisition_geometry_differs_from_analysis_aoi",
+                    False,
+                )
+            ),
+        },
     }
     if recipe.schema_version == 3:
         from faster_raster.ag_classification import classification_dependency_status
@@ -471,7 +509,7 @@ def compile_study_plan(
         )
         dependency = classification_dependency_status()
         estimated_transfer = estimate_uncompressed_asset_bytes(
-            tuple(workfile.spec.area.bbox),
+            request_bbox,
             asset_safety_profile(
                 recipe.required_assets,
                 requested_resolution,
@@ -482,13 +520,27 @@ def compile_study_plan(
                 "asset": "naip_multispectral",
                 "band_ids": [0, 1, 2, 3],
                 "requested_resolution_m": requested_resolution,
+                "imagery_year": imagery_year,
+                "imagery_timeframe": {
+                    "start": imagery_start,
+                    "end": imagery_end,
+                },
             },
-            "weak_supervision": "same-year USDA CDL superclasses",
+            "weak_supervision": (
+                "USDA CDL superclasses"
+                if imagery_year != cdl_year
+                else "same-year USDA CDL superclasses"
+            ),
+            "cdl_year": cdl_year,
+            "temporal_mismatch": imagery_year != cdl_year,
             "mapping_id": CDL_SURFACE_SUPERCLASSES.mapping_id,
             "mapping_sha256": CDL_SURFACE_SUPERCLASSES.sha256,
             "estimated_uncompressed_transfer_bytes": estimated_transfer,
             "dependency_readiness": dependency,
-            "scientific_claim": CLASSIFICATION_SCIENTIFIC_CLAIM,
+            "scientific_claim": classification_scientific_claim(
+                imagery_year,
+                cdl_year,
+            ),
             "unsupported_claims": list(CLASSIFICATION_UNSUPPORTED_CLAIMS),
         }
         if not dependency["available"]:

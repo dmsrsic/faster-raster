@@ -69,7 +69,10 @@ def _analytical_hashes(handoff: Path) -> dict[str, str]:
 
 
 def _raw_naip_evidence(handoff: Path, year: int) -> list[Any] | None:
-    catalog = _read_json(handoff / "metadata" / f"naip_{year}_catalog.json")
+    catalog_path = handoff / "metadata" / f"naip_{year}_catalog.json"
+    if not catalog_path.is_file():
+        return None
+    catalog = _read_json(catalog_path)
     encoded: dict[str, Any] = {}
     for feature in catalog.get("features", []):
         value = feature.get("attributes", {}).get("acquisition_date")
@@ -162,7 +165,29 @@ def derive_publication(
             )
         )
         receipt = _read_json(receipt_path)
-        year = int(receipt["requested_cdl_year"])
+        cdl_year = int(receipt["requested_cdl_year"])
+        actual_imagery = receipt.get("actual_imagery")
+        actual_imagery = (
+            actual_imagery
+            if isinstance(actual_imagery, dict)
+            else {}
+        )
+        imagery_year = int(actual_imagery.get("year", cdl_year))
+        resolved_location = receipt.get("resolved_location")
+        resolved_location = (
+            resolved_location
+            if isinstance(resolved_location, dict)
+            else {}
+        )
+        analysis_aoi = resolved_location.get(
+            "analysis_aoi_epsg_4326"
+        )
+        contract_repair = receipt.get("contract_repair")
+        contract_repair = (
+            contract_repair
+            if isinstance(contract_repair, dict)
+            else None
+        )
         recipe = load_named_recipe(
             Path(__file__).resolve().parent.parent,
             "naip_cdl_classification_audit",
@@ -197,14 +222,45 @@ def derive_publication(
             / recipe.recipe_id
             / f"{recipe.recipe_id}_4k.png"
         )
+        naip_asset = next(
+            (
+                asset
+                for asset in receipt.get("assets", [])
+                if asset.get("asset_name") == "naip_multispectral"
+            ),
+            None,
+        )
+        naip_relative = (
+            _relative_path(naip_asset["output_path"])
+            if isinstance(naip_asset, dict)
+            else PurePosixPath(
+                f"data/naip_{imagery_year}_multispectral.cog.tif"
+            )
+        )
+        acquisition_date_evidence = _raw_naip_evidence(
+            staging,
+            imagery_year,
+        )
+        if acquisition_date_evidence is None:
+            catalog_dates = actual_imagery.get(
+                "catalog_acquisition_dates"
+            )
+            acquisition_date_evidence = (
+                catalog_dates
+                if isinstance(catalog_dates, list) and catalog_dates
+                else None
+            )
         preview, publication = render_classification_audit(
             preview,
-            naip_path=staging / "data" / f"naip_{year}_multispectral.cog.tif",
+            naip_path=staging / naip_relative,
             classification_result=classification_result,
             recipe=recipe,
-            year=year,
+            year=imagery_year,
+            cdl_year=cdl_year,
+            analysis_aoi_epsg_4326=analysis_aoi,
+            contract_repair=contract_repair,
             acquisition_evidence={
-                "acquisition_date_evidence": _raw_naip_evidence(staging, year)
+                "acquisition_date_evidence": acquisition_date_evidence
             },
             network_bytes=0,
             reused_bytes=reused_bytes,
@@ -275,13 +331,26 @@ def derive_publication(
         manifest["derived_publication"] = receipt["derived_publication"]
         _write_json(staging / "manifest.json", manifest)
 
-        resolved = _read_json(staging / "resolved_config.json")
+        resolved_path = staging / "resolved_config.json"
+        resolved = (
+            _read_json(resolved_path)
+            if resolved_path.is_file()
+            else {
+                "compatibility": {
+                    "source_resolved_config_present": False,
+                    "note": (
+                        "publication-only derivation synthesized this "
+                        "metadata wrapper for an older finalized handoff"
+                    ),
+                }
+            }
+        )
         resolved["derived_publication"] = {
             "source_handoff_id": source.name,
             "network_allowed": False,
             "reuse_mode": "only",
         }
-        _write_json(staging / "resolved_config.json", resolved)
+        _write_json(resolved_path, resolved)
 
         if _analytical_hashes(staging) != source_hashes:
             raise RuntimeError(

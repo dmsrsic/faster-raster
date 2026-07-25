@@ -208,6 +208,118 @@ analytical hash is unchanged, records the source handoff and manifest hash,
 sets network bytes to zero, and regenerates checksums. It never mutates the
 historical source handoff.
 
+## Interactive contract repair
+
+`fr cook` can repair a bounded source-contract failure for this workflow when
+NAIP is unavailable for the requested imagery year, acquisition-date range, or
+location. It never substitutes data automatically. The prompt identifies the
+failed `naip_multispectral` asset, shows source-backed alternatives when they
+are known, validates only the replacement field, recompiles the normal study
+plan, recalculates cache matches and byte ceilings, shows the original and
+resolved request, and requires confirmation before the executor performs any
+source request. The executor validates catalog coverage before raster transfer;
+if the replacement is still unsupported, no raster is transferred and the
+bounded prompt resumes.
+
+Prompting is enabled by default only when both standard input and standard
+output are interactive terminals. Use `--interactive` to opt in when terminal
+detection is unavailable, or `--non-interactive` to require fail-closed
+behavior:
+
+```bash
+fr cook study.fr.md --interactive
+fr cook study.fr.md --non-interactive
+```
+
+Redirected input, CI, scheduled jobs, HPC jobs, `--json`, and other
+noninteractive execution never wait for input. They return the structured
+source-coverage failure. `--interactive` and `--json` cannot be combined.
+Entering `q`, reaching end-of-input, exceeding the bounded invalid-attempt
+limit, rejecting a temporal mismatch, or declining final confirmation cancels
+without starting source access for the proposed replacement.
+
+An unavailable-year repair resembles:
+
+```text
+Source resolution blocked
+
+Asset: NAIP multispectral imagery
+Requested year: 2022
+Reason: no compatible imagery was found
+
+Source-reported compatible years:
+  [1] 2021
+  [2] 2023
+  [3] Enter another year
+  [q] Cancel
+```
+
+The listed choice or manually entered year is validated. Imagery dates move to
+that imagery year, while the CDL crop-label year remains the workfile year. If
+those years differ, FasterRaster displays a prominent warning and requires a
+separate explicit acceptance. Receipts describe the result as temporally
+mismatched weak supervision; they do not claim that the replacement imagery
+represents the originally requested year. Date-range recovery asks for start
+and end separately in `YYYY-MM-DD` form and rejects malformed, cross-year, or
+inverted ranges.
+
+Location recovery accepts either the normal explicit
+`west,south,east,north` bbox or a point and metric buffer:
+
+```text
+Location recovery options:
+  [1] Enter replacement bbox
+  [2] Create location from point and buffer
+  [q] Cancel
+
+Center longitude (longitude first): -83.0123
+Center latitude: 39.9987
+Buffer distance: 2.0
+Unit:
+  [1] meters
+  [2] kilometers
+  [3] miles
+Shape:
+  [1] square
+  [2] circle
+```
+
+Coordinates are always longitude first, then latitude. Supported units are
+meters, kilometers, and miles. For a square, the entered distance is the
+half-width and half-height, so the full side is twice that value. For a circle,
+it is the radius. FasterRaster constructs the geometry in a point-centered
+metric azimuthal-equidistant CRS and transforms it to EPSG:4326; it never
+pretends that degrees are meters. Circles use a fixed 128-segment polygon.
+Invalid coordinates, non-finite or nonpositive distances, unsupported
+units/shapes, distances above the bounded 500 km limit, unsafe high latitudes,
+and antimeridian-crossing results fail clearly and re-prompt.
+
+A square is axis-aligned and remains a true square in its local metric
+construction CRS, and its source-request bbox is the geographic envelope
+derived from that square. A
+circle remains a true circular analysis AOI, while its rectangular envelope is
+sent to bbox-only source services. Projected square edges and geographic
+envelope edges are deterministically densified before transformation. Pixels in
+an envelope but outside the generated AOI are masked from training, inference,
+confidence, agreement, previews, metrics, coverage counts, and class-area
+inventories and analytical valid-coverage counts. The prompt warns about this
+distinction and reports the excluded envelope-only area.
+
+The repair is run-scoped: the original workfile is never modified. The final
+handoff records the original request, resolved request, failure type, evidence,
+alternatives, confirmations, original and resolved plan hashes, temporal
+mismatch, point/buffer construction, analysis AOI, request envelope, areas,
+geometry hash, and intervention ID. `interventions.jsonl`, the asset plan,
+manifest, recipe receipt, training/model receipts, and publication receipt make
+the human repair visible rather than hiding it. Publication-only rerendering
+reuses the recorded imagery year, CDL year, AOI mask, and intervention
+reference.
+
+Current limitations are deliberate: repair is wired only to
+`naip_cdl_classification_audit`; there is no place-name or address geocoding,
+arbitrary polygon drawing, cloud optimization, arbitrary resolution repair, or
+automatic workfile write-back.
+
 ## Workfile and bounded examples
 
 Create and inspect the built-in study:
