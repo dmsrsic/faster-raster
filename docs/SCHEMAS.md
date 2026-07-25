@@ -10,6 +10,20 @@ faster-raster export-schemas --out schemas/
 
 The export is deterministic: the same code version writes byte-identical schema files.
 
+## Agricultural and workfile schemas
+
+- `agricultural_recipe_v3.schema.json` preserves the published beta.3
+  NAIP–CDL classification contract.
+- `agricultural_recipe_v4.schema.json` validates source-aware index requests,
+  explicit general/specialist classes, bounded selection/calibration, and
+  deterministic arbitration.
+- `workfile_v1.schema.json` remains backward compatible and adds an optional
+  V4-only classification override for the index-guided workflow.
+
+The V4 recipe is also part of the discriminated agricultural recipe union.
+Schema export ordering and JSON formatting are deterministic; generated
+schemas are checked against the committed files in tests and release gates.
+
 ## `research_spec.schema.json`
 
 Validates user-authored semantic research specs. It covers project metadata, AOI fields, target grid fields, source requests, and output settings.
@@ -39,4 +53,3 @@ This is useful for CI checks before URL planning.
 ## Boundary
 
 Schema export does not create manifests, call network endpoints, inspect remote services, or require geospatial libraries.
-

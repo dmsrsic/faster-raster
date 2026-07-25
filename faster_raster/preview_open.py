@@ -119,6 +119,151 @@ def _classification_summary(
     }
 
 
+def _hybrid_summary(
+    handoff: Path,
+    receipt: dict[str, Any],
+) -> dict[str, Any] | None:
+    hybrid_receipt = receipt.get("index_guided_hybrid")
+    analysis = handoff / "analysis" / "indices"
+    if not isinstance(hybrid_receipt, dict) and not analysis.is_dir():
+        return None
+    registry = _read_json(analysis / "index_registry.json")
+    capability = _read_json(analysis / "index_capability_report.json")
+    plan = _read_json(analysis / "index_plan.json")
+    statistics = _read_json(analysis / "index_statistics.json")
+    ranking = _read_json(analysis / "index_candidate_ranking.json")
+    rules = _read_json(analysis / "specialist_class_rules.json")
+    overlap = _read_json(analysis / "specialist_overlap_matrix.json")
+    inventory = _read_json(analysis / "hybrid_class_inventory.json")
+    validation = _read_json(analysis / "index_validation_metrics.json")
+    selection = _read_json(
+        handoff / "receipts" / "index_selection_receipt.json"
+    )
+    hybrid = _read_json(
+        handoff / "receipts" / "hybrid_classification_receipt.json"
+    )
+    definitions = {
+        item.get("index_id"): item
+        for item in registry.get("indices", [])
+        if isinstance(item, dict) and item.get("index_id")
+    }
+    calculated = []
+    for index_id in sorted(statistics):
+        definition = definitions.get(index_id, {})
+        index_statistics = statistics.get(index_id, {})
+        calculated.append(
+            {
+                "index_id": index_id,
+                "formula": definition.get("formula"),
+                "formula_sha256": definition.get("content_sha256"),
+                "required_bands": definition.get("required_bands", []),
+                "valid_pixel_count": index_statistics.get(
+                    "valid_pixel_count"
+                ),
+                "minimum": index_statistics.get("minimum"),
+                "maximum": index_statistics.get("maximum"),
+                "mean": index_statistics.get("mean"),
+                "standard_deviation": index_statistics.get(
+                    "standard_deviation"
+                ),
+                "quantiles": index_statistics.get("quantiles"),
+            }
+        )
+    specialist_classes = []
+    for item in rules.get("classes", []):
+        if not isinstance(item, dict):
+            continue
+        strategy = item.get("strategy_contract", {})
+        if not isinstance(strategy, dict):
+            strategy = {}
+        specialist_classes.append(
+            {
+                "class_id": item.get("class_id"),
+                "label": item.get("label"),
+                "output_code": item.get("output_code"),
+                "eligible_parent_general_classes": item.get(
+                    "eligible_parent_general_classes",
+                    [],
+                ),
+                "priority": item.get("priority"),
+                "enabled": item.get("enabled"),
+                "candidate_pixels": item.get("candidate_pixels"),
+                "score_semantics": strategy.get("score_semantics"),
+                "strategy": strategy.get("strategy"),
+                "calibration_source": (
+                    item.get("calibration") or {}
+                ).get("source"),
+            }
+        )
+    selected = selection.get("selected")
+    selected = selected if isinstance(selected, dict) else {}
+    outer = selection.get("outer_holdout")
+    outer = outer if isinstance(outer, dict) else {}
+    actual_imagery = receipt.get("actual_imagery")
+    actual_imagery = (
+        actual_imagery if isinstance(actual_imagery, dict) else {}
+    )
+    resolved_location = receipt.get("resolved_location")
+    resolved_location = (
+        resolved_location if isinstance(resolved_location, dict) else {}
+    )
+    return {
+        "available": bool(
+            registry
+            or capability
+            or plan
+            or statistics
+            or rules
+            or hybrid
+        ),
+        "registry_version": registry.get("schema_version"),
+        "registry_sha256": registry.get("registry_sha256"),
+        "source_compatibility_status": capability.get("status"),
+        "source_bands": (
+            (capability.get("source") or {}).get("actual_band_order")
+        ),
+        "calculated_indices": calculated,
+        "selection_mode": plan.get("selection_mode"),
+        "selection_status": selection.get("status"),
+        "candidate_count": selection.get(
+            "candidate_count",
+            ranking.get("candidate_count"),
+        ),
+        "selected_candidate": selected.get("candidate_id"),
+        "selected_indices": selected.get("index_ids"),
+        "selected_threshold": selected.get("threshold"),
+        "selected_direction": selected.get("direction"),
+        "selected_weights": selected.get("weights"),
+        "inner_selection": selection.get("inner_selection"),
+        "untouched_holdout_metrics": outer.get("metrics"),
+        "specialist_classes": specialist_classes,
+        "overlaps": overlap.get("overlaps", []),
+        "unresolved_pixels": hybrid.get("unresolved_pixels"),
+        "arbitration": hybrid.get("arbitration"),
+        "final_class_inventory": inventory.get("classes", []),
+        "validation": validation,
+        "imagery_year": actual_imagery.get("year"),
+        "cdl_year": receipt.get("requested_cdl_year"),
+        "temporal_mismatch": (
+            actual_imagery.get("year") is not None
+            and receipt.get("requested_cdl_year") is not None
+            and actual_imagery.get("year")
+            != receipt.get("requested_cdl_year")
+        ),
+        "analysis_aoi_recorded": (
+            resolved_location.get("analysis_aoi_epsg_4326") is not None
+        ),
+        "machine_readable_evidence": {
+            "registry": "analysis/indices/index_registry.json",
+            "capability": "analysis/indices/index_capability_report.json",
+            "plan": "analysis/indices/index_plan.json",
+            "selection": "receipts/index_selection_receipt.json",
+            "specialist_rules": "analysis/indices/specialist_class_rules.json",
+            "hybrid": "receipts/hybrid_classification_receipt.json",
+        },
+    }
+
+
 def is_finalized_handoff(path: Path) -> bool:
     if not path.is_dir() or path.name.startswith((".", "_")):
         return False
@@ -405,5 +550,6 @@ def inspect_handoff(handoff: Path) -> dict[str, Any]:
         ],
         "output_paths": receipt.get("generated_output_paths", []),
         "classification": _classification_summary(handoff, receipt),
+        "index_guided_hybrid": _hybrid_summary(handoff, receipt),
         "contract_repair": repair,
     }

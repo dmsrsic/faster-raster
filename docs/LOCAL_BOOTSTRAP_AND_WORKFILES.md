@@ -61,6 +61,19 @@ The schema version is `fasterraster.work/v1`. The parser rejects duplicate YAML 
 
 Source policy may be `auto`, `preferred` with `prefer` and `deny` lists, or `pinned` with logical mappings such as `natural_imagery: naip`. Auto planning does not require ordinary users to know every registry ID. The source-resolution artifact records all candidates, rejections and reasons, selected source, capability timestamp and age, credentials, local driver compatibility, fallback use, provisional status, and execution-time revalidation.
 
+For
+`workflow_id: naip_cdl_index_hybrid_classification_audit`, V1 workfiles may
+include an optional validated `classification` override. It uses the V4 recipe
+contract: explicit general classes/count, index requests, explicit specialist
+classes/count, calibration, selection mode/search bounds, and arbitration. The
+field is rejected for other workflows, so older workfiles need no new fields
+and cannot silently acquire hybrid semantics.
+
+The `ag-naip-index-hybrid-classification` template exposes point/buffer or bbox
+location behavior, imagery/CDL years, byte ceiling, general class selection,
+specialist strategies/labels/parents, and selection mode. Recommendation review
+does not rewrite the workfile; an accepted choice applies only to that run.
+
 ## Commands
 
 ```text
@@ -70,6 +83,8 @@ fr configure [deterministic update flags] [--apply-recommendations]
 fr doctor [--offline] [--json]
 fr sources [--stale] [--status STATUS] [--category CATEGORY] [--json]
 fr sources evaluate [--source ID] [--offline] [--maximum-bytes N] [--keep-probe-artifacts] [--json]
+fr indices list [--json]
+fr indices show INDEX_ID [--json]
 fr validate STUDY.fr.md [--json]
 fr plan STUDY.fr.md [--out DIR] [--json]
 fr explain STUDY.fr.md [--json]

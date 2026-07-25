@@ -187,6 +187,7 @@ def test_template_listing_show_and_deterministic_generation(tmp_path: Path):
         "human-development-cdl-reuse",
         "ag-cdl-naip",
         "ag-naip-classification",
+        "ag-naip-index-hybrid-classification",
         "generic-cog",
     }
     assert show_study_template("human-development-cdl") == show_study_template(

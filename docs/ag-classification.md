@@ -16,6 +16,12 @@ ownership map, construction or occupancy evidence, population or economic
 activity, irrigation status, yield, causal land-use change, independent
 accuracy assessment, or historical change.
 
+The additive Unreleased V4 workflow preserves this broad result and applies
+explicit spectral specialist classes afterward. See
+[Index-guided hybrid classification](index-guided-classification.md). Existing
+V3 recipes, features, output meanings, handoffs, inspection, and zero-network
+rerendering do not require new fields.
+
 ![Finalized NAIP–CDL classification audit publication](assets/naip-cdl-classification-audit.png)
 
 *Finalized real-imagery example. The holdout and agreement values shown here
@@ -315,10 +321,10 @@ the human repair visible rather than hiding it. Publication-only rerendering
 reuses the recorded imagery year, CDL year, AOI mask, and intervention
 reference.
 
-Current limitations are deliberate: repair is wired only to
-`naip_cdl_classification_audit`; there is no place-name or address geocoding,
-arbitrary polygon drawing, cloud optimization, arbitrary resolution repair, or
-automatic workfile write-back.
+Repair is available to both the V3 classification audit and its additive
+Unreleased V4 index-guided workflow. There is no place-name or address
+geocoding, arbitrary polygon drawing, cloud optimization, arbitrary resolution
+repair, or automatic workfile write-back.
 
 ## Workfile and bounded examples
 

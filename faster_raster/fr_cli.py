@@ -1,17 +1,20 @@
 from __future__ import annotations
 
 import argparse
+import contextlib
 import hashlib
+import io
 import json
 import os
 import sys
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any, Callable, Mapping, Sequence
 
 from faster_raster import __version__
 from faster_raster.ag_execution import (
     RecoverableRecipeExecutionError,
     RecipeExecutionError,
+    SelectionReviewReady,
     _regenerate_checksums,
     configured_handoff_root,
     execute_recipe,
@@ -21,7 +24,11 @@ from faster_raster.ag_geography import (
     asset_safety_profile,
     validate_aoi_safety,
 )
-from faster_raster.ag_recipes import RecipeLoadError, load_named_recipe
+from faster_raster.ag_recipes import (
+    AgriculturalRecipeV4,
+    RecipeLoadError,
+    load_named_recipe,
+)
 from faster_raster.local_config import (
     ConfigError,
     apply_config_updates,
@@ -360,6 +367,124 @@ def command_templates(args: argparse.Namespace) -> int:
     return 0
 
 
+def command_indices(args: argparse.Namespace) -> int:
+    from faster_raster.spectral_indices import (
+        BUILTIN_INDEX_REGISTRY,
+        IndexCapabilityError,
+        naip_source_capabilities,
+        validate_index_compatibility,
+    )
+
+    capabilities = naip_source_capabilities()
+
+    def item(index_id: str) -> dict[str, Any]:
+        definition = BUILTIN_INDEX_REGISTRY.get(index_id)
+        if definition.parameterized:
+            compatibility: dict[str, Any] = {
+                "status": "PARAMETERIZED",
+                "source_asset": "naip_multispectral",
+                "note": "compatibility depends on the declared semantic bands",
+            }
+        else:
+            try:
+                compatibility = validate_index_compatibility(
+                    index_id,
+                    capabilities,
+                )
+            except IndexCapabilityError as exc:
+                compatibility = exc.as_dict()
+        return {
+            **definition.as_dict(),
+            "naip_compatibility": compatibility,
+            "registry_version": BUILTIN_INDEX_REGISTRY.as_dict()[
+                "schema_version"
+            ],
+            "registry_sha256": BUILTIN_INDEX_REGISTRY.sha256,
+        }
+
+    if args.indices_command == "list":
+        items = [item(index_id) for index_id in BUILTIN_INDEX_REGISTRY.ids]
+        if args.json:
+            _json(
+                {
+                    "registry_version": BUILTIN_INDEX_REGISTRY.as_dict()[
+                        "schema_version"
+                    ],
+                    "registry_sha256": BUILTIN_INDEX_REGISTRY.sha256,
+                    "index_count": len(items),
+                    "indices": items,
+                }
+            )
+        else:
+            print(
+                "Built-in spectral indices "
+                f"({BUILTIN_INDEX_REGISTRY.sha256[:12]}):"
+            )
+            for value in items:
+                compatibility = value["naip_compatibility"]
+                status = compatibility["status"]
+                detail = (
+                    ""
+                    if status in {"COMPATIBLE", "PARAMETERIZED"}
+                    else " · missing "
+                    + ", ".join(compatibility.get("missing_bands", []))
+                )
+                print(
+                    f"  {value['index_id']}: {value['display_name']} · "
+                    f"NAIP {status.lower()}{detail}"
+                )
+        return 0
+    try:
+        value = item(args.index_id)
+    except ValueError as exc:
+        raise CommandError(str(exc)) from exc
+    if args.json:
+        _json(value)
+    else:
+        print(f"{value['index_id']} · {value['display_name']}")
+        print(f"Formula: {value['formula']}")
+        print(
+            "Required bands: "
+            + (
+                ", ".join(value["required_bands"])
+                if value["required_bands"]
+                else "parameterized"
+            )
+        )
+        print(
+            "Expected range: "
+            + (
+                ", ".join(str(item) for item in value["expected_range"])
+                if value["expected_range"] is not None
+                else "unbounded or contract-dependent"
+            )
+        )
+        print(
+            "NAIP compatibility: "
+            + value["naip_compatibility"]["status"]
+        )
+        if value["naip_compatibility"].get("missing_bands"):
+            print(
+                "Missing bands: "
+                + ", ".join(
+                    value["naip_compatibility"]["missing_bands"]
+                )
+            )
+        print("Intended uses: " + "; ".join(value["intended_uses"]))
+        print(
+            "Unsupported interpretations: "
+            + "; ".join(value["unsupported_interpretations"])
+        )
+        print(
+            "Raw-DN caveat: " + value["raw_digital_number_caveat"]
+        )
+        print(
+            f"Definition / registry hash: {value['content_sha256']} / "
+            f"{value['registry_sha256']}"
+        )
+    return 0
+
+
 def command_init(args: argparse.Namespace) -> int:
     destination = args.workfile.resolve()
     if destination.exists() and not args.force:
@@ -547,6 +672,51 @@ def command_plan(args: argparse.Namespace) -> int:
     return 2 if plan["blocking"] else 0
 
 
+def _write_hybrid_plan_summary(
+    plan: Mapping[str, Any],
+    writer: Callable[[str], Any],
+) -> None:
+    hybrid = plan.get("index_guided_hybrid")
+    if not isinstance(hybrid, dict):
+        return
+    requested = hybrid.get("requested_indices") or []
+    specialists = hybrid.get("specialist_classes") or []
+    failures = hybrid.get("capability_failures") or []
+    writer("  Index-guided hybrid:")
+    writer(
+        "    Requested indices: "
+        + (
+            ", ".join(
+                str(item.get("index_id")) for item in requested
+            )
+            or "none"
+        )
+    )
+    writer(
+        "    Source compatibility: "
+        + ("INCOMPATIBLE" if failures else "COMPATIBLE")
+    )
+    writer(
+        "    Specialist classes: "
+        + (
+            ", ".join(
+                str(item.get("class_id")) for item in specialists
+            )
+            or "none"
+        )
+    )
+    bounds = hybrid.get("candidate_search_bounds") or {}
+    writer(
+        "    Candidate bound: "
+        f"{int(bounds.get('maximum_candidate_models', 0))} models; "
+        f"{int(bounds.get('maximum_calibration_samples', 0))} samples"
+    )
+    writer(
+        "    Expected analytical rasters: "
+        f"{len(hybrid.get('expected_output_rasters') or [])}"
+    )
+
+
 def command_explain(args: argparse.Namespace) -> int:
     _, _, _, plan = _load_and_plan(args)
     if args.json:
@@ -620,6 +790,7 @@ def command_explain(args: argparse.Namespace) -> int:
             + f" ({dependency['install_command']})"
         )
         print("Unsupported claims: " + "; ".join(classification["unsupported_claims"]))
+    _write_hybrid_plan_summary(plan, print)
     return 2 if plan["blocking"] else 0
 
 
@@ -649,6 +820,9 @@ def _execute_classification_request(
     recipe: Any,
     recipe_raw: dict[str, Any],
     contract_repair: Mapping[str, Any] | None = None,
+    recommendation_selector: (
+        Callable[[str, list[dict[str, Any]]], str | None] | None
+    ) = None,
 ) -> Path:
     values = plan["resolved_config"]["values"]
     return execute_recipe(
@@ -675,7 +849,82 @@ def _execute_classification_request(
         ),
         analysis_aoi_epsg_4326=request.analysis_aoi_epsg_4326,
         contract_repair=contract_repair,
+        recommendation_selector=recommendation_selector,
     )
+
+
+def _interactive_recommendation_selector(
+    session: PromptSession,
+) -> Callable[[str, list[dict[str, Any]]], str | None]:
+    def select(
+        class_id: str,
+        ranking: list[dict[str, Any]],
+    ) -> str | None:
+        if not ranking:
+            session.write(
+                f"No candidate for {class_id} met the configured guards."
+            )
+            return None
+        shown = ranking[: min(8, len(ranking))]
+        session.write("")
+        session.write(f"Index recommendations for {class_id}:")
+        for position, candidate in enumerate(shown, start=1):
+            session.write(
+                f"  [{position}] {candidate['candidate_id']}  "
+                f"{candidate['selection_metric']:.3f} "
+                f"({candidate['complexity']} index"
+                + ("es)" if int(candidate["complexity"]) != 1 else ")")
+            )
+        session.write(
+            "Metrics are spatial agreement with declared calibration "
+            "evidence, not independent accuracy or physical causation."
+        )
+        session.write(
+            "Enter a shown number, any exact candidate ID from the review, "
+            "or q to cancel."
+        )
+        candidate_ids = {
+            str(candidate["candidate_id"]): candidate
+            for candidate in ranking
+        }
+        while True:
+            try:
+                choice = session.read("Selection: ")
+            except RepairCancelled:
+                return None
+            if choice.isdigit():
+                position = int(choice)
+                if 1 <= position <= len(shown):
+                    candidate_id = str(
+                        shown[position - 1]["candidate_id"]
+                    )
+                else:
+                    session.invalid("selection is outside the shown choices")
+                    continue
+            elif choice in candidate_ids:
+                candidate_id = choice
+            else:
+                session.invalid(
+                    "selection must be a shown number, exact candidate ID, "
+                    "or q"
+                )
+                continue
+            candidate = candidate_ids[candidate_id]
+            session.write(
+                f"Selected {candidate_id}: inner spatial metric "
+                f"{candidate['selection_metric']:.3f}."
+            )
+            try:
+                if session.confirm(
+                    "Accept for this run without modifying the workfile? "
+                    "[y/N]: "
+                ):
+                    return candidate_id
+            except RepairCancelled:
+                return None
+            session.write("Selection not accepted; choose again or cancel.")
+
+    return select
 
 
 def _request_candidate_directory(
@@ -766,6 +1015,7 @@ def _show_proposed_repair(
         session.write(
             f"  Estimated uncompressed assets: {int(estimated):,} bytes"
         )
+    _write_hybrid_plan_summary(plan, session.write)
     session.write(
         f"  Configured network ceiling: "
         f"{int(plan['maximum_download_bytes']):,} bytes"
@@ -782,6 +1032,9 @@ def _repair_classification_cook(
     recipe: Any,
     recipe_raw: dict[str, Any],
     initial_error: RecoverableRecipeExecutionError,
+    recommendation_selector: (
+        Callable[[str, list[dict[str, Any]]], str | None] | None
+    ) = None,
 ) -> tuple[Path, dict[str, Any]]:
     session = PromptSession()
     original_request = ClassificationRuntimeRequest.from_workfile(workfile)
@@ -900,6 +1153,7 @@ def _repair_classification_cook(
                 recipe=recipe,
                 recipe_raw=recipe_raw,
                 contract_repair=intervention,
+                recommendation_selector=recommendation_selector,
             )
         except RecoverableRecipeExecutionError as exc:
             failure = exc.recoverable_failure
@@ -930,34 +1184,103 @@ def command_cook(args: argparse.Namespace) -> int:
     if isinstance(workfile.spec, HumanDevelopmentWorkfileSpec):
         values = plan["resolved_config"]["values"]
         execute_human_development = _human_execute()
-        preview = execute_human_development(
-            root,
-            workfile=workfile,
-            plan=plan,
-            open_preview=bool(values["open_when_complete"]["value"]),
+        execution_output = (
+            contextlib.redirect_stdout(io.StringIO())
+            if args.json
+            else contextlib.nullcontext()
         )
+        with execution_output:
+            preview = execute_human_development(
+                root,
+                workfile=workfile,
+                plan=plan,
+                open_preview=bool(values["open_when_complete"]["value"]),
+            )
         final = _handoff_from_preview(preview, configured_handoff_root(root))
         result = {"status": "PASS", "handoff": str(final), "preview": str(preview), "network_plan": plan["rows"]}
         _json(result) if args.json else print(f"Cook complete: {final}\nPreview: {preview}")
         return 0
     recipe = load_named_recipe(root, workfile.spec.workflow_id)
+    if (
+        isinstance(recipe, AgriculturalRecipeV4)
+        and workfile.spec.classification is not None
+    ):
+        recipe = recipe.model_copy(
+            update={"classification": workfile.spec.classification}
+        )
+    recommendation_selector = None
+    if (
+        isinstance(recipe, AgriculturalRecipeV4)
+        and recipe.classification.specialists.selection_mode
+        == "recommendation"
+    ):
+        interactive = terminal_interaction_enabled(
+            getattr(args, "interactive", None),
+            json_output=bool(args.json),
+        )
+        if interactive:
+            recommendation_selector = (
+                _interactive_recommendation_selector(PromptSession())
+            )
     recipe_raw = json.loads((root / "recipes" / "ag" / f"{recipe.recipe_id}.json").read_text(encoding="utf-8"))
     request = ClassificationRuntimeRequest.from_workfile(workfile)
     try:
-        preview = _execute_classification_request(
-            root,
-            workfile,
-            plan,
-            request,
-            recipe=recipe,
-            recipe_raw=recipe_raw,
+        execution_output = (
+            contextlib.redirect_stdout(io.StringIO())
+            if args.json
+            else contextlib.nullcontext()
         )
+        with execution_output:
+            preview = _execute_classification_request(
+                root,
+                workfile,
+                plan,
+                request,
+                recipe=recipe,
+                recipe_raw=recipe_raw,
+                recommendation_selector=recommendation_selector,
+            )
+    except SelectionReviewReady as review:
+        result = {
+            "status": review.status,
+            "finalized": False,
+            "selection_mode": "recommendation",
+            "review_package": (
+                str(review.package_path)
+                if review.package_path is not None
+                else None
+            ),
+            "candidate_count": review.details.get(
+                "candidate_count", 0
+            ),
+            "message": (
+                "Index candidates were calculated and ranked. No completed "
+                "hybrid handoff was created; review the package, select a "
+                "contract, and rerun."
+            ),
+        }
+        _json(result) if args.json else print(
+            result["message"]
+            + (
+                f"\nReview package: {result['review_package']}"
+                if result["review_package"]
+                else ""
+            )
+        )
+        return 2
     except RecoverableRecipeExecutionError as exc:
         interactive = terminal_interaction_enabled(
             getattr(args, "interactive", None),
             json_output=bool(args.json),
         )
-        if recipe.recipe_id != "naip_cdl_classification_audit" or not interactive:
+        if (
+            recipe.recipe_id
+            not in {
+                "naip_cdl_classification_audit",
+                "naip_cdl_index_hybrid_classification_audit",
+            }
+            or not interactive
+        ):
             raise
         try:
             preview, plan = _repair_classification_cook(
@@ -969,6 +1292,7 @@ def command_cook(args: argparse.Namespace) -> int:
                 recipe=recipe,
                 recipe_raw=recipe_raw,
                 initial_error=exc,
+                recommendation_selector=recommendation_selector,
             )
         except (RepairCancelled, RepairAttemptsExceeded) as repair_error:
             raise CommandError(str(repair_error)) from repair_error
@@ -1142,6 +1466,75 @@ def command_inspect(args: argparse.Namespace) -> int:
                         "    Missing optional artifacts: "
                         + ", ".join(classification["missing_fields"])
                     )
+        hybrid = report.get("index_guided_hybrid")
+        if hybrid is not None:
+            print("  Index-guided hybrid summary:")
+            print(
+                "    Registry: "
+                f"{hybrid.get('registry_version') or 'unavailable'} "
+                f"({str(hybrid.get('registry_sha256') or '')[:12] or 'unavailable'})"
+            )
+            print(
+                "    Source compatibility: "
+                f"{hybrid.get('source_compatibility_status') or 'unavailable'}"
+            )
+            print(
+                "    Selection: "
+                f"{hybrid.get('selection_mode') or 'unavailable'} / "
+                f"{hybrid.get('selection_status') or 'unavailable'}"
+            )
+            indices = hybrid.get("calculated_indices") or []
+            print(
+                "    Calculated indices: "
+                + (
+                    ", ".join(item["index_id"] for item in indices)
+                    if indices
+                    else "none"
+                )
+            )
+            print(
+                "    Specialist classes: "
+                + (
+                    ", ".join(
+                        str(item.get("class_id"))
+                        for item in (
+                            hybrid.get("specialist_classes") or []
+                        )
+                    )
+                    or "none"
+                )
+            )
+            print(
+                "    Unresolved overlap pixels: "
+                f"{hybrid.get('unresolved_pixels') or 0}"
+            )
+            if args.verbose:
+                for item in indices:
+                    print(
+                        f"      {item['index_id']}: "
+                        f"range={item.get('minimum')}..{item.get('maximum')} "
+                        f"valid={item.get('valid_pixel_count')} "
+                        f"bands={','.join(item.get('required_bands') or [])}"
+                    )
+                    print(
+                        f"        formula: {item.get('formula') or 'custom; see evidence'}"
+                    )
+                for item in hybrid.get("specialist_classes") or []:
+                    print(
+                        f"      {item.get('class_id')}: "
+                        f"code={item.get('output_code')} "
+                        f"priority={item.get('priority')} "
+                        f"candidates={item.get('candidate_pixels')} "
+                        f"calibration={item.get('calibration_source')}"
+                    )
+                if hybrid.get("untouched_holdout_metrics"):
+                    print(
+                        "    Untouched holdout metrics: "
+                        + json.dumps(
+                            hybrid["untouched_holdout_metrics"],
+                            sort_keys=True,
+                        )
+                    )
     return 0
 
 
@@ -1213,6 +1606,28 @@ def build_parser() -> argparse.ArgumentParser:
     templates_show.add_argument("template_id")
     templates_show.add_argument("--json", action="store_true")
     templates_show.set_defaults(handler=command_templates)
+
+    indices = commands.add_parser(
+        "indices",
+        help="discover deterministic built-in spectral-index contracts",
+    )
+    index_commands = indices.add_subparsers(
+        dest="indices_command",
+        required=True,
+    )
+    indices_list = index_commands.add_parser(
+        "list",
+        help="list built-in index IDs and NAIP compatibility",
+    )
+    indices_list.add_argument("--json", action="store_true")
+    indices_list.set_defaults(handler=command_indices)
+    indices_show = index_commands.add_parser(
+        "show",
+        help="show formula, bands, range, compatibility, and caveats",
+    )
+    indices_show.add_argument("index_id")
+    indices_show.add_argument("--json", action="store_true")
+    indices_show.set_defaults(handler=command_indices)
 
     init = commands.add_parser("init", help="create a valid Markdown study workfile")
     init.add_argument("workfile", type=Path)

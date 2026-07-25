@@ -1,35 +1,5 @@
 {
   "$defs": {
-    "AreaSpec": {
-      "additionalProperties": false,
-      "properties": {
-        "bbox": {
-          "maxItems": 4,
-          "minItems": 4,
-          "prefixItems": [
-            {
-              "type": "number"
-            },
-            {
-              "type": "number"
-            },
-            {
-              "type": "number"
-            },
-            {
-              "type": "number"
-            }
-          ],
-          "title": "Bbox",
-          "type": "array"
-        }
-      },
-      "required": [
-        "bbox"
-      ],
-      "title": "AreaSpec",
-      "type": "object"
-    },
     "CalibrationEvidenceSpec": {
       "additionalProperties": false,
       "properties": {
@@ -201,28 +171,6 @@
         }
       },
       "title": "CandidateSearchBoundsSpec",
-      "type": "object"
-    },
-    "DataSpec": {
-      "additionalProperties": false,
-      "properties": {
-        "allow_network": {
-          "default": false,
-          "title": "Allow Network",
-          "type": "boolean"
-        },
-        "reuse": {
-          "default": "auto",
-          "enum": [
-            "auto",
-            "only",
-            "never"
-          ],
-          "title": "Reuse",
-          "type": "string"
-        }
-      },
-      "title": "DataSpec",
       "type": "object"
     },
     "GeneralClassificationSpec": {
@@ -567,20 +515,6 @@
       "title": "IndexRequestSpec",
       "type": "object"
     },
-    "LimitsSpec": {
-      "additionalProperties": false,
-      "properties": {
-        "maximum_download_mb": {
-          "default": 250.0,
-          "exclusiveMinimum": 0,
-          "maximum": 20000,
-          "title": "Maximum Download Mb",
-          "type": "number"
-        }
-      },
-      "title": "LimitsSpec",
-      "type": "object"
-    },
     "MultiIndexBooleanStrategy": {
       "additionalProperties": false,
       "properties": {
@@ -685,84 +619,105 @@
       "title": "MultiIndexWeightedStrategy",
       "type": "object"
     },
-    "OutputSpec": {
+    "RecipeDefaults": {
       "additionalProperties": false,
       "properties": {
-        "include_context_imagery": {
-          "default": false,
-          "title": "Include Context Imagery",
-          "type": "boolean"
+        "max_total_bytes": {
+          "exclusiveMinimum": 0,
+          "maximum": 20000000000,
+          "title": "Max Total Bytes",
+          "type": "integer"
         },
-        "open_when_complete": {
-          "default": false,
-          "title": "Open When Complete",
-          "type": "boolean"
+        "naip_resolution_meters": {
+          "exclusiveMinimum": 0,
+          "maximum": 100,
+          "title": "Naip Resolution Meters",
+          "type": "number"
         },
-        "preview": {
-          "default": true,
-          "title": "Preview",
-          "type": "boolean"
-        },
-        "preview_emphasis": {
-          "default": "development",
+        "portion": {
           "enum": [
-            "development",
-            "all_transitions"
+            "native",
+            "overview"
           ],
-          "title": "Preview Emphasis",
+          "title": "Portion",
           "type": "string"
-        }
-      },
-      "title": "OutputSpec",
-      "type": "object"
-    },
-    "ProcessingSpec": {
-      "additionalProperties": false,
-      "properties": {
-        "maximum_parallel_tasks": {
-          "anyOf": [
-            {
-              "maximum": 256,
-              "minimum": 1,
-              "type": "integer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "Maximum Parallel Tasks"
         },
-        "resolution_m": {
-          "anyOf": [
-            {
-              "exclusiveMinimum": 0,
-              "maximum": 100000,
-              "type": "number"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "Resolution M"
+        "preview_width": {
+          "maximum": 16384,
+          "minimum": 640,
+          "title": "Preview Width",
+          "type": "integer"
         },
         "service_tile_size": {
+          "maximum": 10000,
+          "minimum": 64,
+          "title": "Service Tile Size",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "max_total_bytes",
+        "naip_resolution_meters",
+        "portion",
+        "preview_width",
+        "service_tile_size"
+      ],
+      "title": "RecipeDefaults",
+      "type": "object"
+    },
+    "RecipeResampling": {
+      "additionalProperties": false,
+      "properties": {
+        "categorical": {
+          "enum": [
+            "nearest",
+            "mode",
+            "bilinear",
+            "cubic",
+            "lanczos",
+            "average"
+          ],
+          "title": "Categorical",
+          "type": "string"
+        },
+        "imagery": {
+          "enum": [
+            "nearest",
+            "mode",
+            "bilinear",
+            "cubic",
+            "lanczos",
+            "average"
+          ],
+          "title": "Imagery",
+          "type": "string"
+        },
+        "terrain": {
           "anyOf": [
             {
-              "maximum": 10000,
-              "minimum": 64,
-              "type": "integer"
+              "enum": [
+                "nearest",
+                "mode",
+                "bilinear",
+                "cubic",
+                "lanczos",
+                "average"
+              ],
+              "type": "string"
             },
             {
               "type": "null"
             }
           ],
           "default": null,
-          "title": "Service Tile Size"
+          "title": "Terrain"
         }
       },
-      "title": "ProcessingSpec",
+      "required": [
+        "categorical",
+        "imagery"
+      ],
+      "title": "RecipeResampling",
       "type": "object"
     },
     "SingleIndexThresholdStrategy": {
@@ -782,133 +737,6 @@
         "condition"
       ],
       "title": "SingleIndexThresholdStrategy",
-      "type": "object"
-    },
-    "SourcesSpec": {
-      "additionalProperties": false,
-      "properties": {
-        "cdl_classes": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "Cdl Classes"
-        },
-        "cdl_color": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "Cdl Color"
-        },
-        "crop_classes": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "Crop Classes"
-        },
-        "deny": {
-          "items": {
-            "type": "string"
-          },
-          "title": "Deny",
-          "type": "array"
-        },
-        "hillshade": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "Hillshade"
-        },
-        "natural": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "Natural"
-        },
-        "natural_imagery": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "Natural Imagery"
-        },
-        "ndvi": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "Ndvi"
-        },
-        "policy": {
-          "default": "auto",
-          "enum": [
-            "auto",
-            "pinned",
-            "preferred"
-          ],
-          "title": "Policy",
-          "type": "string"
-        },
-        "prefer": {
-          "items": {
-            "type": "string"
-          },
-          "title": "Prefer",
-          "type": "array"
-        },
-        "terrain": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "Terrain"
-        }
-      },
-      "title": "SourcesSpec",
       "type": "object"
     },
     "SpecialistClassSpec": {
@@ -1119,34 +947,6 @@
       "title": "TargetSignatureStrategy",
       "type": "object"
     },
-    "TimeSpec": {
-      "additionalProperties": false,
-      "properties": {
-        "crop_year": {
-          "maximum": 2200,
-          "minimum": 1900,
-          "title": "Crop Year",
-          "type": "integer"
-        },
-        "end": {
-          "format": "date",
-          "title": "End",
-          "type": "string"
-        },
-        "start": {
-          "format": "date",
-          "title": "Start",
-          "type": "string"
-        }
-      },
-      "required": [
-        "start",
-        "end",
-        "crop_year"
-      ],
-      "title": "TimeSpec",
-      "type": "object"
-    },
     "WeightedIndexInputSpec": {
       "additionalProperties": false,
       "properties": {
@@ -1183,81 +983,110 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
-    "area": {
-      "$ref": "#/$defs/AreaSpec"
+    "analysis_type": {
+      "const": "index_guided_hybrid_classification",
+      "title": "Analysis Type",
+      "type": "string"
     },
     "classification": {
-      "anyOf": [
-        {
-          "$ref": "#/$defs/HybridClassificationSpec"
-        },
-        {
-          "type": "null"
-        }
-      ],
-      "default": null
+      "$ref": "#/$defs/HybridClassificationSpec"
     },
-    "data": {
-      "$ref": "#/$defs/DataSpec"
+    "defaults": {
+      "$ref": "#/$defs/RecipeDefaults"
     },
-    "limits": {
-      "$ref": "#/$defs/LimitsSpec"
+    "inspection_focus": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Inspection Focus",
+      "type": "array"
     },
-    "name": {
-      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$",
-      "title": "Name",
+    "maximum_naip_pixel_size_m": {
+      "exclusiveMinimum": 0,
+      "maximum": 100,
+      "title": "Maximum Naip Pixel Size M",
+      "type": "number"
+    },
+    "preview": {
+      "const": "index_hybrid_classification_audit",
+      "title": "Preview",
       "type": "string"
     },
-    "outputs": {
-      "$ref": "#/$defs/OutputSpec"
+    "purpose": {
+      "minLength": 1,
+      "title": "Purpose",
+      "type": "string"
     },
-    "processing": {
-      "$ref": "#/$defs/ProcessingSpec"
+    "recipe_id": {
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "title": "Recipe Id",
+      "type": "string"
     },
-    "recipe": {
-      "anyOf": [
-        {
-          "pattern": "^[a-z][a-z0-9_-]*$",
-          "type": "string"
-        },
-        {
-          "type": "null"
-        }
-      ],
-      "default": null,
-      "title": "Recipe"
+    "required_assets": {
+      "items": {
+        "enum": [
+          "naip_multispectral",
+          "cdl_classes"
+        ],
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Required Assets",
+      "type": "array"
+    },
+    "required_output_artifacts": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Required Output Artifacts",
+      "type": "array"
+    },
+    "resampling": {
+      "$ref": "#/$defs/RecipeResampling"
     },
     "schema_version": {
-      "const": "fasterraster.work/v1",
+      "const": 4,
       "title": "Schema Version",
+      "type": "integer"
+    },
+    "scientific_claim": {
+      "const": "Single-date high-resolution NAIP spectral surface classification weakly supervised by USDA CDL superclasses, with explicitly declared scene-relative spectral-index specialist refinements. Spatial holdout metrics measure agreement with weak labels, not independent ground-truth accuracy.",
+      "title": "Scientific Claim",
       "type": "string"
     },
-    "sources": {
-      "$ref": "#/$defs/SourcesSpec"
+    "title": {
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
     },
-    "time": {
-      "$ref": "#/$defs/TimeSpec"
-    },
-    "workflow": {
-      "anyOf": [
-        {
-          "pattern": "^[a-z][a-z0-9_-]*$",
-          "type": "string"
-        },
-        {
-          "type": "null"
-        }
-      ],
-      "default": null,
-      "title": "Workflow"
+    "unsupported_claims": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Unsupported Claims",
+      "type": "array"
     }
   },
   "required": [
     "schema_version",
-    "name",
-    "area",
-    "time"
+    "recipe_id",
+    "title",
+    "purpose",
+    "analysis_type",
+    "scientific_claim",
+    "unsupported_claims",
+    "required_assets",
+    "maximum_naip_pixel_size_m",
+    "resampling",
+    "classification",
+    "preview",
+    "inspection_focus",
+    "defaults",
+    "required_output_artifacts"
   ],
-  "title": "FasterRaster Markdown workfile v1 front matter",
+  "title": "FasterRaster agricultural recipe v4",
   "type": "object"
 }

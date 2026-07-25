@@ -16,7 +16,11 @@ from faster_raster.ag_geography import (
     asset_safety_profile,
     estimate_uncompressed_asset_bytes,
 )
-from faster_raster.ag_recipes import load_named_recipe
+from faster_raster.ag_recipes import (
+    AgriculturalRecipeV4,
+    TargetSignatureStrategy,
+    load_named_recipe,
+)
 from faster_raster.local_config import (
     ConfigDocument,
     load_config_file,
@@ -138,6 +142,13 @@ def compile_resolved_configuration(
     cli_overrides: Mapping[str, Any] | None = None,
 ) -> tuple[dict[str, Any], ConfigDocument]:
     recipe = load_named_recipe(repository_root, workfile.spec.workflow_id)
+    if (
+        isinstance(recipe, AgriculturalRecipeV4)
+        and workfile.spec.classification is not None
+    ):
+        recipe = recipe.model_copy(
+            update={"classification": workfile.spec.classification}
+        )
     effective_config, config_files = resolved_config_document(paths)
     normalized = normalized_config_paths(effective_config, paths)
     values: dict[str, dict[str, Any]] = {}
@@ -392,6 +403,13 @@ def compile_study_plan(
         cli_overrides=cli_overrides,
     )
     recipe = load_named_recipe(repository_root, workfile.spec.workflow_id)
+    if (
+        isinstance(recipe, AgriculturalRecipeV4)
+        and workfile.spec.classification is not None
+    ):
+        recipe = recipe.model_copy(
+            update={"classification": workfile.spec.classification}
+        )
     runtime = dict(runtime_request or {})
     request_bbox = tuple(
         runtime.get("request_bbox_epsg_4326", workfile.spec.area.bbox)
@@ -501,7 +519,7 @@ def compile_study_plan(
             ),
         },
     }
-    if recipe.schema_version == 3:
+    if recipe.schema_version in {3, 4}:
         from faster_raster.ag_classification import classification_dependency_status
 
         requested_resolution = float(
@@ -537,17 +555,218 @@ def compile_study_plan(
             "mapping_sha256": CDL_SURFACE_SUPERCLASSES.sha256,
             "estimated_uncompressed_transfer_bytes": estimated_transfer,
             "dependency_readiness": dependency,
-            "scientific_claim": classification_scientific_claim(
-                imagery_year,
-                cdl_year,
+            "scientific_claim": (
+                classification_scientific_claim(
+                    imagery_year,
+                    cdl_year,
+                )
+                if recipe.schema_version == 3
+                else recipe.scientific_claim
             ),
-            "unsupported_claims": list(CLASSIFICATION_UNSUPPORTED_CLAIMS),
+            "unsupported_claims": list(recipe.unsupported_claims),
         }
         if not dependency["available"]:
             plan["blocking"] = True
             plan["classification"]["blocking_reason"] = (
                 "classification extra is unavailable before raster transfer"
             )
+        if isinstance(recipe, AgriculturalRecipeV4):
+            from faster_raster.spectral_indices import (
+                IndexCapabilityError,
+                naip_source_capabilities,
+                parse_index_expression,
+                validate_index_compatibility,
+            )
+
+            capabilities = naip_source_capabilities()
+            requested_indices: list[dict[str, Any]] = []
+            capability_failures: list[dict[str, Any]] = []
+            search_indices = set(
+                recipe.classification.specialists.search.candidate_indices
+            )
+            for request in recipe.classification.indices:
+                try:
+                    if request.expression is None:
+                        compatibility = validate_index_compatibility(
+                            request.index_id,
+                            capabilities,
+                        )
+                        required_bands = compatibility["required_bands"]
+                        formula_hash = None
+                    else:
+                        parsed = parse_index_expression(request.expression)
+                        compatibility = validate_index_compatibility(
+                            request.index_id,
+                            capabilities,
+                            required_bands=parsed.required_bands,
+                        )
+                        required_bands = list(parsed.required_bands)
+                        formula_hash = parsed.formula_hash
+                    requested_indices.append(
+                        {
+                            **request.model_dump(mode="json"),
+                            "required_bands": required_bands,
+                            "formula_sha256": formula_hash,
+                            "compatibility": compatibility["status"],
+                            "required_by_candidate_search": (
+                                request.index_id in search_indices
+                            ),
+                        }
+                    )
+                except IndexCapabilityError as exc:
+                    capability_failures.append(exc.as_dict())
+            declared_indices = {
+                request.index_id for request in recipe.classification.indices
+            }
+            for index_id in sorted(search_indices - declared_indices):
+                try:
+                    compatibility = validate_index_compatibility(
+                        index_id,
+                        capabilities,
+                    )
+                    requested_indices.append(
+                        {
+                            "index_id": index_id,
+                            "expression": None,
+                            "persist": True,
+                            "display": False,
+                            "required_bands": compatibility[
+                                "required_bands"
+                            ],
+                            "formula_sha256": None,
+                            "compatibility": compatibility["status"],
+                            "required_by_candidate_search": True,
+                            "selection_candidate_only": True,
+                        }
+                    )
+                except IndexCapabilityError as exc:
+                    capability_failures.append(exc.as_dict())
+            for specialist in recipe.classification.specialists.classes:
+                if isinstance(
+                    specialist.strategy,
+                    TargetSignatureStrategy,
+                ):
+                    try:
+                        validate_index_compatibility(
+                            "target_signature_similarity",
+                            capabilities,
+                            required_bands=tuple(
+                                specialist.strategy.target_bands
+                            ),
+                        )
+                    except IndexCapabilityError as exc:
+                        capability_failures.append(exc.as_dict())
+            selection_mode = (
+                recipe.classification.specialists.selection_mode
+            )
+            plan["index_guided_hybrid"] = {
+                "source_band_capabilities": capabilities.as_dict(),
+                "requested_indices": requested_indices,
+                "capability_failures": capability_failures,
+                "indices_to_persist": sorted(
+                    {
+                        request.index_id
+                        for request in recipe.classification.indices
+                        if request.persist
+                    }
+                    | search_indices
+                ),
+                "general_classes": {
+                    "requested_class_count": (
+                        recipe.classification.general.requested_class_count
+                    ),
+                    "actual_class_count": len(
+                        recipe.classification.general.class_ids
+                    ),
+                    "class_ids": list(
+                        recipe.classification.general.class_ids
+                    ),
+                    "class_codes": list(
+                        recipe.classification.general.class_codes
+                    ),
+                },
+                "specialist_classes": [
+                    {
+                        "class_id": specialist.class_id,
+                        "label": specialist.label,
+                        "output_code": specialist.output_code,
+                        "strategy_type": specialist.strategy.type,
+                        "eligible_parent_general_classes": list(
+                            specialist.eligible_parent_general_classes
+                        ),
+                        "priority": specialist.priority,
+                        "calibration_source": (
+                            specialist.calibration.source
+                        ),
+                    }
+                    for specialist in (
+                        recipe.classification.specialists.classes
+                    )
+                ],
+                "selection_mode": selection_mode,
+                "automatic_authorized": (
+                    recipe.classification.specialists.automatic_authorized
+                ),
+                "candidate_search_bounds": (
+                    recipe.classification.specialists.search.model_dump(
+                        mode="json"
+                    )
+                ),
+                "noninteractive_selection_status": (
+                    "AWAITING_INDEX_SELECTION"
+                    if selection_mode == "recommendation"
+                    else "READY"
+                ),
+                "expected_output_rasters": [
+                    "data/final_hybrid_classification.cog.tif",
+                    "data/hybrid_decision_state.cog.tif",
+                    *[
+                        f"data/indices/{index_id}.cog.tif"
+                        for index_id in sorted(
+                            {
+                                request.index_id
+                                for request in (
+                                    recipe.classification.indices
+                                )
+                                if request.persist
+                            }
+                            | search_indices
+                        )
+                    ],
+                    *[
+                        f"data/specialists/{specialist.class_id}_score.cog.tif"
+                        for specialist in (
+                            recipe.classification.specialists.classes
+                        )
+                    ],
+                    *[
+                        f"data/specialists/{specialist.class_id}_candidate.cog.tif"
+                        for specialist in (
+                            recipe.classification.specialists.classes
+                        )
+                    ],
+                ],
+                "estimated_derived_float32_rasters": (
+                    len(
+                        {
+                            request.index_id
+                            for request in recipe.classification.indices
+                            if request.persist
+                        }
+                        | search_indices
+                    )
+                    + len(recipe.classification.specialists.classes)
+                ),
+                "memory_policy": (
+                    "windowed float32 calculation; no AOI-wide feature cube"
+                ),
+            }
+            if capability_failures:
+                plan["blocking"] = True
+                plan["index_guided_hybrid"]["blocking_reason"] = (
+                    "one or more requested indices require unavailable "
+                    "semantic source bands"
+                )
     destination = output_dir or Path(resolved["values"]["state_root"]["value"]) / "plans" / workfile.spec.name
     destination.mkdir(parents=True, exist_ok=True)
     write_profile_atomic(destination / "resolved_config.json", resolved)

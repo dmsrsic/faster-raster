@@ -1,0 +1,225 @@
+{
+  "schema_version": 4,
+  "recipe_id": "naip_cdl_index_hybrid_classification_audit",
+  "title": "NAIP–CDL Index-Guided Hybrid Classification Audit",
+  "purpose": "Preserve a broad weak-supervised NAIP surface classification, apply explicit scene-relative vegetation and wet-surface specialist rules, and publish inspectable hybrid arbitration evidence.",
+  "analysis_type": "index_guided_hybrid_classification",
+  "scientific_claim": "Single-date high-resolution NAIP spectral surface classification weakly supervised by USDA CDL superclasses, with explicitly declared scene-relative spectral-index specialist refinements. Spatial holdout metrics measure agreement with weak labels, not independent ground-truth accuracy.",
+  "unsupported_claims": [
+    "crop species truth from one NAIP acquisition",
+    "authoritative land-cover replacement",
+    "cadastral or parcel boundaries",
+    "confirmed field ownership",
+    "construction dates",
+    "occupancy",
+    "population or economic activity",
+    "irrigation status",
+    "crop yield",
+    "causal land-use change",
+    "independent accuracy assessment",
+    "historical change from a single-date classification",
+    "surface reflectance from raw NAIP digital numbers",
+    "physical causation from a selected spectral index",
+    "threshold transferability across dates, mosaics, sensors, or radiometric products",
+    "mining, abandonment, contamination, ownership, or safety from spectral similarity"
+  ],
+  "required_assets": [
+    "naip_multispectral",
+    "cdl_classes"
+  ],
+  "maximum_naip_pixel_size_m": 1.5,
+  "resampling": {
+    "imagery": "bilinear",
+    "categorical": "nearest"
+  },
+  "classification": {
+    "general": {
+      "mapping_id": "cdl_surface_superclasses_v1",
+      "backend": "random_forest",
+      "random_seed": 20260725,
+      "training_core_radius_cdl_cells": 1,
+      "maximum_samples_per_class": 20000,
+      "minimum_training_samples_per_class": 500,
+      "spatial_holdout_folds": 5,
+      "spatial_holdout_fold": 0,
+      "inference_window_size": 512,
+      "confidence_threshold": 0.6,
+      "sieve_minimum_pixels": 9,
+      "features": [
+        "red",
+        "green",
+        "blue",
+        "nir",
+        "ndvi",
+        "gndvi",
+        "vari",
+        "excess_green",
+        "brightness",
+        "saturation"
+      ],
+      "n_estimators": 192,
+      "max_depth": 20,
+      "min_samples_leaf": 5,
+      "max_features": "sqrt",
+      "class_weight": "balanced_subsample",
+      "n_jobs": 1,
+      "requested_class_count": 6,
+      "class_ids": [
+        "cropland",
+        "fallow_or_barren",
+        "developed_open_or_low",
+        "developed_medium_or_high",
+        "noncrop_vegetation",
+        "water"
+      ]
+    },
+    "indices": [
+      {
+        "index_id": "ndvi",
+        "persist": true,
+        "display": true
+      },
+      {
+        "index_id": "gndvi",
+        "persist": true,
+        "display": false
+      },
+      {
+        "index_id": "green_nir_water_proxy",
+        "persist": true,
+        "display": true
+      }
+    ],
+    "specialists": {
+      "requested_class_count": 2,
+      "selection_mode": "user_defined",
+      "automatic_authorized": false,
+      "classes": [
+        {
+          "class_id": "vigorous_vegetation_candidate",
+          "label": "Vigorous vegetation candidate",
+          "output_code": 20,
+          "intended_interpretation": "Scene-relative high NDVI and GNDVI response within declared vegetation-related broad classes.",
+          "unsupported_interpretations": [
+            "crop species, yield, irrigation status, or independently validated plant condition"
+          ],
+          "strategy": {
+            "type": "multi_index_boolean",
+            "operator": "all",
+            "conditions": [
+              {
+                "index_id": "ndvi",
+                "direction": "high",
+                "threshold": 0.45
+              },
+              {
+                "index_id": "gndvi",
+                "direction": "high",
+                "threshold": 0.35
+              }
+            ]
+          },
+          "eligible_parent_general_classes": [
+            "cropland",
+            "noncrop_vegetation"
+          ],
+          "priority": 50,
+          "minimum_support_pixels": 1,
+          "uncertainty_behavior": "keep_general",
+          "calibration": {
+            "source": "fixed_rule",
+            "minimum_positive_support": 20,
+            "minimum_negative_support": 20,
+            "publish_coordinates": false
+          }
+        },
+        {
+          "class_id": "wet_surface_candidate",
+          "label": "Water or wet-surface spectral candidate",
+          "output_code": 21,
+          "intended_interpretation": "Scene-relative high green–NIR normalized-difference response within the broad water class.",
+          "unsupported_interpretations": [
+            "NDMI, canopy water content, hydrologic permanence, or authoritative water boundaries"
+          ],
+          "strategy": {
+            "type": "single_index_threshold",
+            "condition": {
+              "index_id": "green_nir_water_proxy",
+              "direction": "high",
+              "threshold": 0.0
+            }
+          },
+          "eligible_parent_general_classes": [
+            "water"
+          ],
+          "priority": 60,
+          "minimum_support_pixels": 1,
+          "uncertainty_behavior": "keep_general",
+          "calibration": {
+            "source": "fixed_rule",
+            "minimum_positive_support": 20,
+            "minimum_negative_support": 20,
+            "publish_coordinates": false
+          }
+        }
+      ],
+      "search": {
+        "candidate_indices": [],
+        "maximum_pairs": 36,
+        "maximum_triples": 24,
+        "maximum_candidate_models": 128,
+        "maximum_calibration_samples": 100000,
+        "inner_spatial_folds": 3,
+        "ranking_metric": "macro_f1",
+        "minimum_selection_metric": 0.55,
+        "minimum_complexity_improvement": 0.01,
+        "tie_tolerance": 1e-09
+      }
+    },
+    "arbitration": {
+      "policy": "priority_then_class_code",
+      "equal_priority_tie": "mark_unresolved",
+      "unresolved_code": 255,
+      "preserve_general_output": true,
+      "compare_unscaled_scores": false
+    }
+  },
+  "preview": "index_hybrid_classification_audit",
+  "inspection_focus": [
+    "raw broad general classification before specialist overrides",
+    "analytical NDVI and green–NIR wet-surface proxy values",
+    "specialist candidate masks and score semantics",
+    "explicit parent restrictions, overlaps, and arbitration",
+    "final hybrid classes and unresolved decision states"
+  ],
+  "defaults": {
+    "max_total_bytes": 500000000,
+    "naip_resolution_meters": 1.2,
+    "portion": "native",
+    "preview_width": 3840,
+    "service_tile_size": 1800
+  },
+  "required_output_artifacts": [
+    "asset_plan.json",
+    "recipe_receipt.json",
+    "preview_4k_png",
+    "classification_legend.json",
+    "general_classification_cog",
+    "confidence_cog",
+    "agreement_cog",
+    "final_hybrid_classification_cog",
+    "hybrid_decision_state_cog",
+    "index_registry.json",
+    "index_capability_report.json",
+    "index_plan.json",
+    "index_statistics.json",
+    "specialist_class_rules.json",
+    "specialist_overlap_matrix.json",
+    "hybrid_class_inventory.json",
+    "index_calculation_receipt.json",
+    "index_selection_receipt.json",
+    "specialist_classification_receipt.json",
+    "hybrid_classification_receipt.json",
+    "checksums.sha256"
+  ]
+}

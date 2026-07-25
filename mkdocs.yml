@@ -48,6 +48,7 @@ nav:
       - Supported sources: supported-sources.md
       - Human-development workflow: human-development.md
       - NAIP–CDL surface classification: ag-classification.md
+      - Index-guided hybrid classification: index-guided-classification.md
       - Hybrid publication: hybrid-publication.md
       - Examples: examples.md
   - Reproducibility:

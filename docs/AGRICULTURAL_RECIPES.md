@@ -1,17 +1,37 @@
 # Agricultural Recipe Runtime
 
-`scripts/fr-cook-ag` supports four version-2 agricultural recipes:
+`scripts/fr-cook-ag` supports the original version-2 agricultural recipes plus
+the V3 NAIP–CDL classification audit and additive Unreleased V4 index-guided
+hybrid classification audit.
 
 - `crop_vigor_classification` compares natural color, NAIP NDVI, and raw USDA CDL classes.
 - `irrigation_field_structure` emphasizes irrigation geometry and field edges.
 - `crop_class_area_inventory` produces CDL class counts and approximate hectares.
 - `crop_terrain_relationship` adds USGS 3DEP hillshade to the crop/vegetation view.
+- `naip_cdl_classification_audit` preserves the beta.3 raw four-band
+  weak-supervised broad classifier.
+- `naip_cdl_index_hybrid_classification_audit` preserves that broad result and
+  applies source-compatible spectral specialist classes.
 
 Each recipe requires a WGS 84 bbox (`west,south,east,north`), growing-season
 start and end dates, and an exact CDL year. The recipe declares its assets,
 maximum acceptable NAIP pixel size, semantic resampling policies, preview,
 inspection focus, execution limits, and required output artifacts. Recipe
 schema validation happens before cache inspection or network activity.
+
+## V4 index-guided contract
+
+`AgriculturalRecipeV4` contains explicit general class IDs/count/codes,
+persisted index requests, explicit specialist IDs/count/codes/parents,
+calibration evidence, user/recommendation/automatic selection mode, bounded
+candidate search, and deterministic arbitration. Source compatibility is based
+on semantic bands. Four-band NAIP cannot satisfy NDMI or NBR because it lacks
+SWIR1/SWIR2.
+
+The existing V3 recipe is unchanged. V4 reuses the same acquisition, caching,
+AOI masks, CDL weak labels, broad classifier, transaction, repair, manifest,
+inspection, and zero-network publication derivation. See
+[`index-guided-classification.md`](index-guided-classification.md).
 
 ## Geographic coverage
 

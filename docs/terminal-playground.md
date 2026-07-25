@@ -27,6 +27,24 @@ fr explain studies/example.fr.md --offline --verbose --out build/example-explana
 
 Validation is offline. `--offline` on planning prohibits source refresh as well as raster transfer.
 
+## Discover and plan spectral indices
+
+```sh
+fr indices list
+fr indices list --json
+fr indices show ndvi
+fr indices show ndmi
+fr templates show ag-naip-index-hybrid-classification
+fr validate studies/index-hybrid.fr.md
+fr plan studies/index-hybrid.fr.md --offline --verbose
+fr explain studies/index-hybrid.fr.md --offline --verbose
+```
+
+`fr indices show ndmi` explains that ordinary four-band NAIP lacks SWIR1.
+Recommendation mode prompts only in an interactive terminal. With
+`--non-interactive` or `--json`, it calculates a review package, returns
+`AWAITING_INDEX_SELECTION`, and never claims a finalized hybrid result.
+
 ## Cook and inspect
 
 After explicitly allowing network use in the workfile:

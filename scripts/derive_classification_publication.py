@@ -21,6 +21,10 @@ from faster_raster.ag_execution import (
     _validate_required_artifacts,
 )
 from faster_raster.ag_recipes import AgriculturalRecipeV3, load_named_recipe
+from faster_raster.ag_recipes import AgriculturalRecipeV4
+from faster_raster.hybrid_publication import (
+    render_hybrid_classification_audit,
+)
 from faster_raster.preview_open import inspect_handoff, is_finalized_handoff
 
 
@@ -59,7 +63,10 @@ def _relative_path(value: Any) -> PurePosixPath:
 def _analytical_hashes(handoff: Path) -> dict[str, str]:
     paths = [
         *sorted((handoff / "data").glob("*.tif")),
-        *sorted((handoff / "analysis" / "classification").glob("*")),
+        *sorted((handoff / "data").glob("**/*.tif")),
+        *sorted((handoff / "analysis" / "classification").glob("**/*")),
+        *sorted((handoff / "analysis" / "indices").glob("**/*")),
+        *sorted((handoff / "receipts").glob("*.json")),
     ]
     return {
         path.relative_to(handoff).as_posix(): _sha256(path)
@@ -131,6 +138,89 @@ def _classification_result(
     }
 
 
+def _hybrid_result(handoff: Path) -> dict[str, Any]:
+    analysis = handoff / "analysis" / "indices"
+    receipts = handoff / "receipts"
+    index_paths = {
+        path.name.removesuffix(".cog.tif"): path
+        for path in sorted((handoff / "data" / "indices").glob("*.cog.tif"))
+    }
+    score_paths = {
+        path.name.removesuffix("_score.cog.tif"): path
+        for path in sorted(
+            (handoff / "data" / "specialists").glob("*_score.cog.tif")
+        )
+    }
+    candidate_paths = {
+        path.name.removesuffix("_candidate.cog.tif"): path
+        for path in sorted(
+            (handoff / "data" / "specialists").glob(
+                "*_candidate.cog.tif"
+            )
+        )
+    }
+    return {
+        "registry": _read_json(analysis / "index_registry.json"),
+        "capability_report": _read_json(
+            analysis / "index_capability_report.json"
+        ),
+        "index_plan": _read_json(analysis / "index_plan.json"),
+        "index_statistics": _read_json(
+            analysis / "index_statistics.json"
+        ),
+        "selection_receipt": _read_json(
+            receipts / "index_selection_receipt.json"
+        ),
+        "specialist_rules": _read_json(
+            analysis / "specialist_class_rules.json"
+        ),
+        "specialist_receipt": _read_json(
+            receipts / "specialist_classification_receipt.json"
+        ),
+        "hybrid_receipt": _read_json(
+            receipts / "hybrid_classification_receipt.json"
+        ),
+        "paths": {
+            "general_classification": next(
+                iter(
+                    sorted(
+                        (handoff / "data").glob(
+                            "naip_*_surface_classification.cog.tif"
+                        )
+                    )
+                )
+            ),
+            "general_confidence": next(
+                iter(
+                    sorted(
+                        (handoff / "data").glob(
+                            "naip_*_classification_confidence.cog.tif"
+                        )
+                    )
+                )
+            ),
+            "general_agreement": next(
+                iter(
+                    sorted(
+                        (handoff / "data").glob(
+                            "naip_*_cdl_agreement_state.cog.tif"
+                        )
+                    )
+                )
+            ),
+            "indices": index_paths,
+            "specialist_scores": score_paths,
+            "specialist_candidates": candidate_paths,
+            "final_hybrid_classification": (
+                handoff / "data/final_hybrid_classification.cog.tif"
+            ),
+            "hybrid_decision_state": (
+                handoff / "data/hybrid_decision_state.cog.tif"
+            ),
+        },
+    }
+
+
 def derive_publication(
     source: Path,
     output_root: Path,
@@ -156,15 +246,10 @@ def derive_publication(
     try:
         shutil.copytree(source, staging, copy_function=shutil.copy2)
         receipt_path = next(
-            iter(
-                sorted(
-                    staging.glob(
-                        "preview/naip_cdl_classification_audit/recipe_receipt.json"
-                    )
-                )
-            )
+            iter(sorted(staging.glob("preview/*/recipe_receipt.json")))
         )
         receipt = _read_json(receipt_path)
+        recipe_id = str(receipt["recipe_id"])
         cdl_year = int(receipt["requested_cdl_year"])
         actual_imagery = receipt.get("actual_imagery")
         actual_imagery = (
@@ -190,10 +275,15 @@ def derive_publication(
         )
         recipe = load_named_recipe(
             Path(__file__).resolve().parent.parent,
-            "naip_cdl_classification_audit",
+            recipe_id,
         )
-        if not isinstance(recipe, AgriculturalRecipeV3):
-            raise TypeError("classification publication requires recipe v3")
+        if not isinstance(
+            recipe,
+            (AgriculturalRecipeV3, AgriculturalRecipeV4),
+        ):
+            raise TypeError(
+                "classification publication requires recipe v3 or v4"
+            )
         classification_result = _classification_result(staging, receipt)
         source_assets: list[dict[str, Any]] = []
         reused_bytes = 0
@@ -250,27 +340,44 @@ def derive_publication(
                 if isinstance(catalog_dates, list) and catalog_dates
                 else None
             )
-        preview, publication = render_classification_audit(
-            preview,
-            naip_path=staging / naip_relative,
-            classification_result=classification_result,
-            recipe=recipe,
-            year=imagery_year,
-            cdl_year=cdl_year,
-            analysis_aoi_epsg_4326=analysis_aoi,
-            contract_repair=contract_repair,
-            acquisition_evidence={
-                "acquisition_date_evidence": acquisition_date_evidence
-            },
-            network_bytes=0,
-            reused_bytes=reused_bytes,
-        )
+        if isinstance(recipe, AgriculturalRecipeV3):
+            preview, publication = render_classification_audit(
+                preview,
+                naip_path=staging / naip_relative,
+                classification_result=classification_result,
+                recipe=recipe,
+                year=imagery_year,
+                cdl_year=cdl_year,
+                analysis_aoi_epsg_4326=analysis_aoi,
+                contract_repair=contract_repair,
+                acquisition_evidence={
+                    "acquisition_date_evidence": acquisition_date_evidence
+                },
+                network_bytes=0,
+                reused_bytes=reused_bytes,
+            )
+        else:
+            preview, publication = render_hybrid_classification_audit(
+                preview,
+                naip_path=staging / naip_relative,
+                general_result=classification_result,
+                hybrid_result=_hybrid_result(staging),
+                recipe=recipe,
+                year=imagery_year,
+                cdl_year=cdl_year,
+                analysis_aoi_epsg_4326=analysis_aoi,
+                network_bytes=0,
+                reused_bytes=reused_bytes,
+            )
         now = datetime.now(timezone.utc).isoformat()
         receipt["assets"] = source_assets
         receipt["completed_at_utc"] = now
         receipt["total_network_bytes"] = 0
         receipt["total_reused_bytes"] = reused_bytes
-        receipt["classification"]["publication"] = publication
+        if isinstance(recipe, AgriculturalRecipeV3):
+            receipt["classification"]["publication"] = publication
+        else:
+            receipt["index_guided_hybrid"]["publication"] = publication
         receipt["artifact_accounting"]["downloaded_bytes"] = 0
         receipt["artifact_accounting"]["reused_bytes"] = reused_bytes
         receipt["derived_publication"] = {
@@ -328,6 +435,8 @@ def derive_publication(
         manifest["classification"]["artifact_accounting"] = receipt[
             "artifact_accounting"
         ]
+        if isinstance(recipe, AgriculturalRecipeV4):
+            manifest["index_guided_hybrid"]["publication"] = publication
         manifest["derived_publication"] = receipt["derived_publication"]
         _write_json(staging / "manifest.json", manifest)
 

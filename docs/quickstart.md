@@ -28,3 +28,25 @@ fr inspect latest --verbose
 ```
 
 Final handoffs are under `outputs/handoffs/`. See [Network and byte budgets](network-byte-budgets.md) before enabling network access.
+
+## Explore index-guided classification offline
+
+Index discovery and workfile validation do not contact a provider:
+
+```sh
+fr indices list
+fr indices show ndvi
+fr init studies/index-hybrid.fr.md \
+  --template ag-naip-index-hybrid-classification \
+  --name index-hybrid-demo \
+  --bbox -83.2000 39.8500 -83.1990 39.8510 \
+  --years 2023
+fr validate studies/index-hybrid.fr.md
+fr plan studies/index-hybrid.fr.md --offline
+fr explain studies/index-hybrid.fr.md --offline
+```
+
+Review source-band compatibility, persisted indices, specialist parents,
+selection mode, candidate bounds, expected rasters, and transfer ceiling before
+enabling a cook. See
+[Index-guided hybrid classification](index-guided-classification.md).

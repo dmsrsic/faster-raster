@@ -8,7 +8,7 @@
 
 FasterRaster turns public raster sources into bounded, reproducible, and publication-ready geospatial workflows. It compiles explicit source contracts, validates inputs, harmonizes grids, and preserves the evidence required to reproduce every output.
 
-**Public beta:** `v1.0.0-beta.1` (`1.0.0b1` as a Python package). The beta is suitable for technical evaluation and reproducible local studies; interfaces and output contracts may still change before a stable `v1.0.0` release.
+**Public beta:** `v1.0.0-beta.3` (`1.0.0b3` as a Python package). The beta is suitable for technical evaluation and reproducible local studies; interfaces and output contracts may still change before a stable `v1.0.0` release.
 
 FasterRaster is useful when a raster workflow needs more than a download script: exact source years, byte ceilings, categorical resampling rules, deterministic plans, transactional handoffs, checksums, provenance, and a clear record of what was reused or transferred.
 
@@ -23,6 +23,9 @@ FasterRaster is useful when a raster workflow needs more than a download script:
 - Finalizes results transactionally with manifests, receipts, checksums, and provenance.
 - Replays compatible handoffs with strict zero-network `reuse: only` behavior.
 - Publishes regional and deterministic 1 m hotspot human-development hybrids.
+- Supports explicit interactive repair when requested NAIP coverage is
+  unavailable, preserving original/resolved years, AOIs, and intervention
+  evidence without weakening noninteractive fail-closed behavior.
 
 The human-development workflow uses CDL non-agricultural classes as a **crop-focused mapped-development proxy**. It is not authoritative evidence of urbanization, population or economic growth, construction dates, occupancy, cadastral approval, or causality.
 
@@ -60,6 +63,38 @@ Review the workfile, same-year source evidence, transfer estimate, and byte
 ceiling before any live `fr cook`. See the
 [classification methodology and interpretation guide](docs/ag-classification.md).
 
+## Unreleased: index-guided hybrid classification
+
+Current development adds first-class spectral indices and an additive
+`naip_cdl_index_hybrid_classification_audit` recipe. The broad CDL-weakly
+supervised classifier remains independently inspectable. Specialist index
+classes then refine only declared parent classes using fixed thresholds,
+Boolean rules, explicitly normalized weighted scores, or target spectral
+similarity. Arbitration is deterministic, and the general classification,
+specialist candidates/scores, final hybrid classes, and decision state remain
+separate artifacts.
+
+The shipped development recipe demonstrates vigorous-vegetation and
+wet-surface candidates from four-band NAIP. For example, a vegetation
+specialist can require both NDVI and GNDVI thresholds within cropland or
+noncrop-vegetation parents. These are scene-relative spectral rules, not
+independent ground truth.
+
+Discover compatible definitions before editing a workfile:
+
+```sh
+fr indices list
+fr indices show ndvi
+fr templates show ag-naip-index-hybrid-classification
+```
+
+Recommendation mode ranks a bounded, spatially validated candidate set.
+Noninteractive execution produces an `AWAITING_INDEX_SELECTION` review package
+and does not finalize. Automatic selection requires explicit workfile
+authorization and stops when support or performance guards are not met. See
+the [index-guided classification guide](docs/index-guided-classification.md)
+for the complete contract, examples, outputs, and scientific limitations.
+
 ## Five-minute offline start
 
 Prerequisites are Python 3.12, a working GDAL/Rasterio runtime, and Git. Ubuntu is the public CI platform; WSL2 is exercised during local release validation. macOS and native Windows may work but are not beta CI targets yet.
@@ -89,7 +124,7 @@ Those commands make no network requests and write the deterministic plan beneath
 To install a built wheel instead:
 
 ```sh
-python -m pip install dist/faster_raster-1.0.0b1-py3-none-any.whl
+python -m pip install dist/faster_raster-1.0.0b3-py3-none-any.whl
 ```
 
 See [Installation](docs/installation.md) and the [five-minute quickstart](docs/quickstart.md) for clean-environment and live-study instructions.
@@ -134,7 +169,7 @@ Plans, grids, source mappings, receipts, and publication compatibility are conte
 
 ## Project status and boundaries
 
-This beta is release-engineered around the implemented local community core. Additional source adapters, provider-neutral credential references, paid or restricted datasets, richer classification contracts, scheduler-neutral execution packages, and workstation-to-cluster execution are roadmap directions—not shipped capabilities or promises.
+This beta is release-engineered around the implemented local community core. Additional source adapters, provider-neutral credential references, paid or restricted datasets, scheduler-neutral execution packages, and workstation-to-cluster execution are roadmap directions—not shipped capabilities or promises. Index-guided hybrid classification described above is current Unreleased development, not an already published beta.4 release.
 
 Public-source adapters and core orchestration are part of the community beta. Managed infrastructure, private integrations, paid-source adapters, enterprise authentication, specialized classifiers, and cluster services may be developed separately.
 
@@ -143,9 +178,10 @@ Public-source adapters and core orchestration are part of the community beta. Ma
 - [Documentation home](docs/index.md)
 - [Terminal playground](docs/terminal-playground.md)
 - [NAIP–CDL weak-supervised surface classification](docs/ag-classification.md)
+- [Index-guided hybrid classification](docs/index-guided-classification.md)
 - [Human-development methodology](docs/human-development.md)
 - [Errors and recovery](docs/errors-recovery.md)
-- [Release notes](release/v1.0.0-beta.1.md)
+- [Release notes](release/v1.0.0-beta.3.md)
 - [Contributing](CONTRIBUTING.md)
 - [Security](SECURITY.md)
 - [Citation](docs/citation.md) and [`CITATION.cff`](CITATION.cff)

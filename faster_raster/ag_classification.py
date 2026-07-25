@@ -23,12 +23,21 @@ from faster_raster.ag_classification_contracts import (
     CDL_SURFACE_SUPERCLASSES,
     ClassificationMapping,
 )
-from faster_raster.ag_recipes import AgriculturalRecipeV3, ClassificationSpec
+from faster_raster.ag_recipes import (
+    AgriculturalRecipeV3,
+    AgriculturalRecipeV4,
+    ClassificationSpec,
+    GeneralClassificationSpec,
+)
 from faster_raster.aoi_geometry import raster_aoi_mask
 from faster_raster.contract_repair import intervention_reference
+from faster_raster.spectral_indices import (
+    DEFAULT_EPSILON,
+    evaluate_builtin_indices,
+)
 
 
-FEATURE_EPSILON = np.float32(1e-6)
+FEATURE_EPSILON = DEFAULT_EPSILON
 SUPPORTED_FEATURES = (
     "red",
     "green",
@@ -194,37 +203,18 @@ def calculate_features(
         scaled = numeric.astype(np.float32, copy=False)
     valid = _source_valid_mask(scaled, source_mask)
     red, green, blue, nir = scaled
-    maximum = np.maximum(np.maximum(red, green), blue)
-    minimum = np.minimum(np.minimum(red, green), blue)
-    values: dict[str, np.ndarray] = {
-        "red": red,
-        "green": green,
-        "blue": blue,
-        "nir": nir,
-        "ndvi": np.clip((nir - red) / (nir + red + epsilon), -1.0, 1.0),
-        "gndvi": np.clip(
-            (nir - green) / (nir + green + epsilon),
-            -1.0,
-            1.0,
-        ),
-        "vari": np.clip(
-            (green - red) / (green + red - blue + epsilon),
-            -1.0,
-            1.0,
-        ),
-        "excess_green": np.clip(2.0 * green - red - blue, -2.0, 2.0),
-        "brightness": np.clip((red + green + blue) / 3.0, 0.0, 1.0),
-        "saturation": np.clip(
-            (maximum - minimum) / (maximum + epsilon),
-            0.0,
-            1.0,
-        ),
-    }
-    stack = np.stack([values[name] for name in features]).astype(
-        np.float32,
-        copy=False,
+    stack, feature_valid = evaluate_builtin_indices(
+        {
+            "red": red,
+            "green": green,
+            "blue": blue,
+            "nir": nir,
+        },
+        features,
+        source_mask=valid,
+        epsilon=epsilon,
     )
-    valid &= np.all(np.isfinite(stack), axis=0)
+    valid &= feature_valid
     stack[:, ~valid] = 0.0
     return stack, valid
 
@@ -600,6 +590,9 @@ def extract_training_samples(
     *,
     analysis_aoi_epsg_4326: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
+    class_codes = tuple(
+        getattr(spec, "class_codes", tuple(range(1, 7)))
+    )
     retained: dict[int, dict[str, np.ndarray]] = {}
     eligible = Counter()
     invalid_source_pixels = 0
@@ -641,7 +634,7 @@ def extract_training_samples(
                 )
                 source_valid &= aoi_valid
             labels = cores.read(1, window=window)
-            for class_code in range(1, 7):
+            for class_code in class_codes:
                 local_rows, local_columns = np.nonzero(
                     (labels == class_code) & source_valid
                 )
@@ -704,7 +697,7 @@ def extract_training_samples(
     coordinate_rows: list[tuple[int, int, int, int]] = []
     train_block_ids: set[tuple[int, int]] = set()
     holdout_block_ids: set[tuple[int, int]] = set()
-    for class_code in range(1, 7):
+    for class_code in class_codes:
         sample = retained.get(class_code)
         if sample is None:
             excluded_classes[str(class_code)] = "no_eligible_training_core_pixels"
@@ -1265,7 +1258,7 @@ def execute_classification(
     naip_path: Path,
     cdl_path: Path,
     staging: Path,
-    recipe: AgriculturalRecipeV3,
+    recipe: AgriculturalRecipeV3 | AgriculturalRecipeV4,
     *,
     year: int,
     cdl_year: int | None = None,
@@ -1273,6 +1266,11 @@ def execute_classification(
     contract_repair: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     resolved_cdl_year = cdl_year if cdl_year is not None else year
+    spec: ClassificationSpec | GeneralClassificationSpec = (
+        recipe.classification.general
+        if isinstance(recipe, AgriculturalRecipeV4)
+        else recipe.classification
+    )
     _, _, _ = _load_sklearn()
     source_validation = validate_naip_multispectral(naip_path)
     analysis = staging / "analysis" / "classification"
@@ -1283,17 +1281,17 @@ def execute_classification(
         cdl_path,
         naip_path,
         data,
-        radius=recipe.classification.training_core_radius_cdl_cells,
+        radius=spec.training_core_radius_cdl_cells,
     )
     samples = extract_training_samples(
         naip_path,
         labels["training_core_path"],
-        recipe.classification,
+        spec,
         analysis_aoi_epsg_4326=analysis_aoi_epsg_4326,
     )
     model, metrics, model_receipt = fit_and_evaluate(
         samples,
-        recipe.classification,
+        spec,
     )
     repair_provenance = intervention_reference(contract_repair)
     analysis_context = {
@@ -1317,16 +1315,16 @@ def execute_classification(
         "sampling_algorithm": (
             "bounded deterministic minimum-priority reservoir by superclass"
         ),
-        "seed": recipe.classification.random_seed,
-        "window_size": recipe.classification.inference_window_size,
+        "seed": spec.random_seed,
+        "window_size": spec.inference_window_size,
         "maximum_samples_per_class": (
-            recipe.classification.maximum_samples_per_class
+            spec.maximum_samples_per_class
         ),
         "minimum_training_samples_per_class": (
-            recipe.classification.minimum_training_samples_per_class
+            spec.minimum_training_samples_per_class
         ),
-        "spatial_holdout_folds": recipe.classification.spatial_holdout_folds,
-        "spatial_holdout_fold": recipe.classification.spatial_holdout_fold,
+        "spatial_holdout_folds": spec.spatial_holdout_folds,
+        "spatial_holdout_fold": spec.spatial_holdout_fold,
         "eligible_pixels_per_class": samples["eligible_pixels_per_class"],
         "selected_samples_per_class": samples[
             "selected_samples_per_class"
@@ -1384,7 +1382,7 @@ def execute_classification(
         "schema_version": "fasterraster.naip-feature-contract/v1",
         "source_band_order": ["red", "green", "blue", "near_infrared"],
         "source_scaling": "uint8 divided by 255 to float32 [0,1]",
-        "feature_order": list(recipe.classification.features),
+        "feature_order": list(spec.features),
         "epsilon": float(FEATURE_EPSILON),
         "equations": {
             "ndvi": "(NIR - R) / (NIR + R + epsilon)",
@@ -1419,7 +1417,7 @@ def execute_classification(
     inference = run_inference(
         naip_path,
         model,
-        recipe.classification,
+        spec,
         data,
         year=year,
         analysis_aoi_epsg_4326=analysis_aoi_epsg_4326,

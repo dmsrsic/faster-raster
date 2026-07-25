@@ -28,6 +28,8 @@ SCHEMA_FILENAMES = [
     "system_grade.schema.json",
     "agricultural_recipe_v2.schema.json",
     "agricultural_recipe_v3.schema.json",
+    "agricultural_recipe_v4.schema.json",
+    "workfile_v1.schema.json",
     "workfile_v2.schema.json",
 ]
 
@@ -990,8 +992,12 @@ def all_schemas() -> dict[str, dict]:
     from faster_raster.ag_recipes import (
         agricultural_recipe_v2_schema,
         agricultural_recipe_v3_schema,
+        agricultural_recipe_v4_schema,
     )
-    from faster_raster.workfiles import human_development_workfile_schema
+    from faster_raster.workfiles import (
+        human_development_workfile_schema,
+        workfile_schema,
+    )
 
     return {
         "research_spec.schema.json": research_spec_schema(),
@@ -1017,6 +1023,8 @@ def all_schemas() -> dict[str, dict]:
         "system_grade.schema.json": system_grade_schema(),
         "agricultural_recipe_v2.schema.json": agricultural_recipe_v2_schema(),
         "agricultural_recipe_v3.schema.json": agricultural_recipe_v3_schema(),
+        "agricultural_recipe_v4.schema.json": agricultural_recipe_v4_schema(),
+        "workfile_v1.schema.json": workfile_schema(),
         "workfile_v2.schema.json": human_development_workfile_schema(),
     }
 

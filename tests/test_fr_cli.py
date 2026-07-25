@@ -90,7 +90,13 @@ def test_sources_evaluate_offline_writes_profile_and_self_cleans(tmp_path, monke
     assert not (tmp_path / "cache" / "probes").exists()
 
 
-def test_fr_cook_routes_into_shared_execution_function(tmp_path, monkeypatch):
+@pytest.mark.parametrize("awaiting_selection", [False, True])
+def test_fr_cook_json_routes_execution_without_progress_noise(
+    tmp_path,
+    monkeypatch,
+    capsys,
+    awaiting_selection,
+):
     root = tmp_path / "repo"
     (root / "recipes" / "ag").mkdir(parents=True)
     (root / "recipes" / "ag" / "irrigation_field_structure.json").write_text('{"recipe_id":"irrigation_field_structure"}', encoding="utf-8")
@@ -120,16 +126,41 @@ def test_fr_cook_routes_into_shared_execution_function(tmp_path, monkeypatch):
     called = {}
 
     def fake_execute(root_arg, **kwargs):
+        print("runtime progress that must not corrupt JSON")
         called.update(kwargs)
+        if awaiting_selection:
+            review = fr_cli.SelectionReviewReady(
+                "AWAITING_INDEX_SELECTION",
+                {"candidate_count": 3},
+            )
+            review.package_path = tmp_path / "selection-review"
+            raise review
         preview = root / "outputs" / "handoffs" / "final" / "preview" / "result.png"
         preview.parent.mkdir(parents=True)
         preview.write_bytes(b"png")
         return preview
 
     monkeypatch.setattr(fr_cli, "execute_recipe", fake_execute)
-    args = SimpleNamespace(json=False)
-    assert fr_cli.command_cook(args) == 0
+    args = SimpleNamespace(json=True, interactive=None)
+    assert fr_cli.command_cook(args) == (2 if awaiting_selection else 0)
+    result = json.loads(capsys.readouterr().out)
+    assert "runtime progress" not in json.dumps(result)
     assert called["renderer"] is renderer
+    if awaiting_selection:
+        assert result == {
+            "candidate_count": 3,
+            "finalized": False,
+            "message": (
+                "Index candidates were calculated and ranked. No completed "
+                "hybrid handoff was created; review the package, select a "
+                "contract, and rerun."
+            ),
+            "review_package": str(tmp_path / "selection-review"),
+            "selection_mode": "recommendation",
+            "status": "AWAITING_INDEX_SELECTION",
+        }
+        return
+    assert result["status"] == "PASS"
     final = root / "outputs" / "handoffs" / "final"
     assert (final / "resolved_config.json").is_file()
     assert (final / "source_resolution.json").is_file()

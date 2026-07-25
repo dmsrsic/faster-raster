@@ -76,6 +76,20 @@ The result is not just an image or array. It is a bounded workflow with the mani
 
 </section>
 
+<section class="fr-section" markdown="1">
+
+## Unreleased index-guided classification
+
+Current development preserves the broad NAIP–CDL classifier and adds
+source-aware spectral indices plus explicit specialist classes. User-defined,
+recommendation, and opt-in automatic modes retain formulas, calibration,
+nested spatial selection, overlap arbitration, analytical COGs, receipts, and
+inspection evidence.
+
+[Read the index-guided classification guide](index-guided-classification.md){ .fr-inline-link }
+
+</section>
+
 <section class="fr-section fr-quickstart" markdown="1">
 
 ## A real offline start
@@ -132,7 +146,7 @@ Both examples are documentation-sized derivatives of checksum-verified local pub
 
 ## Public beta scope
 
-The `v1.0.0-beta.1` release supports deterministic workfiles and plans, strict exact-year validation, bounded local execution, transactional handoffs, checksum-bound reuse, implemented USDA CDL acquisition, USGS NAIP visual context, and the documented human-development and agricultural workflows.
+The `v1.0.0-beta.3` release supports deterministic workfiles and plans, strict exact-year validation, bounded local execution, transactional handoffs, checksum-bound reuse, implemented USDA CDL acquisition, USGS NAIP visual context, the NAIP–CDL broad classifier, and auditable interactive source-contract repair.
 
 [Review supported sources](supported-sources.md){ .fr-inline-link }
 
@@ -142,7 +156,7 @@ The `v1.0.0-beta.1` release supports deterministic workfiles and plans, strict e
 
 ## Explicit limitations
 
-Ubuntu with Python 3.12 is the public CI target. Source coverage depends on provider geography, year, catalog state, and service availability. The beta does not ship a general classifier, authoritative urbanization model, causal model, paid-source integration, or cluster execution service.
+Ubuntu with Python 3.12 is the public CI target. Source coverage depends on provider geography, year, catalog state, and service availability. The beta does not ship an authoritative general land-cover model, authoritative urbanization model, causal model, paid-source integration, or cluster execution service.
 
 [Read all known limitations](limitations.md){ .fr-inline-link }
 
@@ -158,6 +172,7 @@ Ubuntu with Python 3.12 is the public CI target. Source coverage depends on prov
   <a href="determinism/"><strong>Determinism and reuse</strong><span>Content-bound plans, evidence, and compatibility.</span></a>
   <a href="network-byte-budgets/"><strong>Network and byte budgets</strong><span>Explicit opt-in and bounded transfer rules.</span></a>
   <a href="human-development/"><strong>Human-development workflow</strong><span>Method, interpretation boundary, and outputs.</span></a>
+  <a href="index-guided-classification/"><strong>Index-guided classification</strong><span>Source-aware indices and specialist refinements.</span></a>
   <a href="errors-recovery/"><strong>Errors and recovery</strong><span>Fail-closed behavior and corrective paths.</span></a>
 </div>
 

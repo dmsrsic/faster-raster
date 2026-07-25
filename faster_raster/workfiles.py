@@ -10,6 +10,7 @@ import yaml
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator, model_validator
 
 from faster_raster.ag_geography import BBoxValidationError, validate_bbox
+from faster_raster.ag_recipes import HybridClassificationSpec
 from faster_raster.development_sources import (
     ANNUAL_NLCD_MAPPING_ID,
     ANNUAL_NLCD_SOURCE_ID,
@@ -173,11 +174,21 @@ class WorkfileSpec(BaseModel):
     processing: ProcessingSpec = Field(default_factory=ProcessingSpec)
     limits: LimitsSpec = Field(default_factory=LimitsSpec)
     outputs: OutputSpec = Field(default_factory=OutputSpec)
+    classification: HybridClassificationSpec | None = None
 
     @model_validator(mode="after")
     def one_workflow(self) -> "WorkfileSpec":
         if bool(self.workflow) == bool(self.recipe):
             raise ValueError("specify exactly one of workflow or recipe")
+        if (
+            self.classification is not None
+            and self.workflow_id
+            != "naip_cdl_index_hybrid_classification_audit"
+        ):
+            raise ValueError(
+                "classification override is supported only by the "
+                "index-guided hybrid classification workflow"
+            )
         return self
 
     @property

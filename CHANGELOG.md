@@ -4,7 +4,35 @@ All notable changes are documented here. Versions follow [Semantic Versioning](h
 
 ## Unreleased
 
-- No changes yet.
+### Added
+
+- Source-aware, deterministically hashed spectral-index registry with semantic
+  band compatibility, published analytical index COGs, statistics, receipts,
+  CLI discovery, and fail-closed NAIP SWIR checks.
+- Bounded custom arithmetic index expressions with canonicalization,
+  complexity limits, safe division, and no arbitrary Python execution.
+- Additive V4 hybrid classification recipe/template separating broad general
+  classes from single-index, Boolean multi-index, normalized weighted-score,
+  and target spectral-signature specialist classes.
+- User-defined, deterministic recommendation, and explicitly authorized
+  automatic selection modes, including calibration points and CDL weak-label
+  targets.
+- Nested spatial candidate selection that keeps the existing outer holdout
+  untouched by index, combination, direction, threshold, and weight choices.
+- Specialist score/candidate rasters, deterministic parent/priority overlap
+  arbitration, final hybrid/decision-state COGs, 4K audit publication,
+  zero-network rerendering, and concise `fr inspect` evidence.
+
+### Safety and provenance
+
+- Noninteractive recommendation produces a clearly nonfinal
+  `AWAITING_INDEX_SELECTION` review package; automatic mode requires explicit
+  authorization and fails closed when support or performance guards are not
+  met.
+- Records formulas, source-band/scaling evidence, candidate bounds/ranking,
+  thresholds, normalizations, spatial folds, calibration digests, untouched
+  holdout metrics, overlap decisions, analytical hashes, and display-only
+  stretches without treating index scores as probabilities.
 
 ## 1.0.0-beta.3 - 2026-07-25
 

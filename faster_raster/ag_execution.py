@@ -27,6 +27,7 @@ from faster_raster.ag_geography import BBoxValidationError, validate_bbox_text
 from faster_raster.ag_recipes import (
     AgriculturalRecipe,
     AgriculturalRecipeV3,
+    AgriculturalRecipeV4,
     RecipeLoadError,
     load_named_recipe,
 )
@@ -76,6 +77,18 @@ class RecoverableRecipeExecutionError(RecipeExecutionError):
         self.failure_document = dict(failure_document)
         self.recoverable_failure = failure
         super().__init__(str(failure_document.get("detail") or failure.detail))
+
+
+class SelectionReviewReady(RecipeExecutionError):
+    """Signals that a deterministic, explicitly nonfinal review package exists."""
+
+    def __init__(self, status: str, details: Mapping[str, Any]) -> None:
+        self.status = status
+        self.details = dict(details)
+        self.package_path: Path | None = None
+        super().__init__(
+            f"{status}: index recommendation review requires a user selection"
+        )
 
 
 def _write_json(path: Path, value: Any) -> None:
@@ -138,6 +151,16 @@ def handoff_transaction(final_path: Path) -> Iterator[Path]:
         if final_path.exists():
             raise RecipeExecutionError(f"final handoff already exists: {final_path}")
         os.replace(staging, final_path)
+    except SelectionReviewReady as exc:
+        shutil.rmtree(staging / "_work", ignore_errors=True)
+        review = final_path.parent / f"{final_path.name}_review"
+        if review.exists():
+            raise RecipeExecutionError(
+                f"selection review package already exists: {review}"
+            ) from exc
+        os.replace(staging, review)
+        exc.package_path = review
+        raise
     except BaseException as exc:
         _write_json(
             staging / "failure_report.json",
@@ -478,6 +501,58 @@ def _validate_classification_recipe_outputs(
         raise RecipeExecutionError("classification output validation failed")
 
 
+def _validate_hybrid_recipe_outputs(
+    staging: Path,
+    preview: Path,
+    recipe: AgriculturalRecipeV4,
+) -> None:
+    analysis = staging / "analysis" / "indices"
+    receipts = staging / "receipts"
+    data = staging / "data"
+    required = [
+        preview,
+        preview.parent / "classification_legend.json",
+        data / "final_hybrid_classification.cog.tif",
+        data / "hybrid_decision_state.cog.tif",
+        analysis / "index_registry.json",
+        analysis / "index_capability_report.json",
+        analysis / "index_plan.json",
+        analysis / "index_statistics.json",
+        analysis / "specialist_class_rules.json",
+        analysis / "specialist_overlap_matrix.json",
+        analysis / "hybrid_class_inventory.json",
+        receipts / "index_calculation_receipt.json",
+        receipts / "index_selection_receipt.json",
+        receipts / "specialist_classification_receipt.json",
+        receipts / "hybrid_classification_receipt.json",
+    ]
+    required.extend(
+        data / "indices" / f"{request.index_id}.cog.tif"
+        for request in recipe.classification.indices
+        if request.persist or request.display
+    )
+    required.extend(
+        path
+        for specialist in recipe.classification.specialists.classes
+        for path in (
+            data / "specialists" / f"{specialist.class_id}_score.cog.tif",
+            data / "specialists" / f"{specialist.class_id}_candidate.cog.tif",
+        )
+    )
+    if any(
+        not path.is_file() or path.stat().st_size == 0 for path in required
+    ):
+        missing = [
+            path.relative_to(staging).as_posix()
+            for path in required
+            if not path.is_file() or path.stat().st_size == 0
+        ]
+        raise RecipeExecutionError(
+            "hybrid classification output validation failed: "
+            + ", ".join(missing)
+        )
+
+
 def _validate_required_artifacts(
     recipe: AgriculturalRecipe,
     staging: Path,
@@ -490,7 +565,7 @@ def _validate_required_artifacts(
         "preview_4k_png": preview,
         "checksums.sha256": staging / "checksums.sha256",
     }
-    if isinstance(recipe, AgriculturalRecipeV3):
+    if isinstance(recipe, (AgriculturalRecipeV3, AgriculturalRecipeV4)):
         analysis = staging / "analysis" / "classification"
         data = staging / "data"
         first = lambda pattern: next(iter(sorted(data.glob(pattern))), data / "missing")
@@ -512,6 +587,52 @@ def _validate_required_artifacts(
                 "class_agreement_matrix.json": analysis / "class_agreement_matrix.json",
                 "disagreement_summary.json": analysis / "disagreement_summary.json",
                 "class_area_inventory.csv": analysis / "class_area_inventory.csv",
+            }
+        )
+    if isinstance(recipe, AgriculturalRecipeV4):
+        index_analysis = staging / "analysis" / "indices"
+        receipts = staging / "receipts"
+        data = staging / "data"
+        known.update(
+            {
+                "general_classification_cog": first(
+                    "naip_*_surface_classification.cog.tif"
+                ),
+                "final_hybrid_classification_cog": (
+                    data / "final_hybrid_classification.cog.tif"
+                ),
+                "hybrid_decision_state_cog": (
+                    data / "hybrid_decision_state.cog.tif"
+                ),
+                "index_registry.json": index_analysis / "index_registry.json",
+                "index_capability_report.json": (
+                    index_analysis / "index_capability_report.json"
+                ),
+                "index_plan.json": index_analysis / "index_plan.json",
+                "index_statistics.json": (
+                    index_analysis / "index_statistics.json"
+                ),
+                "specialist_class_rules.json": (
+                    index_analysis / "specialist_class_rules.json"
+                ),
+                "specialist_overlap_matrix.json": (
+                    index_analysis / "specialist_overlap_matrix.json"
+                ),
+                "hybrid_class_inventory.json": (
+                    index_analysis / "hybrid_class_inventory.json"
+                ),
+                "index_calculation_receipt.json": (
+                    receipts / "index_calculation_receipt.json"
+                ),
+                "index_selection_receipt.json": (
+                    receipts / "index_selection_receipt.json"
+                ),
+                "specialist_classification_receipt.json": (
+                    receipts / "specialist_classification_receipt.json"
+                ),
+                "hybrid_classification_receipt.json": (
+                    receipts / "hybrid_classification_receipt.json"
+                ),
             }
         )
     unsupported = sorted(set(recipe.required_output_artifacts) - set(known))
@@ -607,21 +728,37 @@ def execute_recipe(
     naip_resolution_m: float | None = None,
     analysis_aoi_epsg_4326: Mapping[str, Any] | None = None,
     contract_repair: Mapping[str, Any] | None = None,
+    recommendation_selector: (
+        Callable[[str, list[dict[str, Any]]], str | None] | None
+    ) = None,
 ) -> Path:
     resolved_imagery_year = (
         int(imagery_year) if imagery_year is not None else int(year)
     )
     _validate_dates(start, end, resolved_imagery_year)
     runtime_scientific_claim: str | None = None
-    if isinstance(recipe, AgriculturalRecipeV3):
+    if isinstance(recipe, (AgriculturalRecipeV3, AgriculturalRecipeV4)):
         from faster_raster.ag_classification_contracts import (
             classification_scientific_claim,
         )
         from faster_raster.ag_classification import classification_dependency_status
 
-        runtime_scientific_claim = classification_scientific_claim(
-            resolved_imagery_year,
-            year,
+        runtime_scientific_claim = (
+            classification_scientific_claim(
+                resolved_imagery_year,
+                year,
+            )
+            if isinstance(recipe, AgriculturalRecipeV3)
+            else (
+                recipe.scientific_claim
+                if resolved_imagery_year == year
+                else (
+                    recipe.scientific_claim
+                    + f" Imagery is from {resolved_imagery_year} while CDL "
+                    f"weak labels are from {year}; this temporal mismatch is "
+                    "preserved in provenance."
+                )
+            )
         )
         if not classification_dependency_status()["available"]:
             raise RecipeExecutionError(
@@ -714,7 +851,10 @@ def execute_recipe(
             else {"network_bytes": 0, "requests": [], "layers": []}
         )
         raw_acquisition_evidence: dict[str, Any] | None = None
-        if isinstance(recipe, AgriculturalRecipeV3) and "naip_multispectral" in acquired_names:
+        if isinstance(
+            recipe,
+            (AgriculturalRecipeV3, AgriculturalRecipeV4),
+        ) and "naip_multispectral" in acquired_names:
             from faster_raster.ag_classification_acquisition import (
                 RawNaipEvidenceError,
                 validate_raw_naip_acquisition_evidence,
@@ -754,7 +894,7 @@ def execute_recipe(
         }
         spectral = (
             resolved["naip_multispectral"]
-            if isinstance(recipe, AgriculturalRecipeV3)
+            if isinstance(recipe, (AgriculturalRecipeV3, AgriculturalRecipeV4))
             else resolved["natural"]
         )
         compatibility = {
@@ -774,6 +914,7 @@ def execute_recipe(
             "network_bytes": int(acquisition_manifest.get("network_bytes", 0)),
         }
         classification_result: dict[str, Any] | None = None
+        hybrid_result: dict[str, Any] | None = None
         publication_receipt: dict[str, Any] | None = None
         if isinstance(recipe, AgriculturalRecipeV3):
             from faster_raster.ag_classification import execute_classification
@@ -833,6 +974,159 @@ def execute_recipe(
                 ),
             )
             _validate_classification_recipe_outputs(staging, preview)
+        elif isinstance(recipe, AgriculturalRecipeV4):
+            from faster_raster.ag_classification import execute_classification
+            from faster_raster.hybrid_execution import (
+                HybridExecutionError,
+                execute_hybrid_classification,
+            )
+            from faster_raster.hybrid_publication import (
+                render_hybrid_classification_audit,
+            )
+
+            classification_result = execute_classification(
+                Path(resolved["naip_multispectral"].local_path),
+                Path(resolved["cdl_classes"].local_path),
+                staging,
+                recipe,
+                year=resolved_imagery_year,
+                cdl_year=year,
+                analysis_aoi_epsg_4326=analysis_aoi_epsg_4326,
+                contract_repair=contract_repair,
+            )
+            try:
+                hybrid_result = execute_hybrid_classification(
+                    Path(resolved["naip_multispectral"].local_path),
+                    classification_result,
+                    staging,
+                    recipe,
+                    analysis_aoi_epsg_4326=analysis_aoi_epsg_4326,
+                    recommendation_selector=recommendation_selector,
+                )
+            except HybridExecutionError as exc:
+                raise RecipeExecutionError(str(exc)) from exc
+            if not hybrid_result.get("finalized", True):
+                review_status = str(
+                    hybrid_result.get(
+                        "status",
+                        "AWAITING_INDEX_SELECTION",
+                    )
+                )
+                selection = hybrid_result["selection_receipt"]
+                review_document = {
+                    "schema_version": (
+                        "fasterraster.index-selection-review/v1"
+                    ),
+                    "status": review_status,
+                    "finalized": False,
+                    "recipe_id": recipe.recipe_id,
+                    "selection_mode": (
+                        recipe.classification.specialists.selection_mode
+                    ),
+                    "message": (
+                        "This is a nonfinal analytical review package. "
+                        "Select a candidate and rerun; do not treat it as a "
+                        "completed hybrid classification."
+                    ),
+                    "selection_receipt": (
+                        "receipts/index_selection_receipt.json"
+                    ),
+                    "candidate_ranking": (
+                        "analysis/indices/index_candidate_ranking.json"
+                    ),
+                    "index_validation_metrics": (
+                        "analysis/indices/index_validation_metrics.json"
+                    ),
+                    "candidate_count": selection.get(
+                        "candidate_count", 0
+                    ),
+                    "network_bytes": int(
+                        acquisition_manifest.get("network_bytes", 0)
+                    ),
+                    "automatic_authorized": selection.get(
+                        "automatic_authorized", False
+                    ),
+                    "final_hybrid_classification_present": False,
+                    "completed_handoff_pointer_updated": False,
+                    "checksums_purpose": (
+                        "review package integrity only; not evidence of "
+                        "analytical finalization"
+                    ),
+                }
+                plan.update(
+                    {
+                        "published_handoff_id": None,
+                        "published_handoff_relative_path": None,
+                        "transaction_state": review_status,
+                        "finalized": False,
+                        "selection_review_package": True,
+                    }
+                )
+                _write_json(staging / "asset_plan.json", plan)
+                _write_json(
+                    staging / "selection_review.json",
+                    review_document,
+                )
+                _write_json(
+                    staging / "manifest.json",
+                    {
+                        "schema_version": 1,
+                        "operation_status": review_status,
+                        "verification_status": "REVIEW_REQUIRED",
+                        "completed_handoff_created": False,
+                        "finalized": False,
+                        "final_hybrid_output_declared": False,
+                        "completed_handoff_pointer_updated": False,
+                        "checksums_purpose": (
+                            "review package integrity only; not evidence of "
+                            "analytical finalization"
+                        ),
+                        "recipe_id": recipe.recipe_id,
+                        "selection_mode": (
+                            recipe.classification.specialists.selection_mode
+                        ),
+                        "network_bytes": int(
+                            acquisition_manifest.get("network_bytes", 0)
+                        ),
+                        "asset_plan": "asset_plan.json",
+                        "selection_review": "selection_review.json",
+                        "analytical_artifacts": sorted(
+                            path.relative_to(staging).as_posix()
+                            for path in staging.rglob("*")
+                            if path.is_file()
+                        ),
+                    },
+                )
+                _regenerate_checksums(staging)
+                raise SelectionReviewReady(
+                    review_status,
+                    review_document,
+                )
+            output_dir = staging / "preview" / recipe.recipe_id
+            preview_path = output_dir / f"{recipe.recipe_id}_4k.png"
+            preview, publication_receipt = (
+                render_hybrid_classification_audit(
+                    preview_path,
+                    naip_path=Path(
+                        resolved["naip_multispectral"].local_path
+                    ),
+                    general_result=classification_result,
+                    hybrid_result=hybrid_result,
+                    recipe=recipe,
+                    year=resolved_imagery_year,
+                    cdl_year=year,
+                    analysis_aoi_epsg_4326=analysis_aoi_epsg_4326,
+                    network_bytes=int(
+                        acquisition_manifest.get("network_bytes", 0)
+                    ),
+                    reused_bytes=sum(
+                        Path(decision.candidate.local_path).stat().st_size
+                        for decision in decisions
+                        if decision.candidate is not None
+                    ),
+                )
+            )
+            _validate_hybrid_recipe_outputs(staging, preview, recipe)
         else:
             preview = renderer(
                 root,
@@ -1040,6 +1334,56 @@ def execute_recipe(
                     },
                 }
             )
+        if hybrid_result is not None:
+            receipt["index_guided_hybrid"] = {
+                "registry": {
+                    "version": hybrid_result["registry"]["schema_version"],
+                    "sha256": hybrid_result["registry"]["registry_sha256"],
+                },
+                "capability_report": hybrid_result["capability_report"],
+                "index_plan": hybrid_result["index_plan"],
+                "index_statistics": hybrid_result["index_statistics"],
+                "selection": hybrid_result["selection_receipt"],
+                "specialist_rules": hybrid_result["specialist_rules"],
+                "specialist_classification": hybrid_result[
+                    "specialist_receipt"
+                ],
+                "hybrid_classification": hybrid_result["hybrid_receipt"],
+                "publication": publication_receipt,
+            }
+            receipt["artifact_accounting"][
+                "locally_derived_artifacts"
+            ].extend(
+                sorted(
+                    path.relative_to(staging).as_posix()
+                    for path in (
+                        staging / "data" / "indices"
+                    ).glob("*.tif")
+                )
+            )
+            receipt["artifact_accounting"]["model_products"].extend(
+                [
+                    "data/final_hybrid_classification.cog.tif",
+                    "data/hybrid_decision_state.cog.tif",
+                ]
+            )
+            receipt["artifact_accounting"]["qa_products"].extend(
+                [
+                    "analysis/indices/index_registry.json",
+                    "analysis/indices/index_capability_report.json",
+                    "analysis/indices/index_plan.json",
+                    "analysis/indices/index_statistics.json",
+                    "analysis/indices/index_candidate_ranking.json",
+                    "analysis/indices/specialist_class_rules.json",
+                    "analysis/indices/specialist_overlap_matrix.json",
+                    "analysis/indices/hybrid_class_inventory.json",
+                    "analysis/indices/index_validation_metrics.json",
+                    "receipts/index_calculation_receipt.json",
+                    "receipts/index_selection_receipt.json",
+                    "receipts/specialist_classification_receipt.json",
+                    "receipts/hybrid_classification_receipt.json",
+                ]
+            )
         _write_json(output_dir / "recipe_receipt.json", receipt)
         _regenerate_checksums(output_dir)
         manifest = {
@@ -1108,6 +1452,31 @@ def execute_recipe(
                 "actual_imagery": receipt["actual_imagery"],
                 "resolved_location": receipt["resolved_location"],
                 "human_repair_occurred": contract_repair is not None,
+            }
+        if hybrid_result is not None:
+            manifest["index_guided_hybrid"] = {
+                "registry_version": hybrid_result["registry"][
+                    "schema_version"
+                ],
+                "registry_sha256": hybrid_result["registry"][
+                    "registry_sha256"
+                ],
+                "selection_mode": recipe.classification.specialists.selection_mode,
+                "selection_status": hybrid_result["selection_receipt"][
+                    "status"
+                ],
+                "index_ids": sorted(hybrid_result["paths"]["indices"]),
+                "specialist_class_ids": [
+                    item.class_id
+                    for item in recipe.classification.specialists.classes
+                ],
+                "final_hybrid_classification": (
+                    "data/final_hybrid_classification.cog.tif"
+                ),
+                "hybrid_decision_state": (
+                    "data/hybrid_decision_state.cog.tif"
+                ),
+                "publication": publication_receipt,
             }
         _write_json(staging / "manifest.json", manifest)
         _regenerate_checksums(staging)

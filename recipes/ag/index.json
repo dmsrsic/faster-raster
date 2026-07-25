@@ -21,6 +21,10 @@
     {
       "file": "naip_cdl_classification_audit.json",
       "recipe_id": "naip_cdl_classification_audit"
+    },
+    {
+      "file": "naip_cdl_index_hybrid_classification_audit.json",
+      "recipe_id": "naip_cdl_index_hybrid_classification_audit"
     }
   ],
   "reuse_modes": {
