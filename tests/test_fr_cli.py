@@ -25,7 +25,7 @@ def test_fr_version(capsys):
     with pytest.raises(SystemExit) as raised:
         fr_cli.main(["--version"])
     assert raised.value.code == 0
-    assert capsys.readouterr().out == "fr 1.0.0b2\n"
+    assert capsys.readouterr().out == "fr 1.0.0b3\n"
 
 
 def isolate(monkeypatch, tmp_path: Path) -> None:

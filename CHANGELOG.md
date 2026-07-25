@@ -4,12 +4,17 @@ All notable changes are documented here. Versions follow [Semantic Versioning](h
 
 ## Unreleased
 
+- No changes yet.
+
+## 1.0.0-beta.3 - 2026-07-25
+
 ### Added
 
 - Auditable terminal repair when classification imagery is unavailable for
-  the requested year, date range, or location.
-- Direct bounding-box and point-and-buffer location construction with square
-  or circular AOIs in meters, kilometers, or miles.
+  the requested year, date range, or location, including source-listed and
+  manually entered replacement years and replacement temporal ranges.
+- Direct bounding-box repair and point-and-buffer construction with square or
+  circular AOIs in meters, kilometers, or miles.
 - True circular AOI masking across classification analysis and publication.
 
 ### Safety and provenance
@@ -19,6 +24,12 @@ All notable changes are documented here. Versions follow [Semantic Versioning](h
 - Original and resolved request values, acquisition-envelope versus
   analysis-AOI provenance, and compact intervention metadata in final
   handoffs and `fr inspect` output.
+
+### Fixed
+
+- Preserve cross-year imagery/CDL values, repaired AOIs, and intervention
+  provenance during publication-only rerendering, including compatibility
+  with older finalized handoffs.
 
 ## 1.0.0-beta.2 - 2026-07-25
 
