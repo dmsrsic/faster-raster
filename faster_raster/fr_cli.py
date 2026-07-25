@@ -271,6 +271,23 @@ def _plan_text(plan: Mapping[str, Any], *, verbose: bool = False) -> None:
             print(f"  source: {row['source'] or 'none selected'}; reason: {row['reason']}")
     if any(row["provisional"] for row in plan["rows"]):
         print("A required download has provisional source evidence; cook must revalidate it.")
+    if plan.get("classification"):
+        classification = plan["classification"]
+        raw = classification["raw_four_band_naip"]
+        dependency = classification["dependency_readiness"]
+        print(
+            "Classification: raw NAIP bands "
+            f"{raw['band_ids']} at {raw['requested_resolution_m']:g} m; "
+            f"CDL weak supervision; mapping {classification['mapping_id']} "
+            f"{classification['mapping_sha256'][:12]}…"
+        )
+        print(
+            "Estimated uncompressed transfer: "
+            f"{classification['estimated_uncompressed_transfer_bytes']:,} bytes; "
+            f"classifier dependency ready: {dependency['available']}"
+        )
+        print("Scientific claim: " + classification["scientific_claim"])
+        print("Unsupported claims: " + "; ".join(classification["unsupported_claims"]))
     if plan["blocking"]:
         print("BLOCKING: a required local asset or required download source is unavailable.")
     print(f"Plan artifacts: {plan['artifacts']['directory']}")
@@ -511,7 +528,16 @@ def command_plan(args: argparse.Namespace) -> int:
 def command_explain(args: argparse.Namespace) -> int:
     _, _, _, plan = _load_and_plan(args)
     if args.json:
-        _json({"resolved_config": plan["resolved_config"], "source_resolution": plan["source_resolution"], "asset_plan": plan["asset_plan"], "explanation": plan.get("explanation"), "source_discovery": plan.get("source_discovery")})
+        _json(
+            {
+                "resolved_config": plan["resolved_config"],
+                "source_resolution": plan["source_resolution"],
+                "asset_plan": plan["asset_plan"],
+                "classification": plan.get("classification"),
+                "explanation": plan.get("explanation"),
+                "source_discovery": plan.get("source_discovery"),
+            }
+        )
         return 2 if plan["blocking"] else 0
     if plan.get("explanation"):
         explanation = plan["explanation"]
@@ -549,6 +575,29 @@ def command_explain(args: argparse.Namespace) -> int:
             print(f"  Decision reason: {row['reason']}")
             for rejected in decisions[row["logical_asset"]].get("candidates_rejected", []):
                 print(f"  Rejected {rejected['source_id']}: {'; '.join(rejected['rejection_reasons'])}")
+    if plan.get("classification"):
+        classification = plan["classification"]
+        print("Scientific claim: " + classification["scientific_claim"])
+        print(
+            "Acquisition: raw four-band NAIP "
+            f"{classification['raw_four_band_naip']['band_ids']} at "
+            f"{classification['raw_four_band_naip']['requested_resolution_m']:g} m"
+        )
+        print(
+            f"Weak supervision: {classification['weak_supervision']}; mapping "
+            f"{classification['mapping_id']} ({classification['mapping_sha256']})"
+        )
+        print(
+            "Estimated uncompressed transfer: "
+            f"{classification['estimated_uncompressed_transfer_bytes']:,} bytes"
+        )
+        dependency = classification["dependency_readiness"]
+        print(
+            "Classifier dependency: "
+            + ("ready" if dependency["available"] else "missing")
+            + f" ({dependency['install_command']})"
+        )
+        print("Unsupported claims: " + "; ".join(classification["unsupported_claims"]))
     return 2 if plan["blocking"] else 0
 
 
@@ -603,6 +652,11 @@ def command_cook(args: argparse.Namespace) -> int:
         max_total_bytes=int(values["maximum_download_mb"]["value"] * 1_000_000),
         service_tile_size=int(values["service_tile_size"]["value"]),
         renderer=_recipe_renderer(),
+        naip_resolution_m=(
+            float(values["resolution_m"]["value"])
+            if "resolution_m" in values
+            else None
+        ),
     )
     final = _handoff_from_preview(preview, configured_handoff_root(root))
     write_profile_atomic(final / "resolved_config.json", plan["resolved_config"])
@@ -625,15 +679,110 @@ def command_inspect(args: argparse.Namespace) -> int:
         print(f"Reused bytes: {report['reused_bytes']}")
         print(f"Preview: {report['preview'] or 'none'}")
         for asset in report["asset_status"]:
-            local = _friendly(FRIENDLY_READINESS, asset["local_asset_readiness"], verbose=args.verbose)
+            local = _friendly(
+                FRIENDLY_READINESS,
+                asset["local_asset_readiness"],
+                verbose=args.verbose,
+            )
             remote = _friendly(FRIENDLY_REMOTE_STATUS, asset["remote_source_status"], verbose=args.verbose)
             action = _friendly(FRIENDLY_ACTION, asset["action"], verbose=args.verbose)
             print(f"  {asset['logical_asset']}:")
-            print(f"    Local readiness: {local}")
-            print(f"    Remote source: {remote}")
-            print(f"    Action taken: {action}")
-            if args.verbose:
-                print(f"    Source ID: {asset['selected_source'] or 'none'}; reused={asset['reused']}; acquired={asset['acquired']}")
+            if asset.get("execution_action") in {"acquired", "reused", "failed"}:
+                planned = _friendly(
+                    FRIENDLY_ACTION,
+                    asset["planned_action"],
+                    verbose=args.verbose,
+                )
+                print(f"    Initial local readiness: {local}")
+                print(f"    Planned action: {planned}")
+                print(f"    Execution action: {asset['execution_action']}")
+                print(
+                    "    Final asset verification: "
+                    f"{asset['final_asset_verification']}"
+                )
+                print(
+                    "    Final local artifact: "
+                    f"{asset['final_local_artifact'] or 'none'}"
+                )
+                if args.verbose:
+                    print(f"    Source ID: {asset['selected_source'] or 'none'}")
+                    print(f"    Network bytes: {asset['network_bytes']:,}")
+                    print(f"    Checksum: {asset['checksum'] or 'not verified'}")
+            else:
+                print(f"    Local readiness: {local}")
+                print(f"    Remote source: {remote}")
+                print(f"    Action taken: {action}")
+                if args.verbose:
+                    print(
+                        f"    Source ID: {asset['selected_source'] or 'none'}; "
+                        f"reused={asset['reused']}; acquired={asset['acquired']}"
+                    )
+        classification = report.get("classification")
+        if args.verbose and classification is not None:
+            print("  Classification summary:")
+            if not classification["available"]:
+                print(
+                    "    Finalized classification metrics are unavailable; "
+                    "no dependency was imported."
+                )
+            else:
+                mapping_hash = (
+                    classification["mapping_sha256_abbreviated"]
+                    or "unavailable"
+                )
+                print(
+                    "    Classifier backend: "
+                    f"{classification['classifier_backend'] or 'unavailable'}"
+                )
+                print(
+                    "    Mapping: "
+                    f"{classification['mapping_id'] or 'unavailable'} "
+                    f"({mapping_hash})"
+                )
+                print(
+                    "    Train / holdout samples: "
+                    f"{classification['train_samples'] or 'unavailable'} / "
+                    f"{classification['holdout_samples'] or 'unavailable'}"
+                )
+                for label, key in (
+                    (
+                        "Weak-label overall agreement",
+                        "weak_label_overall_agreement",
+                    ),
+                    ("Macro F1", "macro_f1"),
+                    ("Cohen's kappa", "cohen_kappa"),
+                    ("Confidence threshold", "confidence_threshold"),
+                    ("Classified coverage", "classified_coverage"),
+                    ("Uncertain fraction", "uncertain_fraction"),
+                    (
+                        "High-confidence disagreement",
+                        "high_confidence_disagreement_fraction",
+                    ),
+                ):
+                    value = classification[key]
+                    if value is None:
+                        rendered = "unavailable in finalized artifacts"
+                    elif key in {
+                        "classified_coverage",
+                        "uncertain_fraction",
+                        "high_confidence_disagreement_fraction",
+                    }:
+                        rendered = f"{float(value):.1%}"
+                    else:
+                        rendered = f"{float(value):.3f}"
+                    print(f"    {label}: {rendered}")
+                print("    Predicted hectares by class:")
+                hectares = classification["predicted_hectares_by_class"]
+                if hectares:
+                    for label, value in hectares.items():
+                        print(f"      {label}: {value:,.3f}")
+                else:
+                    print("      unavailable")
+                if classification["missing_fields"]:
+                    print(
+                        "    Missing optional artifacts: "
+                        + ", ".join(classification["missing_fields"])
+                    )
     return 0
 
 

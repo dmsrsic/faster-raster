@@ -13,6 +13,7 @@ from faster_raster.ag_recipes import AgriculturalRecipe
 
 ASSET_PATTERNS: dict[str, tuple[str, ...]] = {
     "natural": ("naip_*_natural_color.cog.tif",),
+    "naip_multispectral": ("naip_*_multispectral.cog.tif",),
     "ndvi": ("naip_*_ndvi_color.cog.tif",),
     "cdl_classes": ("cdl_*_classes.cog.tif",),
     "cdl_color": ("cdl_*_color.cog.tif",),
@@ -20,6 +21,7 @@ ASSET_PATTERNS: dict[str, tuple[str, ...]] = {
 }
 SOURCE_FAMILY = {
     "natural": "USGS_NAIP",
+    "naip_multispectral": "USGS_NAIP",
     "ndvi": "USGS_NAIP",
     "cdl_classes": "USDA_CDL",
     "cdl_color": "USDA_CDL",
@@ -27,6 +29,7 @@ SOURCE_FAMILY = {
 }
 SEMANTICS = {
     "natural": "continuous",
+    "naip_multispectral": "continuous_multiband_imagery",
     "ndvi": "continuous",
     "cdl_classes": "categorical",
     "cdl_color": "categorical",
@@ -250,6 +253,14 @@ def inspect_asset(
     temporal_key = manifest_temporal_key or filename_temporal_key
     checksum = layer_evidence.get("output_sha256")
     bands = info.get("bands") or []
+    if asset_name == "naip_multispectral":
+        if len(bands) != 4:
+            errors.append(f"band_count_{len(bands)}_is_not_4")
+        data_types = {
+            str(band.get("type") or "").lower() for band in bands
+        }
+        if data_types != {"byte"}:
+            errors.append(f"band_types_are_{sorted(data_types)}_not_byte")
     nodata = tuple(band.get("noDataValue") for band in bands)
     wkt = str((info.get("coordinateSystem") or {}).get("wkt") or "")
 
@@ -358,10 +369,16 @@ def _candidate_rejections(
     relationship = spatial_relationship(record.bbox_epsg_4326, requested_bbox, tolerance=tolerance)
     if record.validation_state != "valid":
         reasons.extend(record.validation_errors or ("invalid_raster",))
-    if record.asset_name in {"natural", "ndvi", "cdl_classes", "cdl_color"}:
+    if record.asset_name in {
+        "natural",
+        "naip_multispectral",
+        "ndvi",
+        "cdl_classes",
+        "cdl_color",
+    }:
         if record.temporal_key != year:
             reasons.append(f"temporal_key_{record.temporal_key}_does_not_match_{year}")
-    if record.asset_name in {"natural", "ndvi"}:
+    if record.asset_name in {"natural", "naip_multispectral", "ndvi"}:
         if record.pixel_size_m is None:
             reasons.append("metric_resolution_unknown")
         elif record.pixel_size_m > recipe.maximum_naip_pixel_size_m + 0.01:
@@ -487,6 +504,7 @@ def asset_plan_document(
     end: str,
     year: int,
     reuse_mode: str,
+    requested_resolution_m: float | None = None,
 ) -> dict[str, Any]:
     return {
         "schema_version": 2,
@@ -497,6 +515,11 @@ def asset_plan_document(
         "requested_cdl_year": year,
         "reuse_mode": reuse_mode,
         "spatial_tolerance_degrees": 1e-6,
+        "effective_naip_resolution_m": (
+            requested_resolution_m
+            if requested_resolution_m is not None
+            else recipe.defaults.naip_resolution_meters
+        ),
         "assets": [decision.to_dict() for decision in decisions],
         "network_required_assets": [
             decision.asset_name

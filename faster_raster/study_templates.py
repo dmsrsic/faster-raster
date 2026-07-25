@@ -48,6 +48,13 @@ TEMPLATES = {
             "bounded acquisition or compatible reuse",
         ),
         StudyTemplate(
+            "ag-naip-classification",
+            "Raw four-band NAIP surface classification with same-year CDL weak supervision.",
+            "naip_cdl_classification_audit",
+            (2023,),
+            "bounded acquisition or compatible reuse; classifier extra required",
+        ),
+        StudyTemplate(
             "generic-cog",
             "Compile-only generic HTTPS/COG manifest scaffold using a supported recipe shell.",
             "crop_class_area_inventory",
@@ -209,6 +216,68 @@ here.
 """
 
 
+def _classification(
+    name: str,
+    bbox: tuple[float, float, float, float],
+    year: int,
+) -> str:
+    return f"""---
+schema_version: fasterraster.work/v1
+name: {name}
+workflow: naip-cdl-classification-audit
+
+area:
+  bbox:
+    - {_number(bbox[0])}
+    - {_number(bbox[1])}
+    - {_number(bbox[2])}
+    - {_number(bbox[3])}
+
+time:
+  start: {year}-01-01
+  end: {year}-12-31
+  crop_year: {year}
+
+sources:
+  policy: auto
+
+data:
+  reuse: auto
+  allow_network: true
+
+processing:
+  resolution_m: 1.2
+  service_tile_size: 1800
+  maximum_parallel_tasks: 1
+
+limits:
+  maximum_download_mb: 500
+
+outputs:
+  preview: true
+  open_when_complete: false
+---
+
+# {name.replace("-", " ").title()}
+
+This study performs single-date high-resolution NAIP spectral surface
+classification weakly supervised by same-year USDA CDL superclasses. Spatial
+holdout metrics measure agreement with weak labels, not independent
+ground-truth accuracy.
+
+It does not establish crop species truth from one NAIP acquisition,
+authoritative land cover, cadastral or parcel boundaries, ownership,
+construction dates, occupancy, population or economic activity, irrigation
+status, crop yield, causal land-use change, independent accuracy, or historical
+change from one date.
+
+The classifier consumes unstretched red, green, blue, near-infrared, NDVI,
+GNDVI, VARI, excess-green, brightness, and saturation predictors derived
+locally from the raw four-band NAIP asset. CDL supplies weak supervision and
+comparison evidence only.
+"""
+
+
 def _generic_cog(name: str, bbox: tuple[float, float, float, float], year: int) -> str:
     return f"""---
 schema_version: fasterraster.work/v1
@@ -277,6 +346,8 @@ def render_study_template(
         raise StudyTemplateError(f"{template_id} accepts exactly one year")
     if template_id == "ag-cdl-naip":
         return _agricultural(safe_name, selected_bbox, selected_years[0])
+    if template_id == "ag-naip-classification":
+        return _classification(safe_name, selected_bbox, selected_years[0])
     return _generic_cog(safe_name, selected_bbox, selected_years[0])
 
 

@@ -122,11 +122,16 @@ AGRICULTURAL_SOURCES: dict[str, SourceDefinition] = {
     "usgs_naip_imageserver": SourceDefinition(
         source_id="usgs_naip_imageserver",
         provider="USGS",
-        product="NAIP natural imagery and NDVI",
+        product="NAIP natural, raw four-band imagery, and display NDVI",
         access_category="service_discovered",
         probe_strategy="service_metadata",
         endpoint="https://imagery.nationalmap.gov/arcgis/rest/services/USGSNAIPImagery/ImageServer",
-        logical_assets=("natural", "ndvi", "natural_imagery"),
+        logical_assets=(
+            "natural",
+            "naip_multispectral",
+            "ndvi",
+            "natural_imagery",
+        ),
         aliases=("naip",),
     ),
     "usgs_3dep_imageserver": SourceDefinition(

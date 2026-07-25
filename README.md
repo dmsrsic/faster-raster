@@ -108,6 +108,7 @@ Public-source adapters and core orchestration are part of the community beta. Ma
 
 - [Documentation home](docs/index.md)
 - [Terminal playground](docs/terminal-playground.md)
+- [NAIP–CDL weak-supervised surface classification](docs/ag-classification.md)
 - [Human-development methodology](docs/human-development.md)
 - [Errors and recovery](docs/errors-recovery.md)
 - [Release notes](release/v1.0.0-beta.1.md)

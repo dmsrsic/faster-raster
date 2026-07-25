@@ -1,0 +1,358 @@
+{
+  "$defs": {
+    "ClassificationSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "backend": {
+          "const": "random_forest",
+          "title": "Backend",
+          "type": "string"
+        },
+        "class_weight": {
+          "const": "balanced_subsample",
+          "default": "balanced_subsample",
+          "title": "Class Weight",
+          "type": "string"
+        },
+        "confidence_threshold": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence Threshold",
+          "type": "number"
+        },
+        "features": {
+          "items": {
+            "enum": [
+              "red",
+              "green",
+              "blue",
+              "nir",
+              "ndvi",
+              "gndvi",
+              "vari",
+              "excess_green",
+              "brightness",
+              "saturation"
+            ],
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Features",
+          "type": "array"
+        },
+        "inference_window_size": {
+          "maximum": 4096,
+          "minimum": 16,
+          "title": "Inference Window Size",
+          "type": "integer"
+        },
+        "mapping_id": {
+          "const": "cdl_surface_superclasses_v1",
+          "title": "Mapping Id",
+          "type": "string"
+        },
+        "max_depth": {
+          "default": 20,
+          "maximum": 256,
+          "minimum": 1,
+          "title": "Max Depth",
+          "type": "integer"
+        },
+        "max_features": {
+          "const": "sqrt",
+          "default": "sqrt",
+          "title": "Max Features",
+          "type": "string"
+        },
+        "maximum_samples_per_class": {
+          "exclusiveMinimum": 0,
+          "maximum": 1000000,
+          "title": "Maximum Samples Per Class",
+          "type": "integer"
+        },
+        "min_samples_leaf": {
+          "default": 5,
+          "maximum": 100000,
+          "minimum": 1,
+          "title": "Min Samples Leaf",
+          "type": "integer"
+        },
+        "minimum_training_samples_per_class": {
+          "exclusiveMinimum": 0,
+          "maximum": 1000000,
+          "title": "Minimum Training Samples Per Class",
+          "type": "integer"
+        },
+        "n_estimators": {
+          "default": 192,
+          "maximum": 4096,
+          "minimum": 1,
+          "title": "N Estimators",
+          "type": "integer"
+        },
+        "n_jobs": {
+          "const": 1,
+          "default": 1,
+          "title": "N Jobs",
+          "type": "integer"
+        },
+        "random_seed": {
+          "maximum": 2147483647,
+          "minimum": 0,
+          "title": "Random Seed",
+          "type": "integer"
+        },
+        "sieve_minimum_pixels": {
+          "maximum": 100000,
+          "minimum": 0,
+          "title": "Sieve Minimum Pixels",
+          "type": "integer"
+        },
+        "spatial_holdout_fold": {
+          "default": 0,
+          "maximum": 19,
+          "minimum": 0,
+          "title": "Spatial Holdout Fold",
+          "type": "integer"
+        },
+        "spatial_holdout_folds": {
+          "maximum": 20,
+          "minimum": 2,
+          "title": "Spatial Holdout Folds",
+          "type": "integer"
+        },
+        "training_core_radius_cdl_cells": {
+          "maximum": 8,
+          "minimum": 1,
+          "title": "Training Core Radius Cdl Cells",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "mapping_id",
+        "backend",
+        "random_seed",
+        "training_core_radius_cdl_cells",
+        "maximum_samples_per_class",
+        "minimum_training_samples_per_class",
+        "spatial_holdout_folds",
+        "inference_window_size",
+        "confidence_threshold",
+        "sieve_minimum_pixels",
+        "features"
+      ],
+      "title": "ClassificationSpec",
+      "type": "object"
+    },
+    "RecipeDefaults": {
+      "additionalProperties": false,
+      "properties": {
+        "max_total_bytes": {
+          "exclusiveMinimum": 0,
+          "maximum": 20000000000,
+          "title": "Max Total Bytes",
+          "type": "integer"
+        },
+        "naip_resolution_meters": {
+          "exclusiveMinimum": 0,
+          "maximum": 100,
+          "title": "Naip Resolution Meters",
+          "type": "number"
+        },
+        "portion": {
+          "enum": [
+            "native",
+            "overview"
+          ],
+          "title": "Portion",
+          "type": "string"
+        },
+        "preview_width": {
+          "maximum": 16384,
+          "minimum": 640,
+          "title": "Preview Width",
+          "type": "integer"
+        },
+        "service_tile_size": {
+          "maximum": 10000,
+          "minimum": 64,
+          "title": "Service Tile Size",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "max_total_bytes",
+        "naip_resolution_meters",
+        "portion",
+        "preview_width",
+        "service_tile_size"
+      ],
+      "title": "RecipeDefaults",
+      "type": "object"
+    },
+    "RecipeResampling": {
+      "additionalProperties": false,
+      "properties": {
+        "categorical": {
+          "enum": [
+            "nearest",
+            "mode",
+            "bilinear",
+            "cubic",
+            "lanczos",
+            "average"
+          ],
+          "title": "Categorical",
+          "type": "string"
+        },
+        "imagery": {
+          "enum": [
+            "nearest",
+            "mode",
+            "bilinear",
+            "cubic",
+            "lanczos",
+            "average"
+          ],
+          "title": "Imagery",
+          "type": "string"
+        },
+        "terrain": {
+          "anyOf": [
+            {
+              "enum": [
+                "nearest",
+                "mode",
+                "bilinear",
+                "cubic",
+                "lanczos",
+                "average"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Terrain"
+        }
+      },
+      "required": [
+        "categorical",
+        "imagery"
+      ],
+      "title": "RecipeResampling",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "analysis_type": {
+      "const": "weak_supervised_classification",
+      "title": "Analysis Type",
+      "type": "string"
+    },
+    "classification": {
+      "$ref": "#/$defs/ClassificationSpec"
+    },
+    "defaults": {
+      "$ref": "#/$defs/RecipeDefaults"
+    },
+    "inspection_focus": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Inspection Focus",
+      "type": "array"
+    },
+    "maximum_naip_pixel_size_m": {
+      "exclusiveMinimum": 0,
+      "maximum": 100,
+      "title": "Maximum Naip Pixel Size M",
+      "type": "number"
+    },
+    "preview": {
+      "const": "classification_audit",
+      "title": "Preview",
+      "type": "string"
+    },
+    "purpose": {
+      "minLength": 1,
+      "title": "Purpose",
+      "type": "string"
+    },
+    "recipe_id": {
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "title": "Recipe Id",
+      "type": "string"
+    },
+    "required_assets": {
+      "items": {
+        "enum": [
+          "naip_multispectral",
+          "cdl_classes"
+        ],
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Required Assets",
+      "type": "array"
+    },
+    "required_output_artifacts": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Required Output Artifacts",
+      "type": "array"
+    },
+    "resampling": {
+      "$ref": "#/$defs/RecipeResampling"
+    },
+    "schema_version": {
+      "const": 3,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "scientific_claim": {
+      "const": "Single-date high-resolution NAIP spectral surface classification weakly supervised by same-year USDA CDL superclasses. Spatial holdout metrics measure agreement with weak labels, not independent ground-truth accuracy.",
+      "title": "Scientific Claim",
+      "type": "string"
+    },
+    "title": {
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+    },
+    "unsupported_claims": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Unsupported Claims",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "recipe_id",
+    "title",
+    "purpose",
+    "analysis_type",
+    "scientific_claim",
+    "unsupported_claims",
+    "required_assets",
+    "maximum_naip_pixel_size_m",
+    "resampling",
+    "classification",
+    "preview",
+    "inspection_focus",
+    "defaults",
+    "required_output_artifacts"
+  ],
+  "title": "FasterRaster agricultural recipe v3",
+  "type": "object"
+}

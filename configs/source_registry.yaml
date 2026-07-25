@@ -1,4 +1,32 @@
 sources:
+  usgs_naip_imageserver:
+    adapter: arcgis_imageserver
+    provider: USGS
+    product: National Agriculture Imagery Program raw four-band imagery
+    base_url: https://imagery.nationalmap.gov/arcgis/rest/services/USGSNAIPImagery/ImageServer
+    operation: exportImage
+    bbox_param: bbox
+    bbox_crs_param: bboxSR
+    image_crs_param: imageSR
+    size_param: size
+    format_param: format
+    response_format_param: f
+    default_image_format: tiff
+    default_response_format: image
+    max_width: 4000
+    max_height: 4000
+    service_crs: EPSG:3857
+    default_export_image_crs: EPSG:3857
+    bbox_request_policy: preserve_input_bbox_with_bboxsr
+    supports_bbox_crs_param: true
+    supports_tiling: true
+    semantic_type: continuous
+    native_pixel_type: uint8
+    time_parameter_strategy: mosaic_rule_by_year_attribute
+    year_parameter_strategy: mosaic_rule_by_attribute
+    time_param: time
+    time_value: "{year}"
+    mosaic_rule_param: mosaicRule
   usda_nass_cdl_imageserver:
     adapter: arcgis_imageserver
     provider: USDA_NASS

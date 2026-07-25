@@ -47,6 +47,7 @@ nav:
       - Concepts and architecture: concepts.md
       - Supported sources: supported-sources.md
       - Human-development workflow: human-development.md
+      - NAIP–CDL surface classification: ag-classification.md
       - Hybrid publication: hybrid-publication.md
       - Examples: examples.md
   - Reproducibility:

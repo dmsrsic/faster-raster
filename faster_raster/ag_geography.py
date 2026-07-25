@@ -10,7 +10,14 @@ BBox = tuple[float, float, float, float]
 WEB_MERCATOR_LATITUDE_LIMIT = 85.05112878
 AOI_ESTIMATE_TO_NETWORK_CEILING_RATIO = 16
 VALID_AG_ASSETS = frozenset(
-    {"natural", "ndvi", "cdl_classes", "cdl_color", "hillshade"}
+    {
+        "natural",
+        "naip_multispectral",
+        "ndvi",
+        "cdl_classes",
+        "cdl_color",
+        "hillshade",
+    }
 )
 
 
@@ -59,6 +66,8 @@ def asset_safety_profile(
     profile: dict[str, tuple[float, int]] = {}
     for name in sorted(requested & {"natural", "ndvi"}):
         profile[name] = (resolution, 4)
+    if "naip_multispectral" in requested:
+        profile["naip_multispectral"] = (resolution, 4)
     if "cdl_classes" in requested:
         profile["cdl_classes"] = (30.0, 2)
     if "cdl_color" in requested:
@@ -216,7 +225,7 @@ def validate_aoi_safety(
 def required_source_families(assets: Iterable[str]) -> tuple[str, ...]:
     requested = set(assets)
     sources = []
-    if requested & {"natural", "ndvi"}:
+    if requested & {"natural", "naip_multispectral", "ndvi"}:
         sources.append("USGS_NAIP")
     if requested & {"cdl_classes", "cdl_color"}:
         sources.append("USDA_CDL")

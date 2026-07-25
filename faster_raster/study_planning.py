@@ -6,7 +6,16 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping
 
+from faster_raster.ag_classification_contracts import (
+    CLASSIFICATION_SCIENTIFIC_CLAIM,
+    CLASSIFICATION_UNSUPPORTED_CLAIMS,
+    CDL_SURFACE_SUPERCLASSES,
+)
 from faster_raster.ag_assets import asset_plan_document, compile_asset_plan, discover_cached_assets
+from faster_raster.ag_geography import (
+    asset_safety_profile,
+    estimate_uncompressed_asset_bytes,
+)
 from faster_raster.ag_recipes import load_named_recipe
 from faster_raster.local_config import (
     ConfigDocument,
@@ -27,6 +36,7 @@ from faster_raster.workfiles import HumanDevelopmentWorkfileSpec, Workfile
 
 ASSET_LABELS = {
     "natural": "Natural imagery",
+    "naip_multispectral": "Raw four-band NAIP imagery",
     "ndvi": "Vegetation index imagery",
     "cdl_classes": "Crop classes",
     "cdl_color": "Crop class colors",
@@ -35,6 +45,7 @@ ASSET_LABELS = {
 
 PIN_GROUPS = {
     "natural": "natural_imagery",
+    "naip_multispectral": "natural_imagery",
     "ndvi": "natural_imagery",
     "cdl_classes": "crop_classes",
     "cdl_color": "crop_classes",
@@ -408,6 +419,7 @@ def compile_study_plan(
         end=workfile.spec.time.end.isoformat(),
         year=workfile.spec.time.crop_year,
         reuse_mode=resolved["values"]["reuse_mode"]["value"],
+        requested_resolution_m=float(resolved["values"]["resolution_m"]["value"]),
     )
     source_by_asset = {item["logical_asset"]: item for item in resolution["decisions"]}
     rows = []
@@ -451,6 +463,39 @@ def compile_study_plan(
         "asset_plan": asset_plan,
         "maximum_download_bytes": int(resolved["values"]["maximum_download_mb"]["value"] * 1_000_000),
     }
+    if recipe.schema_version == 3:
+        from faster_raster.ag_classification import classification_dependency_status
+
+        requested_resolution = float(
+            resolved["values"]["resolution_m"]["value"]
+        )
+        dependency = classification_dependency_status()
+        estimated_transfer = estimate_uncompressed_asset_bytes(
+            tuple(workfile.spec.area.bbox),
+            asset_safety_profile(
+                recipe.required_assets,
+                requested_resolution,
+            ),
+        )
+        plan["classification"] = {
+            "raw_four_band_naip": {
+                "asset": "naip_multispectral",
+                "band_ids": [0, 1, 2, 3],
+                "requested_resolution_m": requested_resolution,
+            },
+            "weak_supervision": "same-year USDA CDL superclasses",
+            "mapping_id": CDL_SURFACE_SUPERCLASSES.mapping_id,
+            "mapping_sha256": CDL_SURFACE_SUPERCLASSES.sha256,
+            "estimated_uncompressed_transfer_bytes": estimated_transfer,
+            "dependency_readiness": dependency,
+            "scientific_claim": CLASSIFICATION_SCIENTIFIC_CLAIM,
+            "unsupported_claims": list(CLASSIFICATION_UNSUPPORTED_CLAIMS),
+        }
+        if not dependency["available"]:
+            plan["blocking"] = True
+            plan["classification"]["blocking_reason"] = (
+                "classification extra is unavailable before raster transfer"
+            )
     destination = output_dir or Path(resolved["values"]["state_root"]["value"]) / "plans" / workfile.spec.name
     destination.mkdir(parents=True, exist_ok=True)
     write_profile_atomic(destination / "resolved_config.json", resolved)

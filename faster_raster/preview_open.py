@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+import csv
 import json
 import shlex
 import shutil
 import subprocess
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any, Callable, Sequence
 
 from faster_raster.local_diagnostics import detect_wsl
@@ -29,6 +30,92 @@ def _read_json(path: Path) -> dict[str, Any]:
         return value if isinstance(value, dict) else {}
     except (OSError, json.JSONDecodeError):
         return {}
+
+
+def _relative_artifact(value: Any) -> str | None:
+    if not isinstance(value, str) or not value.strip():
+        return None
+    candidate = PurePosixPath(value.replace("\\", "/"))
+    if candidate.is_absolute() or ".." in candidate.parts:
+        return None
+    return candidate.as_posix()
+
+
+def _classification_summary(
+    handoff: Path,
+    receipt: dict[str, Any],
+) -> dict[str, Any] | None:
+    analysis = handoff / "analysis" / "classification"
+    receipt_classification = receipt.get("classification", {})
+    if not isinstance(receipt_classification, dict):
+        receipt_classification = {}
+    classification_present = (
+        analysis.is_dir()
+        or receipt.get("recipe_id") == "naip_cdl_classification_audit"
+        or bool(receipt_classification)
+    )
+    if not classification_present:
+        return None
+    model = _read_json(analysis / "model_receipt.json")
+    training = _read_json(analysis / "training_receipt.json")
+    metrics = _read_json(analysis / "weak_label_metrics.json")
+    disagreement = _read_json(analysis / "disagreement_summary.json")
+    publication = receipt_classification.get("publication", {})
+    if not isinstance(publication, dict):
+        publication = {}
+    missing: list[str] = []
+    for name, value in (
+        ("model_receipt", model),
+        ("training_receipt", training),
+        ("weak_label_metrics", metrics),
+        ("disagreement_summary", disagreement),
+    ):
+        if not value:
+            missing.append(name)
+    area_path = analysis / "class_area_inventory.csv"
+    hectares: dict[str, float] = {}
+    if area_path.is_file():
+        try:
+            with area_path.open("r", encoding="utf-8", newline="") as handle:
+                for row in csv.DictReader(handle):
+                    label = row.get("predicted_class_name")
+                    value = row.get("hectares")
+                    if label and value is not None:
+                        hectares[label] = float(value)
+        except (OSError, TypeError, ValueError):
+            missing.append("class_area_inventory")
+            hectares = {}
+    else:
+        missing.append("class_area_inventory")
+    low_confidence = disagreement.get("low_confidence_fraction")
+    classified_coverage = (
+        1.0 - float(low_confidence)
+        if isinstance(low_confidence, (int, float))
+        else None
+    )
+    mapping_hash = model.get("mapping_sha256")
+    return {
+        "available": any((model, training, metrics, disagreement, hectares)),
+        "classifier_backend": model.get("backend"),
+        "mapping_id": model.get("mapping_id"),
+        "mapping_sha256": mapping_hash,
+        "mapping_sha256_abbreviated": (
+            str(mapping_hash)[:12] if mapping_hash else None
+        ),
+        "train_samples": training.get("train_sample_total"),
+        "holdout_samples": training.get("holdout_sample_total"),
+        "weak_label_overall_agreement": metrics.get("overall_agreement"),
+        "macro_f1": metrics.get("macro_f1"),
+        "cohen_kappa": metrics.get("cohen_kappa"),
+        "confidence_threshold": publication.get("confidence_threshold"),
+        "classified_coverage": classified_coverage,
+        "uncertain_fraction": low_confidence,
+        "high_confidence_disagreement_fraction": disagreement.get(
+            "high_confidence_disagreement_fraction"
+        ),
+        "predicted_hectares_by_class": hectares,
+        "missing_fields": sorted(set(missing)),
+    }
 
 
 def is_finalized_handoff(path: Path) -> bool:
@@ -109,6 +196,14 @@ def inspect_handoff(handoff: Path) -> dict[str, Any]:
         receipt_path = workflow_receipt if workflow_receipt.is_file() else None
     receipt = _read_json(receipt_path) if receipt_path else {}
     resolution = _read_json(handoff / "source_resolution.json")
+    asset_plan = _read_json(handoff / "asset_plan.json")
+    status = (
+        manifest.get("operation_status")
+        or receipt.get("final_status")
+        or receipt.get("status")
+        or "unknown"
+    )
+    completed = status in {"completed", "PASS"}
     preview: str | None
     try:
         preview = str(finalized_preview(handoff))
@@ -118,20 +213,87 @@ def inspect_handoff(handoff: Path) -> dict[str, Any]:
         item.get("logical_asset"): item
         for item in resolution.get("decisions", [])
     }
+    planned_assets = {
+        item.get("asset_name"): item
+        for item in asset_plan.get("assets", [])
+        if item.get("asset_name")
+    }
+    executed_assets = {
+        item.get("asset_name"): item
+        for item in receipt.get("assets", [])
+        if item.get("asset_name")
+    }
+    ordered_asset_names = [
+        *planned_assets,
+        *(
+            name
+            for name in executed_assets
+            if name not in planned_assets
+        ),
+    ]
     asset_status = []
-    for asset in receipt.get("assets", []):
-        logical_asset = asset.get("asset_name")
+    for logical_asset in ordered_asset_names:
+        planned = planned_assets.get(logical_asset, {})
+        asset = executed_assets.get(logical_asset, {})
         source = resolution_by_asset.get(logical_asset, {})
-        action = asset.get("action", "unknown")
+        planned_action = planned.get("action", asset.get("action", "unknown"))
+        action = asset.get("action", planned_action)
+        relative_output = _relative_artifact(asset.get("output_path"))
+        checksum = asset.get("sha256")
+        output_exists = bool(
+            relative_output
+            and (handoff / PurePosixPath(relative_output)).is_file()
+        )
+        verification_recorded = asset.get("validation_result")
+        verification_passed = bool(
+            completed
+            and verification_recorded == "PASS"
+            and output_exists
+            and isinstance(checksum, str)
+            and len(checksum) == 64
+        )
+        if not asset:
+            execution_action = "not_run"
+        elif verification_passed and str(action).startswith("reuse_"):
+            execution_action = "reused"
+        elif verification_passed and action in {"acquire", "acquire_and_mosaic"}:
+            execution_action = "acquired"
+        elif verification_recorded and verification_recorded != "PASS":
+            execution_action = "failed"
+        else:
+            execution_action = "not_verified"
         asset_status.append(
             {
                 "logical_asset": logical_asset,
                 "selected_source": source.get("selected_source"),
-                "local_asset_readiness": LOCAL_READINESS_BY_ACTION.get(action, "unknown"),
+                "local_asset_readiness": LOCAL_READINESS_BY_ACTION.get(
+                    planned_action,
+                    "unknown",
+                ),
                 "remote_source_status": source.get("selected_capability_status") or "unknown",
                 "action": action,
-                "reused": str(action).startswith("reuse_"),
-                "acquired": action in {"acquire", "acquire_and_mosaic"},
+                "initial_local_asset_readiness": LOCAL_READINESS_BY_ACTION.get(
+                    planned_action,
+                    "unknown",
+                ),
+                "planned_action": planned_action,
+                "execution_action": execution_action,
+                "final_asset_verification": (
+                    "PASS"
+                    if verification_passed
+                    else (
+                        "FAIL"
+                        if execution_action == "failed"
+                        else "NOT_VERIFIED"
+                    )
+                ),
+                "final_local_artifact": (
+                    relative_output if verification_passed else None
+                ),
+                "network_bytes": int(asset.get("bytes_downloaded", 0) or 0),
+                "checksum": checksum if verification_passed else None,
+                "reused": execution_action == "reused",
+                "acquired": execution_action == "acquired",
             }
         )
     if not asset_status:
@@ -142,6 +304,13 @@ def inspect_handoff(handoff: Path) -> dict[str, Any]:
                 "local_asset_readiness": "unknown",
                 "remote_source_status": item.get("selected_capability_status") or "unknown",
                 "action": "unknown",
+                "initial_local_asset_readiness": "unknown",
+                "planned_action": "unknown",
+                "execution_action": "not_run",
+                "final_asset_verification": "NOT_VERIFIED",
+                "final_local_artifact": None,
+                "network_bytes": 0,
+                "checksum": None,
                 "reused": False,
                 "acquired": False,
             }
@@ -164,6 +333,13 @@ def inspect_handoff(handoff: Path) -> dict[str, Any]:
                         "local_asset_readiness": "ready_exact",
                         "remote_source_status": "credential_missing",
                         "action": "reuse_direct",
+                        "initial_local_asset_readiness": "ready_exact",
+                        "planned_action": "reuse_direct",
+                        "execution_action": "reused",
+                        "final_asset_verification": "PASS",
+                        "final_local_artifact": _relative_artifact(epoch.get(key)),
+                        "network_bytes": 0,
+                        "checksum": None,
                         "reused": True,
                         "acquired": False,
                     }
@@ -179,7 +355,7 @@ def inspect_handoff(handoff: Path) -> dict[str, Any]:
     return {
         "schema_version": "fasterraster.handoff-inspection/v2",
         "handoff": str(handoff),
-        "status": manifest.get("operation_status") or receipt.get("final_status") or receipt.get("status") or "unknown",
+        "status": status,
         "network_bytes": manifest.get("network_bytes", receipt.get("total_network_bytes", receipt.get("network_bytes", 0))),
         "reused_bytes": manifest.get("reused_bytes", receipt.get("total_reused_bytes", 0)),
         "source_choices": source_choices,
@@ -192,4 +368,5 @@ def inspect_handoff(handoff: Path) -> dict[str, Any]:
             )
         ],
         "output_paths": receipt.get("generated_output_paths", []),
+        "classification": _classification_summary(handoff, receipt),
     }

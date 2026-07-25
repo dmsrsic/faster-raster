@@ -24,11 +24,17 @@ from faster_raster.ag_assets import (
     spatial_relationship,
 )
 from faster_raster.ag_geography import BBoxValidationError, validate_bbox_text
-from faster_raster.ag_recipes import AgriculturalRecipe, RecipeLoadError, load_named_recipe
+from faster_raster.ag_recipes import (
+    AgriculturalRecipe,
+    AgriculturalRecipeV3,
+    RecipeLoadError,
+    load_named_recipe,
+)
 
 
 ASSET_FILENAMES = {
     "natural": "naip_{year}_natural_color.cog.tif",
+    "naip_multispectral": "naip_{year}_multispectral.cog.tif",
     "ndvi": "naip_{year}_ndvi_color.cog.tif",
     "cdl_classes": "cdl_{year}_classes.cog.tif",
     "cdl_color": "cdl_{year}_color.cog.tif",
@@ -36,6 +42,7 @@ ASSET_FILENAMES = {
 }
 SERVICE_ENDPOINTS = {
     "natural": "USGS NAIP ImageServer/exportImage (NaturalColor)",
+    "naip_multispectral": "USGS NAIP ImageServer/exportImage (raw bands 0,1,2,3)",
     "ndvi": "USGS NAIP ImageServer/exportImage (NDVI_Color)",
     "cdl_classes": "USDA CDL ImageServer/exportImage (raw classes)",
     "cdl_color": "USDA CDL ImageServer/exportImage (croptypes)",
@@ -43,6 +50,7 @@ SERVICE_ENDPOINTS = {
 }
 REQUEST_PREFIXES = {
     "natural": "naip_natural_",
+    "naip_multispectral": "naip_multispectral_",
     "ndvi": "naip_ndvi_",
     "cdl_classes": "cdl_raw_",
     "cdl_color": "cdl_color_",
@@ -222,6 +230,7 @@ def _run_selective_acquisition(
     recipe: AgriculturalRecipe,
     max_total_bytes: int,
     service_tile_size: int,
+    naip_resolution_m: float | None = None,
     runner: Callable[..., subprocess.CompletedProcess[str]] = subprocess.run,
 ) -> dict[str, Any]:
     if not assets:
@@ -246,7 +255,11 @@ def _run_selective_acquisition(
         "--portion",
         recipe.defaults.portion,
         "--naip-resolution",
-        str(recipe.defaults.naip_resolution_meters),
+        str(
+            naip_resolution_m
+            if naip_resolution_m is not None
+            else recipe.defaults.naip_resolution_meters
+        ),
         "--service-tile-size",
         str(service_tile_size),
         "--max-total-bytes",
@@ -301,9 +314,15 @@ def _verify_resolved(
             raise RecipeExecutionError(
                 f"resolved {name} failed validation: {record.validation_errors}; spatial={relationship}"
             )
-        if name in {"natural", "ndvi", "cdl_classes", "cdl_color"} and record.temporal_key != year:
+        if name in {
+            "natural",
+            "naip_multispectral",
+            "ndvi",
+            "cdl_classes",
+            "cdl_color",
+        } and record.temporal_key != year:
             raise RecipeExecutionError(f"resolved {name} has wrong year {record.temporal_key}")
-        if name in {"natural", "ndvi"} and (
+        if name in {"natural", "naip_multispectral", "ndvi"} and (
             record.pixel_size_m is None
             or record.pixel_size_m > recipe.maximum_naip_pixel_size_m + 0.01
         ):
@@ -322,6 +341,24 @@ def _validate_recipe_outputs(preview: Path) -> None:
         )
 
 
+def _validate_classification_recipe_outputs(
+    staging: Path,
+    preview: Path,
+) -> None:
+    required = [
+        preview,
+        preview.parent / "classification_legend.json",
+        staging / "analysis/classification/class_area_inventory.csv",
+        *sorted((staging / "data").glob("naip_*_surface_classification.cog.tif")),
+        *sorted((staging / "data").glob("naip_*_classification_confidence.cog.tif")),
+        *sorted((staging / "data").glob("naip_*_cdl_agreement_state.cog.tif")),
+    ]
+    if len(required) < 6 or any(
+        not path.is_file() or path.stat().st_size == 0 for path in required
+    ):
+        raise RecipeExecutionError("classification output validation failed")
+
+
 def _validate_required_artifacts(
     recipe: AgriculturalRecipe,
     staging: Path,
@@ -334,6 +371,30 @@ def _validate_required_artifacts(
         "preview_4k_png": preview,
         "checksums.sha256": staging / "checksums.sha256",
     }
+    if isinstance(recipe, AgriculturalRecipeV3):
+        analysis = staging / "analysis" / "classification"
+        data = staging / "data"
+        first = lambda pattern: next(iter(sorted(data.glob(pattern))), data / "missing")
+        known.update(
+            {
+                "classification_legend.json": preview.parent / "classification_legend.json",
+                "classification_cog": first("naip_*_surface_classification.cog.tif"),
+                "confidence_cog": first("naip_*_classification_confidence.cog.tif"),
+                "agreement_cog": first("naip_*_cdl_agreement_state.cog.tif"),
+                "cdl_superclasses_cog": data / "cdl_superclasses.cog.tif",
+                "cdl_training_cores_cog": data / "cdl_training_cores.cog.tif",
+                "holdout_confusion_matrix.csv": analysis / "holdout_confusion_matrix.csv",
+                "holdout_confusion_matrix.json": analysis / "holdout_confusion_matrix.json",
+                "weak_label_metrics.json": analysis / "weak_label_metrics.json",
+                "training_receipt.json": analysis / "training_receipt.json",
+                "model_receipt.json": analysis / "model_receipt.json",
+                "feature_contract.json": analysis / "feature_contract.json",
+                "class_agreement_matrix.csv": analysis / "class_agreement_matrix.csv",
+                "class_agreement_matrix.json": analysis / "class_agreement_matrix.json",
+                "disagreement_summary.json": analysis / "disagreement_summary.json",
+                "class_area_inventory.csv": analysis / "class_area_inventory.csv",
+            }
+        )
     unsupported = sorted(set(recipe.required_output_artifacts) - set(known))
     if unsupported:
         raise RecipeExecutionError(
@@ -423,7 +484,16 @@ def execute_recipe(
     max_total_bytes: int,
     service_tile_size: int,
     renderer: Callable[..., Path],
+    naip_resolution_m: float | None = None,
 ) -> Path:
+    if isinstance(recipe, AgriculturalRecipeV3):
+        from faster_raster.ag_classification import classification_dependency_status
+
+        if not classification_dependency_status()["available"]:
+            raise RecipeExecutionError(
+                "This recipe requires the FasterRaster classification extra: "
+                "pip install -e '.[classification]'"
+            )
     cache_root = Path(
         os.environ.get(
             "FASTERRASTER_AG_CACHE_ROOT",
@@ -450,6 +520,7 @@ def execute_recipe(
         end=end,
         year=year,
         reuse_mode=reuse_mode,
+        requested_resolution_m=naip_resolution_m,
     )
     handoff_root = configured_handoff_root(root)
     final = handoff_root / f"{_safe_name(name)}_{_stamp()}"
@@ -484,10 +555,27 @@ def execute_recipe(
                 recipe=recipe,
                 max_total_bytes=max_total_bytes,
                 service_tile_size=service_tile_size,
+                naip_resolution_m=naip_resolution_m,
             )
             if acquired_names
             else {"network_bytes": 0, "requests": [], "layers": []}
         )
+        raw_acquisition_evidence: dict[str, Any] | None = None
+        if isinstance(recipe, AgriculturalRecipeV3) and "naip_multispectral" in acquired_names:
+            from faster_raster.ag_classification_acquisition import (
+                RawNaipEvidenceError,
+                validate_raw_naip_acquisition_evidence,
+            )
+
+            try:
+                raw_acquisition_evidence = validate_raw_naip_acquisition_evidence(
+                    acquisition_manifest,
+                    requested_year=year,
+                )
+            except RawNaipEvidenceError as exc:
+                raise RecipeExecutionError(
+                    f"acquired naip_multispectral failed evidence validation: {exc}"
+                ) from exc
         resolved = _verify_resolved(staging, recipe, bbox, year)
         compatibility_assets = {
             key: str(_find_resolved_paths(staging, year, [key]).get(key))
@@ -495,31 +583,96 @@ def execute_recipe(
             else None
             for key in ASSET_PATTERNS
         }
-        natural = resolved["natural"]
+        spectral = (
+            resolved["naip_multispectral"]
+            if isinstance(recipe, AgriculturalRecipeV3)
+            else resolved["natural"]
+        )
         compatibility = {
             "compatible": True,
             "assets": compatibility_assets,
             "published_handoff_id": final.name,
             "published_handoff_relative_path": final.name,
-            "natural_pixel_size_m": natural.pixel_size_m,
+            "natural_pixel_size_m": spectral.pixel_size_m,
+            "spectral_pixel_size_m": spectral.pixel_size_m,
+            "effective_naip_resolution_m": (
+                naip_resolution_m
+                if naip_resolution_m is not None
+                else recipe.defaults.naip_resolution_meters
+            ),
             "maximum_naip_pixel_size_m": recipe.maximum_naip_pixel_size_m,
             "checks": {decision.asset_name: decision.action for decision in decisions},
             "network_bytes": int(acquisition_manifest.get("network_bytes", 0)),
         }
-        preview = renderer(
-            root,
-            staging,
-            recipe_raw,
-            compatibility,
-            name,
-            bbox,
-            start,
-            end,
-            year,
-            False,
-        )
-        output_dir = preview.parent
-        _validate_recipe_outputs(preview)
+        classification_result: dict[str, Any] | None = None
+        publication_receipt: dict[str, Any] | None = None
+        if isinstance(recipe, AgriculturalRecipeV3):
+            from faster_raster.ag_classification import execute_classification
+            from faster_raster.ag_classification_publication import (
+                render_classification_audit,
+            )
+
+            classification_result = execute_classification(
+                Path(resolved["naip_multispectral"].local_path),
+                Path(resolved["cdl_classes"].local_path),
+                staging,
+                recipe,
+                year=year,
+            )
+            output_dir = staging / "preview" / recipe.recipe_id
+            preview_path = (
+                output_dir
+                / f"{recipe.recipe_id}_4k.png"
+            )
+            catalog_features = (
+                acquisition_manifest.get("naip", {}).get(
+                    "catalog_features",
+                    [],
+                )
+                if isinstance(acquisition_manifest.get("naip"), dict)
+                else []
+            )
+            acquisition_dates = sorted(
+                {
+                    item.get("attributes", {}).get("acquisition_date")
+                    for item in catalog_features
+                    if item.get("attributes", {}).get("acquisition_date")
+                    is not None
+                },
+                key=lambda value: (type(value).__name__, str(value)),
+            )
+            preview, publication_receipt = render_classification_audit(
+                preview_path,
+                naip_path=Path(resolved["naip_multispectral"].local_path),
+                classification_result=classification_result,
+                recipe=recipe,
+                year=year,
+                acquisition_evidence={
+                    "acquisition_date_evidence": acquisition_dates or None,
+                },
+                network_bytes=int(acquisition_manifest.get("network_bytes", 0)),
+                reused_bytes=sum(
+                    Path(decision.candidate.local_path).stat().st_size
+                    for decision in decisions
+                    if decision.candidate is not None
+                ),
+            )
+            _validate_classification_recipe_outputs(staging, preview)
+        else:
+            preview = renderer(
+                root,
+                staging,
+                recipe_raw,
+                compatibility,
+                name,
+                bbox,
+                start,
+                end,
+                year,
+                False,
+            )
+            output_dir = preview.parent
+            _validate_recipe_outputs(preview)
         per_asset: list[dict[str, Any]] = []
         for decision in decisions:
             output_record = resolved[decision.asset_name]
@@ -552,6 +705,20 @@ def execute_recipe(
                     "validation_result": "PASS",
                 }
             )
+        generated_output_paths = sorted(
+            {
+                path.relative_to(staging).as_posix()
+                for path in staging.rglob("*")
+                if path.is_file() and "_work" not in path.parts
+            }
+            | {
+                (output_dir / "recipe_receipt.json")
+                .relative_to(staging)
+                .as_posix(),
+                "checksums.sha256",
+                "manifest.json",
+            }
+        )
         receipt = {
             "schema_version": 3,
             "final_status": "PASS",
@@ -562,22 +729,84 @@ def execute_recipe(
             "requested_bbox_epsg_4326": list(bbox),
             "requested_timeframe": {"start": start, "end": end},
             "requested_cdl_year": year,
+            "effective_naip_resolution_m": (
+                naip_resolution_m
+                if naip_resolution_m is not None
+                else recipe.defaults.naip_resolution_meters
+            ),
             "reuse_mode": reuse_mode,
             "assets": per_asset,
             "total_network_bytes": int(acquisition_manifest.get("network_bytes", 0)),
             "total_reused_bytes": sum(item["bytes_reused"] for item in per_asset),
             "asset_plan": str((staging / "asset_plan.json").relative_to(staging)),
-            "generated_output_paths": [
-                "asset_plan.json",
-                *(str(Path(record.local_path).relative_to(staging)) for record in resolved.values()),
-                str(preview.relative_to(staging)),
-                str((output_dir / "class_inventory.csv").relative_to(staging)),
-                str((output_dir / "recipe_receipt.json").relative_to(staging)),
-                "checksums.sha256",
-            ],
+            "generated_output_paths": generated_output_paths,
             "blocking_failures": [],
             "completed_at_utc": datetime.now(timezone.utc).isoformat(),
         }
+        if classification_result is not None:
+            receipt.update(
+                {
+                    "scientific_claim": recipe.scientific_claim,
+                    "unsupported_claims": recipe.unsupported_claims,
+                    "mapping": {
+                        "mapping_id": classification_result["mapping"]["mapping_id"],
+                        "contract_version": classification_result["mapping"][
+                            "contract_version"
+                        ],
+                        "sha256": classification_result["mapping_sha256"],
+                    },
+                    "four_band_source_verification": {
+                        **classification_result["source_validation"],
+                        "acquisition_request_evidence": (
+                            raw_acquisition_evidence
+                            or {"status": "REUSED", "network_request_verified": False}
+                        ),
+                    },
+                    "classification": {
+                        "model": classification_result["model_receipt"],
+                        "training": classification_result["training_receipt"],
+                        "weak_label_spatial_holdout_agreement": (
+                            classification_result["metrics"]
+                        ),
+                        "agreement_audit": classification_result["agreement"],
+                        "publication": publication_receipt,
+                    },
+                    "artifact_accounting": {
+                        "downloaded_bytes": int(
+                            acquisition_manifest.get("network_bytes", 0)
+                        ),
+                        "reused_bytes": sum(
+                            item["bytes_reused"] for item in per_asset
+                        ),
+                        "locally_derived_artifacts": [
+                            "data/cdl_superclasses.cog.tif",
+                            "data/cdl_training_cores.cog.tif",
+                        ],
+                        "model_products": [
+                            f"data/naip_{year}_surface_classification.cog.tif",
+                            f"data/naip_{year}_classification_confidence.cog.tif",
+                            "analysis/classification/model_receipt.json",
+                        ],
+                        "qa_products": [
+                            f"data/naip_{year}_cdl_agreement_state.cog.tif",
+                            "analysis/classification/holdout_confusion_matrix.csv",
+                            "analysis/classification/holdout_confusion_matrix.json",
+                            "analysis/classification/weak_label_metrics.json",
+                            "analysis/classification/training_receipt.json",
+                            "analysis/classification/feature_contract.json",
+                            "analysis/classification/class_agreement_matrix.csv",
+                            "analysis/classification/class_agreement_matrix.json",
+                            "analysis/classification/disagreement_summary.json",
+                            "analysis/classification/class_area_inventory.csv",
+                        ],
+                        "preview_products": [
+                            path
+                            for path in generated_output_paths
+                            if path.startswith("preview/")
+                        ],
+                    },
+                }
+            )
         _write_json(output_dir / "recipe_receipt.json", receipt)
         _regenerate_checksums(output_dir)
         manifest = {
@@ -592,6 +821,11 @@ def execute_recipe(
                 "cdl_year": year,
                 "reuse_mode": reuse_mode,
                 "recipe_id": recipe.recipe_id,
+                "effective_naip_resolution_m": (
+                    naip_resolution_m
+                    if naip_resolution_m is not None
+                    else recipe.defaults.naip_resolution_meters
+                ),
                 "network_ceiling_bytes": max_total_bytes,
             },
             "layers": [
@@ -609,12 +843,27 @@ def execute_recipe(
                 for item in per_asset
             ],
             "network_bytes": int(acquisition_manifest.get("network_bytes", 0)),
+            "reused_bytes": sum(item["bytes_reused"] for item in per_asset),
             "requests": acquisition_manifest.get("requests", []),
             "asset_plan": "asset_plan.json",
             "recipe_receipt": str((output_dir / "recipe_receipt.json").relative_to(staging)),
             "blocking_failures": [],
             "completed_at_utc": datetime.now(timezone.utc).isoformat(),
         }
+        if classification_result is not None:
+            manifest["classification"] = {
+                "mapping_id": classification_result["mapping"]["mapping_id"],
+                "mapping_version": classification_result["mapping"][
+                    "contract_version"
+                ],
+                "mapping_sha256": classification_result["mapping_sha256"],
+                "scientific_claim": recipe.scientific_claim,
+                "weak_label_spatial_holdout_agreement": (
+                    classification_result["metrics"]
+                ),
+                "artifact_accounting": receipt["artifact_accounting"],
+                "four_band_source_verification": receipt["four_band_source_verification"],
+            }
         _write_json(staging / "manifest.json", manifest)
         _regenerate_checksums(staging)
         _validate_required_artifacts(recipe, staging, preview)

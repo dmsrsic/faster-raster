@@ -48,6 +48,9 @@ docs = [
   "mkdocs>=1.6,<2",
   "mkdocs-material>=9.6,<10"
 ]
+classification = [
+  "scikit-learn>=1.5,<2.0"
+]
 
 [project.scripts]
 faster-raster = "faster_raster.cli:app"

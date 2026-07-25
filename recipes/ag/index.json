@@ -17,6 +17,10 @@
     {
       "file": "irrigation_field_structure.json",
       "recipe_id": "irrigation_field_structure"
+    },
+    {
+      "file": "naip_cdl_classification_audit.json",
+      "recipe_id": "naip_cdl_classification_audit"
     }
   ],
   "reuse_modes": {
@@ -24,5 +28,5 @@
     "never": "Ignore compatible handoffs and acquire a fresh bundle.",
     "only": "Require compatible local data and prohibit acquisition."
   },
-  "schema_version": 2
+  "schema_version": 3
 }

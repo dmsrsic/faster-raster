@@ -27,6 +27,7 @@ SCHEMA_FILENAMES = [
     "materialization_verification.schema.json",
     "system_grade.schema.json",
     "agricultural_recipe_v2.schema.json",
+    "agricultural_recipe_v3.schema.json",
     "workfile_v2.schema.json",
 ]
 
@@ -986,7 +987,10 @@ def materialization_verification_schema() -> dict:
 
 
 def all_schemas() -> dict[str, dict]:
-    from faster_raster.ag_recipes import agricultural_recipe_schema
+    from faster_raster.ag_recipes import (
+        agricultural_recipe_v2_schema,
+        agricultural_recipe_v3_schema,
+    )
     from faster_raster.workfiles import human_development_workfile_schema
 
     return {
@@ -1011,7 +1015,8 @@ def all_schemas() -> dict[str, dict]:
         "artifact_catalog.schema.json": artifact_catalog_schema(),
         "materialization_verification.schema.json": materialization_verification_schema(),
         "system_grade.schema.json": system_grade_schema(),
-        "agricultural_recipe_v2.schema.json": agricultural_recipe_schema(),
+        "agricultural_recipe_v2.schema.json": agricultural_recipe_v2_schema(),
+        "agricultural_recipe_v3.schema.json": agricultural_recipe_v3_schema(),
         "workfile_v2.schema.json": human_development_workfile_schema(),
     }
 

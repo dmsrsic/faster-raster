@@ -1,0 +1,99 @@
+{
+  "schema_version": 3,
+  "recipe_id": "naip_cdl_classification_audit",
+  "title": "NAIP–CDL Weak-Supervised Surface Classification Audit",
+  "purpose": "Classify single-date four-band NAIP spectral surfaces with same-year USDA CDL superclasses as weak supervision and publish a spatially validated agreement audit.",
+  "analysis_type": "weak_supervised_classification",
+  "scientific_claim": "Single-date high-resolution NAIP spectral surface classification weakly supervised by same-year USDA CDL superclasses. Spatial holdout metrics measure agreement with weak labels, not independent ground-truth accuracy.",
+  "unsupported_claims": [
+    "crop species truth from one NAIP acquisition",
+    "authoritative land-cover replacement",
+    "cadastral or parcel boundaries",
+    "confirmed field ownership",
+    "construction dates",
+    "occupancy",
+    "population or economic activity",
+    "irrigation status",
+    "crop yield",
+    "causal land-use change",
+    "independent accuracy assessment",
+    "historical change from a single-date classification"
+  ],
+  "required_assets": [
+    "naip_multispectral",
+    "cdl_classes"
+  ],
+  "maximum_naip_pixel_size_m": 1.5,
+  "resampling": {
+    "imagery": "bilinear",
+    "categorical": "nearest"
+  },
+  "classification": {
+    "mapping_id": "cdl_surface_superclasses_v1",
+    "backend": "random_forest",
+    "random_seed": 20260724,
+    "training_core_radius_cdl_cells": 1,
+    "maximum_samples_per_class": 20000,
+    "minimum_training_samples_per_class": 500,
+    "spatial_holdout_folds": 5,
+    "spatial_holdout_fold": 0,
+    "inference_window_size": 512,
+    "confidence_threshold": 0.6,
+    "sieve_minimum_pixels": 9,
+    "features": [
+      "red",
+      "green",
+      "blue",
+      "nir",
+      "ndvi",
+      "gndvi",
+      "vari",
+      "excess_green",
+      "brightness",
+      "saturation"
+    ],
+    "n_estimators": 192,
+    "max_depth": 20,
+    "min_samples_leaf": 5,
+    "max_features": "sqrt",
+    "class_weight": "balanced_subsample",
+    "n_jobs": 1
+  },
+  "preview": "classification_audit",
+  "inspection_focus": [
+    "natural-color field and urban structure",
+    "color-infrared vegetation response",
+    "numeric NDVI derived from unstretched bands",
+    "predicted surface superclasses",
+    "confidence and high-confidence CDL disagreement"
+  ],
+  "defaults": {
+    "max_total_bytes": 500000000,
+    "naip_resolution_meters": 1.2,
+    "portion": "native",
+    "preview_width": 3840,
+    "service_tile_size": 1800
+  },
+  "required_output_artifacts": [
+    "asset_plan.json",
+    "recipe_receipt.json",
+    "preview_4k_png",
+    "classification_legend.json",
+    "classification_cog",
+    "confidence_cog",
+    "agreement_cog",
+    "cdl_superclasses_cog",
+    "cdl_training_cores_cog",
+    "holdout_confusion_matrix.csv",
+    "holdout_confusion_matrix.json",
+    "weak_label_metrics.json",
+    "training_receipt.json",
+    "model_receipt.json",
+    "feature_contract.json",
+    "class_agreement_matrix.csv",
+    "class_agreement_matrix.json",
+    "disagreement_summary.json",
+    "class_area_inventory.csv",
+    "checksums.sha256"
+  ]
+}

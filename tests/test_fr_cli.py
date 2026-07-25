@@ -9,7 +9,12 @@ import pytest
 
 from faster_raster import fr_cli
 from faster_raster.local_paths import resolve_local_paths
-from faster_raster.preview_open import finalized_preview, latest_handoff, open_local_preview
+from faster_raster.preview_open import (
+    finalized_preview,
+    inspect_handoff,
+    latest_handoff,
+    open_local_preview,
+)
 from faster_raster.workfiles import workfile_template
 
 
@@ -138,6 +143,196 @@ def _finalized(path: Path, *, preview=True) -> Path:
         (path / "preview").mkdir()
         (path / "preview" / "result_4k.png").write_bytes(b"png")
     return path
+
+
+def _write_json(path: Path, value: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(value), encoding="utf-8")
+
+
+def _asset_handoff(
+    tmp_path: Path,
+    *,
+    action: str,
+    validation: str = "PASS",
+    completed: bool = True,
+) -> Path:
+    handoff = tmp_path / f"handoff-{action}"
+    handoff.mkdir()
+    _write_json(
+        handoff / "manifest.json",
+        {
+            "operation_status": "completed" if completed else "failed",
+            "network_bytes": 17 if action == "acquire" else 0,
+        },
+    )
+    _write_json(
+        handoff / "asset_plan.json",
+        {
+            "assets": [
+                {
+                    "asset_name": "naip_multispectral",
+                    "action": action,
+                }
+            ]
+        },
+    )
+    _write_json(
+        handoff / "source_resolution.json",
+        {
+            "decisions": [
+                {
+                    "logical_asset": "naip_multispectral",
+                    "selected_source": "usgs_naip_imageserver",
+                    "selected_capability_status": "available",
+                }
+            ]
+        },
+    )
+    artifact = handoff / "data" / "naip.tif"
+    artifact.parent.mkdir()
+    artifact.write_bytes(b"verified fixture")
+    _write_json(
+        handoff / "preview" / "recipe_receipt.json",
+        {
+            "final_status": "PASS" if completed else "FAIL",
+            "assets": [
+                {
+                    "asset_name": "naip_multispectral",
+                    "action": action,
+                    "validation_result": validation,
+                    "output_path": "data/naip.tif",
+                    "bytes_downloaded": 17 if action == "acquire" else 0,
+                    "sha256": "a" * 64,
+                }
+            ],
+        },
+    )
+    return handoff
+
+
+@pytest.mark.parametrize(
+    ("action", "expected_execution"),
+    [("acquire", "acquired"), ("reuse_direct", "reused")],
+)
+def test_completed_asset_inspection_shows_progression(
+    tmp_path,
+    action,
+    expected_execution,
+):
+    handoff = _asset_handoff(tmp_path, action=action)
+    asset = inspect_handoff(handoff)["asset_status"][0]
+    assert asset["initial_local_asset_readiness"] == (
+        "missing" if action == "acquire" else "ready_exact"
+    )
+    assert asset["planned_action"] == action
+    assert asset["execution_action"] == expected_execution
+    assert asset["final_asset_verification"] == "PASS"
+    assert asset["final_local_artifact"] == "data/naip.tif"
+    assert asset["checksum"] == "a" * 64
+
+
+def test_plan_only_missing_asset_retains_readiness_semantics(tmp_path):
+    handoff = tmp_path / "plan-only"
+    handoff.mkdir()
+    _write_json(
+        handoff / "asset_plan.json",
+        {
+            "assets": [
+                {
+                    "asset_name": "naip_multispectral",
+                    "action": "acquire",
+                }
+            ]
+        },
+    )
+    report = inspect_handoff(handoff)
+    asset = report["asset_status"][0]
+    assert asset["local_asset_readiness"] == "missing"
+    assert asset["execution_action"] == "not_run"
+    assert asset["final_asset_verification"] == "NOT_VERIFIED"
+
+
+def test_failed_asset_is_never_described_as_verified(tmp_path):
+    handoff = _asset_handoff(
+        tmp_path,
+        action="acquire",
+        validation="FAIL",
+        completed=False,
+    )
+    asset = inspect_handoff(handoff)["asset_status"][0]
+    assert asset["execution_action"] == "failed"
+    assert asset["final_asset_verification"] == "FAIL"
+    assert asset["final_local_artifact"] is None
+    assert asset["checksum"] is None
+
+
+def test_verbose_inspection_reads_classification_summary_without_model_import(
+    tmp_path,
+    capsys,
+):
+    handoff = _asset_handoff(tmp_path, action="acquire")
+    analysis = handoff / "analysis" / "classification"
+    _write_json(
+        analysis / "model_receipt.json",
+        {
+            "backend": "random_forest",
+            "mapping_id": "cdl_surface_superclasses_v1",
+            "mapping_sha256": "b" * 64,
+        },
+    )
+    _write_json(
+        analysis / "training_receipt.json",
+        {"train_sample_total": 100, "holdout_sample_total": 25},
+    )
+    _write_json(
+        analysis / "weak_label_metrics.json",
+        {"overall_agreement": 0.49, "macro_f1": 0.46, "cohen_kappa": 0.31},
+    )
+    _write_json(
+        analysis / "disagreement_summary.json",
+        {
+            "low_confidence_fraction": 0.38,
+            "high_confidence_disagreement_fraction": 0.21,
+        },
+    )
+    (analysis / "class_area_inventory.csv").write_text(
+        "predicted_class_name,hectares\ncropland,12.5\n",
+        encoding="utf-8",
+    )
+    receipt_path = handoff / "preview" / "recipe_receipt.json"
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    receipt["recipe_id"] = "naip_cdl_classification_audit"
+    receipt["classification"] = {
+        "publication": {"confidence_threshold": 0.60}
+    }
+    _write_json(receipt_path, receipt)
+
+    args = SimpleNamespace(
+        target=str(handoff),
+        json=False,
+        verbose=True,
+    )
+    assert fr_cli.command_inspect(args) == 0
+    output = capsys.readouterr().out
+    assert "Execution action: acquired" in output
+    assert "Final asset verification: PASS" in output
+    assert "Classifier backend: random_forest" in output
+    assert "Weak-label overall agreement: 0.490" in output
+    assert "Confidence threshold: 0.600" in output
+    assert "cropland: 12.500" in output
+
+
+def test_classification_summary_missing_metrics_is_bounded(tmp_path):
+    handoff = _asset_handoff(tmp_path, action="reuse_direct")
+    receipt_path = handoff / "preview" / "recipe_receipt.json"
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    receipt["recipe_id"] = "naip_cdl_classification_audit"
+    _write_json(receipt_path, receipt)
+    summary = inspect_handoff(handoff)["classification"]
+    assert summary is not None
+    assert summary["available"] is False
+    assert "weak_label_metrics" in summary["missing_fields"]
 
 
 def test_inspect_latest_ignores_staging_directories(tmp_path):
