@@ -4,6 +4,10 @@ All notable changes are documented here. Versions follow [Semantic Versioning](h
 
 ## Unreleased
 
+- No changes yet.
+
+## 1.0.0-beta.4 - 2026-07-25
+
 ### Added
 
 - Source-aware, deterministically hashed spectral-index registry with semantic

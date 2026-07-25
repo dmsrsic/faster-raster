@@ -8,7 +8,7 @@
 
 FasterRaster turns public raster sources into bounded, reproducible, and publication-ready geospatial workflows. It compiles explicit source contracts, validates inputs, harmonizes grids, and preserves the evidence required to reproduce every output.
 
-**Public beta:** `v1.0.0-beta.3` (`1.0.0b3` as a Python package). The beta is suitable for technical evaluation and reproducible local studies; interfaces and output contracts may still change before a stable `v1.0.0` release.
+**Public beta:** `v1.0.0-beta.4` (`1.0.0b4` as a Python package). The beta is suitable for technical evaluation and reproducible local studies; interfaces and output contracts may still change before a stable `v1.0.0` release.
 
 FasterRaster is useful when a raster workflow needs more than a download script: exact source years, byte ceilings, categorical resampling rules, deterministic plans, transactional handoffs, checksums, provenance, and a clear record of what was reused or transferred.
 
@@ -63,7 +63,7 @@ Review the workfile, same-year source evidence, transfer estimate, and byte
 ceiling before any live `fr cook`. See the
 [classification methodology and interpretation guide](docs/ag-classification.md).
 
-## Unreleased: index-guided hybrid classification
+## Index-guided hybrid classification
 
 Current development adds first-class spectral indices and an additive
 `naip_cdl_index_hybrid_classification_audit` recipe. The broad CDL-weakly
@@ -124,7 +124,7 @@ Those commands make no network requests and write the deterministic plan beneath
 To install a built wheel instead:
 
 ```sh
-python -m pip install dist/faster_raster-1.0.0b3-py3-none-any.whl
+python -m pip install dist/faster_raster-1.0.0b4-py3-none-any.whl
 ```
 
 See [Installation](docs/installation.md) and the [five-minute quickstart](docs/quickstart.md) for clean-environment and live-study instructions.
@@ -181,7 +181,7 @@ Public-source adapters and core orchestration are part of the community beta. Ma
 - [Index-guided hybrid classification](docs/index-guided-classification.md)
 - [Human-development methodology](docs/human-development.md)
 - [Errors and recovery](docs/errors-recovery.md)
-- [Release notes](release/v1.0.0-beta.3.md)
+- [Release notes](release/v1.0.0-beta.4.md)
 - [Contributing](CONTRIBUTING.md)
 - [Security](SECURITY.md)
 - [Citation](docs/citation.md) and [`CITATION.cff`](CITATION.cff)

@@ -146,7 +146,7 @@ Both examples are documentation-sized derivatives of checksum-verified local pub
 
 ## Public beta scope
 
-The `v1.0.0-beta.3` release supports deterministic workfiles and plans, strict exact-year validation, bounded local execution, transactional handoffs, checksum-bound reuse, implemented USDA CDL acquisition, USGS NAIP visual context, the NAIP–CDL broad classifier, and auditable interactive source-contract repair.
+The `v1.0.0-beta.4` release adds source-aware index-guided hybrid classification to deterministic workfiles and plans, strict exact-year validation, bounded local execution, transactional handoffs, checksum-bound reuse, implemented USDA CDL acquisition, USGS NAIP visual context, the NAIP–CDL broad classifier, and auditable interactive source-contract repair.
 
 [Review supported sources](supported-sources.md){ .fr-inline-link }
 
