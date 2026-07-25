@@ -57,7 +57,7 @@ jobs:
           mkdir "$RUNNER_TEMP/fr-wheel-check"
           cd "$RUNNER_TEMP/fr-wheel-check"
           "$RUNNER_TEMP/fr-wheel/bin/fr" --help >/dev/null
-          test "$("$RUNNER_TEMP/fr-wheel/bin/fr" --version)" = "fr 1.0.0b1"
+          test "$("$RUNNER_TEMP/fr-wheel/bin/fr" --version)" = "fr 1.0.0b2"
           "$RUNNER_TEMP/fr-wheel/bin/faster-raster" version --plain
           "$RUNNER_TEMP/fr-wheel/bin/fr" doctor --offline
           "$RUNNER_TEMP/fr-wheel/bin/fr" templates list
@@ -68,7 +68,7 @@ jobs:
             --years 2008 2016 2021
           "$RUNNER_TEMP/fr-wheel/bin/fr" validate meridian.fr.md
           "$RUNNER_TEMP/fr-wheel/bin/python" -c \
-            'import faster_raster; from faster_raster import fr_cli, human_development, human_development_publication; assert faster_raster.__version__ == "1.0.0b1"'
+            'import faster_raster; from faster_raster import fr_cli, human_development, human_development_publication; assert faster_raster.__version__ == "1.0.0b2"'
 
       - name: Verify schema determinism
         run: |
@@ -100,7 +100,7 @@ jobs:
       - name: Retain local-build evidence
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: faster-raster-1.0.0b1-offline-gate
+          name: faster-raster-1.0.0b2-offline-gate
           path: |
             dist/*
             ${{ runner.temp }}/beta-check/*
