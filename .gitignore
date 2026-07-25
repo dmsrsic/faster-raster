@@ -28,6 +28,7 @@ cache/staging/materialization/
 
 # FasterRaster runtime artifacts
 cache/
+/logs/
 
 # Beta release/runtime boundaries
 /outputs/

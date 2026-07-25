@@ -16,6 +16,11 @@ ownership map, construction or occupancy evidence, population or economic
 activity, irrigation status, yield, causal land-use change, independent
 accuracy assessment, or historical change.
 
+![Finalized NAIP–CDL classification audit publication](assets/naip-cdl-classification-audit.png)
+
+*Finalized real-imagery example. The holdout and agreement values shown here
+measure consistency with same-year CDL weak labels, not independent accuracy.*
+
 ## Source and feature contract
 
 The spectral source is an unrendered four-band `uint8` NAIP COG requested from
@@ -149,6 +154,23 @@ estimate is exactly four bytes per requested NAIP pixel. Final publication is
 transactional: failed work remains a bounded failed diagnostic, required
 outputs and COGs validate before finalization, checksums are regenerated last,
 and receipts contain handoff-relative paths only.
+
+### Publication panel interpretation
+
+| Panel | Interpretation |
+| --- | --- |
+| Main map | Muted predicted surface classes over natural-color context; thin outlines mark filtered high-confidence disagreement regions. |
+| Natural color | Display-only `(R,G,B)` view derived locally from the raw four-band NAIP source. |
+| Color infrared | Display-only `(NIR,R,G)` view that makes vigorous vegetation visually prominent. |
+| Numeric NDVI | Display-only color rendering of NDVI computed from raw numeric red and NIR bands, with a zero-centered percentile stretch. |
+| Predicted classes | Nearest-neighbor rendering of the raw analytical class codes; class 0 remains unknown or uncertain. |
+| Confidence and CDL audit | Maximum model probability beside agreement states, weak-label metrics, coverage, and class-area inventory. |
+
+Natural-color, CIR, and NDVI styling are interpretive views, not model inputs.
+The publication renderer preserves the predicted class codes and does not
+rewrite the classification, confidence, or agreement COGs. A disagreement
+outline indicates where a confident prediction differs from a usable CDL weak
+label; it does not establish which source is correct.
 
 ### Finalized inspection and publication-only derivation
 

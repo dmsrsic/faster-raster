@@ -26,6 +26,40 @@ FasterRaster is useful when a raster workflow needs more than a download script:
 
 The human-development workflow uses CDL non-agricultural classes as a **crop-focused mapped-development proxy**. It is not authoritative evidence of urbanization, population or economic growth, construction dates, occupancy, cadastral approval, or causality.
 
+## NAIP–CDL classification audit
+
+The `naip_cdl_classification_audit` recipe acquires raw, unrendered four-band
+NAIP imagery and classifies it from locally computed numeric spectral features.
+Same-year USDA CDL superclasses provide weak supervision, while deterministic
+spatial-block holdout, confidence and disagreement outputs, reproducible COGs,
+and content-bound receipts make the result auditable. Reported metrics measure
+agreement with those weak labels—not independent ground-truth accuracy.
+
+![NAIP–CDL classification audit publication](docs/assets/naip-cdl-classification-audit.png)
+
+*A finalized real-imagery publication showing the analytical classification,
+source-derived views, confidence, and CDL agreement audit. Display styling does
+not modify the analytical rasters.*
+
+Create a deliberately small study, then validate and inspect its offline plan:
+
+```sh
+mkdir -p studies
+fr templates show ag-naip-classification
+fr init studies/naip-classification.fr.md \
+  --template ag-naip-classification \
+  --name bounded-naip-classification \
+  --bbox -83.2000 39.8500 -83.1990 39.8510 \
+  --years 2023
+fr validate studies/naip-classification.fr.md
+fr plan studies/naip-classification.fr.md --offline
+fr explain studies/naip-classification.fr.md --offline
+```
+
+Review the workfile, same-year source evidence, transfer estimate, and byte
+ceiling before any live `fr cook`. See the
+[classification methodology and interpretation guide](docs/ag-classification.md).
+
 ## Five-minute offline start
 
 Prerequisites are Python 3.12, a working GDAL/Rasterio runtime, and Git. Ubuntu is the public CI platform; WSL2 is exercised during local release validation. macOS and native Windows may work but are not beta CI targets yet.
