@@ -95,6 +95,28 @@ authorization and stops when support or performance guards are not met. See
 the [index-guided classification guide](docs/index-guided-classification.md)
 for the complete contract, examples, outputs, and scientific limitations.
 
+## FasterRaster Cook Expert
+
+Need help translating a geospatial objective into a FasterRaster cook?
+
+The [FasterRaster Cook Expert](https://chatgpt.com/g/g-6a667954b08c8191a6b827ae9cf84897-fasterraster-cook-expert) is a public ChatGPT assistant trained on FasterRaster's public documentation, schemas, source catalog, CLI reference, and example workfiles.
+
+It can help you:
+
+- explain FasterRaster terminology such as cooks, workfiles, recipes, source contracts, adapters, preflight, receipts, handoffs, specialists, and arbitration;
+- turn a GIS or remote-sensing objective into a complete `.fr.md` workfile;
+- assemble complex agricultural, classification, index-guided, imagery, climate, and multi-source cooks;
+- explain each field and scientific decision in plain language;
+- review an existing cook for unsupported fields, incompatible sources, or overly broad scientific claims;
+- provide the public CLI commands needed to validate, plan, cook, inspect, and publish the workflow;
+- interpret public manifests, receipts, validation reports, and completed handoffs.
+
+[Open the FasterRaster Cook Expert →](https://chatgpt.com/g/g-6a667954b08c8191a6b827ae9cf84897-fasterraster-cook-expert)
+
+> **Review before execution:** The assistant generates and explains public FasterRaster configurations, but it does not execute the cook for you. Validate the generated workfile with `fr validate`, inspect its plan, confirm source and byte-budget decisions, and review the scientific limitations before enabling network access.
+>
+> The assistant is grounded only in documented public FasterRaster capabilities. It does not describe or provide access to private integrations, managed infrastructure, proprietary execution systems, or undocumented features.
+
 ## Five-minute offline start
 
 Prerequisites are Python 3.12, a working GDAL/Rasterio runtime, and Git. Ubuntu is the public CI platform; WSL2 is exercised during local release validation. macOS and native Windows may work but are not beta CI targets yet.
@@ -177,6 +199,7 @@ Public-source adapters and core orchestration are part of the community beta. Ma
 
 - [Documentation home](docs/index.md)
 - [Terminal playground](docs/terminal-playground.md)
+- [FasterRaster Cook Expert](https://chatgpt.com/g/g-6a667954b08c8191a6b827ae9cf84897-fasterraster-cook-expert) — explain cook terminology, assemble public `.fr.md` workfiles, and review configurations
 - [NAIP–CDL weak-supervised surface classification](docs/ag-classification.md)
 - [Index-guided hybrid classification](docs/index-guided-classification.md)
 - [Human-development methodology](docs/human-development.md)
