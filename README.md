@@ -199,7 +199,7 @@ Public-source adapters and core orchestration are part of the community beta. Ma
 
 - [Documentation home](docs/index.md)
 - [Terminal playground](docs/terminal-playground.md)
-- [FasterRaster Cook Expert](https://chatgpt.com/g/g-6a667954b08c8191a6b827ae9cf84897-fasterraster-cook-expert) — explain cook terminology, assemble public `.fr.md` workfiles, and review configurations
+- [FasterRaster Cook Expert](https://chatgpt.com/g/g-6a667954b08c8191a6b827ae9cf84897-fasterraster-cook-expert)
 - [NAIP–CDL weak-supervised surface classification](docs/ag-classification.md)
 - [Index-guided hybrid classification](docs/index-guided-classification.md)
 - [Human-development methodology](docs/human-development.md)
