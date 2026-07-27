@@ -17,7 +17,14 @@
       "compute_sha256",
       "record_range_behavior"
     ],
-    "example_wave1_climate_stack__prism_daily_ppt_static_zip__20230101": [],
+    "example_wave1_climate_stack__prism_daily_ppt_static_zip__20230101": [
+      "validate_http_status",
+      "validate_byte_cap",
+      "validate_magic",
+      "validate_content_family",
+      "compute_sha256",
+      "record_range_behavior"
+    ],
     "example_wave1_climate_stack__terraclimate_monthly__2023-01": [
       "validate_http_status",
       "validate_byte_cap",

@@ -29,6 +29,19 @@
     },
     {
       "bounded_probe_only": true,
+      "cache_path": "cache/static_http_range/prism_daily_ppt_static_zip/20230101/a4a19c039ce2.zip",
+      "checksum_algorithm": "sha256",
+      "eviction_class": "bounded_probe_evidence",
+      "extension": ".zip",
+      "full_object_expected": false,
+      "max_bytes": 65536,
+      "overwrite_policy": "content_addressed",
+      "request_id": "example_wave1_climate_stack__prism_daily_ppt_static_zip__20230101",
+      "resume_supported": false,
+      "source_id": "prism_daily_ppt_static_zip"
+    },
+    {
+      "bounded_probe_only": true,
       "cache_path": "cache/static_http_range/terraclimate_monthly/2023-01/97c4f45acff2.nc",
       "checksum_algorithm": "sha256",
       "eviction_class": "bounded_probe_evidence",

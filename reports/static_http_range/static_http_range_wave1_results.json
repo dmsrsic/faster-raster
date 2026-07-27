@@ -1,64 +1,12 @@
 {
-  "attempted_source_count": 4,
+  "attempted_source_count": 5,
   "decision": "wave1_adapter_live_validated",
   "fail_count": 0,
-  "fixture_count": 1,
-  "fixture_source_count": 1,
-  "fixtures": [
-    {
-      "attempted": false,
-      "bytes_read": 65536,
-      "classification": "fixture_only",
-      "content_type": "application/zip",
-      "current_endpoint_status": "unresolved_or_stale",
-      "default_params": {
-        "day": "01",
-        "month": "01",
-        "year": 2023,
-        "yyyymmdd": "20230101"
-      },
-      "detected_content_family": "zip",
-      "detected_magic": "zip",
-      "dry_run": true,
-      "error": null,
-      "execution_status": "fixture_only",
-      "expected_content_family": "zip",
-      "expected_magic": "zip",
-      "generated_at_utc": "2026-07-10T23:03:39Z",
-      "historical_bytes_read": 65536,
-      "historical_content_type": "application/zip",
-      "historical_detected_magic": "zip",
-      "historical_http_status": 206,
-      "historical_observed_at_utc": "2026-07-08T21:29:55Z",
-      "historical_sha256_short": "cc89306d4d5b",
-      "http_status": 206,
-      "live_probe_enabled": false,
-      "max_bytes": 65536,
-      "network_run": false,
-      "next_unlock": "Resolve current PRISM catalog/service asset strategy before enabling live adapter execution.",
-      "promotion_status": "preserve_as_contract_fixture",
-      "quality": "contract_fixture",
-      "range_honored": true,
-      "range_requested": true,
-      "reason": "Historical bounded ZIP evidence exists, but current deterministic URL reproduction failed across the audited static/service candidates.",
-      "required_params": [
-        "year",
-        "month",
-        "day",
-        "yyyymmdd"
-      ],
-      "sha256": null,
-      "sha256_short": "cc89306d4d5b",
-      "source_id": "prism_daily_ppt_static_zip",
-      "source_label": "PRISM daily precipitation historical ZIP fixture",
-      "status": "fixture_only",
-      "url_redacted": "Historical static ZIP path evidence exists, but current deterministic PRISM static/service candidates did not reproduce a bounded 206 ZIP response.",
-      "url_template": null,
-      "warning": "Historical bounded ZIP evidence preserved; current deterministic endpoint unresolved."
-    }
-  ],
+  "fixture_count": 0,
+  "fixture_source_count": 0,
+  "fixtures": [],
   "network_run": true,
-  "pass_count": 4,
+  "pass_count": 5,
   "results": [
     {
       "attempted": true,
@@ -76,7 +24,7 @@
       "error": null,
       "expected_content_family": "gzip",
       "expected_magic": "gzip",
-      "generated_at_utc": "2026-07-10T23:03:37Z",
+      "generated_at_utc": "2026-07-27T15:55:33Z",
       "http_status": 206,
       "max_bytes": 65536,
       "network_run": true,
@@ -117,7 +65,7 @@
         "netcdf",
         "hdf5"
       ],
-      "generated_at_utc": "2026-07-10T23:03:38Z",
+      "generated_at_utc": "2026-07-27T15:55:33Z",
       "http_status": 206,
       "max_bytes": 65536,
       "network_run": true,
@@ -156,7 +104,7 @@
         "netcdf",
         "hdf5"
       ],
-      "generated_at_utc": "2026-07-10T23:03:38Z",
+      "generated_at_utc": "2026-07-27T15:55:34Z",
       "http_status": 206,
       "max_bytes": 65536,
       "network_run": true,
@@ -187,7 +135,7 @@
       "error": null,
       "expected_content_family": "zip",
       "expected_magic": "zip",
-      "generated_at_utc": "2026-07-10T23:03:39Z",
+      "generated_at_utc": "2026-07-27T15:55:35Z",
       "http_status": 206,
       "max_bytes": 65536,
       "network_run": true,
@@ -203,7 +151,42 @@
       "url_redacted": "https://geodata.ucdavis.edu/climate/worldclim/2_1/base/wc2.1_10m_prec.zip",
       "url_template": "https://geodata.ucdavis.edu/climate/worldclim/2_1/base/wc2.1_10m_prec.zip",
       "warning": null
+    },
+    {
+      "attempted": true,
+      "bytes_read": 65536,
+      "classification": "runnable",
+      "content_type": "application/zip",
+      "default_params": {
+        "year": 2023,
+        "yyyymmdd": "20230101"
+      },
+      "detected_content_family": "zip",
+      "detected_magic": "zip",
+      "dry_run": false,
+      "error": null,
+      "expected_content_family": "zip",
+      "expected_magic": "zip",
+      "generated_at_utc": "2026-07-27T15:55:35Z",
+      "http_status": 206,
+      "max_bytes": 65536,
+      "network_run": true,
+      "quality": "candidate",
+      "range_honored": true,
+      "range_requested": true,
+      "required_params": [
+        "year",
+        "yyyymmdd"
+      ],
+      "sha256": "cc89306d4d5b510b0ce2e19829777a7cabad6c15fb12bb7dc4bb56c1270ea283",
+      "sha256_short": "cc89306d4d5b",
+      "source_id": "prism_daily_ppt_static_zip",
+      "source_label": "PRISM daily precipitation ZIP",
+      "status": "pass_bounded_truncated",
+      "url_redacted": "https://data.prism.oregonstate.edu/time_series/us/an/4km/ppt/daily/2023/prism_ppt_us_25m_20230101.zip",
+      "url_template": "https://data.prism.oregonstate.edu/time_series/us/an/4km/ppt/daily/{year}/prism_ppt_us_25m_{yyyymmdd}.zip",
+      "warning": null
     }
   ],
-  "runnable_source_count": 4
+  "runnable_source_count": 5
 }

@@ -101,49 +101,51 @@
       "warnings": []
     },
     {
-      "acquisition_mode": "historical_contract_fixture",
+      "acquisition_mode": "bounded_http_range",
       "adapter": "static_http_range",
       "auth_profile": null,
       "bounded_probe_only": true,
-      "bounded_request": false,
-      "checksum_policy": "historical_evidence_only",
+      "bounded_request": true,
+      "checksum_policy": "compute_after_fetch",
       "container": "zip",
       "credential_required": false,
-      "deterministic_url": null,
-      "execution_status": "non_executable_fixture",
+      "deterministic_url": "https://data.prism.oregonstate.edu/time_series/us/an/4km/ppt/daily/2023/prism_ppt_us_25m_20230101.zip",
+      "execution_status": "planned_executable",
       "expected_content_family": "zip",
       "expected_format": "zip",
       "expected_inner_format": null,
       "expected_magic": "zip",
-      "fixture_only": true,
+      "fixture_only": false,
       "full_object_expected": false,
       "harmonization_readiness": "fixture_only_endpoint_resolution_required",
-      "max_bytes": null,
-      "network_required": false,
+      "max_bytes": 65536,
+      "network_required": true,
       "provenance": {
         "config": "configs/static_http_range_wave1.yaml",
         "container": "zip",
-        "current_endpoint_status": "unresolved_or_stale",
         "expected_inner_format": null,
-        "historical_bytes_read": 65536,
-        "historical_detected_magic": "zip",
-        "historical_http_status": 206,
-        "historical_sha256_short": "cc89306d4d5b",
         "planning_index": 4
       },
-      "request_headers_redacted": {},
+      "request_headers_redacted": {
+        "Range": "bytes=0-65535"
+      },
       "request_id": "example_wave1_climate_stack__prism_daily_ppt_static_zip__20230101",
       "request_method": "GET",
-      "source_classification": "fixture_only",
+      "source_classification": "runnable",
       "source_id": "prism_daily_ppt_static_zip",
       "spatial_key": "EPSG:4326:-83.2,39.8,-83.19,39.81",
       "task_id": "example_wave1_climate_stack",
       "temporal_key": "20230101",
-      "url_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "validation_steps": [],
-      "warnings": [
-        "fixture-only source; no fetch job generated"
-      ]
+      "url_sha256": "a4a19c039ce2d02fb6ff79db5957bf20f7245ff1f9596ca4ccd7bfb01fddc383",
+      "validation_steps": [
+        "validate_http_status",
+        "validate_byte_cap",
+        "validate_magic",
+        "validate_content_family",
+        "compute_sha256",
+        "record_range_behavior"
+      ],
+      "warnings": []
     },
     {
       "acquisition_mode": "bounded_http_range",

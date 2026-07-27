@@ -6,8 +6,8 @@
 - Network run: `False`
 - Manifest rows: `5`
 - Request count: `5`
-- Executable requests: `4`
-- Fixture requests: `1`
-- Manifest SHA256: `e99b0a3fd94756f3f9e58db63ee4fc79bc8da1707bcd33b6ae22f8ba2c1c5c85`
+- Executable requests: `5`
+- Fixture requests: `0`
+- Manifest SHA256: `794e2d58876d448ce70dbd1b94733d3749930f15ebf761594cdcaf6217d21a74`
 
 The compile step plans bounded adapter requests only. It does not fetch data.

@@ -1,15 +1,15 @@
 {
-  "acquisition_manifest_sha256": "e99b0a3fd94756f3f9e58db63ee4fc79bc8da1707bcd33b6ae22f8ba2c1c5c85",
+  "acquisition_manifest_sha256": "794e2d58876d448ce70dbd1b94733d3749930f15ebf761594cdcaf6217d21a74",
   "adapter_counts": {
     "static_http_range": 5
   },
-  "compile_report_contract_sha256": "304f0505b74a342d580cf699faef958dddec87a6e42644258feb8da49e11d3a4",
+  "compile_report_contract_sha256": "b4a4bc4ce154dfb7f58f33ff9b231c95fb65232321e4b0452c50e83774e70691",
   "determinism_status": "PASS",
-  "executable_request_count": 4,
-  "fixture_request_count": 1,
+  "executable_request_count": 5,
+  "fixture_request_count": 0,
   "manifest_row_count": 5,
   "network_run": false,
-  "package_version": "1.0.0a2",
+  "package_version": "1.0.0b4",
   "request_count": 5,
   "source_counts": {
     "chirps_daily_precipitation": 1,
@@ -20,9 +20,7 @@
   },
   "source_resolution_sha256": "b18b0087b66ba3442827eb989b0bc770fb862a8d2355abbea980adadfdec318e",
   "task_id": "example_wave1_climate_stack",
-  "validation_plan_sha256": "73c92c8f9e73ba514d47225095c4c833798cd2aab51ce96acb4b9b45f30e99ef",
+  "validation_plan_sha256": "51cad263ce1eae824c8029ff7fad23348e2478f37a50957419c20518e136a3c2",
   "validation_status": "PASS",
-  "warnings": [
-    "fixture-only source; no fetch job generated"
-  ]
+  "warnings": []
 }

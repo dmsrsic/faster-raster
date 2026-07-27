@@ -262,16 +262,132 @@
     },
     {
       "adapter": "static_http_range",
-      "cache_path": null,
-      "dependencies": [],
-      "deterministic_url": null,
-      "fixture_only": true,
-      "job_id": "example_wave1_climate_stack__prism_daily_ppt_static_zip__20230101__record_fixture_evidence",
-      "max_bytes": null,
+      "cache_path": "cache/static_http_range/prism_daily_ppt_static_zip/20230101/a4a19c039ce2.zip",
+      "dependencies": [
+        "example_wave1_climate_stack__prism_daily_ppt_static_zip__20230101__resolve_request"
+      ],
+      "deterministic_url": "https://data.prism.oregonstate.edu/time_series/us/an/4km/ppt/daily/2023/prism_ppt_us_25m_20230101.zip",
+      "fixture_only": false,
+      "job_id": "example_wave1_climate_stack__prism_daily_ppt_static_zip__20230101__bounded_fetch",
+      "max_bytes": 65536,
+      "network_required": true,
+      "request_id": "example_wave1_climate_stack__prism_daily_ppt_static_zip__20230101",
+      "source_id": "prism_daily_ppt_static_zip",
+      "stage": "bounded_fetch",
+      "task_id": "example_wave1_climate_stack"
+    },
+    {
+      "adapter": "static_http_range",
+      "cache_path": "cache/static_http_range/prism_daily_ppt_static_zip/20230101/a4a19c039ce2.zip",
+      "dependencies": [
+        "example_wave1_climate_stack__prism_daily_ppt_static_zip__20230101__bounded_fetch"
+      ],
+      "deterministic_url": "https://data.prism.oregonstate.edu/time_series/us/an/4km/ppt/daily/2023/prism_ppt_us_25m_20230101.zip",
+      "fixture_only": false,
+      "job_id": "example_wave1_climate_stack__prism_daily_ppt_static_zip__20230101__compute_checksum",
+      "max_bytes": 65536,
       "network_required": false,
       "request_id": "example_wave1_climate_stack__prism_daily_ppt_static_zip__20230101",
       "source_id": "prism_daily_ppt_static_zip",
-      "stage": "record_fixture_evidence",
+      "stage": "compute_checksum",
+      "task_id": "example_wave1_climate_stack"
+    },
+    {
+      "adapter": "static_http_range",
+      "cache_path": "cache/static_http_range/prism_daily_ppt_static_zip/20230101/a4a19c039ce2.zip",
+      "dependencies": [
+        "example_wave1_climate_stack__prism_daily_ppt_static_zip__20230101__validate_http_status",
+        "example_wave1_climate_stack__prism_daily_ppt_static_zip__20230101__validate_byte_cap",
+        "example_wave1_climate_stack__prism_daily_ppt_static_zip__20230101__validate_magic",
+        "example_wave1_climate_stack__prism_daily_ppt_static_zip__20230101__validate_content_family",
+        "example_wave1_climate_stack__prism_daily_ppt_static_zip__20230101__compute_checksum"
+      ],
+      "deterministic_url": "https://data.prism.oregonstate.edu/time_series/us/an/4km/ppt/daily/2023/prism_ppt_us_25m_20230101.zip",
+      "fixture_only": false,
+      "job_id": "example_wave1_climate_stack__prism_daily_ppt_static_zip__20230101__record_source_evidence",
+      "max_bytes": 65536,
+      "network_required": false,
+      "request_id": "example_wave1_climate_stack__prism_daily_ppt_static_zip__20230101",
+      "source_id": "prism_daily_ppt_static_zip",
+      "stage": "record_source_evidence",
+      "task_id": "example_wave1_climate_stack"
+    },
+    {
+      "adapter": "static_http_range",
+      "cache_path": "cache/static_http_range/prism_daily_ppt_static_zip/20230101/a4a19c039ce2.zip",
+      "dependencies": [],
+      "deterministic_url": "https://data.prism.oregonstate.edu/time_series/us/an/4km/ppt/daily/2023/prism_ppt_us_25m_20230101.zip",
+      "fixture_only": false,
+      "job_id": "example_wave1_climate_stack__prism_daily_ppt_static_zip__20230101__resolve_request",
+      "max_bytes": 65536,
+      "network_required": false,
+      "request_id": "example_wave1_climate_stack__prism_daily_ppt_static_zip__20230101",
+      "source_id": "prism_daily_ppt_static_zip",
+      "stage": "resolve_request",
+      "task_id": "example_wave1_climate_stack"
+    },
+    {
+      "adapter": "static_http_range",
+      "cache_path": "cache/static_http_range/prism_daily_ppt_static_zip/20230101/a4a19c039ce2.zip",
+      "dependencies": [
+        "example_wave1_climate_stack__prism_daily_ppt_static_zip__20230101__bounded_fetch"
+      ],
+      "deterministic_url": "https://data.prism.oregonstate.edu/time_series/us/an/4km/ppt/daily/2023/prism_ppt_us_25m_20230101.zip",
+      "fixture_only": false,
+      "job_id": "example_wave1_climate_stack__prism_daily_ppt_static_zip__20230101__validate_byte_cap",
+      "max_bytes": 65536,
+      "network_required": false,
+      "request_id": "example_wave1_climate_stack__prism_daily_ppt_static_zip__20230101",
+      "source_id": "prism_daily_ppt_static_zip",
+      "stage": "validate_byte_cap",
+      "task_id": "example_wave1_climate_stack"
+    },
+    {
+      "adapter": "static_http_range",
+      "cache_path": "cache/static_http_range/prism_daily_ppt_static_zip/20230101/a4a19c039ce2.zip",
+      "dependencies": [
+        "example_wave1_climate_stack__prism_daily_ppt_static_zip__20230101__bounded_fetch"
+      ],
+      "deterministic_url": "https://data.prism.oregonstate.edu/time_series/us/an/4km/ppt/daily/2023/prism_ppt_us_25m_20230101.zip",
+      "fixture_only": false,
+      "job_id": "example_wave1_climate_stack__prism_daily_ppt_static_zip__20230101__validate_content_family",
+      "max_bytes": 65536,
+      "network_required": false,
+      "request_id": "example_wave1_climate_stack__prism_daily_ppt_static_zip__20230101",
+      "source_id": "prism_daily_ppt_static_zip",
+      "stage": "validate_content_family",
+      "task_id": "example_wave1_climate_stack"
+    },
+    {
+      "adapter": "static_http_range",
+      "cache_path": "cache/static_http_range/prism_daily_ppt_static_zip/20230101/a4a19c039ce2.zip",
+      "dependencies": [
+        "example_wave1_climate_stack__prism_daily_ppt_static_zip__20230101__bounded_fetch"
+      ],
+      "deterministic_url": "https://data.prism.oregonstate.edu/time_series/us/an/4km/ppt/daily/2023/prism_ppt_us_25m_20230101.zip",
+      "fixture_only": false,
+      "job_id": "example_wave1_climate_stack__prism_daily_ppt_static_zip__20230101__validate_http_status",
+      "max_bytes": 65536,
+      "network_required": false,
+      "request_id": "example_wave1_climate_stack__prism_daily_ppt_static_zip__20230101",
+      "source_id": "prism_daily_ppt_static_zip",
+      "stage": "validate_http_status",
+      "task_id": "example_wave1_climate_stack"
+    },
+    {
+      "adapter": "static_http_range",
+      "cache_path": "cache/static_http_range/prism_daily_ppt_static_zip/20230101/a4a19c039ce2.zip",
+      "dependencies": [
+        "example_wave1_climate_stack__prism_daily_ppt_static_zip__20230101__bounded_fetch"
+      ],
+      "deterministic_url": "https://data.prism.oregonstate.edu/time_series/us/an/4km/ppt/daily/2023/prism_ppt_us_25m_20230101.zip",
+      "fixture_only": false,
+      "job_id": "example_wave1_climate_stack__prism_daily_ppt_static_zip__20230101__validate_magic",
+      "max_bytes": 65536,
+      "network_required": false,
+      "request_id": "example_wave1_climate_stack__prism_daily_ppt_static_zip__20230101",
+      "source_id": "prism_daily_ppt_static_zip",
+      "stage": "validate_magic",
       "task_id": "example_wave1_climate_stack"
     },
     {

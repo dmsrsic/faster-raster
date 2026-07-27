@@ -2,18 +2,18 @@
   "adapter_counts": {
     "static_http_range": 5
   },
-  "cache_plan_sha256": "18a81049abbf02ff878bc93c41c809770f770fbc822250fc6d449c42ee69dbb5",
-  "dag_sha256": "c34dcf4760c793584dc2073223cecd8841effa579b86adfb09c5a1dbf8aed3c0",
+  "cache_plan_sha256": "60619339da4a5567731b4d8fdd91826525cbb11bd20c1364eafbd41bf4da6203",
+  "dag_sha256": "f81b565b87ec1b0f0f2dd73fa1ec4228aeb1030c0717232c4331f284ebde4ddf",
   "dag_validation_status": "PASS",
-  "dependency_count": 44,
-  "executable_request_count": 4,
-  "execution_package_contract_sha256": "6a08115f26f17e89b3347852ecd7f43b7c4607c57821e081959e9f82d171e3ed",
+  "dependency_count": 55,
+  "executable_request_count": 5,
+  "execution_package_contract_sha256": "5becdfd00462b92e15a541aa26b8a392e2ff76931163851411fde677406d6e6a",
   "failure_policy_sha256": "f21b33e44e06ac8e9e47da9a812583f92adb2d83c00ccd323f5bf2bc35484be3",
-  "fixture_request_count": 1,
-  "jobs_sha256": "5a6c3697a569723b7875572aec5890d816e99a099ce5f620fdf6cf2c26f69f22",
-  "manifest_sha256": "e99b0a3fd94756f3f9e58db63ee4fc79bc8da1707bcd33b6ae22f8ba2c1c5c85",
-  "package_id": "fr_v07_b9aaeb7e827f2a56",
-  "package_sha256": "6a08115f26f17e89b3347852ecd7f43b7c4607c57821e081959e9f82d171e3ed",
+  "fixture_request_count": 0,
+  "jobs_sha256": "9eca428497477008cbba4fa4f5b6a3ac72bb3cc5a956db21f402e4ed462e52a0",
+  "manifest_sha256": "794e2d58876d448ce70dbd1b94733d3749930f15ebf761594cdcaf6217d21a74",
+  "package_id": "fr_v07_6a36830ad1aa825e",
+  "package_sha256": "5becdfd00462b92e15a541aa26b8a392e2ff76931163851411fde677406d6e6a",
   "package_version": "0.7.0",
   "request_count": 5,
   "source_counts": {
@@ -24,17 +24,16 @@
     "worldclim_bioclim_normals": 1
   },
   "stage_counts": {
-    "bounded_fetch": 4,
-    "compute_checksum": 4,
-    "record_fixture_evidence": 1,
-    "record_source_evidence": 4,
-    "resolve_request": 4,
-    "validate_byte_cap": 4,
-    "validate_content_family": 4,
-    "validate_http_status": 4,
-    "validate_magic": 4
+    "bounded_fetch": 5,
+    "compute_checksum": 5,
+    "record_source_evidence": 5,
+    "resolve_request": 5,
+    "validate_byte_cap": 5,
+    "validate_content_family": 5,
+    "validate_http_status": 5,
+    "validate_magic": 5
   },
   "task_id": "example_wave1_climate_stack",
-  "total_job_count": 33,
+  "total_job_count": 40,
   "validation_status": "PASS"
 }

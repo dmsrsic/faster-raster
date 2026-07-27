@@ -381,6 +381,9 @@ def write_static_range_report(payload_or_results: dict[str, Any] | list[dict[str
         payload = build_static_range_payload(payload_or_results, [], allow_network=any(row.get("network_run") for row in payload_or_results))
     results = payload.get("results", [])
     fixtures = payload.get("fixtures", [])
+    runnable_count = payload.get("runnable_source_count", len(results))
+    runnable_label = "source" if runnable_count == 1 else "sources"
+    fixture_count = payload.get("fixture_source_count", len(fixtures))
     out_json.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     title = "Static HTTP Range Plan" if all(row["dry_run"] for row in results) else "Static HTTP Range Results"
     lines = [
@@ -395,7 +398,16 @@ def write_static_range_report(payload_or_results: dict[str, Any] | list[dict[str
         f"network_run: {payload.get('network_run', False)}",
         f"decision: {payload.get('decision', 'not_promoted')}",
         "",
-        "The static_http_range adapter was live-validated against four currently reproducible sources. PRISM is preserved separately as historical bounded contract evidence and is not counted as a live adapter failure." if payload.get("decision") == "wave1_adapter_live_validated" else "PRISM is preserved separately as historical bounded contract evidence and is not counted as a runnable Wave 1 adapter failure.",
+        (
+            f"Live validation passed for {runnable_count} selected runnable {runnable_label}. "
+            f"Contract fixtures reported separately: {fixture_count}."
+            if payload.get("decision") == "wave1_adapter_live_validated"
+            else (
+                f"The static_http_range adapter evaluated {runnable_count} selected runnable {runnable_label}. "
+                f"Contract fixtures: {fixture_count}. "
+                f"Decision: {payload.get('decision', 'not_promoted')}."
+            )
+        ),
         "",
         "| Source | Status | HTTP | Bytes | Magic | Family | Quality |",
         "| --- | --- | ---: | ---: | --- | --- | --- |",

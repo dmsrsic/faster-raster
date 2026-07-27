@@ -13,6 +13,9 @@ from faster_raster import local_executor, system_grade, run_receipts, task_compi
 
 
 TASK_ID = "example_wave1_climate_stack"
+RUNNABLE_SOURCE_COUNT = 5
+FIXTURE_SOURCE_COUNT = 0
+JOBS_PER_RUNNABLE_SOURCE = 8
 runner = CliRunner()
 
 
@@ -148,9 +151,9 @@ def test_run_plan_is_deterministic_and_does_not_use_network(monkeypatch, tmp_pat
     first = local_executor.build_run_plan(TASK_ID, write_artifacts=False)
     second = local_executor.build_run_plan(TASK_ID, write_artifacts=False)
 
-    assert first["planned_job_count"] == 33
-    assert first["planned_network_job_count"] == 4
-    assert first["planned_fixture_job_count"] == 1
+    assert first["planned_job_count"] == RUNNABLE_SOURCE_COUNT * JOBS_PER_RUNNABLE_SOURCE
+    assert first["planned_network_job_count"] == RUNNABLE_SOURCE_COUNT
+    assert first["planned_fixture_job_count"] == FIXTURE_SOURCE_COUNT
     assert first["network_allowed"] is False
     assert first["run_plan_contract_sha256"] == second["run_plan_contract_sha256"]
 
@@ -161,7 +164,7 @@ def test_network_disabled_by_default_blocks_fetch_and_records_fixture(monkeypatc
     receipt = result["receipt"]
     assert receipt["run_status"] == "blocked_policy"
     assert receipt["network_run"] is False
-    assert receipt["fixture_source_count"] == 1
+    assert receipt["fixture_source_count"] == FIXTURE_SOURCE_COUNT
     assert receipt["successful_source_count"] == 0
     assert "execution_blocked: network_not_allowed" in receipt["warnings"]
 
@@ -179,9 +182,9 @@ def test_mocked_local_execution_success_writes_receipt_and_cache(monkeypatch, tm
 
     receipt = result["receipt"]
     assert receipt["run_status"] == "completed"
-    assert receipt["successful_source_count"] == 4
+    assert receipt["successful_source_count"] == RUNNABLE_SOURCE_COUNT
     assert receipt["failed_source_count"] == 0
-    assert receipt["fixture_source_count"] == 1
+    assert receipt["fixture_source_count"] == FIXTURE_SOURCE_COUNT
     assert receipt["all_byte_caps_respected"] is True
     assert receipt["all_magic_valid"] is True
     assert receipt["all_content_families_valid"] is True
@@ -191,7 +194,7 @@ def test_mocked_local_execution_success_writes_receipt_and_cache(monkeypatch, tm
 
     run_dir = Path(result["receipt_path"]).parent
     cache_index = json.loads((run_dir / "cache_index.json").read_text())
-    assert len(cache_index["entries"]) == 4
+    assert len(cache_index["entries"]) == RUNNABLE_SOURCE_COUNT
     assert all(".head65536" in entry["cache_path"] for entry in cache_index["entries"])
     assert {entry["cache_status"] for entry in cache_index["entries"]} == {"fetched"}
 
@@ -213,7 +216,7 @@ def test_independent_branches_continue_after_one_failure(monkeypatch, tmp_path):
     )
 
     assert result["receipt"]["run_status"] == "failed"
-    assert result["receipt"]["successful_source_count"] == 3
+    assert result["receipt"]["successful_source_count"] == RUNNABLE_SOURCE_COUNT - 1
     assert result["receipt"]["failed_source_count"] == 1
 
 
@@ -288,8 +291,8 @@ def test_system_grade_valid_live_receipt_with_failed_latest_materialization_hold
 
     assert report["release_decision"] in {"release_ready_with_cautions", "hold_release"}
     assert report["latest_run_receipt_valid"] is True
-    assert report["local_successful_source_count"] == 4
-    assert report["local_fixture_source_count"] == 1
+    assert report["local_successful_source_count"] == RUNNABLE_SOURCE_COUNT
+    assert report["local_fixture_source_count"] == FIXTURE_SOURCE_COUNT
     assert "no_live_materialization_receipt" in report["warnings"]
 
 
@@ -305,7 +308,7 @@ def test_system_grade_invalid_live_receipt_holds_release(monkeypatch, tmp_path):
     )
     receipt_path = Path(result["receipt_path"])
     receipt = json.loads(receipt_path.read_text())
-    receipt["successful_source_count"] = 3
+    receipt["successful_source_count"] = RUNNABLE_SOURCE_COUNT - 1
     receipt_path.write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n")
 
     report = system_grade.grade_system(TASK_ID)
@@ -358,7 +361,7 @@ def test_valid_cache_hit_hydrates_http_metadata_and_network_run_false(tmp_path):
     http_jobs = [job for job in jobs if job["stage"] == "validate_http_status"]
     cache_index = json.loads((run_dir / "cache_index.json").read_text())
 
-    assert counter["count"] == 4
+    assert counter["count"] == RUNNABLE_SOURCE_COUNT
     assert result["receipt"]["allow_network"] is True
     assert result["receipt"]["network_run"] is False
     assert all(job["status"] == "cache_hit" for job in fetch_jobs)

@@ -1,17 +1,16 @@
 {
-  "dependency_count": 44,
+  "dependency_count": 55,
   "errors": [],
-  "job_count": 33,
+  "job_count": 40,
   "stage_counts": {
-    "bounded_fetch": 4,
-    "compute_checksum": 4,
-    "record_fixture_evidence": 1,
-    "record_source_evidence": 4,
-    "resolve_request": 4,
-    "validate_byte_cap": 4,
-    "validate_content_family": 4,
-    "validate_http_status": 4,
-    "validate_magic": 4
+    "bounded_fetch": 5,
+    "compute_checksum": 5,
+    "record_source_evidence": 5,
+    "resolve_request": 5,
+    "validate_byte_cap": 5,
+    "validate_content_family": 5,
+    "validate_http_status": 5,
+    "validate_magic": 5
   },
   "status": "PASS"
 }

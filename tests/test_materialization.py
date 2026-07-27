@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import gzip
 import hashlib
+import json
 from pathlib import Path
 
 from typer.testing import CliRunner
@@ -13,7 +14,7 @@ from faster_raster.cli import app
 
 TASK_ID = "example_wave1_climate_stack"
 SOURCE_ID = "chirps_daily_precipitation"
-REQUEST_ID = "example_wave1_climate_stack__chirps_daily_precipitation__20230101"
+PRISM_SOURCE_ID = "prism_daily_ppt_static_zip"
 
 
 class FakeHeaders(dict):
@@ -77,13 +78,45 @@ def _clear_latest_materialization():
     latest.unlink(missing_ok=True)
 
 
-def _patch_probe(monkeypatch, payload: bytes, *, evidence_class: str = "live_network"):
+def _manifest_row(source_id: str) -> dict:
+    manifest_path = (
+        task_compiler.TASK_COMPILE_ROOT
+        / TASK_ID
+        / "acquisition_manifest.jsonl"
+    )
+    rows = [
+        json.loads(line)
+        for line in manifest_path.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+    return next(row for row in rows if row["source_id"] == source_id)
+
+
+def _detected_contract(payload: bytes) -> tuple[str, str, str]:
+    if payload.startswith(b"\x1f\x8b"):
+        return "gzip", "gzip", "application/gzip"
+    if payload.startswith(b"PK\x03\x04"):
+        return "zip", "zip", "application/zip"
+    if payload.startswith(b"CDF"):
+        return "netcdf", "netcdf", "application/x-netcdf"
+    raise AssertionError("unsupported synthetic probe payload")
+
+
+def _patch_probe(
+    monkeypatch,
+    payload: bytes,
+    *,
+    source_id: str = SOURCE_ID,
+    evidence_class: str = "live_network",
+):
+    row = _manifest_row(source_id)
     prefix = payload[: min(16, len(payload))]
+    detected_magic, detected_family, content_type = _detected_contract(payload)
     evidence = {
-        SOURCE_ID: {
+        source_id: {
             "task_id": TASK_ID,
-            "request_id": REQUEST_ID,
-            "source_id": SOURCE_ID,
+            "request_id": row["request_id"],
+            "source_id": source_id,
             "status": "succeeded",
             "network_attempted": True,
             "bytes_read": len(prefix),
@@ -91,13 +124,13 @@ def _patch_probe(monkeypatch, payload: bytes, *, evidence_class: str = "live_net
             "sha256_short": hashlib.sha256(prefix).hexdigest()[:12],
             "http_status": 206,
             "content_range": f"bytes 0-{len(prefix)-1}/{len(payload)}",
-            "content_type": "application/gzip",
+            "content_type": content_type,
             "range_requested": True,
             "range_honored": True,
-            "detected_magic": "gzip",
-            "detected_content_family": "gzip",
-            "expected_magic": "gzip",
-            "expected_content_family": "gzip",
+            "detected_magic": detected_magic,
+            "detected_content_family": detected_family,
+            "expected_magic": row["expected_magic"],
+            "expected_content_family": row["expected_content_family"],
             "byte_cap": 65536,
             "credentials_used": False,
             "authorization_headers_present": False,
@@ -141,12 +174,58 @@ def test_materialization_plan_is_deterministic(monkeypatch, tmp_path):
     assert plan1["planned_transfer_count"] == 1
 
 
-def test_fixture_only_prism_is_ineligible(monkeypatch, tmp_path):
+def test_prism_without_matching_probe_evidence_is_ineligible(
+    monkeypatch,
+    tmp_path,
+):
     _patch_probe(monkeypatch, _payload())
-    plan = materialization.build_materialization_plan(TASK_ID, artifact_root=tmp_path / "artifacts", staging_root=tmp_path / "staging", catalog_root=tmp_path / "catalog", write_artifacts=False)
-    prism = next(item for item in plan["object_plans"] if item["source_id"] == "prism_daily_ppt_static_zip")
-    assert prism["eligibility_status"] == "fixture_not_materializable"
+    plan = materialization.build_materialization_plan(
+        TASK_ID,
+        sources=[PRISM_SOURCE_ID],
+        artifact_root=tmp_path / "artifacts",
+        staging_root=tmp_path / "staging",
+        catalog_root=tmp_path / "catalog",
+        write_artifacts=False,
+    )
+    prism = next(
+        item
+        for item in plan["object_plans"]
+        if item["source_id"] == PRISM_SOURCE_ID
+    )
+    assert prism["eligibility_status"] == "probe_source_evidence_missing"
     assert prism["materialization_eligible"] is False
+    assert "probe_source_evidence_missing" in plan["blocking_reasons"]
+
+
+def test_prism_with_matching_live_probe_evidence_is_eligible(
+    monkeypatch,
+    tmp_path,
+):
+    payload = b"PK\x03\x04synthetic-prism-zip-prefix"
+    _patch_probe(
+        monkeypatch,
+        payload,
+        source_id=PRISM_SOURCE_ID,
+    )
+    plan = materialization.build_materialization_plan(
+        TASK_ID,
+        sources=[PRISM_SOURCE_ID],
+        artifact_root=tmp_path / "artifacts",
+        staging_root=tmp_path / "staging",
+        catalog_root=tmp_path / "catalog",
+        write_artifacts=False,
+    )
+    prism = next(
+        item
+        for item in plan["object_plans"]
+        if item["source_id"] == PRISM_SOURCE_ID
+    )
+    assert plan["validation_status"] == "PASS"
+    assert plan["planned_transfer_count"] == 1
+    assert prism["eligibility_status"] == "eligible"
+    assert prism["materialization_eligible"] is True
+    assert prism["expected_magic"] == "zip"
+    assert prism["expected_content_family"] == "zip"
 
 
 def test_materialization_blocks_without_approval(monkeypatch, tmp_path):
@@ -487,7 +566,7 @@ def test_successful_materialization_followed_by_blocked_policy_preserves_evidenc
     assert report["latest_attempt_effect_on_release"] == "warning"
     assert report["materialized_source_count"] == 1
     assert report["verified_artifact_count"] == 1
-    assert report["wave1_materialization_coverage"] == 0.25
+    assert report["wave1_materialization_coverage"] == 0.2
     assert report["full_wave1_materialized"] is False
     assert "no_live_materialization_receipt" not in report["warnings"]
     assert "latest_materialization_attempt_blocked_policy" in report["warnings"]

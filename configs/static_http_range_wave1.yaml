@@ -59,9 +59,8 @@ runnable_sources:
     default_params: {}
     max_bytes: 65536
     notes: "WorldClim v2.1 10 minute monthly precipitation normals ZIP bounded range probe."
-contract_fixtures:
   - source_id: prism_daily_ppt_static_zip
-    source_label: PRISM daily precipitation historical ZIP fixture
+    source_label: PRISM daily precipitation ZIP
     adapter: static_http_range
     access_pattern: static_https_range
     credential_required: false
@@ -69,22 +68,15 @@ contract_fixtures:
     bounded_probe_appropriate: true
     variable: ppt
     temporal_granularity: daily
-    execution_status: fixture_only
-    live_probe_enabled: false
-    historical_http_status: 206
-    historical_bytes_read: 65536
-    historical_content_type: application/zip
-    historical_detected_magic: zip
-    historical_sha256_short: cc89306d4d5b
-    historical_observed_at_utc: "2026-07-08T21:29:55Z"
-    current_endpoint_status: unresolved_or_stale
-    promotion_status: preserve_as_contract_fixture
+    execution_status: runnable
+    live_probe_enabled: true
     expected_magic: zip
     expected_content_family: zip
-    unresolved_url_template_metadata: "Historical static ZIP path evidence exists, but current deterministic PRISM static/service candidates did not reproduce a bounded 206 ZIP response."
-    required_params: [year, month, day, yyyymmdd]
-    default_params: {year: 2023, month: "01", day: "01", yyyymmdd: "20230101"}
+    url_template: "https://data.prism.oregonstate.edu/time_series/us/an/4km/ppt/daily/{year}/prism_ppt_us_25m_{yyyymmdd}.zip"
+    required_params: [year, yyyymmdd]
+    default_params: {year: 2023, yyyymmdd: "20230101"}
     max_bytes: 65536
-    reason: "Historical bounded ZIP evidence exists, but current deterministic URL reproduction failed across the audited static/service candidates."
-    next_unlock: "Resolve current PRISM catalog/service asset strategy before enabling live adapter execution."
-    notes: "Fixture-only contract evidence; not a runnable Wave 1 live adapter source."
+    current_endpoint_status: official_catalog_path_verified_by_transactional_install
+    promotion_status: runnable_live_verified
+    notes: "PRISM 4 km daily precipitation ZIP using a stable historical asset. The transactional installer preserves this promotion only after focused tests, an end-to-end bounded live probe, receipt validation, and the full test suite pass."
+contract_fixtures: []

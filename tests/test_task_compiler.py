@@ -10,6 +10,9 @@ from faster_raster import system_grade
 
 
 TASK_ID = "example_wave1_climate_stack"
+RUNNABLE_SOURCE_COUNT = 5
+FIXTURE_SOURCE_COUNT = 0
+JOBS_PER_RUNNABLE_SOURCE = 8
 runner = CliRunner()
 
 
@@ -29,16 +32,17 @@ def test_task_compile_static_range_manifest_counts():
     rows = report["manifest_rows"]
 
     assert report["manifest_row_count"] == 5
-    assert report["executable_request_count"] == 4
-    assert report["fixture_request_count"] == 1
+    assert report["executable_request_count"] == RUNNABLE_SOURCE_COUNT
+    assert report["fixture_request_count"] == FIXTURE_SOURCE_COUNT
     assert report["validation_status"] == "PASS"
     assert report["determinism_status"] == "PASS"
     assert report["adapter_counts"] == {"static_http_range": 5}
-    assert sum(1 for row in rows if row["fixture_only"]) == 1
+    assert sum(1 for row in rows if row["fixture_only"]) == FIXTURE_SOURCE_COUNT
     runnable = [row for row in rows if not row["fixture_only"]]
     assert {row["source_id"] for row in runnable} == {
         "chirps_daily_precipitation",
         "gridmet_daily",
+        "prism_daily_ppt_static_zip",
         "terraclimate_monthly",
         "worldclim_bioclim_normals",
     }
@@ -46,24 +50,45 @@ def test_task_compile_static_range_manifest_counts():
     assert all("Authorization" not in row["request_headers_redacted"] for row in rows)
 
 
-def test_prism_compiles_as_fixture_only_not_fetch_job():
+def test_prism_compiles_as_runnable_bounded_fetch_pipeline():
     task_compiler.package_task(TASK_ID)
-    jobs = json.loads((task_compiler.EXECUTION_PACKAGE_ROOT / TASK_ID / "execution_jobs.json").read_text())["jobs"]
-    prism_jobs = [job for job in jobs if job["source_id"] == "prism_daily_ppt_static_zip"]
+    jobs = json.loads(
+        (
+            task_compiler.EXECUTION_PACKAGE_ROOT
+            / TASK_ID
+            / "execution_jobs.json"
+        ).read_text()
+    )["jobs"]
+    prism_jobs = [
+        job
+        for job in jobs
+        if job["source_id"] == "prism_daily_ppt_static_zip"
+    ]
 
-    assert [job["stage"] for job in prism_jobs] == ["record_fixture_evidence"]
-    assert not any(job["stage"] == "bounded_fetch" for job in prism_jobs)
+    assert len(prism_jobs) == JOBS_PER_RUNNABLE_SOURCE
+    assert {job["stage"] for job in prism_jobs} == {
+        "resolve_request",
+        "bounded_fetch",
+        "validate_http_status",
+        "validate_byte_cap",
+        "validate_magic",
+        "validate_content_family",
+        "compute_checksum",
+        "record_source_evidence",
+    }
+    assert all(job["fixture_only"] is False for job in prism_jobs)
+    assert sum(job["network_required"] is True for job in prism_jobs) == 1
 
 
 def test_execution_package_stage_counts_and_dag_pass():
     package = task_compiler.package_task(TASK_ID)
 
-    assert package["executable_request_count"] == 4
-    assert package["fixture_request_count"] == 1
-    assert package["total_job_count"] == 33
+    assert package["executable_request_count"] == RUNNABLE_SOURCE_COUNT
+    assert package["fixture_request_count"] == FIXTURE_SOURCE_COUNT
+    assert package["total_job_count"] == RUNNABLE_SOURCE_COUNT * JOBS_PER_RUNNABLE_SOURCE
     assert package["dag_validation_status"] == "PASS"
-    assert package["stage_counts"]["bounded_fetch"] == 4
-    assert package["stage_counts"]["record_fixture_evidence"] == 1
+    assert package["stage_counts"]["bounded_fetch"] == RUNNABLE_SOURCE_COUNT
+    assert package["stage_counts"].get("record_fixture_evidence", 0) == FIXTURE_SOURCE_COUNT
 
 
 def test_compile_and_package_are_deterministic():
@@ -87,8 +112,8 @@ def test_task_compile_cli_no_network_defaults():
     result = runner.invoke(app, ["task", "compile", TASK_ID, "--plain"])
 
     assert result.exit_code == 0
-    assert "executable_request_count: 4" in result.output
-    assert "fixture_request_count: 1" in result.output
+    assert f"executable_request_count: {RUNNABLE_SOURCE_COUNT}" in result.output
+    assert f"fixture_request_count: {FIXTURE_SOURCE_COUNT}" in result.output
     assert "network_run: False" in result.output
 
 
@@ -98,9 +123,9 @@ def test_task_package_and_inspect_cli():
 
     assert package.exit_code == 0
     assert "dag_validation_status: PASS" in package.output
-    assert "total_job_count: 33" in package.output
+    assert f"total_job_count: {RUNNABLE_SOURCE_COUNT * JOBS_PER_RUNNABLE_SOURCE}" in package.output
     assert inspect.exit_code == 0
-    assert "fixture_request_count: 1" in inspect.output
+    assert f"fixture_request_count: {FIXTURE_SOURCE_COUNT}" in inspect.output
 
 
 def test_system_grade_cli():
@@ -174,4 +199,6 @@ def test_system_grade_valid_compile_report_without_live_receipt_has_cautions(mon
 
     assert grade["release_decision"] == "release_ready_with_cautions"
     assert grade["blocking_failures"] == []
+    assert grade["expected_runnable_source_count"] == 4
+    assert grade["expected_fixture_source_count"] == 1
     assert "no_live_local_execution_receipt" in grade["warnings"]
