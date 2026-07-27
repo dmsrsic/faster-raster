@@ -572,10 +572,74 @@ def _derive_ndvi_5070(
     *,
     resolution_m: float,
 ) -> dict[str, Any]:
-    with rasterio.Env(GDAL_DISABLE_READDIR_ON_OPEN="EMPTY_DIR", GDAL_PAM_ENABLED="NO"):
+    with rasterio.Env(
+        GDAL_DISABLE_READDIR_ON_OPEN="EMPTY_DIR",
+        GDAL_PAM_ENABLED="NO",
+    ):
         with rasterio.open(source_path) as source:
             if source.count < 4 or source.crs is None:
-                raise EnvironmentalCorrelationError("naip_multispectral_contract_invalid")
+                raise EnvironmentalCorrelationError(
+                    "naip_multispectral_contract_invalid"
+                )
+            declared_order = source.tags().get("FASTERRASTER_BAND_ORDER")
+            expected_order = "red,green,blue,near_infrared"
+            if declared_order not in {None, expected_order}:
+                raise EnvironmentalCorrelationError(
+                    "naip_multispectral_band_order_invalid"
+                )
+
+            red_native = source.read(
+                indexes=(1,),
+                masked=False,
+            )[0].astype(np.float32, copy=False)
+            nir_native = source.read(
+                indexes=(4,),
+                masked=False,
+            )[0].astype(np.float32, copy=False)
+
+            # ArcGIS TIFF exports can declare 0 as nodata even though
+            # zero-valued digital numbers occur inside covered imagery.
+            # Coverage, not value equality, determines source validity.
+            coverage = source.dataset_mask() > 0
+            native_valid = (
+                coverage
+                & np.isfinite(red_native)
+                & np.isfinite(nir_native)
+            )
+            if not np.any(native_valid):
+                raise EnvironmentalCorrelationError(
+                    "naip_multispectral_has_no_covered_red_nir_pixels"
+                )
+
+            red_values = red_native[native_valid].astype(
+                np.float64,
+                copy=False,
+            )
+            nir_values = nir_native[native_valid].astype(
+                np.float64,
+                copy=False,
+            )
+            if (
+                float(np.ptp(red_values)) <= 0.0
+                or float(np.ptp(nir_values)) <= 0.0
+            ):
+                raise EnvironmentalCorrelationError(
+                    "naip_red_or_nir_band_is_constant"
+                )
+
+            red_source = np.full(
+                red_native.shape,
+                np.nan,
+                dtype=np.float32,
+            )
+            nir_source = np.full(
+                nir_native.shape,
+                np.nan,
+                dtype=np.float32,
+            )
+            red_source[native_valid] = red_native[native_valid]
+            nir_source[native_valid] = nir_native[native_valid]
+
             transform, width, height = calculate_default_transform(
                 source.crs,
                 DEFAULT_TARGET_CRS,
@@ -584,15 +648,26 @@ def _derive_ndvi_5070(
                 *source.bounds,
                 resolution=resolution_m,
             )
-            red = np.full((height, width), np.nan, dtype=np.float32)
-            nir = np.full((height, width), np.nan, dtype=np.float32)
-            for band, destination_array in ((1, red), (4, nir)):
+            red = np.full(
+                (height, width),
+                np.nan,
+                dtype=np.float32,
+            )
+            nir = np.full(
+                (height, width),
+                np.nan,
+                dtype=np.float32,
+            )
+            for source_values, destination_array in (
+                (red_source, red),
+                (nir_source, nir),
+            ):
                 reproject(
-                    source=rasterio.band(source, band),
+                    source=source_values,
                     destination=destination_array,
                     src_transform=source.transform,
                     src_crs=source.crs,
-                    src_nodata=source.nodata,
+                    src_nodata=np.nan,
                     dst_transform=transform,
                     dst_crs=DEFAULT_TARGET_CRS,
                     dst_nodata=np.nan,
@@ -600,8 +675,19 @@ def _derive_ndvi_5070(
                     init_dest_nodata=True,
                     num_threads=1,
                 )
+
     denominator = nir + red
-    valid = np.isfinite(red) & np.isfinite(nir) & (np.abs(denominator) > 1e-6)
+    valid = (
+        np.isfinite(red)
+        & np.isfinite(nir)
+        & (np.abs(denominator) > 1e-6)
+    )
+    valid_pixel_count = int(np.count_nonzero(valid))
+    if valid_pixel_count == 0:
+        raise EnvironmentalCorrelationError(
+            "naip_ndvi_has_no_valid_pixels_after_reprojection"
+        )
+
     ndvi = np.full(red.shape, NODATA, dtype=np.float32)
     ndvi[valid] = np.clip(
         (nir[valid] - red[valid]) / denominator[valid],
@@ -620,19 +706,36 @@ def _derive_ndvi_5070(
             "FASTERRASTER_FORMULA": "(nir-red)/(nir+red)",
             "FASTERRASTER_RED_BAND": "1",
             "FASTERRASTER_NIR_BAND": "4",
+            "FASTERRASTER_VALIDITY_POLICY": (
+                "dataset_coverage_mask_not_source_nodata_value"
+            ),
         },
     )
     return {
         "source_id": NAIP_SOURCE_ID,
         "source_raster_sha256": _sha256(source_path),
         "output_sha256": _sha256(destination),
-        "valid_pixel_count": int(np.count_nonzero(valid)),
+        "valid_pixel_count": valid_pixel_count,
+        "native_coverage_pixel_count": int(
+            np.count_nonzero(native_valid)
+        ),
+        "red_band_statistics": {
+            "minimum": float(red_values.min()),
+            "maximum": float(red_values.max()),
+            "mean": float(red_values.mean()),
+            "standard_deviation": float(red_values.std()),
+        },
+        "nir_band_statistics": {
+            "minimum": float(nir_values.min()),
+            "maximum": float(nir_values.max()),
+            "mean": float(nir_values.mean()),
+            "standard_deviation": float(nir_values.std()),
+        },
         "width": int(ndvi.shape[1]),
         "height": int(ndvi.shape[0]),
         "resolution_m": resolution_m,
         "crs": DEFAULT_TARGET_CRS,
     }
-
 
 def _generic_plan(
     source_path: Path,

@@ -1,6 +1,6 @@
 ---
 schema_version: fasterraster.work/v1
-name: champaign-prism-dem-ndvi-correlation-2023
+name: champaign-prism-dem-ndvi-correlation-2019
 workflow: prism-dem-ndvi-correlation-audit
 
 area:
@@ -11,9 +11,9 @@ area:
     - 40.45
 
 time:
-  start: 2023-04-01
-  end: 2023-10-31
-  crop_year: 2023
+  start: 2019-04-01
+  end: 2019-10-31
+  crop_year: 2019
 
 sources:
   policy: pinned
@@ -39,8 +39,8 @@ outputs:
   open_when_complete: false
 
 correlation:
-  precipitation_start: 2023-06-09
-  precipitation_end: 2023-06-15
+  precipitation_start: 2019-06-09
+  precipitation_end: 2019-06-15
   maximum_precipitation_days: 7
   minimum_valid_cells: 12
   naip_analysis_resolution_m: 30

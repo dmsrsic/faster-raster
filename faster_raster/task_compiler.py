@@ -73,16 +73,44 @@ def _compile_contract_hash(value: dict[str, Any]) -> str:
 
 
 def _date_parts(task: dict[str, Any]) -> dict[str, Any]:
-    dates = (task.get("time") or {}).get("dates") or [task.get("date")] if task.get("date") else []
-    date = dates[0] if dates else task.get("date") or "2023-01-01"
-    year = int((task.get("time") or {}).get("years", [task.get("year") or int(str(date)[:4])])[0])
-    parts = str(date).split("-")
+    time_contract = task.get("time") or {}
+    configured_dates = time_contract.get("dates") or []
+    legacy_date = task.get("date")
+    selected_date = configured_dates[0] if configured_dates else legacy_date
+
+    configured_years = time_contract.get("years") or []
+    legacy_year = task.get("year")
+
+    if selected_date is None:
+        fallback_year = (
+            int(configured_years[0])
+            if configured_years
+            else int(legacy_year or 2023)
+        )
+        selected_date = f"{fallback_year:04d}-01-01"
+
+    selected_date = str(selected_date)
+    parts = selected_date.split("-")
+    if len(parts) != 3 or any(not part for part in parts):
+        raise ValueError("task date must use YYYY-MM-DD")
+
+    date_year = int(parts[0])
+    year = (
+        int(configured_years[0])
+        if configured_years
+        else int(legacy_year or date_year)
+    )
+    if year != date_year:
+        raise ValueError(
+            f"task year/date mismatch: year={year}, date={selected_date}"
+        )
+
     return {
-        "date": date,
+        "date": selected_date,
         "year": year,
-        "month": parts[1] if len(parts) > 1 else "01",
-        "day": parts[2] if len(parts) > 2 else "01",
-        "yyyymmdd": "".join(parts) if len(parts) == 3 else f"{year}0101",
+        "month": parts[1],
+        "day": parts[2],
+        "yyyymmdd": "".join(parts),
     }
 
 
