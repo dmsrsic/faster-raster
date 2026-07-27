@@ -74,6 +74,7 @@ from faster_raster.contract_repair import (
     terminal_interaction_enabled,
 )
 from faster_raster.workfiles import (
+    ENVIRONMENTAL_CORRELATION_WORKFLOW_ID,
     HumanDevelopmentWorkfileSpec,
     WorkfileError,
     load_workfile,
@@ -1200,6 +1201,37 @@ def command_cook(args: argparse.Namespace) -> int:
         result = {"status": "PASS", "handoff": str(final), "preview": str(preview), "network_plan": plan["rows"]}
         _json(result) if args.json else print(f"Cook complete: {final}\nPreview: {preview}")
         return 0
+    if workfile.spec.workflow_id == ENVIRONMENTAL_CORRELATION_WORKFLOW_ID:
+        from faster_raster.environmental_correlation import (
+            execute_environmental_correlation,
+        )
+
+        values = plan["resolved_config"]["values"]
+        execution_output = (
+            contextlib.redirect_stdout(io.StringIO())
+            if args.json
+            else contextlib.nullcontext()
+        )
+        with execution_output:
+            preview = execute_environmental_correlation(
+                root,
+                workfile=workfile,
+                plan=plan,
+                open_preview=bool(values["open_when_complete"]["value"]),
+            )
+        final = _handoff_from_preview(preview, configured_handoff_root(root))
+        result = {
+            "status": "PASS",
+            "handoff": str(final),
+            "preview": str(preview),
+            "network_plan": plan["rows"],
+            "correlation_summary": str(final / "analysis" / "correlation_summary.json"),
+        }
+        _json(result) if args.json else print(
+            f"Cook complete: {final}\nPreview: {preview}\n"
+            f"Correlation summary: {result['correlation_summary']}"
+        )
+        return 0
     recipe = load_named_recipe(root, workfile.spec.workflow_id)
     if (
         isinstance(recipe, AgriculturalRecipeV4)
@@ -1535,6 +1567,58 @@ def command_inspect(args: argparse.Namespace) -> int:
                             sort_keys=True,
                         )
                     )
+        environmental = report.get("environmental_correlation")
+        if environmental is not None:
+            print("  PRISM × DEM × NDVI correlation summary:")
+            print(
+                "    Common valid cells: "
+                f"{environmental.get('common_valid_cell_count') or 'unavailable'}"
+            )
+            period = environmental.get("precipitation_period") or {}
+            print(
+                "    Precipitation period: "
+                f"{period.get('start') or 'unknown'} through "
+                f"{period.get('end') or 'unknown'} "
+                f"({period.get('day_count') or 'unknown'} days)"
+            )
+            pearson = environmental.get("pearson") or {}
+            partial = environmental.get("partial_correlation") or {}
+            print(
+                "    Pearson precipitation / NDVI: "
+                f"{pearson.get('precipitation__ndvi')}"
+            )
+            print(
+                "    Pearson elevation / NDVI: "
+                f"{pearson.get('elevation__ndvi')}"
+            )
+            print(
+                "    Partial precipitation / NDVI controlling elevation: "
+                f"{partial.get('precipitation__ndvi_controlling_elevation')}"
+            )
+            print(
+                "    Interpretation: exploratory spatial association only; "
+                "no causal or iid significance claim."
+            )
+            if environmental.get("naip_acquisition_dates"):
+                print(
+                    "    NAIP acquisition dates: "
+                    + ", ".join(
+                        str(value)
+                        for value in environmental["naip_acquisition_dates"]
+                    )
+                )
+            if args.verbose:
+                model = environmental.get("standardized_linear_model") or {}
+                print(
+                    "    Standardized model: "
+                    f"ppt={model.get('precipitation_coefficient')} "
+                    f"elevation={model.get('elevation_coefficient')} "
+                    f"R²={model.get('r_squared')}"
+                )
+                print(
+                    "    Evidence: "
+                    f"{environmental.get('evidence') or 'unavailable'}"
+                )
     return 0
 
 

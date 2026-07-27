@@ -224,7 +224,7 @@ def _stream_statistics(dataset: rasterio.io.DatasetReader) -> dict[str, Any]:
     total_squares = 0.0
 
     for _, window in dataset.block_windows(1):
-        values = dataset.read(1, window=window, masked=False)
+        values = dataset.read(indexes=(1,), window=window, masked=False)[0]
         if nodata is None:
             nodata_mask = np.zeros(values.shape, dtype=bool)
         else:

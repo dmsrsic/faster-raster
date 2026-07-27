@@ -570,15 +570,26 @@ def execute_raster_harmonization(
 
 
 def verify_harmonization_receipt(receipt_or_path: Mapping[str, Any] | Path) -> dict[str, Any]:
+    receipt_path: Path | None = None
     if isinstance(receipt_or_path, Mapping):
         receipt = dict(receipt_or_path)
     else:
-        receipt = json.loads(Path(receipt_or_path).read_text(encoding="utf-8"))
+        receipt_path = Path(receipt_or_path)
+        receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
     failures: list[str] = []
     computed_receipt_sha256 = compute_harmonization_receipt_sha256(receipt)
     if computed_receipt_sha256 != receipt.get("harmonization_receipt_sha256"):
         failures.append("harmonization_receipt_hash_mismatch")
     output_path = Path(str(receipt.get("output_artifact_path") or ""))
+    if not output_path.is_absolute() and receipt_path is not None:
+        candidates = [
+            receipt_path.parent / output_path,
+            receipt_path.parent.parent / output_path,
+        ]
+        output_path = next(
+            (candidate for candidate in candidates if candidate.is_file()),
+            candidates[-1],
+        )
     if not output_path.is_file() or output_path.is_symlink():
         failures.append("harmonized_output_missing_or_invalid")
     else:

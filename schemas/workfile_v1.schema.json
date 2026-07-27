@@ -206,6 +206,11 @@
     "DataSpec": {
       "additionalProperties": false,
       "properties": {
+        "allow_materialization": {
+          "default": false,
+          "title": "Allow Materialization",
+          "type": "boolean"
+        },
         "allow_network": {
           "default": false,
           "title": "Allow Network",
@@ -223,6 +228,55 @@
         }
       },
       "title": "DataSpec",
+      "type": "object"
+    },
+    "EnvironmentalCorrelationSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "elevation_resolution_m": {
+          "default": 30.0,
+          "maximum": 1000.0,
+          "minimum": 10.0,
+          "title": "Elevation Resolution M",
+          "type": "number"
+        },
+        "maximum_precipitation_days": {
+          "default": 31,
+          "maximum": 31,
+          "minimum": 1,
+          "title": "Maximum Precipitation Days",
+          "type": "integer"
+        },
+        "minimum_valid_cells": {
+          "default": 12,
+          "maximum": 1000000,
+          "minimum": 4,
+          "title": "Minimum Valid Cells",
+          "type": "integer"
+        },
+        "naip_analysis_resolution_m": {
+          "default": 30.0,
+          "maximum": 100.0,
+          "minimum": 10.0,
+          "title": "Naip Analysis Resolution M",
+          "type": "number"
+        },
+        "precipitation_end": {
+          "format": "date",
+          "title": "Precipitation End",
+          "type": "string"
+        },
+        "precipitation_start": {
+          "format": "date",
+          "title": "Precipitation Start",
+          "type": "string"
+        }
+      },
+      "required": [
+        "precipitation_start",
+        "precipitation_end"
+      ],
+      "title": "EnvironmentalCorrelationSpec",
       "type": "object"
     },
     "GeneralClassificationSpec": {
@@ -888,6 +942,18 @@
           "title": "Policy",
           "type": "string"
         },
+        "precipitation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Precipitation"
+        },
         "prefer": {
           "items": {
             "type": "string"
@@ -1190,6 +1256,17 @@
       "anyOf": [
         {
           "$ref": "#/$defs/HybridClassificationSpec"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "correlation": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/EnvironmentalCorrelationSpec"
         },
         {
           "type": "null"

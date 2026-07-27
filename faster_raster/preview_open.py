@@ -264,6 +264,35 @@ def _hybrid_summary(
     }
 
 
+
+def _environmental_correlation_summary(
+    handoff: Path,
+    receipt: dict[str, Any],
+) -> dict[str, Any] | None:
+    path = handoff / "analysis" / "correlation_summary.json"
+    summary = _read_json(path)
+    workflow = receipt.get("workflow")
+    if not summary and workflow != "prism_dem_ndvi_correlation_audit":
+        return None
+    methods = summary.get("methods") if isinstance(summary, dict) else {}
+    methods = methods if isinstance(methods, dict) else {}
+    return {
+        "available": bool(summary),
+        "common_valid_cell_count": summary.get("common_valid_cell_count"),
+        "precipitation_period": summary.get("precipitation_period"),
+        "naip_acquisition_dates": summary.get("naip_acquisition_dates", []),
+        "temporal_alignment": summary.get("temporal_alignment"),
+        "target_crs": summary.get("target_crs"),
+        "target_resolution_m": summary.get("target_resolution_m"),
+        "pearson": methods.get("pearson"),
+        "spearman_rank": methods.get("spearman_rank"),
+        "partial_correlation": methods.get("partial_correlation"),
+        "standardized_linear_model": methods.get("standardized_linear_model"),
+        "scientific_claim": summary.get("scientific_claim"),
+        "unsupported_claims": summary.get("unsupported_claims", []),
+        "evidence": "analysis/correlation_summary.json",
+    }
+
 def is_finalized_handoff(path: Path) -> bool:
     if not path.is_dir() or path.name.startswith((".", "_")):
         return False
@@ -551,5 +580,6 @@ def inspect_handoff(handoff: Path) -> dict[str, Any]:
         "output_paths": receipt.get("generated_output_paths", []),
         "classification": _classification_summary(handoff, receipt),
         "index_guided_hybrid": _hybrid_summary(handoff, receipt),
+        "environmental_correlation": _environmental_correlation_summary(handoff, receipt),
         "contract_repair": repair,
     }

@@ -35,7 +35,11 @@ from faster_raster.source_capabilities import (
     source_evidence_state,
     write_profile_atomic,
 )
-from faster_raster.workfiles import HumanDevelopmentWorkfileSpec, Workfile
+from faster_raster.workfiles import (
+    ENVIRONMENTAL_CORRELATION_WORKFLOW_ID,
+    HumanDevelopmentWorkfileSpec,
+    Workfile,
+)
 
 
 ASSET_LABELS = {
@@ -380,6 +384,18 @@ def compile_study_plan(
     now: datetime | None = None,
     runtime_request: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
+    if workfile.spec.workflow_id == ENVIRONMENTAL_CORRELATION_WORKFLOW_ID:
+        from faster_raster.environmental_correlation import (
+            compile_environmental_correlation_plan,
+        )
+
+        return compile_environmental_correlation_plan(
+            repository_root,
+            workfile,
+            paths,
+            cli_overrides=cli_overrides,
+            output_dir=output_dir,
+        )
     if isinstance(workfile.spec, HumanDevelopmentWorkfileSpec):
         try:
             from faster_raster.human_development_workflow import compile_human_development_plan

@@ -24,6 +24,7 @@ from faster_raster.development_sources import (
 WORKFILE_SCHEMA_VERSION = "fasterraster.work/v1"
 HUMAN_DEVELOPMENT_WORKFILE_SCHEMA_VERSION = "fasterraster.work/v2"
 HUMAN_DEVELOPMENT_WORKFLOW_ID = "human_development_change"
+ENVIRONMENTAL_CORRELATION_WORKFLOW_ID = "prism_dem_ndvi_correlation_audit"
 FORBIDDEN_KEY_PARTS = {
     "password",
     "token",
@@ -103,6 +104,7 @@ class SourcesSpec(BaseModel):
     cdl_classes: str | None = None
     cdl_color: str | None = None
     hillshade: str | None = None
+    precipitation: str | None = None
 
     @field_validator("prefer", "deny")
     @classmethod
@@ -124,6 +126,7 @@ class SourcesSpec(BaseModel):
                 "cdl_classes",
                 "cdl_color",
                 "hillshade",
+                "precipitation",
             )
         )
         if self.policy == "pinned" and not pinned:
@@ -139,6 +142,35 @@ class DataSpec(BaseModel):
     model_config = ConfigDict(extra="forbid")
     reuse: Literal["auto", "only", "never"] = "auto"
     allow_network: bool = False
+    allow_materialization: bool = False
+
+
+
+
+class EnvironmentalCorrelationSpec(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    precipitation_start: date
+    precipitation_end: date
+    maximum_precipitation_days: int = Field(
+        default=31, ge=1, le=31
+    )
+    minimum_valid_cells: int = Field(default=12, ge=4, le=1_000_000)
+    naip_analysis_resolution_m: float = Field(default=30.0, ge=10.0, le=100.0)
+    elevation_resolution_m: float = Field(default=30.0, ge=10.0, le=1000.0)
+
+    @model_validator(mode="after")
+    def precipitation_window_is_bounded(self) -> "EnvironmentalCorrelationSpec":
+        if self.precipitation_end < self.precipitation_start:
+            raise ValueError(
+                "correlation.precipitation_end must not precede precipitation_start"
+            )
+        day_count = (self.precipitation_end - self.precipitation_start).days + 1
+        if day_count > self.maximum_precipitation_days:
+            raise ValueError(
+                "correlation precipitation window exceeds maximum_precipitation_days"
+            )
+        return self
 
 
 class ProcessingSpec(BaseModel):
@@ -175,6 +207,7 @@ class WorkfileSpec(BaseModel):
     limits: LimitsSpec = Field(default_factory=LimitsSpec)
     outputs: OutputSpec = Field(default_factory=OutputSpec)
     classification: HybridClassificationSpec | None = None
+    correlation: EnvironmentalCorrelationSpec | None = None
 
     @model_validator(mode="after")
     def one_workflow(self) -> "WorkfileSpec":
@@ -188,6 +221,54 @@ class WorkfileSpec(BaseModel):
             raise ValueError(
                 "classification override is supported only by the "
                 "index-guided hybrid classification workflow"
+            )
+        if self.workflow_id == ENVIRONMENTAL_CORRELATION_WORKFLOW_ID:
+            if self.correlation is None:
+                raise ValueError(
+                    "prism_dem_ndvi_correlation_audit requires a correlation contract"
+                )
+            if not self.data.allow_network or not self.data.allow_materialization:
+                raise ValueError(
+                    "environmental correlation requires data.allow_network and "
+                    "data.allow_materialization"
+                )
+            if self.data.reuse != "never":
+                raise ValueError(
+                    "environmental correlation currently requires data.reuse: never"
+                )
+            expected_sources = {
+                "natural_imagery": "usgs_naip_imageserver",
+                "crop_classes": "usda_nass_cdl_imageserver",
+                "terrain": "usgs_3dep_imageserver",
+                "precipitation": "prism_daily_ppt_static_zip",
+            }
+            if self.sources.policy != "pinned" or any(
+                getattr(self.sources, key) != value
+                for key, value in expected_sources.items()
+            ):
+                raise ValueError(
+                    "environmental correlation requires pinned NAIP, CDL, 3DEP, "
+                    "and PRISM source IDs"
+                )
+            if self.processing.resolution_m is None:
+                raise ValueError(
+                    "environmental correlation requires explicit processing.resolution_m"
+                )
+            if self.processing.resolution_m is not None and not (
+                1000.0 <= self.processing.resolution_m <= 10_000.0
+            ):
+                raise ValueError(
+                    "environmental correlation resolution must be 1000..10000 meters"
+                )
+            if self.correlation.precipitation_start.year != self.time.crop_year or (
+                self.correlation.precipitation_end.year != self.time.crop_year
+            ):
+                raise ValueError(
+                    "correlation precipitation dates must match time.crop_year"
+                )
+        elif self.correlation is not None:
+            raise ValueError(
+                "correlation is supported only by prism_dem_ndvi_correlation_audit"
             )
         return self
 
@@ -361,7 +442,7 @@ def load_workfile(path: Path, *, repository_root: Path | None = None) -> Workfil
         raise WorkfileError(f"Invalid workfile {path}: {exc}") from exc
     if repository_root is not None:
         recipe_path = repository_root / "recipes" / "ag" / f"{spec.workflow_id}.json"
-        if spec.workflow_id != HUMAN_DEVELOPMENT_WORKFLOW_ID and not recipe_path.is_file():
+        if spec.workflow_id not in {HUMAN_DEVELOPMENT_WORKFLOW_ID, ENVIRONMENTAL_CORRELATION_WORKFLOW_ID} and not recipe_path.is_file():
             raise WorkfileError(f"unsupported workflow or recipe: {spec.workflow or spec.recipe}")
     return Workfile(path=path.resolve(), spec=spec, prose=prose, front_matter=raw)
 

@@ -33,6 +33,11 @@
     "DataSpec": {
       "additionalProperties": false,
       "properties": {
+        "allow_materialization": {
+          "default": false,
+          "title": "Allow Materialization",
+          "type": "boolean"
+        },
         "allow_network": {
           "default": false,
           "title": "Allow Network",

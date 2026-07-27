@@ -8,12 +8,12 @@ Support is workflow-specific; a source entry does not imply every dataset or geo
 | USGS NAIP imagery | Exact-year visual context and raw four-band red/green/blue/NIR analytical source for classification/index recipes | Offline mocks and contracts only |
 | USGS 3DEP | Bounded terrain context when a shipped recipe requires it | Offline mocks and contracts only |
 | CHIRPS, gridMET, TerraClimate, WorldClim | Bounded static HTTP range planning/probe contracts | Offline fixtures only |
-| PRISM daily precipitation ZIP | Deterministic daily path, bounded probe, guarded complete-object materialization, selected-GeoTIFF extraction, Rasterio/COG validation, and provider-sidecar consistency receipts | Offline synthetic archive/raster tests; live canary is explicit and opt-in |
+| PRISM daily precipitation ZIP | Deterministic daily path, bounded probe, guarded complete-object materialization, selected-GeoTIFF extraction, Rasterio/COG validation, provider-sidecar consistency receipts, AOI harmonization, and the bounded PRISM × DEM × NDVI correlation workflow | Offline synthetic archive/raster/executor/correlation tests; live materialization remains explicit |
 | Copernicus CDSE | Credential-gated planning/readiness scaffolding | Offline contract tests only |
 
 Routine CI never contacts USDA, USGS, ArcGIS, PRISM, STAC, THREDDS, or other raster services.
 
-PRISM daily packages are treated as ZIP containers whose primary raster is a date-matched GeoTIFF accompanied by provider metadata and ancillary files. The archive profile validates paths, compression bounds, member CRCs, naming, and exactly one primary raster. The decoded-raster stage then streams only that selected member, verifies its declared size and CRC, promotes it content-addressably, opens it with Rasterio in sidecar-isolated mode, validates the declared COG layout, and cross-checks grid, projection, nodata, statistics, units, date, and bounds against the provider sidecars. Spatial subsetting and target-grid harmonization are not yet implemented.
+PRISM daily packages are treated as ZIP containers whose primary raster is a date-matched GeoTIFF accompanied by provider metadata and ancillary files. The archive profile validates paths, compression bounds, member CRCs, naming, and exactly one primary raster. The decoded-raster stage then streams only that selected member, verifies its declared size and CRC, promotes it content-addressably, opens it with Rasterio in sidecar-isolated mode, validates the declared COG layout, and cross-checks grid, projection, nodata, statistics, units, date, and bounds against the provider sidecars. Spatial subsetting and target-grid harmonization are implemented for the guarded PRISM product path. The normal `prism_dem_ndvi_correlation_audit` workflow uses these contracts to build a bounded common-grid environmental association handoff.
 
 The opt-in `fr-prism-canary` command can create a bounded probe, guarded full-object materialization receipt, decoded-raster receipt, and deterministic raster profile in an isolated workspace. Planning requires `--allow-network`; complete-object and raster execution requires `--execute --allow-network --allow-materialization`. See [PRISM daily precipitation](prism-daily-precipitation.md) for the staged contract and remaining roadmap.
 
@@ -35,3 +35,8 @@ The USDA states that CDL is public domain and free to redistribute. Source data 
 ## Exact-year behavior
 
 FasterRaster does not silently substitute imagery years. If coverage is unavailable, the error reports intersecting available years when the source provides them. Edit the workfile to select another year explicitly, then validate and plan again.
+
+
+## Environmental correlation workflow
+
+The normal-workfile `prism_dem_ndvi_correlation_audit` workflow combines accumulated PRISM precipitation, USGS 3DEP elevation, and numeric NDVI derived from raw four-band NAIP. Same-year CDL is retained as crop context. Reported statistics are exploratory spatial associations without causal or ordinary iid significance claims. See [PRISM × DEM × NDVI correlation audit](prism-dem-ndvi-correlation.md).
