@@ -80,6 +80,7 @@ def _create_archive(
     cog: bool = True,
     metadata_date: str = DATE,
     projection_wkt: str | None = None,
+    include_statistics_nnull: bool = True,
 ) -> Path:
     root.mkdir(parents=True, exist_ok=True)
     source = root / "source.tif"
@@ -100,14 +101,18 @@ def _create_archive(
     ) as dataset:
         dataset.write(values, 1)
         dataset.update_tags(**TAGS)
-        dataset.update_tags(
-            1,
-            STATISTICS_MINIMUM=f"{stats['minimum']:.4f}",
-            STATISTICS_MAXIMUM=f"{stats['maximum']:.4f}",
-            STATISTICS_MEAN=f"{stats['mean']:.4f}",
-            STATISTICS_STDDEV=f"{stats['stddev']:.4f}",
-            STATISTICS_NNULL=str(stats["nnull"]),
-        )
+        embedded_statistics = {
+            "STATISTICS_MINIMUM": f"{stats['minimum']:.4f}",
+            "STATISTICS_MAXIMUM": f"{stats['maximum']:.4f}",
+            "STATISTICS_MEAN": f"{stats['mean']:.4f}",
+            "STATISTICS_STDDEV": f"{stats['stddev']:.4f}",
+            "STATISTICS_VALID_PERCENT": (
+                f"{100.0 * (values.size - int(stats['nnull'])) / values.size:.6f}"
+            ),
+        }
+        if include_statistics_nnull:
+            embedded_statistics["STATISTICS_NNULL"] = str(stats["nnull"])
+        dataset.update_tags(1, **embedded_statistics)
     if cog:
         raster_copy(source, primary, driver="COG", compress="LZW", blocksize=512, overview_resampling="nearest")
     else:
@@ -162,6 +167,27 @@ def test_materializes_decoded_cog_and_verifies_receipt(tmp_path):
     verification = verify_prism_raster_receipt(receipt_path)
     assert verification["verification_status"] == "PASS", verification
 
+
+
+def test_accepts_standard_gdal_statistics_without_nonstandard_nnull(tmp_path):
+    archive = _create_archive(
+        tmp_path / "fixture-no-nnull",
+        include_statistics_nnull=False,
+    )
+    profile = inspect_prism_archive(archive, temporal_key=DATE)
+    receipt = materialize_prism_primary_raster(
+        archive,
+        temporal_key=DATE,
+        product_profile=profile,
+        artifact_root=tmp_path / "artifacts-no-nnull",
+        staging_root=tmp_path / "staging-no-nnull",
+    )
+
+    raster_profile = receipt["raster_profile"]
+    assert receipt["validation_status"] == "PASS"
+    assert "STATISTICS_NNULL" not in raster_profile["band_tags"]
+    assert raster_profile["computed_statistics"]["nodata_pixel_count"] > 0
+    assert raster_profile["sidecar_consistency_status"] == "PASS"
 
 def test_reuses_existing_content_addressed_raster(tmp_path):
     archive = _create_archive(tmp_path / "fixture")

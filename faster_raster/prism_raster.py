@@ -352,7 +352,14 @@ def inspect_prism_raster(
                     "maximum": float(band_tags["STATISTICS_MAXIMUM"]),
                     "mean": float(band_tags["STATISTICS_MEAN"]),
                     "stddev": float(band_tags["STATISTICS_STDDEV"]),
-                    "nnull": int(band_tags["STATISTICS_NNULL"]),
+                    # STATISTICS_NNULL is not a standard GDAL statistics tag.
+                    # The provider .stx sidecar and streamed pixel accounting
+                    # remain mandatory and authoritative when it is absent.
+                    "nnull": (
+                        int(band_tags["STATISTICS_NNULL"])
+                        if "STATISTICS_NNULL" in band_tags
+                        else None
+                    ),
                 }
     except rasterio.errors.RasterioIOError as exc:
         raise PrismRasterError("prism_raster_decode_failed") from exc
@@ -377,7 +384,11 @@ def inspect_prism_raster(
     for key in _REQUIRED_PRISM_TAGS:
         _require(processing_info.get(key) == dataset_tags.get(key), "prism_processing_info_tag_mismatch")
 
-    _require(embedded_statistics["nnull"] == statistics["nodata_pixel_count"], "prism_embedded_nodata_count_mismatch")
+    if embedded_statistics["nnull"] is not None:
+        _require(
+            embedded_statistics["nnull"] == statistics["nodata_pixel_count"],
+            "prism_embedded_nodata_count_mismatch",
+        )
     for key in ("minimum", "maximum", "mean", "stddev"):
         computed_key = "stddev_population" if key == "stddev" else key
         _require(_close(stx[key], embedded_statistics[key], 1e-4), "prism_statistics_sidecar_mismatch")
