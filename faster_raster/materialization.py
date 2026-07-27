@@ -22,6 +22,7 @@ from faster_raster.artifact_receipts import (
     verify_materialization_run,
 )
 from faster_raster.content_magic import detect_content_magic
+from faster_raster.prism_product import PRISM_SOURCE_ID, PrismProductError, inspect_prism_archive
 from faster_raster.local_executor import COMPILE_ROOT, PACKAGE_ROOT
 from faster_raster.run_receipts import parse_content_range, read_json, read_jsonl, sha256_file, validate_http_206_evidence, verify_run_receipt, write_json, write_jsonl
 
@@ -610,7 +611,14 @@ def _failed_transfer_receipt(object_plan: dict[str, Any], failure_class: str, er
     }
 
 
-def _basic_container_validation(path: Path, expected_magic: Any) -> tuple[str, str, dict[str, Any], str | None]:
+def _basic_container_validation(
+    path: Path,
+    expected_magic: Any,
+    *,
+    source_id: str | None = None,
+    temporal_key: str | None = None,
+    logical_archive_name: str | None = None,
+) -> tuple[str, str, dict[str, Any], str | None]:
     detected = detect_content_magic(path.read_bytes()[:4096])
     magic = detected.magic
     if magic not in _as_set(expected_magic):
@@ -642,6 +650,16 @@ def _basic_container_validation(path: Path, expected_magic: Any) -> tuple[str, s
                     "uncompressed_total_bytes": uncompressed,
                     "maximum_member_expansion_ratio": max((item.file_size / max(item.compress_size, 1) for item in infos), default=0),
                 }
+            if source_id == PRISM_SOURCE_ID:
+                try:
+                    metadata["product_profile"] = inspect_prism_archive(
+                        path,
+                        temporal_key=temporal_key,
+                        logical_archive_name=logical_archive_name,
+                    )
+                    metadata["validation_level"] = "product_profile_structural"
+                except PrismProductError as exc:
+                    return magic, "FAIL", {}, str(exc)
         except zipfile.BadZipFile:
             return magic, "FAIL", {}, "corrupt zip"
     return magic, "PASS", metadata, None
@@ -797,7 +815,15 @@ def execute_materialization(
                     staging.unlink(missing_ok=True)
                     event("prefix_continuity_failed", "failed", source_id=source_id, request_id=request_id)
                     raise MaterializationError("source_changed_since_probe")
-                detected_magic, container_status, metadata, container_error = _basic_container_validation(staging, object_plan["expected_magic"])
+                detected_magic, container_status, metadata, container_error = _basic_container_validation(
+                    staging,
+                    object_plan["expected_magic"],
+                    source_id=source_id,
+                    temporal_key=object_plan.get("temporal_key"),
+                    logical_archive_name=Path(
+                        urllib.parse.urlsplit(object_plan["deterministic_url_redacted"]).path
+                    ).name,
+                )
                 if container_status != "PASS":
                     staging.unlink(missing_ok=True)
                     event("container_validation_failed", "failed", {"error": container_error}, source_id, request_id)

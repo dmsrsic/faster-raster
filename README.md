@@ -179,9 +179,11 @@ The [examples gallery](docs/examples.md) also includes Star, Idaho, where 2021 N
 
 ## Sources and scope
 
-Implemented beta paths include live USDA CDL acquisition; USGS NAIP context; bounded 3DEP use where a recipe requires it; bounded local workers; and offline compiler/evidence paths for the shipped public-source contracts. The static HTTP range wave includes CHIRPS, gridMET, TerraClimate, and WorldClim bounded probes. PRISM remains historical fixture evidence until a current deterministic endpoint is promoted through the source policy.
+Implemented beta paths include live USDA CDL acquisition; USGS NAIP context; bounded 3DEP use where a recipe requires it; bounded local workers; and offline compiler/evidence paths for the shipped public-source contracts. The static HTTP range wave includes CHIRPS, gridMET, TerraClimate, WorldClim, and PRISM daily precipitation bounded probes. PRISM uses a deterministic official daily ZIP path and can be materialized as a complete, content-addressed object after matching live probe evidence and explicit approval. Its product profile safely inventories the date-matched GeoTIFF and ancillary members without extracting them; raster decoding, COG conformance checks, AOI subsetting, and target-grid harmonization remain downstream work.
 
 Exact-year behavior is strict. If a requested NAIP year has no intersecting records, FasterRaster reports the available intersecting years and stops. The user must explicitly choose another year. The Buckeye recovery from requested 2021 context to explicitly selected 2023 context demonstrates that contract; it is not silent substitution.
+
+A guarded maintainer canary is available as `fr-prism-canary`. Plan-only use requires `--allow-network`, compiles the task, performs bounded source validation, and writes a materialization plan. Complete-object execution additionally requires `--execute --allow-materialization` and remains subject to explicit object and total-byte ceilings. Canary artifacts and receipts are written to a separate workspace rather than to publication outputs.
 
 Read [Supported sources](docs/supported-sources.md), [network and byte budgets](docs/network-byte-budgets.md), and [known limitations](docs/limitations.md) before interpreting results.
 

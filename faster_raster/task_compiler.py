@@ -119,7 +119,7 @@ def _harmonization_readiness(source_id: str) -> str:
         "gridmet_daily": "requires_netcdf_variable_selection",
         "terraclimate_monthly": "requires_netcdf_variable_selection",
         "worldclim_bioclim_normals": "requires_archive_member_resolution",
-        "prism_daily_ppt_static_zip": "fixture_only_endpoint_resolution_required",
+        "prism_daily_ppt_static_zip": "archive_profile_supported_cog_raster_decode_pending",
     }.get(source_id, "unknown")
 
 
@@ -159,7 +159,13 @@ def _planned_request_for_static_spec(
     provenance = {
         "config": static_http_range.portable_project_path(static_http_range.DEFAULT_WAVE1_CONFIG),
         "container": _container(source_id),
-        "expected_inner_format": "geotiff" if source_id == "chirps_daily_precipitation" else None,
+        "expected_inner_format": (
+            "geotiff"
+            if source_id == "chirps_daily_precipitation"
+            else "cog_geotiff"
+            if source_id == "prism_daily_ppt_static_zip"
+            else None
+        ),
         "planning_index": index,
     }
     warnings: list[str] = []

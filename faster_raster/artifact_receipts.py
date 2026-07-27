@@ -7,6 +7,7 @@ from typing import Any
 
 from faster_raster.adapter_contract import stable_json
 from faster_raster.run_receipts import sha256_file
+from faster_raster.prism_product import PRISM_SOURCE_ID, PrismProductError, inspect_prism_archive
 
 
 VOLATILE_ARTIFACT_FIELDS = {
@@ -102,6 +103,33 @@ def verify_artifact_receipt(receipt: dict[str, Any], *, repo_root: Path | None =
         failures.append("probe prefix mismatch")
     if receipt.get("container_validation_status") != "PASS":
         failures.append("container validation failed")
+    prism_profile_ok = True
+    if receipt.get("source_id") == PRISM_SOURCE_ID and artifact_path.is_file() and not artifact_path.is_symlink():
+        stored_profile = (receipt.get("container_metadata") or {}).get("product_profile") or {}
+        try:
+            recomputed_profile = inspect_prism_archive(
+                artifact_path,
+                temporal_key=receipt.get("temporal_key"),
+                logical_archive_name=stored_profile.get("archive_name"),
+            )
+        except PrismProductError as exc:
+            prism_profile_ok = False
+            failures.append(f"PRISM product profile verification failed: {exc}")
+        else:
+            comparable_fields = [
+                "product_profile_version",
+                "product_validation_status",
+                "temporal_key",
+                "archive_name",
+                "inventory_sha256",
+                "primary_raster_member",
+            ]
+            if any(stored_profile.get(field) != recomputed_profile.get(field) for field in comparable_fields):
+                prism_profile_ok = False
+                failures.append("PRISM product profile receipt mismatch")
+            if recomputed_profile.get("product_validation_status") != "PASS":
+                prism_profile_ok = False
+                failures.append("PRISM product profile validation failed")
     if receipt.get("credentials_used") or receipt.get("authorization_headers_present"):
         failures.append("credentials or authorization values present")
     checks.extend(
@@ -109,6 +137,7 @@ def verify_artifact_receipt(receipt: dict[str, Any], *, repo_root: Path | None =
             _check("checksum", not any("checksum" in item for item in failures)),
             _check("prefix_continuity", receipt.get("prefix_match") is True),
             _check("container_validation", receipt.get("container_validation_status") == "PASS"),
+            _check("prism_product_profile", prism_profile_ok),
             _check("no_credentials", not receipt.get("credentials_used") and not receipt.get("authorization_headers_present")),
         ]
     )
