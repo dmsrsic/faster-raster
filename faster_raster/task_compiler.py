@@ -119,7 +119,7 @@ def _harmonization_readiness(source_id: str) -> str:
         "gridmet_daily": "requires_netcdf_variable_selection",
         "terraclimate_monthly": "requires_netcdf_variable_selection",
         "worldclim_bioclim_normals": "requires_archive_member_resolution",
-        "prism_daily_ppt_static_zip": "archive_profile_supported_cog_raster_decode_pending",
+        "prism_daily_ppt_static_zip": "decoded_cog_profile_supported_aoi_harmonization_pending",
     }.get(source_id, "unknown")
 
 

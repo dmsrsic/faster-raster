@@ -7,13 +7,14 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from faster_raster import artifact_receipts, local_executor, materialization, task_compiler
+from faster_raster import artifact_receipts, local_executor, materialization, prism_raster, task_compiler
 from faster_raster.prism_product import PRISM_SOURCE_ID
 
 
 DEFAULT_TASK_ID = "example_wave1_climate_stack"
 DEFAULT_PROBE_BYTES = 65_536
 DEFAULT_OBJECT_CAP = 16 * 1024 * 1024
+DEFAULT_RASTER_CAP = 64 * 1024 * 1024
 
 
 def _utc_stamp() -> str:
@@ -52,6 +53,9 @@ def _configure_workspace(workspace: Path) -> dict[str, Path]:
         "artifact_root": workspace / "cache" / "artifacts" / "sha256",
         "staging_root": workspace / "cache" / "staging" / "materialization",
         "catalog_root": workspace / "cache" / "catalog",
+        "raster_artifact_root": workspace / "cache" / "derived" / "prism" / "sha256",
+        "raster_staging_root": workspace / "cache" / "staging" / "prism-raster",
+        "raster_receipt_path": workspace / "prism_raster_receipt.json",
     }
 
 
@@ -66,6 +70,7 @@ def run_canary(
     probe_bytes: int = DEFAULT_PROBE_BYTES,
     max_object_bytes: int = DEFAULT_OBJECT_CAP,
     max_total_bytes: int = DEFAULT_OBJECT_CAP,
+    max_raster_bytes: int = DEFAULT_RASTER_CAP,
     timeout_seconds: int = 60,
 ) -> dict[str, Any]:
     repo_root = repo_root.resolve()
@@ -76,6 +81,8 @@ def run_canary(
         raise ValueError("materialization byte caps must be positive")
     if max_object_bytes > max_total_bytes:
         raise ValueError("max_object_bytes must not exceed max_total_bytes")
+    if max_raster_bytes <= 0:
+        raise ValueError("max_raster_bytes must be positive")
     if not allow_network:
         raise ValueError("bounded canary requires --allow-network")
     if execute and not (allow_network and allow_materialization):
@@ -122,7 +129,7 @@ def run_canary(
             raise RuntimeError(f"PRISM materialization plan is not eligible: {plan.get('blocking_reasons')}")
 
         summary: dict[str, Any] = {
-            "canary_version": 1,
+            "canary_version": 2,
             "task_id": task_id,
             "source_id": PRISM_SOURCE_ID,
             "workspace": str(workspace),
@@ -137,6 +144,7 @@ def run_canary(
             "expected_object_size_bytes": prism_plan.get("expected_object_size_bytes"),
             "max_object_bytes": max_object_bytes,
             "max_total_bytes": max_total_bytes,
+            "max_raster_bytes": max_raster_bytes,
             "status": "PLAN_READY",
         }
 
@@ -170,6 +178,24 @@ def run_canary(
             if profile.get("product_validation_status") != "PASS":
                 raise RuntimeError("PRISM product profile validation did not pass")
 
+            raster_receipt = prism_raster.materialize_prism_primary_raster(
+                Path(artifact["artifact_path"]),
+                temporal_key=str(artifact["temporal_key"]),
+                product_profile=profile,
+                artifact_root=roots["raster_artifact_root"],
+                staging_root=roots["raster_staging_root"],
+                receipt_path=roots["raster_receipt_path"],
+                max_extracted_raster_bytes=max_raster_bytes,
+            )
+            raster_verification = prism_raster.verify_prism_raster_receipt(roots["raster_receipt_path"])
+            raster_profile = raster_receipt.get("raster_profile") or {}
+            if raster_receipt.get("validation_status") != "PASS" or raster_verification.get("verification_status") != "PASS":
+                raise RuntimeError(
+                    "PRISM decoded-raster validation failed: "
+                    f"receipt={raster_receipt.get('validation_status')} "
+                    f"verification={raster_verification.get('verification_status')}"
+                )
+
             summary.update(
                 {
                     "status": "PASS",
@@ -181,6 +207,14 @@ def run_canary(
                     "object_size_bytes": artifact.get("object_size_bytes"),
                     "whole_object_sha256": artifact.get("whole_object_sha256"),
                     "product_profile": profile,
+                    "raster_receipt_path": str(roots["raster_receipt_path"]),
+                    "raster_receipt_contract_sha256": raster_receipt.get("raster_receipt_contract_sha256"),
+                    "raster_receipt_verification_status": raster_verification.get("verification_status"),
+                    "raster_artifact_id": raster_receipt.get("raster_artifact_id"),
+                    "raster_artifact_path": raster_receipt.get("raster_artifact_path"),
+                    "raster_sha256": raster_receipt.get("raster_sha256"),
+                    "raster_size_bytes": raster_receipt.get("raster_size_bytes"),
+                    "raster_profile": raster_profile,
                 }
             )
 
@@ -204,6 +238,7 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--probe-bytes", type=int, default=DEFAULT_PROBE_BYTES)
     parser.add_argument("--max-object-bytes", type=int, default=DEFAULT_OBJECT_CAP)
     parser.add_argument("--max-total-bytes", type=int, default=DEFAULT_OBJECT_CAP)
+    parser.add_argument("--max-raster-bytes", type=int, default=DEFAULT_RASTER_CAP)
     parser.add_argument("--timeout-seconds", type=int, default=60)
     parser.add_argument("--execute", action="store_true")
     parser.add_argument("--allow-network", action="store_true")
@@ -224,6 +259,7 @@ def main() -> None:
         probe_bytes=args.probe_bytes,
         max_object_bytes=args.max_object_bytes,
         max_total_bytes=args.max_total_bytes,
+        max_raster_bytes=args.max_raster_bytes,
         timeout_seconds=args.timeout_seconds,
     )
     if args.json:
@@ -240,6 +276,12 @@ def main() -> None:
             print(f"whole_object_sha256: {summary['whole_object_sha256']}")
             print(f"primary_raster_member: {summary['product_profile']['primary_raster_member']}")
             print(f"inventory_sha256: {summary['product_profile']['inventory_sha256']}")
+            print(f"raster_artifact_path: {summary['raster_artifact_path']}")
+            print(f"raster_sha256: {summary['raster_sha256']}")
+            print(f"raster_profile_sha256: {summary['raster_profile']['raster_profile_sha256']}")
+            print(f"raster_dimensions: {summary['raster_profile']['width']}x{summary['raster_profile']['height']}")
+            print(f"raster_epsg: {summary['raster_profile']['epsg']}")
+            print(f"cog_validation: {summary['raster_profile']['cog_structure_validation_status']}")
         print(f"summary_json: {summary['canary_summary_path']}")
 
 

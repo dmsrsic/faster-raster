@@ -153,7 +153,7 @@ def test_prism_artifact_receipt_reinspects_archive(tmp_path):
 
 
 def test_task_compiler_reports_prism_product_readiness():
-    assert task_compiler._harmonization_readiness(PRISM_SOURCE_ID) == "archive_profile_supported_cog_raster_decode_pending"
+    assert task_compiler._harmonization_readiness(PRISM_SOURCE_ID) == "decoded_cog_profile_supported_aoi_harmonization_pending"
 
 
 def test_canary_execution_requires_explicit_permissions(tmp_path):
@@ -163,4 +163,14 @@ def test_canary_execution_requires_explicit_permissions(tmp_path):
             workspace=tmp_path / "workspace",
             execute=True,
             allow_network=True,
+        )
+
+
+def test_canary_rejects_nonpositive_decoded_raster_cap(tmp_path):
+    with pytest.raises(ValueError, match="max_raster_bytes must be positive"):
+        run_canary(
+            repo_root=tmp_path,
+            workspace=tmp_path / "workspace",
+            allow_network=True,
+            max_raster_bytes=0,
         )
