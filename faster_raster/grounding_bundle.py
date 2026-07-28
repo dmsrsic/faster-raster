@@ -86,8 +86,29 @@ GROUNDING_FILES: tuple[tuple[str, str], ...] = (
 )
 
 
-def _sha256(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+def _canonical_grounding_bytes(path: Path) -> bytes:
+    try:
+        text = path.read_bytes().decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise ValueError(
+            f"grounding input is not valid UTF-8 text: {path}"
+        ) from exc
+    return text.replace("\r\n", "\n").replace("\r", "\n").encode("utf-8")
+
+
+def _grounding_file_record(
+    path: Path,
+    *,
+    relative_path: str,
+    role: str,
+) -> dict[str, Any]:
+    content = _canonical_grounding_bytes(path)
+    return {
+        "path": relative_path,
+        "role": role,
+        "bytes": len(content),
+        "sha256": hashlib.sha256(content).hexdigest(),
+    }
 
 
 def build_grounding_bundle(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
@@ -98,12 +119,11 @@ def build_grounding_bundle(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
         if not path.is_file():
             raise ValueError(f"grounding input is missing: {relative_path}")
         files.append(
-            {
-                "path": relative_path,
-                "role": role,
-                "bytes": path.stat().st_size,
-                "sha256": _sha256(path),
-            }
+            _grounding_file_record(
+                path,
+                relative_path=relative_path,
+                role=role,
+            )
         )
     unsigned = {
         "schema_version": SCHEMA_VERSION,

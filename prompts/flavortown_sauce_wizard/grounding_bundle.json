@@ -104,16 +104,16 @@
       "sha256": "ec0adb65607f89109511e6620330d82d7bfe4191ae75c17d1b4d10f820b5fd29"
     },
     {
-      "bytes": 19307,
+      "bytes": 18967,
       "path": "docs/ag-classification.md",
       "role": "classification_methodology",
-      "sha256": "a6a74e77132a5d0f202ff7085e32f69b45637cde22f03136e35ea922a65f5b0b"
+      "sha256": "04b3365a22a0845879cb543fd2c7bc2aafcf45adc6cbfdf3e8eeb2f70c1ea408"
     },
     {
-      "bytes": 14794,
+      "bytes": 14448,
       "path": "docs/index-guided-classification.md",
       "role": "hybrid_classification_methodology",
-      "sha256": "e338b87c38bf88cb0d255bb5a3c59225238e8dd304175f2ad93a9be07acfd820"
+      "sha256": "11bc414ed0c0765e55af4ebd41a2c20994b699110056d0ac5ab2bd27d931f160"
     },
     {
       "bytes": 3152,
@@ -182,7 +182,7 @@
       "sha256": "000ca5266e676c42f54b4fc838cd0ff751d89987c79246bfc27b7ef763cea728"
     }
   ],
-  "grounding_bundle_sha256": "ff3a96aaa0413d13a5c94a7e3b4857fe8283adc8dc9c488fdde1d3e81440f9cd",
+  "grounding_bundle_sha256": "d27bfe1582770957269ce6fe1e577314f6c1f8718769b6b78e879ef3043574fb",
   "release": {
     "contract_status": "experimental",
     "development_label": "Unreleased",

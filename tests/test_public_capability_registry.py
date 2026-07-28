@@ -9,10 +9,35 @@ from faster_raster.capability_registry import (
     public_json,
     registry_markdown,
 )
-from faster_raster.grounding_bundle import build_grounding_bundle
+from faster_raster.grounding_bundle import (
+    _grounding_file_record,
+    build_grounding_bundle,
+)
 
 
 ROOT = Path(__file__).resolve().parent.parent
+
+
+def test_grounding_file_hashes_and_sizes_are_newline_independent(tmp_path):
+    variants = {
+        "lf": b"first line\nsecond line\n",
+        "crlf": b"first line\r\nsecond line\r\n",
+        "cr": b"first line\rsecond line\r",
+    }
+    records = []
+    for name, content in variants.items():
+        path = tmp_path / f"{name}.txt"
+        path.write_bytes(content)
+        records.append(
+            _grounding_file_record(
+                path,
+                relative_path="same.txt",
+                role="fixture",
+            )
+        )
+
+    assert records[0] == records[1] == records[2]
+    assert records[0]["bytes"] == len(variants["lf"])
 
 
 def test_capability_registry_is_valid_deterministic_and_status_complete():
