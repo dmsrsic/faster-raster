@@ -18,6 +18,8 @@ fr sauce time select my-source.sauce --requested 2022 --candidate 2021 --out res
 fr preview-templates list
 fr preview-templates show ag_classification_audit_v1 --json
 fr preview-templates validate general_multisource_v1
+fr plan study.fr.md --resolve-imagery-year 2019 --resolve-cdl-year 2019
+fr explain study.fr.md --resolve-imagery-year 2019 --resolve-cdl-year 2019
 ```
 
 `validate`, `explain`, `test`, preview-template discovery, and Sauce Time
@@ -25,6 +27,10 @@ fixture ranking are offline. `probe` requires `--allow-network`, remains
 metadata-only and byte-capped, and fails before network access if the pack
 requires a credential resolver. `credential_ref` values are opaque names, not
 secret values.
+
+The paired classification year arguments create an immutable coherent or
+imagery-only temporal-resolution contract. Both are required; neither edits
+the workfile or authorizes raster acquisition during selection.
 
 Professional commands remain stable:
 

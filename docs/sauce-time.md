@@ -64,10 +64,26 @@ The result uses `fasterraster.temporal-resolution/v1`, binds the search and
 ranked-alternatives hashes, records `explicit_user_selection`, and has a new
 `resolved_contract_sha256`. The original Source Pack is not modified.
 
-NAIP exact-year recovery exposes the same ranked contract in its structured
-recoverable failure while preserving the existing noninteractive fail-closed
-behavior and interactive compatibility. Source Pack fixtures provide the
-second offline integration.
+NAIP–CDL classification recovery uses the related
+`fasterraster.classification-temporal-alternatives/v1` contract. It ranks
+coherent imagery/weak-label year pairs before imagery-only repair, stops at
+`AWAITING_TEMPORAL_SELECTION`, performs no raster acquisition, and records
+unknown coverage as unknown. Explicit selection creates
+`fasterraster.classification-temporal-resolution/v1` with original and resolved
+year pairs plus immutable hashes.
+
+For noninteractive use, pass both year arguments to `fr plan`, `fr explain`,
+or `fr cook`:
+
+```sh
+fr plan study.fr.md \
+  --resolve-imagery-year 2019 \
+  --resolve-cdl-year 2019
+```
+
+Supplying only one argument is rejected. These arguments create a resolution
+contract; they do not silently edit the workfile or authorize unbounded source
+access.
 
 Candidates outside `temporal.tolerance_days` are excluded. If none remain, the
 status is `NO_TEMPORAL_ALTERNATIVES`, not a fabricated substitution.

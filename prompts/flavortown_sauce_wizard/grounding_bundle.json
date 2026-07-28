@@ -1,11 +1,14 @@
 {
   "bundle_version": "1.0.0",
-  "capability_registry_sha256": "75563bddcceeb8aa99e80418f149b4c584a34d13a82b8f1602c7f8f4360a7f31",
+  "capability_registry_sha256": "65da21e291fcd03a496993bb0fe25b1af17038a140bdace5d45a8b08de03a0c2",
   "contract_schema_versions": [
     "fasterraster.source-pack/v1",
     "fasterraster.credential-requirement/v1",
     "fasterraster.temporal-alternatives/v1",
     "fasterraster.temporal-resolution/v1",
+    "fasterraster.classification-temporal-alternatives/v1",
+    "fasterraster.classification-temporal-resolution/v1",
+    "fasterraster.categorical-area-accounting/v1",
     "fasterraster.preview-template/v1",
     "fasterraster.capability-registry/v1"
   ],
@@ -35,6 +38,24 @@
       "sha256": "7f56ecd573201c4392d6d81335a17652cf6058d7eea84ca50791c484bf8657a7"
     },
     {
+      "bytes": 3384,
+      "path": "schemas/classification_temporal_alternatives.schema.json",
+      "role": "classification_temporal_schema",
+      "sha256": "8cd5dac3d907c8d6e856f7d433b7745f43b1b446d1148fe636d1cc8cc23d8878"
+    },
+    {
+      "bytes": 1955,
+      "path": "schemas/classification_temporal_resolution.schema.json",
+      "role": "classification_temporal_schema",
+      "sha256": "53b39976ab0b120637e70412d3aa8c275c4de92596941b24dec73ed3d0b4e30a"
+    },
+    {
+      "bytes": 4241,
+      "path": "schemas/categorical_area_accounting.schema.json",
+      "role": "scientific_accounting_schema",
+      "sha256": "505db9eb8b0a7e7961e67300333713cf19a5204472b47306ef4307e9d029a3fb"
+    },
+    {
       "bytes": 1600,
       "path": "schemas/preview_template.schema.json",
       "role": "preview_schema",
@@ -47,22 +68,22 @@
       "sha256": "bde0c5829c1df99be12676dd617e20ba8fdf9535695444a1acdf6a4ab885d458"
     },
     {
-      "bytes": 5442,
+      "bytes": 6884,
       "path": "configs/public_capabilities.yaml",
       "role": "capability_registry",
-      "sha256": "56ec94832c6c8f30e9303d55585955e113b202fa615d9e55d3c8a26ced089d03"
+      "sha256": "0288d6cabc61158f9e38bab14ce11971a87ddde1d0dfb2f65e2f0eed3bd19ef5"
     },
     {
-      "bytes": 5207,
+      "bytes": 7247,
       "path": "configs/preview_templates.yaml",
       "role": "preview_registry",
-      "sha256": "dc159277080f130ac09ae6f343638ca50287ef9e096c26a063246df2522501e1"
+      "sha256": "cdc1a20986856eaad562255755569dc68f3f45d32b8e429c54cf18c279453c09"
     },
     {
-      "bytes": 1910,
+      "bytes": 2240,
       "path": "docs/generated/capabilities.md",
       "role": "capability_reference",
-      "sha256": "b45c0538120d11b9f1fc9b56133a5872ea828ab04e414ccc007eda7a32b6752a"
+      "sha256": "0b6a16f0c879e9db45773eba2b3b5ec5d7da7d7b79b5732b0ebac1e5f485d34f"
     },
     {
       "bytes": 4528,
@@ -71,22 +92,34 @@
       "sha256": "c405a20aa87f3fd96adf44a7317bb70d19cd6f2e57d98d6af088f375748bd949"
     },
     {
-      "bytes": 2386,
+      "bytes": 2927,
       "path": "docs/sauce-time.md",
       "role": "temporal_guide",
-      "sha256": "fe2650abc99a58be2ee7f2b9207d1264fb31d11c5ae882a3c3a80baf6e2366d9"
+      "sha256": "d515bb7df9d3d7c378362a7d030980f2af28051537d3c87cf094fa7030bb0ffd"
     },
     {
-      "bytes": 2087,
+      "bytes": 2825,
       "path": "docs/preview-templates.md",
       "role": "preview_guide",
-      "sha256": "a936d077fa7db83e6ecf546523b4f580a01b2663793e08ab6732a1229d78b137"
+      "sha256": "ec0adb65607f89109511e6620330d82d7bfe4191ae75c17d1b4d10f820b5fd29"
     },
     {
-      "bytes": 2559,
+      "bytes": 19307,
+      "path": "docs/ag-classification.md",
+      "role": "classification_methodology",
+      "sha256": "a6a74e77132a5d0f202ff7085e32f69b45637cde22f03136e35ea922a65f5b0b"
+    },
+    {
+      "bytes": 14794,
+      "path": "docs/index-guided-classification.md",
+      "role": "hybrid_classification_methodology",
+      "sha256": "e338b87c38bf88cb0d255bb5a3c59225238e8dd304175f2ad93a9be07acfd820"
+    },
+    {
+      "bytes": 3152,
       "path": "docs/limitations.md",
       "role": "limitations",
-      "sha256": "8c730e3aa00c74b77bc78c21a012742161a94322f63b8e9df6ede6cbee933ee3"
+      "sha256": "94f027ed5c82a87bf743c24989b09dfbc9b083bc548bb99e00c230b62fd7d7e1"
     },
     {
       "bytes": 1295,
@@ -143,13 +176,13 @@
       "sha256": "d67ec2fee33aa916809caf6ae599d69690b24c04e78adbe13aaf4be8b9e9f5dc"
     },
     {
-      "bytes": 6715,
+      "bytes": 8400,
       "path": "prompts/flavortown_sauce_wizard/capabilities.json",
       "role": "machine_capabilities",
-      "sha256": "068569ba4466ef8b3cf7261c432639894189995db14af870e90a2ff11f72d214"
+      "sha256": "000ca5266e676c42f54b4fc838cd0ff751d89987c79246bfc27b7ef763cea728"
     }
   ],
-  "grounding_bundle_sha256": "0e8c164930187177686a5fe0168c42e3338924475275510e5986bbacccce789c",
+  "grounding_bundle_sha256": "ff3a96aaa0413d13a5c94a7e3b4857fe8283adc8dc9c488fdde1d3e81440f9cd",
   "release": {
     "contract_status": "experimental",
     "development_label": "Unreleased",

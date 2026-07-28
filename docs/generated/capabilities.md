@@ -12,6 +12,9 @@ A catalog entry never implies that every product, geography, date, or output is 
 | Bring Your Own Sauce / declarative Source Packs | `experimental` | yes | yes | no | no | `validation_and_bounded_probe_only` |
 | Sauce Time ranked temporal alternatives | `experimental` | yes | no | no | no | `advisory_only` |
 | Reusable preview templates | `experimental` | yes | yes | no | no | `render_contract_compilation` |
+| CRS-aware categorical area accounting | `experimental` | no | yes | yes | yes | `equal_area_inventory` |
+| Classification confidence-threshold provenance | `experimental` | yes | yes | yes | yes | `fail_closed_provenance` |
+| Coherent NAIP-CDL temporal repair | `experimental` | yes | no | no | no | `explicit_selection_only` |
 | Public credential-requirement contract | `experimental` | yes | no | no | no | `fails_before_network_without_resolver` |
 | Authenticated parallel execution backend | `private` | no | no | yes | yes | `unavailable` |
 | Arbitrary-code source plugins | `unsupported` | no | no | no | no | `unavailable` |
@@ -27,4 +30,4 @@ A catalog entry never implies that every product, geography, date, or output is 
 | CHIRPS, gridMET, TerraClimate, and WorldClim | `experimental` | yes | yes | no | no | `bounded_probe_and_fixture_paths` |
 | Copernicus Data Space STAC | `experimental` | yes | no | no | no | `resolver_required` |
 
-Registry SHA-256: `75563bddcceeb8aa99e80418f149b4c584a34d13a82b8f1602c7f8f4360a7f31`
+Registry SHA-256: `65da21e291fcd03a496993bb0fe25b1af17038a140bdace5d45a8b08de03a0c2`

@@ -14,6 +14,12 @@ experimental** and are not retroactively claimed as beta.4 capabilities. The
 canonical status matrix is the
 [public capability registry](generated/capabilities.md).
 
+The Unreleased tranche also corrects categorical physical-area reporting with
+a deterministic equal-area authority, preserves confidence-threshold
+provenance across planning through inspection, adds explicit coherent NAIP–CDL
+year-pair repair, and strengthens classification audit templates with readable
+legends and deterministic documentation derivatives.
+
 The published beta does not include a public credential resolver,
 authenticated parallel backend, paid-source integrations, or arbitrary-code
 plugins. Live access remains explicit and bounded.

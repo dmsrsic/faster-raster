@@ -75,3 +75,16 @@ Review source-band compatibility, persisted indices, specialist parents,
 selection mode, candidate bounds, expected rasters, and transfer ceiling before
 enabling a cook. See
 [Index-guided hybrid classification](index-guided-classification.md).
+
+If planning reports that a requested NAIP/CDL pair is unavailable, review its
+ranked coherent and imagery-only alternatives. A noninteractive coherent
+selection is explicit:
+
+```sh
+fr plan studies/index-hybrid.fr.md \
+  --resolve-imagery-year 2019 \
+  --resolve-cdl-year 2019
+```
+
+The paired arguments create a hashed resolution contract; they do not edit the
+workfile or download rasters during selection.

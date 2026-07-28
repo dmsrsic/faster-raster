@@ -46,10 +46,49 @@
       "kind": "workflow",
       "label": "Reusable preview templates",
       "materialization": false,
-      "notes": "Declarative roles and layouts only; render contracts remain authoritative.",
+      "notes": "Declarative roles and layouts only; render contracts remain authoritative, including classification audit legends and provenance.",
       "planning": true,
       "preview": true,
       "public_execution": "render_contract_compilation",
+      "status": "experimental"
+    },
+    {
+      "analysis": true,
+      "capability_id": "categorical_area_accounting",
+      "credential_requirement": "none",
+      "kind": "scientific_contract",
+      "label": "CRS-aware categorical area accounting",
+      "materialization": true,
+      "notes": "Native class counts remain exact; physical areas use a declared equal-area grid and reconcile to the valid footprint.",
+      "planning": false,
+      "preview": true,
+      "public_execution": "equal_area_inventory",
+      "status": "experimental"
+    },
+    {
+      "analysis": true,
+      "capability_id": "classification_confidence_provenance",
+      "credential_requirement": "none",
+      "kind": "scientific_contract",
+      "label": "Classification confidence-threshold provenance",
+      "materialization": true,
+      "notes": "Plans, model receipts, final receipts, inspection, and publication evidence preserve the configured metric, threshold, unknown class, and source.",
+      "planning": true,
+      "preview": true,
+      "public_execution": "fail_closed_provenance",
+      "status": "experimental"
+    },
+    {
+      "analysis": false,
+      "capability_id": "classification_temporal_repair",
+      "credential_requirement": "none",
+      "kind": "workflow",
+      "label": "Coherent NAIP-CDL temporal repair",
+      "materialization": false,
+      "notes": "Ranks coherent imagery and weak-label year pairs before imagery-only choices; selection is explicit, immutable, and performs no raster acquisition.",
+      "planning": true,
+      "preview": false,
+      "public_execution": "explicit_selection_only",
       "status": "experimental"
     },
     {
@@ -92,7 +131,7 @@
       "status": "unsupported"
     }
   ],
-  "capability_registry_sha256": "75563bddcceeb8aa99e80418f149b4c584a34d13a82b8f1602c7f8f4360a7f31",
+  "capability_registry_sha256": "65da21e291fcd03a496993bb0fe25b1af17038a140bdace5d45a8b08de03a0c2",
   "registry_version": "1.0.0",
   "release": {
     "contract_status": "experimental",

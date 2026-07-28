@@ -9,6 +9,9 @@ disappear.
 | Workfile validation fails | Front matter or a workflow contract is invalid | `fr validate studies/my-study.fr.md --json` |
 | Offline plan is blocked | Required compatible evidence is absent under the current policy | `fr explain studies/my-study.fr.md --offline --verbose --out build/explanation` |
 | Requested year has no coverage | Exact-year behavior stopped correctly | `fr sauce time alternatives PACK --requested YYYY --json` or edit the workfile only after reviewing source-reported years |
+| Classification has no coherent requested year pair | NAIP/CDL exact-time planning stopped before acquisition | Review the ranked pair, then pass both `--resolve-imagery-year YYYY --resolve-cdl-year YYYY` to `fr plan`, `fr explain`, or `fr cook` |
+| Inspection says confidence provenance is legacy-unavailable | The handoff predates mandatory threshold evidence | Keep the legacy status explicit; rerun the analysis under the current contract rather than guessing a threshold |
+| Reported class area differs from nominal pixel width × height | Physical area was measured on an equal-area grid | Inspect `analysis/classification/area_accounting.json`; compare reconciliation and reference CRS, not projected nominal pixel area |
 | Source Pack validation fails | Schema, host, template, CRS, resampling, nodata, secret, or preview policy is unsafe | `fr sauce validate my-source.sauce --json` |
 | Source Pack golden test fails | Authored contract and checked-in expected plan drifted | `fr sauce explain my-source.sauce --json`; review the diff before intentionally regenerating evidence |
 | Probe says network permission is required | Network is disabled by default | Review the pack, then run `fr sauce probe PACK --allow-network --out build/probe.json` |

@@ -18,6 +18,17 @@ All notable changes are documented here. Versions follow [Semantic Versioning](h
   Schema, deterministic hashes, and legacy-task compatibility mappings.
 - Canonical public capability registry, generated website and GPT surfaces,
   drift tests, and a content-hashed Flavortown Sauce Wizard grounding bundle.
+- CRS-aware categorical area accounting that preserves native class counts,
+  measures physical area on a declared equal-area grid, and reconciles class
+  totals to the valid footprint.
+- Mandatory maximum-class-probability threshold provenance across plans,
+  receipts, publications, and inspection, including truthful legacy behavior.
+- Explicit coherent NAIP–CDL temporal alternatives and immutable resolution
+  contracts, with paired noninteractive CLI year arguments and zero raster
+  acquisition during selection.
+- Classification audit-template checks for readable legends, decision and
+  confidence explanations, title bounds, supported class codes, minimum text
+  size, provenance footers, and deterministic documentation derivatives.
 
 ### Security and compatibility
 

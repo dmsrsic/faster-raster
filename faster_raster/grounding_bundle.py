@@ -17,6 +17,18 @@ GROUNDING_FILES: tuple[tuple[str, str], ...] = (
     ("schemas/credential_requirement.schema.json", "credential_schema"),
     ("schemas/temporal_alternatives.schema.json", "temporal_schema"),
     ("schemas/temporal_resolution.schema.json", "temporal_schema"),
+    (
+        "schemas/classification_temporal_alternatives.schema.json",
+        "classification_temporal_schema",
+    ),
+    (
+        "schemas/classification_temporal_resolution.schema.json",
+        "classification_temporal_schema",
+    ),
+    (
+        "schemas/categorical_area_accounting.schema.json",
+        "scientific_accounting_schema",
+    ),
     ("schemas/preview_template.schema.json", "preview_schema"),
     ("schemas/capability_registry.schema.json", "capability_schema"),
     ("configs/public_capabilities.yaml", "capability_registry"),
@@ -25,6 +37,11 @@ GROUNDING_FILES: tuple[tuple[str, str], ...] = (
     ("docs/bring-your-own-sauce.md", "source_pack_guide"),
     ("docs/sauce-time.md", "temporal_guide"),
     ("docs/preview-templates.md", "preview_guide"),
+    ("docs/ag-classification.md", "classification_methodology"),
+    (
+        "docs/index-guided-classification.md",
+        "hybrid_classification_methodology",
+    ),
     ("docs/limitations.md", "limitations"),
     (
         "examples/sauce-packs/prism-daily.sauce/sauce.yaml",
@@ -104,6 +121,9 @@ def build_grounding_bundle(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
             "fasterraster.credential-requirement/v1",
             "fasterraster.temporal-alternatives/v1",
             "fasterraster.temporal-resolution/v1",
+            "fasterraster.classification-temporal-alternatives/v1",
+            "fasterraster.classification-temporal-resolution/v1",
+            "fasterraster.categorical-area-accounting/v1",
             "fasterraster.preview-template/v1",
             "fasterraster.capability-registry/v1",
         ],

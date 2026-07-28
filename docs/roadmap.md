@@ -7,6 +7,8 @@ Implemented in the current **Unreleased / experimental** public tranche:
 - declarative `fasterraster.source-pack/v1` Source Packs;
 - advisory, explicitly selected Sauce Time contracts;
 - registry-driven reusable preview templates;
+- CRS-aware categorical area accounting and confidence-threshold provenance;
+- explicit coherent NAIP–CDL temporal repair;
 - provider-neutral opaque credential-requirement contracts that never contain
   resolved secrets.
 

@@ -30,9 +30,10 @@ FasterRaster is useful when a raster workflow needs more than a download script:
 ## Capability status
 
 The published package remains `v1.0.0-beta.4` / `1.0.0b4`. Bring Your Own
-Sauce, Sauce Time, reusable preview templates, and the public
-credential-requirement seam below are implemented **Unreleased /
-experimental** contracts in this source tree; they are not retroactively
+Sauce, Sauce Time, reusable preview templates, CRS-aware categorical area
+accounting, classification confidence provenance, coherent NAIP–CDL temporal
+repair, and the public credential-requirement seam below are implemented
+**Unreleased / experimental** contracts in this source tree; they are not retroactively
 claimed as beta.4 features. `configs/public_capabilities.yaml` is authoritative,
 and drift tests bind the CLI, website, and GPT grounding export to it.
 
@@ -43,6 +44,9 @@ and drift tests bind the CLI, website, and GPT grounding export to it.
 | Bring Your Own Sauce / declarative Source Packs | `experimental` | yes | yes | no | no | `validation_and_bounded_probe_only` |
 | Sauce Time ranked temporal alternatives | `experimental` | yes | no | no | no | `advisory_only` |
 | Reusable preview templates | `experimental` | yes | yes | no | no | `render_contract_compilation` |
+| CRS-aware categorical area accounting | `experimental` | no | yes | yes | yes | `equal_area_inventory` |
+| Classification confidence-threshold provenance | `experimental` | yes | yes | yes | yes | `fail_closed_provenance` |
+| Coherent NAIP-CDL temporal repair | `experimental` | yes | no | no | no | `explicit_selection_only` |
 | Public credential-requirement contract | `experimental` | yes | no | no | no | `fails_before_network_without_resolver` |
 | Authenticated parallel execution backend | `private` | no | no | yes | yes | `unavailable` |
 | Arbitrary-code source plugins | `unsupported` | no | no | no | no | `unavailable` |
@@ -96,7 +100,13 @@ fr explain studies/naip-classification.fr.md --offline
 ```
 
 Review the workfile, same-year source evidence, transfer estimate, and byte
-ceiling before any live `fr cook`. See the
+ceiling before any live `fr cook`. Native categorical pixel counts remain
+exact. Physical areas are measured on a declared equal-area grid, and the
+configured confidence metric, threshold, unknown class, and threshold source
+remain consistent through plans, receipts, publication evidence, and
+inspection. If an exact coherent year pair is unavailable, planning ranks
+explicit coherent imagery/weak-label pairs ahead of imagery-only alternatives;
+nothing is silently substituted or acquired during selection. See the
 [classification methodology and interpretation guide](docs/ag-classification.md).
 
 ## Index-guided hybrid classification

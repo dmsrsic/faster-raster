@@ -55,7 +55,40 @@ capabilities:
     analysis: false
     credential_requirement: none
     public_execution: render_contract_compilation
-    notes: Declarative roles and layouts only; render contracts remain authoritative.
+    notes: Declarative roles and layouts only; render contracts remain authoritative, including classification audit legends and provenance.
+  - capability_id: categorical_area_accounting
+    label: CRS-aware categorical area accounting
+    kind: scientific_contract
+    status: experimental
+    planning: false
+    preview: true
+    materialization: true
+    analysis: true
+    credential_requirement: none
+    public_execution: equal_area_inventory
+    notes: Native class counts remain exact; physical areas use a declared equal-area grid and reconcile to the valid footprint.
+  - capability_id: classification_confidence_provenance
+    label: Classification confidence-threshold provenance
+    kind: scientific_contract
+    status: experimental
+    planning: true
+    preview: true
+    materialization: true
+    analysis: true
+    credential_requirement: none
+    public_execution: fail_closed_provenance
+    notes: Plans, model receipts, final receipts, inspection, and publication evidence preserve the configured metric, threshold, unknown class, and source.
+  - capability_id: classification_temporal_repair
+    label: Coherent NAIP-CDL temporal repair
+    kind: workflow
+    status: experimental
+    planning: true
+    preview: false
+    materialization: false
+    analysis: false
+    credential_requirement: none
+    public_execution: explicit_selection_only
+    notes: Ranks coherent imagery and weak-label year pairs before imagery-only choices; selection is explicit, immutable, and performs no raster acquisition.
   - capability_id: credential_reference
     label: Public credential-requirement contract
     kind: boundary

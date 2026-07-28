@@ -16,8 +16,16 @@
   hooks, and unrestricted templates are unsupported.
 - Sauce Time alternatives use available metadata. Unknown coverage or quality
   remains unknown, and an explicit selection is required.
+- Coherent NAIP–CDL temporal repair is advisory until explicitly selected.
+  Imagery-only repair can create a scientifically important year mismatch that
+  remains visible in receipts and requires explicit acceptance.
 - Preview templates define layouts and roles; they do not expand a source's
   executable capabilities.
+- Equal-area reprojection makes categorical area physically meaningful, but
+  rasterized boundaries still have finite-grid discretization error. Native
+  categorical pixel counts and equal-area estimates are reported separately.
+- Confidence is maximum model class probability relative to the configured
+  threshold; it is not independent accuracy or calibrated certainty.
 - The NAIP–CDL classifier is a bounded weak-supervised analytical workflow,
   not a general-purpose or authoritative land-cover model.
 - Raw NAIP values are not automatically atmospherically corrected surface
