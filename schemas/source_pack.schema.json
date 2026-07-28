@@ -1,0 +1,428 @@
+{
+  "$defs": {
+    "AccessContract": {
+      "additionalProperties": false,
+      "properties": {
+        "allowed_hosts": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Allowed Hosts",
+          "type": "array"
+        },
+        "authentication_scheme": {
+          "default": "none",
+          "enum": [
+            "none",
+            "bearer",
+            "api_key",
+            "oauth2"
+          ],
+          "title": "Authentication Scheme",
+          "type": "string"
+        },
+        "credential_ref": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Credential Ref"
+        },
+        "redirect_hosts": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Redirect Hosts",
+          "type": "array"
+        }
+      },
+      "title": "AccessContract",
+      "type": "object"
+    },
+    "AdapterContract": {
+      "additionalProperties": false,
+      "properties": {
+        "asset_roles": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Asset Roles",
+          "type": "array"
+        },
+        "endpoint": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Endpoint"
+        },
+        "family": {
+          "enum": [
+            "static_https_template",
+            "arcgis_imageserver",
+            "stac_search",
+            "verified_local_raster"
+          ],
+          "title": "Family",
+          "type": "string"
+        },
+        "local_path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Local Path"
+        },
+        "local_sha256": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Local Sha256"
+        },
+        "media_types": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Media Types",
+          "type": "array"
+        },
+        "url_template": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Url Template"
+        }
+      },
+      "required": [
+        "family",
+        "media_types",
+        "asset_roles"
+      ],
+      "title": "AdapterContract",
+      "type": "object"
+    },
+    "CapabilityContract": {
+      "additionalProperties": false,
+      "properties": {
+        "analysis": {
+          "default": false,
+          "title": "Analysis",
+          "type": "boolean"
+        },
+        "materialization": {
+          "default": false,
+          "title": "Materialization",
+          "type": "boolean"
+        },
+        "planning": {
+          "default": true,
+          "title": "Planning",
+          "type": "boolean"
+        },
+        "preview": {
+          "default": false,
+          "title": "Preview",
+          "type": "boolean"
+        },
+        "temporal_discovery": {
+          "default": false,
+          "title": "Temporal Discovery",
+          "type": "boolean"
+        }
+      },
+      "title": "CapabilityContract",
+      "type": "object"
+    },
+    "NetworkContract": {
+      "additionalProperties": false,
+      "properties": {
+        "max_bytes": {
+          "default": 65536,
+          "maximum": 1000000,
+          "minimum": 1,
+          "title": "Max Bytes",
+          "type": "integer"
+        },
+        "max_requests": {
+          "default": 1,
+          "maximum": 4,
+          "minimum": 1,
+          "title": "Max Requests",
+          "type": "integer"
+        },
+        "maximum_redirects": {
+          "default": 0,
+          "maximum": 2,
+          "minimum": 0,
+          "title": "Maximum Redirects",
+          "type": "integer"
+        },
+        "timeout_seconds": {
+          "default": 8.0,
+          "exclusiveMinimum": 0,
+          "maximum": 30,
+          "title": "Timeout Seconds",
+          "type": "number"
+        }
+      },
+      "title": "NetworkContract",
+      "type": "object"
+    },
+    "PreviewContract": {
+      "additionalProperties": false,
+      "properties": {
+        "role": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Role"
+        },
+        "target_crs": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Target Crs"
+        },
+        "template_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Template Id"
+        },
+        "theme": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Theme"
+        }
+      },
+      "title": "PreviewContract",
+      "type": "object"
+    },
+    "SourceContract": {
+      "additionalProperties": false,
+      "properties": {
+        "crs": {
+          "title": "Crs",
+          "type": "string"
+        },
+        "mask_policy": {
+          "enum": [
+            "explicit_nodata",
+            "alpha_or_dataset_mask",
+            "none"
+          ],
+          "title": "Mask Policy",
+          "type": "string"
+        },
+        "nodata": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Nodata"
+        },
+        "resampling": {
+          "title": "Resampling",
+          "type": "string"
+        },
+        "semantic_type": {
+          "enum": [
+            "categorical",
+            "continuous"
+          ],
+          "title": "Semantic Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "semantic_type",
+        "crs",
+        "resampling",
+        "mask_policy"
+      ],
+      "title": "SourceContract",
+      "type": "object"
+    },
+    "TemporalContract": {
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "default": "exact",
+          "enum": [
+            "exact",
+            "static"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "requested": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Requested"
+        },
+        "template_variables": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              }
+            ]
+          },
+          "title": "Template Variables",
+          "type": "object"
+        },
+        "tolerance_days": {
+          "anyOf": [
+            {
+              "maximum": 36600,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tolerance Days"
+        }
+      },
+      "title": "TemporalContract",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "access": {
+      "$ref": "#/$defs/AccessContract"
+    },
+    "adapter": {
+      "$ref": "#/$defs/AdapterContract"
+    },
+    "capabilities": {
+      "$ref": "#/$defs/CapabilityContract"
+    },
+    "description": {
+      "title": "Description",
+      "type": "string"
+    },
+    "display_name": {
+      "title": "Display Name",
+      "type": "string"
+    },
+    "network": {
+      "$ref": "#/$defs/NetworkContract"
+    },
+    "pack_id": {
+      "title": "Pack Id",
+      "type": "string"
+    },
+    "preview": {
+      "$ref": "#/$defs/PreviewContract"
+    },
+    "schema_version": {
+      "const": "fasterraster.source-pack/v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "source": {
+      "$ref": "#/$defs/SourceContract"
+    },
+    "temporal": {
+      "$ref": "#/$defs/TemporalContract"
+    }
+  },
+  "required": [
+    "schema_version",
+    "pack_id",
+    "display_name",
+    "description",
+    "adapter",
+    "capabilities",
+    "source",
+    "access",
+    "network",
+    "temporal",
+    "preview"
+  ],
+  "title": "FasterRaster declarative Source Pack v1",
+  "type": "object"
+}

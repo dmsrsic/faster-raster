@@ -27,6 +27,42 @@ FasterRaster is useful when a raster workflow needs more than a download script:
   unavailable, preserving original/resolved years, AOIs, and intervention
   evidence without weakening noninteractive fail-closed behavior.
 
+## Capability status
+
+The published package remains `v1.0.0-beta.4` / `1.0.0b4`. Bring Your Own
+Sauce, Sauce Time, reusable preview templates, and the public
+credential-requirement seam below are implemented **Unreleased /
+experimental** contracts in this source tree; they are not retroactively
+claimed as beta.4 features. `configs/public_capabilities.yaml` is authoritative,
+and drift tests bind the CLI, website, and GPT grounding export to it.
+
+<!-- BEGIN GENERATED CAPABILITY MATRIX -->
+| Capability | Status | Plan | Preview | Materialize | Analyze | Public execution |
+|---|---:|:---:|:---:|:---:|:---:|---|
+| Markdown workfiles and deterministic planning | `released` | yes | yes | yes | yes | `bounded_local` |
+| Bring Your Own Sauce / declarative Source Packs | `experimental` | yes | yes | no | no | `validation_and_bounded_probe_only` |
+| Sauce Time ranked temporal alternatives | `experimental` | yes | no | no | no | `advisory_only` |
+| Reusable preview templates | `experimental` | yes | yes | no | no | `render_contract_compilation` |
+| Public credential-requirement contract | `experimental` | yes | no | no | no | `fails_before_network_without_resolver` |
+| Authenticated parallel execution backend | `private` | no | no | yes | yes | `unavailable` |
+| Arbitrary-code source plugins | `unsupported` | no | no | no | no | `unavailable` |
+<!-- END GENERATED CAPABILITY MATRIX -->
+
+Inspect the machine-readable matrix and exercise the offline Source Pack
+journey:
+
+```sh
+fr capabilities --json
+fr sauce validate examples/sauce-packs/prism-daily.sauce
+fr sauce explain examples/sauce-packs/prism-daily.sauce --json
+fr sauce test examples/sauce-packs/prism-daily.sauce
+fr preview-templates list
+```
+
+See [Bring Your Own Sauce](docs/bring-your-own-sauce.md),
+[Sauce Time](docs/sauce-time.md), and
+[Preview templates](docs/preview-templates.md).
+
 The human-development workflow uses CDL non-agricultural classes as a **crop-focused mapped-development proxy**. It is not authoritative evidence of urbanization, population or economic growth, construction dates, occupancy, cadastral approval, or causality.
 
 ## NAIP–CDL classification audit
@@ -193,7 +229,14 @@ Plans, grids, source mappings, receipts, and publication compatibility are conte
 
 ## Project status and boundaries
 
-This beta is release-engineered around the implemented local community core. Additional source adapters, provider-neutral credential references, paid or restricted datasets, scheduler-neutral execution packages, and workstation-to-cluster execution are roadmap directions—not shipped capabilities or promises. Index-guided hybrid classification described above is current Unreleased development, not an already published beta.4 release.
+This beta is release-engineered around the implemented local community core.
+Declarative Source Packs, advisory temporal alternatives, reusable preview
+templates, and opaque credential requirements are current Unreleased public
+contracts, not already-published beta.4 features. Resolved credential handling,
+authenticated materialization, paid or restricted adapters, and parallel
+cluster execution remain private or planned. Index-guided hybrid classification
+described above is also current Unreleased development, not an already
+published beta.4 release.
 
 Public-source adapters and core orchestration are part of the community beta. Managed infrastructure, private integrations, paid-source adapters, enterprise authentication, specialized classifiers, and cluster services may be developed separately.
 

@@ -31,6 +31,12 @@ SCHEMA_FILENAMES = [
     "agricultural_recipe_v4.schema.json",
     "workfile_v1.schema.json",
     "workfile_v2.schema.json",
+    "source_pack.schema.json",
+    "temporal_alternatives.schema.json",
+    "temporal_resolution.schema.json",
+    "preview_template.schema.json",
+    "capability_registry.schema.json",
+    "credential_requirement.schema.json",
 ]
 
 
@@ -998,6 +1004,14 @@ def all_schemas() -> dict[str, dict]:
         human_development_workfile_schema,
         workfile_schema,
     )
+    from faster_raster.public_contract_schemas import (
+        capability_registry_schema,
+        credential_requirement_schema,
+        preview_template_schema,
+        source_pack_schema,
+        temporal_alternatives_schema,
+        temporal_resolution_schema,
+    )
 
     return {
         "research_spec.schema.json": research_spec_schema(),
@@ -1026,12 +1040,22 @@ def all_schemas() -> dict[str, dict]:
         "agricultural_recipe_v4.schema.json": agricultural_recipe_v4_schema(),
         "workfile_v1.schema.json": workfile_schema(),
         "workfile_v2.schema.json": human_development_workfile_schema(),
+        "source_pack.schema.json": source_pack_schema(),
+        "temporal_alternatives.schema.json": temporal_alternatives_schema(),
+        "temporal_resolution.schema.json": temporal_resolution_schema(),
+        "preview_template.schema.json": preview_template_schema(),
+        "capability_registry.schema.json": capability_registry_schema(),
+        "credential_requirement.schema.json": credential_requirement_schema(),
     }
 
 
 def write_json_deterministic(path: Path, value: dict) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(value, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
 
 
 def export_schemas(out_dir: Path) -> list[Path]:

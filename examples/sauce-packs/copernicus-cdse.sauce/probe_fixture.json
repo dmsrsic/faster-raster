@@ -1,0 +1,16 @@
+{
+  "available_times": [
+    "2022",
+    "2023"
+  ],
+  "candidate_metadata": [
+    {
+      "candidate_time": "2022",
+      "coverage_fraction": "unknown",
+      "verification_status": "unknown"
+    }
+  ],
+  "processing_family": "Sentinel-2 L2A",
+  "product": "Sentinel-2 L2A",
+  "provider": "COPERNICUS_CDSE"
+}

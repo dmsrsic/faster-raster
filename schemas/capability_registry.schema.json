@@ -1,0 +1,148 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "capabilities": {
+      "items": {
+        "properties": {
+          "analysis": {
+            "type": "boolean"
+          },
+          "capability_id": {
+            "type": "string"
+          },
+          "credential_requirement": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "materialization": {
+            "type": "boolean"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "planning": {
+            "type": "boolean"
+          },
+          "preview": {
+            "type": "boolean"
+          },
+          "public_execution": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "released",
+              "experimental",
+              "private",
+              "planned",
+              "unsupported"
+            ]
+          }
+        },
+        "required": [
+          "capability_id",
+          "label",
+          "kind",
+          "status",
+          "planning",
+          "preview",
+          "materialization",
+          "analysis",
+          "credential_requirement",
+          "public_execution",
+          "notes"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "registry_version": {
+      "type": "string"
+    },
+    "release": {
+      "type": "object"
+    },
+    "schema_version": {
+      "const": "fasterraster.capability-registry/v1"
+    },
+    "sources": {
+      "items": {
+        "properties": {
+          "analysis": {
+            "type": "boolean"
+          },
+          "capability_id": {
+            "type": "string"
+          },
+          "credential_requirement": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "materialization": {
+            "type": "boolean"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "planning": {
+            "type": "boolean"
+          },
+          "preview": {
+            "type": "boolean"
+          },
+          "public_execution": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "released",
+              "experimental",
+              "private",
+              "planned",
+              "unsupported"
+            ]
+          }
+        },
+        "required": [
+          "capability_id",
+          "label",
+          "kind",
+          "status",
+          "planning",
+          "preview",
+          "materialization",
+          "analysis",
+          "credential_requirement",
+          "public_execution",
+          "notes"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "status_definitions": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema_version",
+    "registry_version",
+    "release",
+    "status_definitions",
+    "capabilities",
+    "sources"
+  ],
+  "title": "FasterRaster public capability registry v1",
+  "type": "object"
+}

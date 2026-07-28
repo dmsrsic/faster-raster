@@ -40,7 +40,11 @@ from faster_raster.human_development import (
     harmonize_epoch,
 )
 from faster_raster.human_development_cdl_preview import render_cdl_proxy_preview
-from faster_raster.human_development_live import _public_resolved_config, compile_live_cdl_plan
+from faster_raster.human_development_live import (
+    _public_resolved_config,
+    compile_live_cdl_plan,
+    execute_live_cdl,
+)
 from faster_raster.local_paths import resolve_local_paths
 from faster_raster.workfiles import WorkfileError, load_workfile
 
@@ -437,6 +441,49 @@ def test_strict_reuse_plan_has_zero_requests_and_correct_intervals(
     ]
     assert plan["asset_plan"]["endpoint_comparison"] == {"before_year": 2008, "after_year": 2021}
     assert plan["asset_plan"]["context_imagery"]["blocking"] is False
+
+
+def test_explicit_offline_live_plan_is_provisional_and_never_contacts_network(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    workfile = load_workfile(
+        ROOT / "examples" / "meridian-cdl-development-change.fr.md",
+        repository_root=ROOT,
+    )
+    monkeypatch.setattr(
+        "faster_raster.human_development_live.discover_cdl_coverage",
+        lambda *args, **kwargs: pytest.fail("offline plan contacted discovery"),
+    )
+    monkeypatch.setattr(
+        "faster_raster.human_development_live.find_cached_cdl_asset",
+        lambda *args, **kwargs: None,
+    )
+    plan = compile_live_cdl_plan(
+        ROOT,
+        workfile,
+        resolve_local_paths(tmp_path),
+        cli_overrides={"offline": True},
+        output_dir=tmp_path / "plan",
+    )
+    assert plan["blocking"] is False
+    assert plan["offline_planning"] is True
+    assert plan["network_requests"] == 0
+    assert plan["requires_coverage_validation"] is True
+    assert plan["source_discovery"]["status"] == "SKIPPED_OFFLINE"
+    assert {
+        item["exact_coverage_status"]
+        for item in plan["asset_plan"]["epochs"]
+    } == {"NOT_CHECKED"}
+    assert {
+        item["planned_action"] for item in plan["asset_plan"]["epochs"]
+    } == {"metadata_discovery_required"}
+    with pytest.raises(HumanDevelopmentError, match="coverage validation"):
+        execute_live_cdl(
+            ROOT,
+            workfile=workfile,
+            plan=plan,
+            open_preview=False,
+        )
 
 def test_completed_config_redacts_runtime_temp_path() -> None:
     resolved = {"values": {"temporary_root": {"value": "/tmp/fasterraster", "origin": "default"}}}

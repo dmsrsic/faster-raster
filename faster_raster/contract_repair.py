@@ -21,6 +21,7 @@ from faster_raster.aoi_geometry import (
     build_point_buffer_area,
     explicit_bbox_area,
 )
+from faster_raster.temporal_alternatives import alternatives_from_years
 from faster_raster.workfiles import TimeSpec, Workfile, WorkfileError, WorkfileSpec
 
 
@@ -47,7 +48,7 @@ class RecoverableContractFailure:
     evidence: dict[str, Any]
 
     def as_dict(self) -> dict[str, Any]:
-        return {
+        result = {
             "schema_version": "fasterraster.recoverable-contract-failure/v1",
             "failure_type": self.failure_type,
             "logical_asset": self.logical_asset,
@@ -58,6 +59,23 @@ class RecoverableContractFailure:
             "compatible_alternatives": list(self.compatible_alternatives),
             "source_evidence": self.evidence,
         }
+        if (
+            self.failure_type == "imagery_year_unavailable"
+            and str(self.original_requested_value).isdigit()
+        ):
+            years = [
+                int(value)
+                for value in self.compatible_alternatives
+                if str(value).isdigit()
+            ]
+            result["temporal_alternatives"] = alternatives_from_years(
+                int(self.original_requested_value),
+                years,
+                source_id="usgs_naip_imageserver",
+                provider="USGS",
+                product="NAIP",
+            )
+        return result
 
 
 def recoverable_failure_from_document(

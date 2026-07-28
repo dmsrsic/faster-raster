@@ -2,14 +2,20 @@
 
 Support is workflow-specific; a source entry does not imply every dataset or geography is executable.
 
-| Source or family | Beta role | Routine CI |
-|---|---|---|
-| USDA NASS Cropland Data Layer | Live exact-year acquisition and mapped-development/crop context | Offline mocks and contracts only |
-| USGS NAIP imagery | Exact-year visual context and raw four-band red/green/blue/NIR analytical source for classification/index recipes | Offline mocks and contracts only |
-| USGS 3DEP | Bounded terrain context when a shipped recipe requires it | Offline mocks and contracts only |
-| CHIRPS, gridMET, TerraClimate, WorldClim | Bounded static HTTP range planning/probe contracts | Offline fixtures only |
-| PRISM daily precipitation ZIP | Deterministic daily path, bounded probe, guarded complete-object materialization, selected-GeoTIFF extraction, Rasterio/COG validation, provider-sidecar consistency receipts, AOI harmonization, and the bounded PRISM × DEM × NDVI correlation workflow | Offline synthetic archive/raster/executor/correlation tests; live materialization remains explicit |
-| Copernicus CDSE | Credential-gated planning/readiness scaffolding | Offline contract tests only |
+The status and execution columns below are generated from the canonical public
+capability registry. Routine CI uses offline mocks, fixtures, and contracts; it
+does not contact providers.
+
+<!-- BEGIN GENERATED SOURCE CAPABILITY MATRIX -->
+| Capability | Status | Plan | Preview | Materialize | Analyze | Public execution |
+|---|---:|:---:|:---:|:---:|:---:|---|
+| USDA NASS Cropland Data Layer | `released` | yes | yes | yes | yes | `exact_year_workflows` |
+| USGS NAIP imagery | `released` | yes | yes | yes | yes | `shipped_agricultural_workflows` |
+| USGS 3DEP | `released` | yes | yes | yes | yes | `recipe_bounded` |
+| PRISM daily precipitation ZIP | `released` | yes | yes | yes | yes | `guarded_bounded` |
+| CHIRPS, gridMET, TerraClimate, and WorldClim | `experimental` | yes | yes | no | no | `bounded_probe_and_fixture_paths` |
+| Copernicus Data Space STAC | `experimental` | yes | no | no | no | `resolver_required` |
+<!-- END GENERATED SOURCE CAPABILITY MATRIX -->
 
 Routine CI never contacts USDA, USGS, ArcGIS, PRISM, STAC, THREDDS, or other raster services.
 

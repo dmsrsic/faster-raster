@@ -1,0 +1,191 @@
+{
+  "capabilities": [
+    {
+      "analysis": true,
+      "capability_id": "workfile_planning",
+      "credential_requirement": "none",
+      "kind": "workflow",
+      "label": "Markdown workfiles and deterministic planning",
+      "materialization": true,
+      "notes": "Workflow-specific; exact source and geography limits still apply.",
+      "planning": true,
+      "preview": true,
+      "public_execution": "bounded_local",
+      "status": "released"
+    },
+    {
+      "analysis": false,
+      "capability_id": "sauce_pack",
+      "credential_requirement": "opaque_reference_supported",
+      "kind": "workflow",
+      "label": "Bring Your Own Sauce / declarative Source Packs",
+      "materialization": false,
+      "notes": "No arbitrary Python, dynamic imports, shell hooks, or unrestricted templates.",
+      "planning": true,
+      "preview": true,
+      "public_execution": "validation_and_bounded_probe_only",
+      "status": "experimental"
+    },
+    {
+      "analysis": false,
+      "capability_id": "sauce_time",
+      "credential_requirement": "none",
+      "kind": "workflow",
+      "label": "Sauce Time ranked temporal alternatives",
+      "materialization": false,
+      "notes": "Never substitutes the requested time without explicit selection.",
+      "planning": true,
+      "preview": false,
+      "public_execution": "advisory_only",
+      "status": "experimental"
+    },
+    {
+      "analysis": false,
+      "capability_id": "preview_templates",
+      "credential_requirement": "none",
+      "kind": "workflow",
+      "label": "Reusable preview templates",
+      "materialization": false,
+      "notes": "Declarative roles and layouts only; render contracts remain authoritative.",
+      "planning": true,
+      "preview": true,
+      "public_execution": "render_contract_compilation",
+      "status": "experimental"
+    },
+    {
+      "analysis": false,
+      "capability_id": "credential_reference",
+      "credential_requirement": "opaque_reference_only",
+      "kind": "boundary",
+      "label": "Public credential-requirement contract",
+      "materialization": false,
+      "notes": "Resolved secrets are excluded from public plans, logs, cache keys, receipts, and archives.",
+      "planning": true,
+      "preview": false,
+      "public_execution": "fails_before_network_without_resolver",
+      "status": "experimental"
+    },
+    {
+      "analysis": true,
+      "capability_id": "private_execution_backend",
+      "credential_requirement": "resolver_required",
+      "kind": "boundary",
+      "label": "Authenticated parallel execution backend",
+      "materialization": true,
+      "notes": "The public repository defines only frozen, versioned input and evidence contracts.",
+      "planning": false,
+      "preview": false,
+      "public_execution": "unavailable",
+      "status": "private"
+    },
+    {
+      "analysis": false,
+      "capability_id": "arbitrary_code_plugins",
+      "credential_requirement": "unsupported",
+      "kind": "boundary",
+      "label": "Arbitrary-code source plugins",
+      "materialization": false,
+      "notes": "Declarative Source Packs are the supported extension seam.",
+      "planning": false,
+      "preview": false,
+      "public_execution": "unavailable",
+      "status": "unsupported"
+    }
+  ],
+  "capability_registry_sha256": "75563bddcceeb8aa99e80418f149b4c584a34d13a82b8f1602c7f8f4360a7f31",
+  "registry_version": "1.0.0",
+  "release": {
+    "contract_status": "experimental",
+    "development_label": "Unreleased",
+    "package_version": "1.0.0b4",
+    "public_release": "v1.0.0-beta.4"
+  },
+  "schema_version": "fasterraster.capability-registry/v1",
+  "sources": [
+    {
+      "analysis": true,
+      "capability_id": "usda_cdl",
+      "credential_requirement": "none",
+      "kind": "source",
+      "label": "USDA NASS Cropland Data Layer",
+      "materialization": true,
+      "notes": "Categorical outputs require nearest or mode resampling.",
+      "planning": true,
+      "preview": true,
+      "public_execution": "exact_year_workflows",
+      "status": "released"
+    },
+    {
+      "analysis": true,
+      "capability_id": "usgs_naip",
+      "credential_requirement": "none",
+      "kind": "source",
+      "label": "USGS NAIP imagery",
+      "materialization": true,
+      "notes": "Exact-year coverage is fail-closed; available years are advisory until selected.",
+      "planning": true,
+      "preview": true,
+      "public_execution": "shipped_agricultural_workflows",
+      "status": "released"
+    },
+    {
+      "analysis": true,
+      "capability_id": "usgs_3dep",
+      "credential_requirement": "none",
+      "kind": "source",
+      "label": "USGS 3DEP",
+      "materialization": true,
+      "notes": "Available only where a shipped workflow declares the terrain role.",
+      "planning": true,
+      "preview": true,
+      "public_execution": "recipe_bounded",
+      "status": "released"
+    },
+    {
+      "analysis": true,
+      "capability_id": "prism_daily",
+      "credential_requirement": "none",
+      "kind": "source",
+      "label": "PRISM daily precipitation ZIP",
+      "materialization": true,
+      "notes": "Complete-object materialization requires explicit approval and byte ceilings.",
+      "planning": true,
+      "preview": true,
+      "public_execution": "guarded_bounded",
+      "status": "released"
+    },
+    {
+      "analysis": false,
+      "capability_id": "static_http_range_wave",
+      "credential_requirement": "none",
+      "kind": "source",
+      "label": "CHIRPS, gridMET, TerraClimate, and WorldClim",
+      "materialization": false,
+      "notes": "Catalog presence does not imply a runnable end-to-end workflow.",
+      "planning": true,
+      "preview": true,
+      "public_execution": "bounded_probe_and_fixture_paths",
+      "status": "experimental"
+    },
+    {
+      "analysis": false,
+      "capability_id": "copernicus_cdse",
+      "credential_requirement": "opaque_bearer_reference",
+      "kind": "source",
+      "label": "Copernicus Data Space STAC",
+      "materialization": false,
+      "notes": "Public contracts can plan requirements; the public runtime never resolves credentials.",
+      "planning": true,
+      "preview": false,
+      "public_execution": "resolver_required",
+      "status": "experimental"
+    }
+  ],
+  "status_definitions": {
+    "experimental": "Implemented in the source tree but not part of the published beta contract.",
+    "planned": "Directional work without an executable public contract.",
+    "private": "Consumed only by a proprietary execution backend; no private implementation is public.",
+    "released": "Included in the published public beta.",
+    "unsupported": "Explicitly outside the current public product."
+  }
+}

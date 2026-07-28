@@ -107,13 +107,22 @@ def compile_live_cdl_plan(
     resolved, _ = _resolved_configuration(workfile, paths, cli_overrides=cli_overrides)
     reuse_mode = str(resolved["values"]["reuse_mode"]["value"])
     maximum_bytes = int(float(resolved["values"]["maximum_download_mb"]["value"]) * 1_000_000)
-    allow_network = bool(spec.data.allow_network and reuse_mode != "only")
+    offline_requested = bool((cli_overrides or {}).get("offline"))
+    allow_network = bool(
+        spec.data.allow_network
+        and reuse_mode != "only"
+        and not offline_requested
+    )
     resolved["values"].update({
         "allow_network": {"value": allow_network, "origin": "workfile", "key": "data.allow_network"},
         "source_id": {"value": spec.sources.source_id, "origin": "workfile", "key": "sources.source_id"},
         "mapping_id": {"value": spec.sources.mapping_id, "origin": "workfile", "key": "sources.mapping_id"},
         "service_tile_size": {"value": spec.processing.service_tile_size, "origin": "workfile", "key": "processing.service_tile_size"},
-        "offline": {"value": reuse_mode == "only", "origin": "workflow_contract", "key": "strict_reuse_only"},
+        "offline": {
+            "value": offline_requested or reuse_mode == "only",
+            "origin": "cli_override" if offline_requested else "workflow_contract",
+            "key": "offline" if offline_requested else "strict_reuse_only",
+        },
     })
     grid = build_service_target_grid(spec.area.bbox, resolution_m=spec.processing.resolution_m)
     handoff_root = configured_handoff_root(repository_root)
@@ -139,6 +148,22 @@ def compile_live_cdl_plan(
         }
         if missing_years:
             blocking_reasons.append(f"strict reuse-only cache is missing CDL years: {missing_years}")
+    elif offline_requested:
+        discovery = {
+            "schema_version": "fasterraster.cdl-source-discovery/v1",
+            "source_id": CDL_SOURCE_ID,
+            "status": "SKIPPED_OFFLINE",
+            "metadata_network_bytes": 0,
+            "requests": [],
+            "epochs": [
+                {
+                    "requested_year": epoch.year,
+                    "exact_coverage_status": "NOT_CHECKED",
+                    "catalog_record_ids": [],
+                }
+                for epoch in spec.epochs
+            ],
+        }
     elif not allow_network:
         discovery = {"status": "BLOCKED_NETWORK_PERMISSION", "metadata_network_bytes": 0, "requests": [], "epochs": []}
         blocking_reasons.append("service_discovered CDL requires explicit network permission")
@@ -176,6 +201,14 @@ def compile_live_cdl_plan(
             action = cache.action
             cache_state = "verified_finalized_cache"
             reason = f"compatible immutable source asset from handoff {cache.source_handoff_id}"
+            estimated = 0
+        elif offline_requested:
+            action = "metadata_discovery_required"
+            cache_state = "missing"
+            reason = (
+                "offline plan did not check exact-year coverage; rerun planning "
+                "without --offline before execution"
+            )
             estimated = 0
         elif blocking_reasons:
             action = "blocked"
@@ -217,7 +250,13 @@ def compile_live_cdl_plan(
         rows.append({
             "data": f"CDL raw classes {epoch.year}", "logical_asset": "land_cover",
             "source": CDL_SOURCE_ID, "local_asset_readiness": "ready_exact" if action == "reuse_exact" else "ready_requires_crop_reprojection" if action == "reuse_crop" else "missing",
-            "remote_source_status": "available" if exact_status in {"PASS", "VERIFIED_CACHE"} else "unreachable",
+            "remote_source_status": (
+                "available"
+                if exact_status in {"PASS", "VERIFIED_CACHE"}
+                else "unknown"
+                if exact_status == "NOT_CHECKED"
+                else "unreachable"
+            ),
             "remote_source_required": action == "export_remote", "remote_source_blocking": action == "blocked",
             "action": action, "reason": reason, "provisional": False,
             "reused": action.startswith("reuse_"), "acquired": action == "export_remote",
@@ -227,6 +266,10 @@ def compile_live_cdl_plan(
         blocking_reasons.append(
             f"estimated CDL raster bytes {estimated_cumulative:,} exceed configured ceiling {maximum_bytes:,}"
         )
+    requires_coverage_validation = any(
+        item["planned_action"] == "metadata_discovery_required"
+        for item in epoch_plans
+    )
     context_plan = {
         "requested": spec.outputs.include_context_imagery,
         "year": spec.sources.context_year,
@@ -255,7 +298,13 @@ def compile_live_cdl_plan(
     }
     source_gate = {
         "schema_version": "fasterraster.human-development-source-gate/v2",
-        "result": "AVAILABLE" if not blocking_reasons else "BLOCKED",
+        "result": (
+            "BLOCKED"
+            if blocking_reasons
+            else "PROVISIONAL_OFFLINE"
+            if requires_coverage_validation
+            else "AVAILABLE"
+        ),
         "remote_live_acquisition_implemented": True,
         "source_id": CDL_SOURCE_ID,
         "mapping_id": USDA_CDL_MAPPING.mapping_id,
@@ -269,9 +318,15 @@ def compile_live_cdl_plan(
         "network_requests": len(discovery.get("requests", [])), "blocking": bool(blocking_reasons),
         "decisions": [{
             "logical_asset": "land_cover", "selected_source": CDL_SOURCE_ID,
-            "selected_capability_status": "available" if not blocking_reasons else "unreachable",
+            "selected_capability_status": (
+                "unreachable"
+                if blocking_reasons
+                else "verification_required"
+                if requires_coverage_validation
+                else "available"
+            ),
             "mapping_id": USDA_CDL_MAPPING.mapping_id, "provisional": False,
-            "live_execution_must_revalidate": False,
+            "live_execution_must_revalidate": requires_coverage_validation,
         }],
     }
     explanation = {
@@ -289,8 +344,10 @@ def compile_live_cdl_plan(
     plan = {
         "schema_version": "fasterraster.study-plan/v1", "created_at": datetime.now(timezone.utc).isoformat(),
         "workfile": str(workfile.path), "study_name": spec.name, "workflow": spec.workflow_id,
-        "comparison_mode": spec.comparison_mode, "offline_planning": reuse_mode == "only",
+        "comparison_mode": spec.comparison_mode,
+        "offline_planning": offline_requested or reuse_mode == "only",
         "network_requests": len(discovery.get("requests", [])), "blocking": bool(blocking_reasons),
+        "requires_coverage_validation": requires_coverage_validation,
         "blocking_reasons": blocking_reasons, "rows": rows, "asset_plan": asset_plan,
         "maximum_download_bytes": maximum_bytes, "source_gate": source_gate,
         "source_discovery": discovery, "source_resolution": source_resolution,
@@ -318,6 +375,11 @@ def execute_live_cdl(
     spec = _spec(workfile)
     if plan.get("blocking"):
         raise HumanDevelopmentError("human-development live CDL study plan is blocked")
+    if plan.get("requires_coverage_validation"):
+        raise HumanDevelopmentError(
+            "offline plan requires exact-year coverage validation; rerun "
+            "planning without --offline before execution"
+        )
     grid = build_service_target_grid(spec.area.bbox, resolution_m=spec.processing.resolution_m)
     if grid.fingerprint != plan["asset_plan"]["target_grid"]["fingerprint_sha256"]:
         raise HumanDevelopmentError("target-grid fingerprint changed between plan and cook")

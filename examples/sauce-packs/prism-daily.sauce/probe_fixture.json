@@ -1,0 +1,24 @@
+{
+  "available_times": [
+    "2022-01-01",
+    "2023-01-01",
+    "2024-01-01"
+  ],
+  "candidate_metadata": [
+    {
+      "candidate_time": "2022-01-01",
+      "coverage_fraction": 1.0,
+      "estimated_transfer_bytes": "unknown",
+      "verification_status": "verified"
+    },
+    {
+      "candidate_time": "2024-01-01",
+      "coverage_fraction": 1.0,
+      "estimated_transfer_bytes": "unknown",
+      "verification_status": "verified"
+    }
+  ],
+  "processing_family": "PRISM daily AN 4 km",
+  "product": "PRISM Time Series Daily",
+  "provider": "PRISM_OSU"
+}

@@ -109,7 +109,12 @@ def test_symlink_source_rejected(tmp_path):
     sha, src = _source(tmp_path)
     target = tmp_path / "real.gz"
     shutil.move(src, target)
-    src.symlink_to(target)
+    try:
+        src.symlink_to(target)
+    except OSError as exc:
+        if getattr(exc, "winerror", None) == 1314:
+            pytest.skip("Windows symlink privilege is unavailable")
+        raise
     plan = derived_artifacts.build_derivation_plan(sha, root=tmp_path)
     result = derived_artifacts.run_derivation(sha, allow_derivation=True, approve_plan_sha256=plan["derivation_plan_contract_sha256"], root=tmp_path)
     assert result["receipt"]["failure_class"] == "source_artifact_not_regular"

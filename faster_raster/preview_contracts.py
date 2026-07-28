@@ -3,7 +3,7 @@ from __future__ import annotations
 import hashlib
 from typing import Any
 from faster_raster.adapter_contract import stable_json
-from faster_raster import preview_themes, preview_profiles
+from faster_raster import preview_profiles, preview_templates, preview_themes
 from faster_raster.adapters.capabilities import adapter_capability_catalog
 
 IMPLEMENTATION_VERSION = "preview-renderer-v1-alpha3"
@@ -56,58 +56,100 @@ def _layer(entry: dict[str, Any], *, theme_id: str | None = None, render_role: s
     }
 
 
-def _build_alpha2_layers(entries: dict[str, dict[str, Any]]) -> list[dict[str, Any]]:
-    source_order = ["usgs_naip_imagery", "usgs_3dep_hillshade", "usda_cdl_imageserver", "chirps_alpha1_derived_geotiff", "sentinel_2_l2a_planetary_computer", "sentinel_1_radar_scaffold"]
-    layers = []
-    for source_id in source_order:
-        entry = entries[source_id]
-        render_role = entry.get("default_render_role")
-        z_order = 0 if source_id == "usgs_naip_imagery" else (5 if render_role == "imagery_alternative" else None)
-        opacity = 1.0 if source_id == "usgs_naip_imagery" else None
-        layers.append(_layer(entry, render_role=render_role, z_order=z_order, opacity=opacity))
-    return sorted(layers, key=lambda layer: (0 if layer["source_id"] == "usgs_naip_imagery" else 1, layer["z_order"], preview_themes.get_theme(layer["theme"])["visual_priority"], layer["source_id"]))
-
-
-def _build_balanced_layers(entries: dict[str, dict[str, Any]], profile: dict[str, Any]) -> list[dict[str, Any]]:
-    imagery = _layer(entries["usgs_naip_imagery"], render_role="primary_imagery", opacity=1.0, z_order=0, profile_id="natural_color_mild_stretch")
-    imagery.update({"compiled_opacity": 1.0, "effective_alpha": 1.0, "blend_mode": "normal", "include_in_alpha_budget": False})
-    terrain = _layer(entries["usgs_3dep_hillshade"], render_role="terrain_context", opacity=profile["terrain_policy"]["requested_opacity"], z_order=10, profile_id="grayscale_single_band")
-    terrain.update({"compiled_opacity": profile["terrain_policy"]["target_opacity"], "effective_alpha": profile["terrain_policy"]["target_opacity"], "blend_mode": "multiply", "opacity_adjustment_reason": "profile_default"})
-    cdl = _layer(entries["usda_cdl_imageserver"], render_role="thematic_overlay", opacity=profile["categorical_policy"]["requested_opacity"], z_order=20, profile_id="categorical_overlay")
-    cdl_adjustment = preview_profiles.compile_categorical_opacity(1.0, profile["categorical_policy"]["requested_opacity"], profile)
-    cdl.update({"resampling_method": "nearest", "blend_mode": "normal", "coverage_dependent_opacity": True, **cdl_adjustment})
-    layers = [imagery, terrain, cdl]
-    budget = preview_profiles.compile_overlay_alpha_budget(layers, profile)
-    return [{**layer, "compiled_order": idx} for idx, layer in enumerate(sorted(layers, key=lambda layer: (layer["z_order"], layer["source_id"])))], budget
+def _build_template_layers(
+    entries: dict[str, dict[str, Any]],
+    template: dict[str, Any],
+    profile: dict[str, Any] | None,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    layers: list[dict[str, Any]] = []
+    for declaration in template.get("source_layers") or []:
+        source_id = declaration["source_id"]
+        if source_id not in entries:
+            raise ValueError(
+                f"preview template {template['template_id']} references "
+                f"unregistered source {source_id}"
+            )
+        layer = _layer(
+            entries[source_id],
+            theme_id=declaration.get("theme_id"),
+            render_role=declaration.get("render_role"),
+            opacity=declaration.get("opacity"),
+            z_order=declaration.get("z_order"),
+            profile_id=declaration.get("profile_id"),
+        )
+        for key in (
+            "compiled_opacity",
+            "blend_mode",
+            "resampling_method",
+            "coverage_dependent_opacity",
+            "include_in_alpha_budget",
+        ):
+            if key in declaration:
+                layer[key] = declaration[key]
+        if layer.get("render_role") == "primary_imagery":
+            layer["effective_alpha"] = float(layer["compiled_opacity"])
+        if layer.get("coverage_dependent_opacity"):
+            if profile is None:
+                raise ValueError("coverage-dependent opacity requires a preview profile")
+            layer.update(
+                preview_profiles.compile_categorical_opacity(
+                    float(declaration.get("categorical_coverage_fraction", 1.0)),
+                    float(layer["requested_opacity"]),
+                    profile,
+                )
+            )
+        layers.append(layer)
+    layers.sort(
+        key=lambda layer: (
+            0
+            if layer["source_id"] == template.get("primary_imagery_selection")
+            else 1,
+            layer["z_order"],
+            preview_themes.get_theme(layer["theme"])["visual_priority"],
+            layer["source_id"],
+        )
+    )
+    if template.get("alpha_budget_profile"):
+        if profile is None:
+            raise ValueError("alpha-budget template requires a preview profile")
+        alpha_budget = preview_profiles.compile_overlay_alpha_budget(layers, profile)
+    else:
+        alpha_budget = {
+            "overlay_alpha_budget_limit": 1.0,
+            "requested_overlay_alpha_budget": 0.0,
+            "compiled_overlay_alpha_budget": 0.0,
+            "overlay_alpha_budget_status": "PASS",
+            "overlay_adjustments": [],
+        }
+    return layers, alpha_budget
 
 
 def build_render_contract(task_id: str, allowlist: dict[str, Any], *, width: int | None = None, height: int | None = None, max_total_bytes: int = 25_000_000, network_policy: str = "disabled", explicit_profile_id: str | None = None) -> dict[str, Any]:
     entries = {entry["source_id"]: entry for entry in allowlist["entries"]}
-    profile = preview_profiles.select_default_profile(task_id, explicit_profile_id=explicit_profile_id)
-    if task_id == "example_imagery_first_multipreview":
-        layers = _build_alpha2_layers(entries)
-        aoi = {"bbox": [-83.20, 39.80, -83.18, 39.82], "crs": "EPSG:4326"}
-        width = width or 1200; height = height or 800
-        alpha_budget = {"overlay_alpha_budget_limit": 1.0, "requested_overlay_alpha_budget": 0.0, "compiled_overlay_alpha_budget": 0.0, "overlay_alpha_budget_status": "PASS", "overlay_adjustments": []}
-    elif task_id == "example_imagery_first_balanced_stack":
-        if profile is None:
-            profile = preview_profiles.imagery_first_balanced_v1()
-        layers, alpha_budget = _build_balanced_layers(entries, profile)
-        aoi = {"bbox": [-84.65, 40.15, -84.45, 40.35], "crs": "EPSG:4326"}
-        width = width or 1560; height = height or 980
-    else:
-        raise ValueError(f"unknown preview task: {task_id}")
+    template = preview_templates.template_for_task(task_id)
+    selected_profile_id = explicit_profile_id or template.get("preview_profile_id")
+    profile = preview_profiles.select_default_profile(
+        task_id,
+        explicit_profile_id=selected_profile_id,
+    )
+    layers, alpha_budget = _build_template_layers(entries, template, profile)
+    aoi = template["task_aoi"]
+    width = width or int(template["default_width"])
+    height = height or int(template["default_height"])
     for idx, layer in enumerate(layers):
         layer["compiled_order"] = idx
     adapter_hashes = {item["adapter_id"]: item["adapter_capability_contract_sha256"] for item in adapter_capability_catalog()["adapters"]}
     contract = {
         "schema_version": 1,
         "task_id": task_id,
+        "preview_template_id": template["template_id"],
+        "preview_template_schema_version": template["schema_version"],
+        "preview_template_contract_sha256": template["template_sha256"],
         "aoi": aoi,
         "target_preview_crs": "EPSG:4326",
         "preview_width": width,
         "preview_height": height,
-        "primary_imagery_selection": "usgs_naip_imagery",
+        "primary_imagery_selection": template["primary_imagery_selection"],
         "preview_profile_id": profile["profile_id"] if profile else None,
         "preview_profile_version": profile["profile_version"] if profile else None,
         "preview_profile_contract_sha256": profile["default_profile_contract_sha256"] if profile else None,
@@ -125,7 +167,7 @@ def build_render_contract(task_id: str, allowlist: dict[str, Any], *, width: int
         "renderer_implementation_version": IMPLEMENTATION_VERSION,
         "render_profiles": RENDER_PROFILES,
         "overlay_alpha_budget": alpha_budget,
-        "source_request_parameters": {"usda_cdl_imageserver": {"time": "1704067200000"}} if task_id == "example_imagery_first_balanced_stack" else {},
+        "source_request_parameters": template.get("source_request_parameters") or {},
         "approval_requirement": "require --allow-preview and --approve-plan-sha256; network also requires --allow-network",
         "generated_at_utc": "volatile_excluded_from_hash",
         "preview_render_contract_sha256": "",

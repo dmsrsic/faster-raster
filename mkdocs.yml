@@ -42,15 +42,22 @@ nav:
   - Start:
       - Installation: installation.md
       - Five-minute quickstart: quickstart.md
+      - First-cook troubleshooting: first-cook-troubleshooting.md
       - Terminal playground: terminal-playground.md
   - Workflows:
       - Concepts and architecture: concepts.md
       - Supported sources: supported-sources.md
+      - Bring Your Own Sauce: bring-your-own-sauce.md
+      - Sauce Time: sauce-time.md
+      - Preview templates: preview-templates.md
       - Human-development workflow: human-development.md
       - NAIP–CDL surface classification: ag-classification.md
       - Index-guided hybrid classification: index-guided-classification.md
       - Hybrid publication: hybrid-publication.md
       - Examples: examples.md
+      - PRISM daily precipitation: prism-daily-precipitation.md
+      - PRISM workflow validation: validation/ames_prism_dem_ndvi_2023.md
+      - PRISM × DEM × NDVI audit: prism-dem-ndvi-correlation.md
   - Reproducibility:
       - Determinism, provenance, and reuse: determinism.md
       - Network and byte budgets: network-byte-budgets.md
@@ -63,6 +70,7 @@ nav:
       - Citation: citation.md
       - Security: security.md
       - Release notes: release-notes.md
+      - Capability matrix: generated/capabilities.md
 extra_css:
   - stylesheets/extra.css
 markdown_extensions:

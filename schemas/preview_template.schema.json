@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "include_north_arrow": {
+      "type": "boolean"
+    },
+    "include_provenance_footer": {
+      "type": "boolean"
+    },
+    "include_scale_bar": {
+      "type": "boolean"
+    },
+    "layout": {
+      "additionalProperties": false,
+      "properties": {
+        "columns": {
+          "maximum": 4,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "rows": {
+          "maximum": 4,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "type": {
+          "const": "grid"
+        }
+      },
+      "required": [
+        "type",
+        "rows",
+        "columns"
+      ],
+      "type": "object"
+    },
+    "panels": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "panel_id": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "panel_id",
+          "role"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "fasterraster.preview-template/v1"
+    },
+    "shared_extent": {
+      "type": "boolean"
+    },
+    "template_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "template_id",
+    "layout",
+    "panels",
+    "shared_extent",
+    "include_scale_bar",
+    "include_north_arrow",
+    "include_provenance_footer"
+  ],
+  "title": "FasterRaster preview template v1",
+  "type": "object"
+}

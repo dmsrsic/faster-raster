@@ -78,6 +78,28 @@ The result is not just an image or array. It is a bounded workflow with the mani
 
 <section class="fr-section" markdown="1">
 
+## One real workfile-to-output record
+
+The Star, Idaho example keeps intent, commands, the 25 MB ceiling, the
+publication derivative, and its hashes connected:
+
+```sh
+fr validate examples/star-idaho-regional-growth-cdl-development-change.fr.md
+fr plan examples/star-idaho-regional-growth-cdl-development-change.fr.md --out build/star-plan
+fr cook examples/star-idaho-regional-growth-cdl-development-change.fr.md --reuse auto --no-open
+fr inspect latest --verbose
+```
+
+The result uses CDL analytical years 2008, 2016, and 2021. The public evidence
+records the output derivative and hashes; it does not retain enough evidence
+to claim historical transfer bytes or runtime.
+
+[Inspect the workfile, output, provenance, and scientific boundary](examples.md#complete-star-workflow-record){ .fr-inline-link }
+
+</section>
+
+<section class="fr-section" markdown="1">
+
 ## Unreleased index-guided classification
 
 Current development preserves the broad NAIP–CDL classifier and adds
@@ -114,6 +136,10 @@ fr plan studies/meridian.fr.md --offline --out build/meridian-plan
 ```
 
 These commands make no network requests. Review the generated workfile and plan before enabling any live acquisition.
+
+Without verified cache evidence, the offline plan records exact-year coverage
+as `NOT_CHECKED` and requires an online re-plan before execution. It does not
+claim that coverage was verified.
 
 [Follow the five-minute quickstart](quickstart.md){ .fr-button .fr-button--primary }
 

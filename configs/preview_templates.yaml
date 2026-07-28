@@ -1,0 +1,129 @@
+schema_version: fasterraster.preview-template-registry/v1
+registry_version: 1.0.0
+roles:
+  natural_color:
+    themes: [aerial_imagery, optical_imagery]
+    required_bands: [red, green, blue]
+    semantic_type: continuous
+    resampling: bilinear
+  classification:
+    themes: [landcover_categorical]
+    required_bands: [class]
+    semantic_type: categorical
+    resampling: nearest
+  confidence:
+    themes: [uncertainty]
+    required_bands: [confidence]
+    semantic_type: continuous
+    resampling: bilinear
+  reference_or_weak_labels:
+    themes: [landcover_categorical]
+    required_bands: [class]
+    semantic_type: categorical
+    resampling: nearest
+  terrain:
+    themes: [elevation, hillshade, terrain]
+    required_bands: [band_1]
+    semantic_type: continuous
+    resampling: bilinear
+  environmental_context:
+    themes: [climate_continuous, hydrology, vegetation_index]
+    required_bands: [band_1]
+    semantic_type: continuous
+    resampling: bilinear
+  diagnostic:
+    themes: [quality_mask, cloud_mask, uncertainty]
+    required_bands: [band_1]
+    semantic_type: categorical
+    resampling: nearest
+templates:
+  ag_classification_audit_v1:
+    schema_version: fasterraster.preview-template/v1
+    status: experimental
+    title: Agricultural classification audit
+    description: Four-panel analytical classification and weak-label audit.
+    layout: {type: grid, rows: 2, columns: 2}
+    panels:
+      - {panel_id: natural, role: natural_color}
+      - {panel_id: classes, role: classification}
+      - {panel_id: confidence, role: confidence}
+      - {panel_id: weak_labels, role: reference_or_weak_labels}
+    shared_extent: true
+    include_scale_bar: true
+    include_north_arrow: true
+    include_provenance_footer: true
+    default_width: 1920
+    default_height: 1080
+  general_multisource_v1:
+    schema_version: fasterraster.preview-template/v1
+    status: experimental
+    title: General multi-source comparison
+    description: Reusable imagery, terrain, and environmental comparison.
+    layout: {type: grid, rows: 1, columns: 3}
+    panels:
+      - {panel_id: imagery, role: natural_color}
+      - {panel_id: terrain, role: terrain}
+      - {panel_id: context, role: environmental_context}
+    shared_extent: true
+    include_scale_bar: true
+    include_north_arrow: true
+    include_provenance_footer: true
+    default_width: 1800
+    default_height: 720
+  imagery_first_multipreview_v1:
+    schema_version: fasterraster.preview-template/v1
+    status: released
+    title: Imagery-first multi-preview
+    description: Registry form of the alpha.2 imagery-first preview.
+    layout: {type: grid, rows: 2, columns: 3}
+    panels:
+      - {panel_id: naip, role: natural_color}
+      - {panel_id: terrain, role: terrain}
+      - {panel_id: cdl, role: classification}
+      - {panel_id: chirps, role: environmental_context}
+      - {panel_id: sentinel2, role: natural_color}
+      - {panel_id: sentinel1, role: diagnostic}
+    shared_extent: true
+    include_scale_bar: true
+    include_north_arrow: true
+    include_provenance_footer: true
+    default_width: 1200
+    default_height: 800
+    task_ids: [example_imagery_first_multipreview]
+    task_aoi: {bbox: [-83.20, 39.80, -83.18, 39.82], crs: "EPSG:4326"}
+    primary_imagery_selection: usgs_naip_imagery
+    source_layers:
+      - {source_id: usgs_naip_imagery, render_role: primary_imagery, opacity: 1.0, z_order: 0}
+      - {source_id: usgs_3dep_hillshade}
+      - {source_id: usda_cdl_imageserver}
+      - {source_id: chirps_alpha1_derived_geotiff}
+      - {source_id: sentinel_2_l2a_planetary_computer, z_order: 5}
+      - {source_id: sentinel_1_radar_scaffold, z_order: 5}
+  imagery_first_balanced_stack_v1:
+    schema_version: fasterraster.preview-template/v1
+    status: released
+    title: Imagery-first balanced stack
+    description: Registry form of the alpha.3 balanced stack.
+    layout: {type: grid, rows: 2, columns: 2}
+    panels:
+      - {panel_id: imagery, role: natural_color}
+      - {panel_id: terrain, role: terrain}
+      - {panel_id: cdl, role: classification}
+      - {panel_id: composite, role: natural_color}
+    shared_extent: true
+    include_scale_bar: true
+    include_north_arrow: true
+    include_provenance_footer: true
+    default_width: 1560
+    default_height: 980
+    task_ids: [example_imagery_first_balanced_stack]
+    task_aoi: {bbox: [-84.65, 40.15, -84.45, 40.35], crs: "EPSG:4326"}
+    primary_imagery_selection: usgs_naip_imagery
+    preview_profile_id: imagery_first_balanced_v1
+    alpha_budget_profile: imagery_first_balanced_v1
+    source_request_parameters:
+      usda_cdl_imageserver: {time: "1704067200000"}
+    source_layers:
+      - {source_id: usgs_naip_imagery, render_role: primary_imagery, opacity: 1.0, z_order: 0, profile_id: natural_color_mild_stretch, include_in_alpha_budget: false}
+      - {source_id: usgs_3dep_hillshade, render_role: terrain_context, opacity: 0.12, compiled_opacity: 0.12, z_order: 10, profile_id: grayscale_single_band, blend_mode: multiply}
+      - {source_id: usda_cdl_imageserver, render_role: thematic_overlay, opacity: 0.24, z_order: 20, profile_id: categorical_overlay, resampling_method: nearest, coverage_dependent_opacity: true}

@@ -212,12 +212,47 @@ def run_doctor(
     gdal_version: str | None = None
     try:
         commands: dict[str, Any] = {}
+        missing_commands: list[str] = []
         for command in REQUIRED_GDAL_COMMANDS:
             location = which(command)
             commands[command] = {"available": bool(location), "location": location}
             if not location:
-                failures.append(f"missing required GDAL command: {command}")
+                missing_commands.append(command)
         checks["gdal_commands"] = commands
+
+        rasterio_runtime: tuple[Any, Any] | None = None
+        if missing_commands and runner is subprocess.run:
+            try:
+                import numpy as np
+                import rasterio
+
+                with rasterio.Env() as environment:
+                    python_drivers = sorted(environment.drivers())
+                required_drivers = {"GTiff", "VRT"}
+                if not required_drivers.issubset(python_drivers):
+                    raise RuntimeError("Rasterio GDAL runtime lacks GTiff or VRT")
+                rasterio_runtime = (rasterio, np)
+                gdal_version = f"Rasterio GDAL {rasterio.__gdal_version__}"
+                drivers = python_drivers
+                checks["gdal_python"] = {
+                    "available": True,
+                    "implementation": "rasterio",
+                    "gdal_version": rasterio.__gdal_version__,
+                }
+                warnings.append(
+                    "GDAL command-line tools are unavailable; the bundled "
+                    "Rasterio GDAL runtime passed capability checks"
+                )
+            except (ImportError, RuntimeError) as exc:
+                checks["gdal_python"] = {
+                    "available": False,
+                    "error": str(exc),
+                }
+        if missing_commands and rasterio_runtime is None:
+            failures.extend(
+                f"missing required GDAL command: {command}"
+                for command in missing_commands
+            )
 
         if commands["gdalinfo"]["available"]:
             version_result = _safe_run(["gdalinfo", "--version"], runner)
@@ -263,6 +298,38 @@ def run_doctor(
                 }
             else:
                 raster_check = {"status": "FAIL", "reason": "tiny raster create/read check failed"}
+                failures.append("unable to create and inspect a tiny local raster")
+        elif rasterio_runtime is not None:
+            rasterio, np = rasterio_runtime
+            raster = probe_dir / "tiny.tif"
+            values = np.array([[0, 64], [128, 255]], dtype=np.uint8)
+            try:
+                with rasterio.open(
+                    raster,
+                    "w",
+                    driver="GTiff",
+                    width=2,
+                    height=2,
+                    count=1,
+                    dtype="uint8",
+                ) as sink:
+                    sink.write(values, 1)
+                with rasterio.open(raster) as source:
+                    roundtrip = source.read(1)
+                raster_check = {
+                    "status": "PASS",
+                    "implementation": "rasterio",
+                    "bytes": raster.stat().st_size,
+                    "sha256": hashlib.sha256(raster.read_bytes()).hexdigest(),
+                }
+                if not np.array_equal(values, roundtrip):
+                    raise RuntimeError("tiny Rasterio round trip changed values")
+            except (OSError, RuntimeError) as exc:
+                raster_check = {
+                    "status": "FAIL",
+                    "implementation": "rasterio",
+                    "reason": str(exc),
+                }
                 failures.append("unable to create and inspect a tiny local raster")
         else:
             raster_check = {"status": "FAIL", "reason": "required GDAL commands are missing"}

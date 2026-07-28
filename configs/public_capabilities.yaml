@@ -1,0 +1,158 @@
+schema_version: fasterraster.capability-registry/v1
+registry_version: 1.0.0
+release:
+  package_version: 1.0.0b4
+  public_release: v1.0.0-beta.4
+  development_label: Unreleased
+  contract_status: experimental
+status_definitions:
+  released: Included in the published public beta.
+  experimental: Implemented in the source tree but not part of the published beta contract.
+  private: Consumed only by a proprietary execution backend; no private implementation is public.
+  planned: Directional work without an executable public contract.
+  unsupported: Explicitly outside the current public product.
+capabilities:
+  - capability_id: workfile_planning
+    label: Markdown workfiles and deterministic planning
+    kind: workflow
+    status: released
+    planning: true
+    preview: true
+    materialization: true
+    analysis: true
+    credential_requirement: none
+    public_execution: bounded_local
+    notes: Workflow-specific; exact source and geography limits still apply.
+  - capability_id: sauce_pack
+    label: Bring Your Own Sauce / declarative Source Packs
+    kind: workflow
+    status: experimental
+    planning: true
+    preview: true
+    materialization: false
+    analysis: false
+    credential_requirement: opaque_reference_supported
+    public_execution: validation_and_bounded_probe_only
+    notes: No arbitrary Python, dynamic imports, shell hooks, or unrestricted templates.
+  - capability_id: sauce_time
+    label: Sauce Time ranked temporal alternatives
+    kind: workflow
+    status: experimental
+    planning: true
+    preview: false
+    materialization: false
+    analysis: false
+    credential_requirement: none
+    public_execution: advisory_only
+    notes: Never substitutes the requested time without explicit selection.
+  - capability_id: preview_templates
+    label: Reusable preview templates
+    kind: workflow
+    status: experimental
+    planning: true
+    preview: true
+    materialization: false
+    analysis: false
+    credential_requirement: none
+    public_execution: render_contract_compilation
+    notes: Declarative roles and layouts only; render contracts remain authoritative.
+  - capability_id: credential_reference
+    label: Public credential-requirement contract
+    kind: boundary
+    status: experimental
+    planning: true
+    preview: false
+    materialization: false
+    analysis: false
+    credential_requirement: opaque_reference_only
+    public_execution: fails_before_network_without_resolver
+    notes: Resolved secrets are excluded from public plans, logs, cache keys, receipts, and archives.
+  - capability_id: private_execution_backend
+    label: Authenticated parallel execution backend
+    kind: boundary
+    status: private
+    planning: false
+    preview: false
+    materialization: true
+    analysis: true
+    credential_requirement: resolver_required
+    public_execution: unavailable
+    notes: The public repository defines only frozen, versioned input and evidence contracts.
+  - capability_id: arbitrary_code_plugins
+    label: Arbitrary-code source plugins
+    kind: boundary
+    status: unsupported
+    planning: false
+    preview: false
+    materialization: false
+    analysis: false
+    credential_requirement: unsupported
+    public_execution: unavailable
+    notes: Declarative Source Packs are the supported extension seam.
+sources:
+  - capability_id: usda_cdl
+    label: USDA NASS Cropland Data Layer
+    kind: source
+    status: released
+    planning: true
+    preview: true
+    materialization: true
+    analysis: true
+    credential_requirement: none
+    public_execution: exact_year_workflows
+    notes: Categorical outputs require nearest or mode resampling.
+  - capability_id: usgs_naip
+    label: USGS NAIP imagery
+    kind: source
+    status: released
+    planning: true
+    preview: true
+    materialization: true
+    analysis: true
+    credential_requirement: none
+    public_execution: shipped_agricultural_workflows
+    notes: Exact-year coverage is fail-closed; available years are advisory until selected.
+  - capability_id: usgs_3dep
+    label: USGS 3DEP
+    kind: source
+    status: released
+    planning: true
+    preview: true
+    materialization: true
+    analysis: true
+    credential_requirement: none
+    public_execution: recipe_bounded
+    notes: Available only where a shipped workflow declares the terrain role.
+  - capability_id: prism_daily
+    label: PRISM daily precipitation ZIP
+    kind: source
+    status: released
+    planning: true
+    preview: true
+    materialization: true
+    analysis: true
+    credential_requirement: none
+    public_execution: guarded_bounded
+    notes: Complete-object materialization requires explicit approval and byte ceilings.
+  - capability_id: static_http_range_wave
+    label: CHIRPS, gridMET, TerraClimate, and WorldClim
+    kind: source
+    status: experimental
+    planning: true
+    preview: true
+    materialization: false
+    analysis: false
+    credential_requirement: none
+    public_execution: bounded_probe_and_fixture_paths
+    notes: Catalog presence does not imply a runnable end-to-end workflow.
+  - capability_id: copernicus_cdse
+    label: Copernicus Data Space STAC
+    kind: source
+    status: experimental
+    planning: true
+    preview: false
+    materialization: false
+    analysis: false
+    credential_requirement: opaque_bearer_reference
+    public_execution: resolver_required
+    notes: Public contracts can plan requirements; the public runtime never resolves credentials.

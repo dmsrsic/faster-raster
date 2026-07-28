@@ -5,8 +5,19 @@
 - Source coverage is limited by provider geography, exact year, catalog state, and service availability.
 - CDL mapped-development results are a crop-focused proxy with classification and source-production uncertainty.
 - Context imagery is visual evidence only and is temporally distinct when its year differs from the analytical endpoint.
-- PRISM static ZIP support is fixture-only pending a currently verified deterministic endpoint.
+- PRISM daily ZIP has a deterministic official path, bounded probe, guarded
+  complete-object materialization, selected-raster validation, and a shipped
+  bounded correlation workflow. Live operations remain explicit and
+  byte-capped; routine CI remains offline.
 - Credentialed and paid-source paths are not production integrations in this beta.
+- Unreleased Source Packs can express opaque credential requirements, but the
+  public runtime cannot resolve them and stops before network access.
+- Source Packs are declarative only; arbitrary Python, dynamic imports, shell
+  hooks, and unrestricted templates are unsupported.
+- Sauce Time alternatives use available metadata. Unknown coverage or quality
+  remains unknown, and an explicit selection is required.
+- Preview templates define layouts and roles; they do not expand a source's
+  executable capabilities.
 - The NAIP–CDL classifier is a bounded weak-supervised analytical workflow,
   not a general-purpose or authoritative land-cover model.
 - Raw NAIP values are not automatically atmospherically corrected surface
