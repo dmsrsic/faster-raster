@@ -3,6 +3,7 @@ from __future__ import annotations
 from copy import deepcopy
 from pathlib import Path
 
+import pytest
 import yaml
 
 from faster_raster import preview_contracts
@@ -10,6 +11,7 @@ from faster_raster.preview_templates import (
     get_template,
     load_registry,
     template_catalog,
+    validate_audit_evidence,
     validate_template,
     validate_template_path,
 )
@@ -71,3 +73,76 @@ def test_categorical_role_rejects_non_nearest_resampling():
     )
     assert result["status"] == "FAIL"
     assert any("unsafe resampling" in item for item in result["errors"])
+
+
+def _valid_audit_evidence() -> dict:
+    return {
+        "panel_titles": ["Natural color", "Classification", "Confidence"],
+        "legends_present": {"broad_classes", "confidence_states"},
+        "explanations_present": {
+            "unknown_uncertain",
+            "confidence_threshold",
+            "decision_states",
+        },
+        "class_codes": [0, 1, 2, 3, 4, 5, 6],
+        "supported_class_codes": [0, 1, 2, 3, 4, 5, 6],
+        "confidence_provenance": {
+            "confidence_metric": "maximum_class_probability",
+            "confidence_threshold": 0.6,
+            "unknown_class_code": 0,
+            "threshold_source": "recipe_default",
+        },
+        "provenance_footer": "Receipt-bound provenance.",
+    }
+
+
+def test_classification_audit_layout_contract_is_complete():
+    result = validate_audit_evidence(
+        "ag_classification_audit_v1",
+        **_valid_audit_evidence(),
+    )
+    assert result["status"] == "PASS"
+    assert result["minimum_font_size"] >= 18
+    assert result["documentation_derivative"] == {
+        "width": 1920,
+        "height": 1080,
+    }
+
+
+@pytest.mark.parametrize(
+    ("change", "expected"),
+    [
+        (
+            {"legends_present": set()},
+            "missing legend",
+        ),
+        (
+            {"panel_titles": ["x" * 120]},
+            "title overflow",
+        ),
+        (
+            {"class_codes": [0, 99]},
+            "unsupported class codes",
+        ),
+        (
+            {"confidence_provenance": {}},
+            "missing confidence threshold",
+        ),
+        (
+            {"provenance_footer": ""},
+            "missing provenance footer",
+        ),
+    ],
+)
+def test_classification_audit_layout_rejects_missing_evidence(
+    change,
+    expected,
+):
+    evidence = _valid_audit_evidence()
+    evidence.update(change)
+    result = validate_audit_evidence(
+        "ag_classification_audit_v1",
+        **evidence,
+    )
+    assert result["status"] == "FAIL"
+    assert any(expected in item for item in result["errors"])

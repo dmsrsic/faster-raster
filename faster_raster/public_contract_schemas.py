@@ -116,6 +116,305 @@ def temporal_resolution_schema() -> dict[str, Any]:
     }
 
 
+def classification_temporal_alternatives_schema() -> dict[str, Any]:
+    year_pair = {
+        "type": "object",
+        "additionalProperties": False,
+        "required": ["imagery_year", "cdl_year"],
+        "properties": {
+            "imagery_year": {"type": "integer"},
+            "cdl_year": {"type": "integer"},
+        },
+    }
+    return {
+        "$schema": DRAFT,
+        "title": "FasterRaster classification temporal alternatives v1",
+        "type": "object",
+        "additionalProperties": False,
+        "required": [
+            "schema_version",
+            "status",
+            "coherent_pair_status",
+            "requested_pair",
+            "original_request_unchanged",
+            "selection_required",
+            "raster_acquisition_authorized",
+            "network_bytes",
+            "search_contract_sha256",
+            "candidate_count",
+            "candidates",
+            "ranking_policy",
+            "temporal_alternatives_sha256",
+        ],
+        "properties": {
+            "schema_version": {
+                "const": "fasterraster.classification-temporal-alternatives/v1"
+            },
+            "status": {
+                "enum": [
+                    "EXACT_TIME_AVAILABLE",
+                    "AWAITING_TEMPORAL_SELECTION",
+                    "NO_COHERENT_ALTERNATIVE",
+                ]
+            },
+            "coherent_pair_status": {
+                "enum": [
+                    "EXACT_TIME_AVAILABLE",
+                    "AWAITING_TEMPORAL_SELECTION",
+                    "NO_COHERENT_ALTERNATIVE",
+                ]
+            },
+            "requested_pair": year_pair,
+            "original_request_unchanged": {"const": True},
+            "selection_required": {"type": "boolean"},
+            "raster_acquisition_authorized": {"const": False},
+            "network_bytes": {"const": 0},
+            "search_contract_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$",
+            },
+            "candidate_count": {"type": "integer", "minimum": 0},
+            "candidates": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "additionalProperties": False,
+                    "required": [
+                        "candidate_id",
+                        "repair_mode",
+                        "imagery_year",
+                        "cdl_year",
+                        "distance_years",
+                        "coverage_fraction",
+                        "coherent_pair",
+                        "rank",
+                        "reason_codes",
+                    ],
+                    "properties": {
+                        "candidate_id": {"type": "string"},
+                        "repair_mode": {
+                            "enum": [
+                                "coherent_imagery_and_weak_labels",
+                                "imagery_only",
+                            ]
+                        },
+                        "imagery_year": {"type": "integer"},
+                        "cdl_year": {"type": "integer"},
+                        "distance_years": {
+                            "type": "integer",
+                            "minimum": 0,
+                        },
+                        "coverage_fraction": {
+                            "oneOf": [
+                                {
+                                    "type": "number",
+                                    "minimum": 0,
+                                    "maximum": 1,
+                                },
+                                {"const": "unknown"},
+                            ]
+                        },
+                        "coherent_pair": {"type": "boolean"},
+                        "rank": {"type": "integer", "minimum": 1},
+                        "reason_codes": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                        },
+                    },
+                },
+            },
+            "ranking_policy": {
+                "type": "array",
+                "items": {"type": "string"},
+            },
+            "temporal_alternatives_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$",
+            },
+        },
+    }
+
+
+def classification_temporal_resolution_schema() -> dict[str, Any]:
+    year_pair = {
+        "type": "object",
+        "additionalProperties": False,
+        "required": ["imagery_year", "cdl_year"],
+        "properties": {
+            "imagery_year": {"type": "integer"},
+            "cdl_year": {"type": "integer"},
+        },
+    }
+    return {
+        "$schema": DRAFT,
+        "title": "FasterRaster classification temporal resolution v1",
+        "type": "object",
+        "additionalProperties": False,
+        "required": [
+            "schema_version",
+            "status",
+            "requested_pair",
+            "resolved_pair",
+            "selected_candidate",
+            "selection_method",
+            "original_request_unchanged",
+            "raster_acquisition_during_selection",
+            "search_contract_sha256",
+            "temporal_alternatives_sha256",
+            "resolved_contract_sha256",
+        ],
+        "properties": {
+            "schema_version": {
+                "const": "fasterraster.classification-temporal-resolution/v1"
+            },
+            "status": {"const": "TEMPORAL_SELECTION_RESOLVED"},
+            "requested_pair": year_pair,
+            "resolved_pair": year_pair,
+            "selected_candidate": {"type": "object"},
+            "selection_method": {
+                "enum": [
+                    "explicit_user_selection",
+                    "explicit_cli_year_arguments",
+                ]
+            },
+            "original_request_unchanged": {"const": True},
+            "raster_acquisition_during_selection": {"const": False},
+            "search_contract_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$",
+            },
+            "temporal_alternatives_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$",
+            },
+            "resolved_contract_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$",
+            },
+        },
+    }
+
+
+def categorical_area_accounting_schema() -> dict[str, Any]:
+    numeric_map = {
+        "type": "object",
+        "additionalProperties": {"type": "number"},
+    }
+    integer_map = {
+        "type": "object",
+        "additionalProperties": {"type": "integer", "minimum": 0},
+    }
+    grid = {
+        "type": "object",
+        "additionalProperties": False,
+        "required": [
+            "crs",
+            "transform",
+            "width",
+            "height",
+            "pixel_area_square_meters",
+        ],
+        "properties": {
+            "crs": {"type": "string"},
+            "transform": {
+                "type": "array",
+                "items": {"type": "number"},
+                "minItems": 6,
+                "maxItems": 6,
+            },
+            "width": {"type": "integer", "minimum": 1},
+            "height": {"type": "integer", "minimum": 1},
+            "pixel_area_square_meters": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+            },
+        },
+    }
+    return {
+        "$schema": DRAFT,
+        "title": "FasterRaster categorical area accounting v1",
+        "type": "object",
+        "additionalProperties": False,
+        "required": [
+            "schema_version",
+            "area_method",
+            "area_units",
+            "area_reference_crs",
+            "categorical_resampling",
+            "native_class_counts_preserved",
+            "source_grid",
+            "area_grid",
+            "native_valid_pixel_count",
+            "native_class_pixel_counts",
+            "equal_area_class_pixel_counts",
+            "class_area_square_meters",
+            "class_area_hectares",
+            "area_reconciliation_tolerance_fraction",
+            "valid_footprint_area_square_meters",
+            "valid_footprint_area_hectares",
+            "summed_class_area_square_meters",
+            "summed_class_area_hectares",
+            "area_reconciliation_difference_fraction",
+            "area_reconciliation_status",
+            "area_accounting_sha256",
+        ],
+        "properties": {
+            "schema_version": {
+                "const": "fasterraster.categorical-area-accounting/v1"
+            },
+            "area_method": {
+                "enum": [
+                    "native_declared_equal_area_grid",
+                    "nearest_neighbor_reprojection_to_equal_area_grid",
+                ]
+            },
+            "area_units": {"const": "hectares"},
+            "area_reference_crs": {"type": "string"},
+            "categorical_resampling": {"const": "nearest"},
+            "native_class_counts_preserved": {"const": True},
+            "source_grid": grid,
+            "area_grid": grid,
+            "native_valid_pixel_count": {
+                "type": "integer",
+                "minimum": 0,
+            },
+            "native_class_pixel_counts": integer_map,
+            "equal_area_class_pixel_counts": integer_map,
+            "class_area_square_meters": numeric_map,
+            "class_area_hectares": numeric_map,
+            "area_reconciliation_tolerance_fraction": {
+                "type": "number",
+                "minimum": 0,
+            },
+            "valid_footprint_area_square_meters": {
+                "type": "number",
+                "minimum": 0,
+            },
+            "valid_footprint_area_hectares": {
+                "type": "number",
+                "minimum": 0,
+            },
+            "summed_class_area_square_meters": {
+                "type": "number",
+                "minimum": 0,
+            },
+            "summed_class_area_hectares": {
+                "type": "number",
+                "minimum": 0,
+            },
+            "area_reconciliation_difference_fraction": {
+                "type": "number",
+                "minimum": 0,
+            },
+            "area_reconciliation_status": {"const": "PASS"},
+            "area_accounting_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$",
+            },
+        },
+    }
+
+
 def preview_template_schema() -> dict[str, Any]:
     return {
         "$schema": DRAFT,

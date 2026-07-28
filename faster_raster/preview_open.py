@@ -95,6 +95,32 @@ def _classification_summary(
         else None
     )
     mapping_hash = model.get("mapping_sha256")
+    area_accounting = disagreement.get("area_accounting")
+    if not isinstance(area_accounting, dict):
+        area_accounting = _read_json(
+            analysis / "area_accounting.json"
+        )
+    if not area_accounting:
+        missing.append("legacy_area_accounting")
+    confidence_provenance = {
+        field: (
+            publication.get(field)
+            if publication.get(field) is not None
+            else model.get(field)
+        )
+        for field in (
+            "confidence_metric",
+            "confidence_threshold",
+            "unknown_class_code",
+            "threshold_source",
+        )
+    }
+    confidence_available = all(
+        value is not None
+        for value in confidence_provenance.values()
+    )
+    if not confidence_available:
+        missing.append("legacy_confidence_provenance")
     return {
         "available": any((model, training, metrics, disagreement, hectares)),
         "classifier_backend": model.get("backend"),
@@ -108,13 +134,34 @@ def _classification_summary(
         "weak_label_overall_agreement": metrics.get("overall_agreement"),
         "macro_f1": metrics.get("macro_f1"),
         "cohen_kappa": metrics.get("cohen_kappa"),
-        "confidence_threshold": publication.get("confidence_threshold"),
+        **confidence_provenance,
+        "confidence_provenance_status": (
+            "AVAILABLE"
+            if confidence_available
+            else "LEGACY_UNAVAILABLE"
+        ),
         "classified_coverage": classified_coverage,
         "uncertain_fraction": low_confidence,
         "high_confidence_disagreement_fraction": disagreement.get(
             "high_confidence_disagreement_fraction"
         ),
         "predicted_hectares_by_class": hectares,
+        "area_method": area_accounting.get("area_method"),
+        "area_reference_crs": area_accounting.get(
+            "area_reference_crs"
+        ),
+        "valid_footprint_area_hectares": area_accounting.get(
+            "valid_footprint_area_hectares"
+        ),
+        "summed_class_area_hectares": area_accounting.get(
+            "summed_class_area_hectares"
+        ),
+        "area_reconciliation_status": area_accounting.get(
+            "area_reconciliation_status"
+        ),
+        "area_accounting_sha256": area_accounting.get(
+            "area_accounting_sha256"
+        ),
         "missing_fields": sorted(set(missing)),
     }
 

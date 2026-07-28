@@ -6,7 +6,10 @@ import pytest
 
 from faster_raster.temporal_alternatives import (
     alternatives_from_years,
+    build_classification_temporal_alternatives,
     build_temporal_alternatives,
+    explicit_classification_temporal_resolution,
+    select_classification_temporal_candidate,
     select_temporal_candidate,
 )
 
@@ -80,3 +83,83 @@ def test_selection_rejects_unlisted_candidate():
     alternatives = alternatives_from_years(2022, [2021], source_id="naip")
     with pytest.raises(ValueError, match="not a unique ranked alternative"):
         select_temporal_candidate(alternatives, "2020")
+
+
+def test_greeley_classification_ranks_coherent_2019_pair_first():
+    alternatives = build_classification_temporal_alternatives(
+        2023,
+        2023,
+        [2019],
+        available_cdl_years=[2019],
+        source_evidence={
+            "bbox_epsg_4326": [
+                -104.80,
+                40.34,
+                -104.58,
+                40.51,
+            ]
+        },
+    )
+    assert alternatives["status"] == "AWAITING_TEMPORAL_SELECTION"
+    assert alternatives["coherent_pair_status"] == (
+        "AWAITING_TEMPORAL_SELECTION"
+    )
+    assert alternatives["candidates"][0]["candidate_id"] == (
+        "coherent:2019:2019"
+    )
+    assert alternatives["candidates"][0]["coherent_pair"] is True
+    assert alternatives["network_bytes"] == 0
+    assert alternatives["raster_acquisition_authorized"] is False
+
+    original = deepcopy(alternatives)
+    resolution = select_classification_temporal_candidate(
+        alternatives,
+        "coherent:2019:2019",
+    )
+    assert alternatives == original
+    assert resolution["status"] == "TEMPORAL_SELECTION_RESOLVED"
+    assert resolution["requested_pair"] == {
+        "imagery_year": 2023,
+        "cdl_year": 2023,
+    }
+    assert resolution["resolved_pair"] == {
+        "imagery_year": 2019,
+        "cdl_year": 2019,
+    }
+    assert resolution["raster_acquisition_during_selection"] is False
+    assert resolution["resolved_contract_sha256"]
+
+
+def test_classification_temporal_states_are_explicit():
+    exact = build_classification_temporal_alternatives(
+        2023,
+        2023,
+        [2023],
+        available_cdl_years=[2023],
+    )
+    assert exact["status"] == "EXACT_TIME_AVAILABLE"
+
+    unavailable = build_classification_temporal_alternatives(
+        2023,
+        2023,
+        [],
+        available_cdl_years=[],
+    )
+    assert unavailable["status"] == "NO_COHERENT_ALTERNATIVE"
+    assert unavailable["coherent_pair_status"] == (
+        "NO_COHERENT_ALTERNATIVE"
+    )
+
+
+def test_explicit_cli_pair_creates_immutable_resolution():
+    result = explicit_classification_temporal_resolution(
+        2023,
+        2023,
+        2019,
+        2019,
+    )
+    assert result["selection_method"] == (
+        "explicit_cli_year_arguments"
+    )
+    assert result["resolved_pair"]["imagery_year"] == 2019
+    assert result["resolved_pair"]["cdl_year"] == 2019

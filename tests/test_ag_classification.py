@@ -16,10 +16,12 @@ from rasterio.transform import from_origin
 from faster_raster.ag_classification import (
     ClassificationError,
     calculate_features,
+    classification_confidence_provenance,
     execute_classification,
     extract_training_samples,
     map_cdl_superclasses,
     prepare_weak_labels,
+    require_confidence_provenance,
     run_inference,
     spatial_fold,
     training_core_mask,
@@ -43,6 +45,38 @@ from faster_raster.ag_recipes import (
     ClassificationSpec,
     load_recipe,
 )
+
+
+def test_confidence_provenance_tracks_recipe_default_and_override():
+    default = classification_confidence_provenance(
+        _classification_spec(confidence_threshold=0.60)
+    )
+    override = classification_confidence_provenance(
+        _classification_spec(confidence_threshold=0.73),
+        threshold_source="configured_override",
+    )
+    assert default == {
+        "confidence_metric": "maximum_class_probability",
+        "confidence_threshold": 0.60,
+        "unknown_class_code": 0,
+        "threshold_source": "recipe_default",
+    }
+    assert override["confidence_threshold"] == 0.73
+    assert override["threshold_source"] == "configured_override"
+
+
+def test_uncertainty_finalization_requires_threshold_provenance():
+    with pytest.raises(
+        ClassificationError,
+        match="requires confidence provenance",
+    ):
+        require_confidence_provenance(
+            {
+                "confidence_metric": "maximum_class_probability",
+                "unknown_class_code": 0,
+            },
+            uncertainty_reported=True,
+        )
 from faster_raster.development_sources import CDL_CLASS_LABELS
 
 

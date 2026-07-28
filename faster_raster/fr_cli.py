@@ -71,6 +71,7 @@ from faster_raster.contract_repair import (
     RepairCancelled,
     amended_workfile,
     build_intervention_record,
+    intervention_from_explicit_temporal_resolution,
     prompt_repair_candidate,
     stable_plan_hash,
     terminal_interaction_enabled,
@@ -878,6 +879,53 @@ def command_validate(args: argparse.Namespace) -> int:
 def _load_and_plan(args: argparse.Namespace) -> tuple[Any, Any, LocalPaths, dict[str, Any]]:
     root = repository_root()
     workfile = load_workfile(args.workfile, repository_root=root)
+    resolved_imagery_year = getattr(
+        args,
+        "resolve_imagery_year",
+        None,
+    )
+    resolved_cdl_year = getattr(args, "resolve_cdl_year", None)
+    temporal_resolution = None
+    original_runtime_request = None
+    if (resolved_imagery_year is None) != (
+        resolved_cdl_year is None
+    ):
+        raise CommandError(
+            "--resolve-imagery-year and --resolve-cdl-year must be "
+            "provided together"
+        )
+    if resolved_imagery_year is not None:
+        from faster_raster.temporal_alternatives import (
+            explicit_classification_temporal_resolution,
+        )
+
+        original = ClassificationRuntimeRequest.from_workfile(workfile)
+        original_runtime_request = original.as_dict()
+        temporal_resolution = (
+            explicit_classification_temporal_resolution(
+                original.imagery_year,
+                original.cdl_year,
+                int(resolved_imagery_year),
+                int(resolved_cdl_year),
+            )
+        )
+        resolved = (
+            original.with_coherent_year(int(resolved_imagery_year))
+            if int(resolved_imagery_year)
+            == int(resolved_cdl_year)
+            else original.with_imagery_year(
+                int(resolved_imagery_year)
+            )
+        )
+        if resolved.cdl_year != int(resolved_cdl_year):
+            raise CommandError(
+                "a noncoherent explicit repair must retain the "
+                "requested CDL year"
+            )
+        resolved = resolved.with_temporal_resolution(
+            temporal_resolution
+        )
+        workfile = amended_workfile(workfile, resolved)
     paths = _paths(workfile.path.parent)
     config, _ = resolved_config_document(paths)
     _refresh_if_requested(args, paths, config)
@@ -887,7 +935,22 @@ def _load_and_plan(args: argparse.Namespace) -> tuple[Any, Any, LocalPaths, dict
         paths,
         cli_overrides=_cli_overrides(args),
         output_dir=args.out.resolve() if getattr(args, "out", None) else None,
+        runtime_request=(
+            resolved.as_dict()
+            if temporal_resolution is not None
+            else None
+        ),
     )
+    if temporal_resolution is not None:
+        plan["classification_temporal_resolution"] = (
+            temporal_resolution
+        )
+        plan["classification_temporal_original_request"] = (
+            original_runtime_request
+        )
+        plan["classification_temporal_resolved_request"] = (
+            resolved.as_dict()
+        )
     return root, workfile, paths, plan
 
 
@@ -1074,6 +1137,12 @@ def _execute_classification_request(
         ),
         analysis_aoi_epsg_4326=request.analysis_aoi_epsg_4326,
         contract_repair=contract_repair,
+        confidence_threshold_source=(
+            "configured_override"
+            if isinstance(recipe, AgriculturalRecipeV4)
+            and workfile.spec.classification is not None
+            else "recipe_default"
+        ),
         recommendation_selector=recommendation_selector,
     )
 
@@ -1480,6 +1549,35 @@ def command_cook(args: argparse.Namespace) -> int:
             )
     recipe_raw = json.loads((root / "recipes" / "ag" / f"{recipe.recipe_id}.json").read_text(encoding="utf-8"))
     request = ClassificationRuntimeRequest.from_workfile(workfile)
+    explicit_contract_repair = None
+    if plan.get("classification_temporal_resolution"):
+        resolved_pair = plan[
+            "classification_temporal_resolution"
+        ]["resolved_pair"]
+        request = (
+            request.with_coherent_year(
+                int(resolved_pair["imagery_year"])
+            )
+            if int(resolved_pair["imagery_year"])
+            == int(resolved_pair["cdl_year"])
+            else request.with_imagery_year(
+                int(resolved_pair["imagery_year"])
+            )
+        )
+        request = request.with_temporal_resolution(
+            plan["classification_temporal_resolution"]
+        )
+        explicit_contract_repair = (
+            intervention_from_explicit_temporal_resolution(
+                original_request=plan[
+                    "classification_temporal_original_request"
+                ],
+                resolved_request=request,
+                resolution=plan[
+                    "classification_temporal_resolution"
+                ],
+            )
+        )
     try:
         execution_output = (
             contextlib.redirect_stdout(io.StringIO())
@@ -1494,6 +1592,7 @@ def command_cook(args: argparse.Namespace) -> int:
                 request,
                 recipe=recipe,
                 recipe_raw=recipe_raw,
+                contract_repair=explicit_contract_repair,
                 recommendation_selector=recommendation_selector,
             )
     except SelectionReviewReady as review:
@@ -1710,6 +1809,18 @@ def command_inspect(args: argparse.Namespace) -> int:
                     else:
                         rendered = f"{float(value):.3f}"
                     print(f"    {label}: {rendered}")
+                print(
+                    "    Confidence provenance: "
+                    f"{classification['confidence_metric'] or 'unavailable'}; "
+                    f"source={classification['threshold_source'] or 'unavailable'}; "
+                    f"status={classification['confidence_provenance_status']}"
+                )
+                print(
+                    "    Physical area: "
+                    f"method={classification['area_method'] or 'unavailable'}; "
+                    f"reference={classification['area_reference_crs'] or 'unavailable'}; "
+                    f"reconciliation={classification['area_reconciliation_status'] or 'unavailable'}"
+                )
                 print("    Predicted hectares by class:")
                 hectares = classification["predicted_hectares_by_class"]
                 if hectares:
@@ -1897,6 +2008,22 @@ def _add_plan_options(parser: argparse.ArgumentParser, *, include_out: bool = Tr
     parser.add_argument("--reuse", choices=("auto", "only", "never"), help="override data reuse policy")
     parser.add_argument("--service-tile-size", type=int)
     parser.add_argument("--maximum-parallel-tasks", type=int)
+    parser.add_argument(
+        "--resolve-imagery-year",
+        type=int,
+        help=(
+            "explicitly resolve classification imagery year; requires "
+            "--resolve-cdl-year and creates an immutable resolution contract"
+        ),
+    )
+    parser.add_argument(
+        "--resolve-cdl-year",
+        type=int,
+        help=(
+            "explicitly resolve classification weak-label year; requires "
+            "--resolve-imagery-year"
+        ),
+    )
 
 
 def build_parser() -> argparse.ArgumentParser:

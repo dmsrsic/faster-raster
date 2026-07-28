@@ -24,6 +24,9 @@ from faster_raster.ag_recipes import (
     WeightedIndexInputSpec,
 )
 from faster_raster.aoi_geometry import raster_aoi_mask
+from faster_raster.area_accounting import (
+    account_categorical_raster_area,
+)
 from faster_raster.hybrid_classification import (
     HYBRID_ENGINE_VERSION,
     IndexArray,
@@ -566,10 +569,6 @@ def _arbitrate_rasters(
                 general,
                 evaluations,
                 recipe.classification.arbitration,
-                pixel_area_m2=abs(
-                    general_source.transform.a * general_source.transform.e
-                    - general_source.transform.b * general_source.transform.d
-                ),
             )
             final_sink.write(result["final_classes"], 1, window=window)
             decision_sink.write(result["decision_state"], 1, window=window)
@@ -594,10 +593,6 @@ def _arbitrate_rasters(
     _finalize_cog(final_working, final_path, categorical=True)
     _finalize_cog(decision_working, decision_path, categorical=True)
     with rasterio.open(general_path) as reference:
-        pixel_area_m2 = abs(
-            reference.transform.a * reference.transform.e
-            - reference.transform.b * reference.transform.d
-        )
         final_validation = _validate_cog(
             final_path,
             reference,
@@ -610,12 +605,15 @@ def _arbitrate_rasters(
             dtype="uint8",
             receipt_path=f"data/{decision_path.name}",
         )
+    area_accounting = account_categorical_raster_area(
+        final_path,
+        class_codes=sorted(inventory_counts),
+    )
     overlap = [
         {
             "left_class_id": key[0],
             "right_class_id": key[1],
             "pixel_count": count,
-            "area_square_meters": count * pixel_area_m2,
         }
         for key, count in sorted(overlap_counts.items())
     ]
@@ -623,8 +621,12 @@ def _arbitrate_rasters(
         {
             "class_code": code,
             "pixel_count": count,
-            "area_square_meters": count * pixel_area_m2,
-            "hectares": count * pixel_area_m2 / 10_000.0,
+            "area_square_meters": area_accounting[
+                "class_area_square_meters"
+            ][str(code)],
+            "hectares": area_accounting["class_area_hectares"][
+                str(code)
+            ],
         }
         for code, count in sorted(inventory_counts.items())
     ]
@@ -636,9 +638,13 @@ def _arbitrate_rasters(
         ),
         "winner_pixels_by_specialist": winner_counts,
         "overlap_matrix": overlap,
+        "overlap_area_status": (
+            "NOT_REPORTED_NON_DISJOINT; inspect pixel counts"
+        ),
         "unresolved_pixels": unresolved,
         "valid_pixels": valid_pixels,
         "class_inventory": inventory,
+        "area_accounting": area_accounting,
         "general_classification_preserved": True,
         "raw_unrelated_scores_compared": False,
         "winner_reason": (

@@ -96,6 +96,28 @@ def _classification_result(
     agreement = _read_json(analysis / "disagreement_summary.json")
     counts = agreement.get("post_sieve_class_counts", {})
     valid_source_pixels = sum(int(value) for value in counts.values())
+    classification_receipt = receipt.get("classification") or {}
+    confidence_provenance = (
+        classification_receipt.get("confidence_provenance")
+        or {
+            field: (
+                classification_receipt.get("publication", {}).get(
+                    field
+                )
+                if isinstance(
+                    classification_receipt.get("publication"),
+                    dict,
+                )
+                else None
+            )
+            for field in (
+                "confidence_metric",
+                "confidence_threshold",
+                "unknown_class_code",
+                "threshold_source",
+            )
+        }
+    )
     return {
         "paths": {
             "classification": handoff
@@ -135,6 +157,7 @@ def _classification_result(
         },
         "mapping": CDL_SURFACE_SUPERCLASSES.as_dict(),
         "mapping_sha256": CDL_SURFACE_SUPERCLASSES.sha256,
+        "confidence_provenance": confidence_provenance,
     }
 
 

@@ -1,0 +1,185 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "area_accounting_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "area_grid": {
+      "additionalProperties": false,
+      "properties": {
+        "crs": {
+          "type": "string"
+        },
+        "height": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "pixel_area_square_meters": {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "transform": {
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 6,
+          "minItems": 6,
+          "type": "array"
+        },
+        "width": {
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "crs",
+        "transform",
+        "width",
+        "height",
+        "pixel_area_square_meters"
+      ],
+      "type": "object"
+    },
+    "area_method": {
+      "enum": [
+        "native_declared_equal_area_grid",
+        "nearest_neighbor_reprojection_to_equal_area_grid"
+      ]
+    },
+    "area_reconciliation_difference_fraction": {
+      "minimum": 0,
+      "type": "number"
+    },
+    "area_reconciliation_status": {
+      "const": "PASS"
+    },
+    "area_reconciliation_tolerance_fraction": {
+      "minimum": 0,
+      "type": "number"
+    },
+    "area_reference_crs": {
+      "type": "string"
+    },
+    "area_units": {
+      "const": "hectares"
+    },
+    "categorical_resampling": {
+      "const": "nearest"
+    },
+    "class_area_hectares": {
+      "additionalProperties": {
+        "type": "number"
+      },
+      "type": "object"
+    },
+    "class_area_square_meters": {
+      "additionalProperties": {
+        "type": "number"
+      },
+      "type": "object"
+    },
+    "equal_area_class_pixel_counts": {
+      "additionalProperties": {
+        "minimum": 0,
+        "type": "integer"
+      },
+      "type": "object"
+    },
+    "native_class_counts_preserved": {
+      "const": true
+    },
+    "native_class_pixel_counts": {
+      "additionalProperties": {
+        "minimum": 0,
+        "type": "integer"
+      },
+      "type": "object"
+    },
+    "native_valid_pixel_count": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "schema_version": {
+      "const": "fasterraster.categorical-area-accounting/v1"
+    },
+    "source_grid": {
+      "additionalProperties": false,
+      "properties": {
+        "crs": {
+          "type": "string"
+        },
+        "height": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "pixel_area_square_meters": {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "transform": {
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 6,
+          "minItems": 6,
+          "type": "array"
+        },
+        "width": {
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "crs",
+        "transform",
+        "width",
+        "height",
+        "pixel_area_square_meters"
+      ],
+      "type": "object"
+    },
+    "summed_class_area_hectares": {
+      "minimum": 0,
+      "type": "number"
+    },
+    "summed_class_area_square_meters": {
+      "minimum": 0,
+      "type": "number"
+    },
+    "valid_footprint_area_hectares": {
+      "minimum": 0,
+      "type": "number"
+    },
+    "valid_footprint_area_square_meters": {
+      "minimum": 0,
+      "type": "number"
+    }
+  },
+  "required": [
+    "schema_version",
+    "area_method",
+    "area_units",
+    "area_reference_crs",
+    "categorical_resampling",
+    "native_class_counts_preserved",
+    "source_grid",
+    "area_grid",
+    "native_valid_pixel_count",
+    "native_class_pixel_counts",
+    "equal_area_class_pixel_counts",
+    "class_area_square_meters",
+    "class_area_hectares",
+    "area_reconciliation_tolerance_fraction",
+    "valid_footprint_area_square_meters",
+    "valid_footprint_area_hectares",
+    "summed_class_area_square_meters",
+    "summed_class_area_hectares",
+    "area_reconciliation_difference_fraction",
+    "area_reconciliation_status",
+    "area_accounting_sha256"
+  ],
+  "title": "FasterRaster categorical area accounting v1",
+  "type": "object"
+}

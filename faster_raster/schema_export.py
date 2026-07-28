@@ -34,6 +34,9 @@ SCHEMA_FILENAMES = [
     "source_pack.schema.json",
     "temporal_alternatives.schema.json",
     "temporal_resolution.schema.json",
+    "classification_temporal_alternatives.schema.json",
+    "classification_temporal_resolution.schema.json",
+    "categorical_area_accounting.schema.json",
     "preview_template.schema.json",
     "capability_registry.schema.json",
     "credential_requirement.schema.json",
@@ -1006,6 +1009,9 @@ def all_schemas() -> dict[str, dict]:
     )
     from faster_raster.public_contract_schemas import (
         capability_registry_schema,
+        categorical_area_accounting_schema,
+        classification_temporal_alternatives_schema,
+        classification_temporal_resolution_schema,
         credential_requirement_schema,
         preview_template_schema,
         source_pack_schema,
@@ -1043,6 +1049,15 @@ def all_schemas() -> dict[str, dict]:
         "source_pack.schema.json": source_pack_schema(),
         "temporal_alternatives.schema.json": temporal_alternatives_schema(),
         "temporal_resolution.schema.json": temporal_resolution_schema(),
+        "classification_temporal_alternatives.schema.json": (
+            classification_temporal_alternatives_schema()
+        ),
+        "classification_temporal_resolution.schema.json": (
+            classification_temporal_resolution_schema()
+        ),
+        "categorical_area_accounting.schema.json": (
+            categorical_area_accounting_schema()
+        ),
         "preview_template.schema.json": preview_template_schema(),
         "capability_registry.schema.json": capability_registry_schema(),
         "credential_requirement.schema.json": credential_requirement_schema(),

@@ -4,7 +4,7 @@ import hashlib
 import re
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any, Iterable, Mapping
 
 import yaml
 
@@ -115,6 +115,50 @@ def validate_template(
                     errors.append(f"{dimension} must be between 64 and 4096")
             except (TypeError, ValueError):
                 errors.append(f"{dimension} must be an integer")
+    audit = value.get("audit_contract")
+    if audit is not None:
+        if not isinstance(audit, Mapping):
+            errors.append("audit_contract must be an object")
+        else:
+            try:
+                minimum_font_size = int(
+                    audit.get("minimum_font_size")
+                )
+                if not 14 <= minimum_font_size <= 72:
+                    errors.append(
+                        "audit minimum_font_size must be between 14 and 72"
+                    )
+            except (TypeError, ValueError):
+                errors.append(
+                    "audit minimum_font_size must be an integer"
+                )
+            for key in (
+                "required_legends",
+                "required_explanations",
+            ):
+                if not isinstance(audit.get(key), list) or not audit.get(
+                    key
+                ):
+                    errors.append(f"audit {key} must be a nonempty array")
+            derivative = audit.get("documentation_derivative")
+            if not isinstance(derivative, Mapping):
+                errors.append(
+                    "audit documentation_derivative must be an object"
+                )
+            else:
+                for dimension in ("width", "height"):
+                    try:
+                        parsed = int(derivative.get(dimension))
+                        if not 320 <= parsed <= 4096:
+                            errors.append(
+                                "audit documentation derivative dimensions "
+                                "must be between 320 and 4096"
+                            )
+                    except (TypeError, ValueError):
+                        errors.append(
+                            "audit documentation derivative dimensions "
+                            "must be integers"
+                        )
     source_layers = value.get("source_layers") or []
     if not isinstance(source_layers, list):
         errors.append("source_layers must be an array")
@@ -145,6 +189,104 @@ def validate_template(
         "warnings": warnings,
         "template_sha256": _hash(stable_template) if not errors else None,
     }
+
+
+def validate_audit_evidence(
+    template_id: str,
+    *,
+    panel_titles: list[str],
+    legends_present: Iterable[str],
+    explanations_present: Iterable[str],
+    class_codes: Iterable[int],
+    supported_class_codes: Iterable[int],
+    confidence_provenance: Mapping[str, Any] | None,
+    provenance_footer: str | None,
+) -> dict[str, Any]:
+    template = get_template(template_id)
+    audit = dict(template.get("audit_contract") or {})
+    errors: list[str] = []
+    maximum_title = int(
+        audit.get("maximum_panel_title_characters", 96)
+    )
+    overflowing = [
+        title
+        for title in panel_titles
+        if len(title) > maximum_title
+    ]
+    if overflowing:
+        errors.append(
+            "panel title overflow: " + "; ".join(overflowing)
+        )
+    legends = set(legends_present)
+    missing_legends = sorted(
+        set(audit.get("required_legends") or []) - legends
+    )
+    if missing_legends:
+        errors.append(
+            "missing legend: " + ", ".join(missing_legends)
+        )
+    explanations = set(explanations_present)
+    missing_explanations = sorted(
+        set(audit.get("required_explanations") or [])
+        - explanations
+    )
+    if missing_explanations:
+        errors.append(
+            "missing explanation: "
+            + ", ".join(missing_explanations)
+        )
+    unsupported = sorted(
+        set(int(code) for code in class_codes)
+        - set(int(code) for code in supported_class_codes)
+    )
+    if unsupported:
+        errors.append(
+            "unsupported class codes: "
+            + ", ".join(str(code) for code in unsupported)
+        )
+    confidence = dict(confidence_provenance or {})
+    if (
+        "confidence_threshold"
+        in set(audit.get("required_explanations") or [])
+        and any(
+            confidence.get(field) is None
+            for field in (
+                "confidence_metric",
+                "confidence_threshold",
+                "unknown_class_code",
+                "threshold_source",
+            )
+        )
+    ):
+        errors.append("missing confidence threshold provenance")
+    if audit.get("require_provenance_footer") and not (
+        provenance_footer or ""
+    ).strip():
+        errors.append("missing provenance footer")
+    return {
+        "status": "PASS" if not errors else "FAIL",
+        "errors": errors,
+        "template_id": template_id,
+        "template_schema_version": template["schema_version"],
+        "template_sha256": template["template_sha256"],
+        "minimum_font_size": audit.get("minimum_font_size"),
+        "documentation_derivative": audit.get(
+            "documentation_derivative"
+        ),
+    }
+
+
+def require_audit_evidence(
+    template_id: str,
+    **evidence: Any,
+) -> dict[str, Any]:
+    result = validate_audit_evidence(template_id, **evidence)
+    if result["status"] != "PASS":
+        raise ValueError(
+            "preview audit contract failed: "
+            + "; ".join(result["errors"])
+        )
+    return result
 
 
 def template_catalog(path: Path | None = None) -> list[dict[str, Any]]:

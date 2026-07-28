@@ -491,6 +491,7 @@ def _validate_classification_recipe_outputs(
         preview,
         preview.parent / "classification_legend.json",
         staging / "analysis/classification/class_area_inventory.csv",
+        staging / "analysis/classification/area_accounting.json",
         *sorted((staging / "data").glob("naip_*_surface_classification.cog.tif")),
         *sorted((staging / "data").glob("naip_*_classification_confidence.cog.tif")),
         *sorted((staging / "data").glob("naip_*_cdl_agreement_state.cog.tif")),
@@ -587,6 +588,7 @@ def _validate_required_artifacts(
                 "class_agreement_matrix.json": analysis / "class_agreement_matrix.json",
                 "disagreement_summary.json": analysis / "disagreement_summary.json",
                 "class_area_inventory.csv": analysis / "class_area_inventory.csv",
+                "area_accounting.json": analysis / "area_accounting.json",
             }
         )
     if isinstance(recipe, AgriculturalRecipeV4):
@@ -728,6 +730,7 @@ def execute_recipe(
     naip_resolution_m: float | None = None,
     analysis_aoi_epsg_4326: Mapping[str, Any] | None = None,
     contract_repair: Mapping[str, Any] | None = None,
+    confidence_threshold_source: str = "recipe_default",
     recommendation_selector: (
         Callable[[str, list[dict[str, Any]]], str | None] | None
     ) = None,
@@ -802,6 +805,9 @@ def execute_recipe(
         "cdl_year": year,
         "analysis_aoi_epsg_4326": analysis_aoi_epsg_4326,
         "human_repair_occurred": contract_repair is not None,
+        "temporal_resolution": (
+            (contract_repair or {}).get("temporal_resolution")
+        ),
     }
     if contract_repair is not None:
         plan["contract_repair"] = dict(contract_repair)
@@ -993,6 +999,7 @@ def execute_recipe(
                 cdl_year=year,
                 analysis_aoi_epsg_4326=analysis_aoi_epsg_4326,
                 contract_repair=contract_repair,
+                confidence_threshold_source=confidence_threshold_source,
             )
             try:
                 hybrid_result = execute_hybrid_classification(
@@ -1290,6 +1297,9 @@ def execute_recipe(
                         ),
                     },
                     "classification": {
+                        "confidence_provenance": classification_result[
+                            "confidence_provenance"
+                        ],
                         "model": classification_result["model_receipt"],
                         "training": classification_result["training_receipt"],
                         "weak_label_spatial_holdout_agreement": (
@@ -1325,6 +1335,7 @@ def execute_recipe(
                             "analysis/classification/class_agreement_matrix.json",
                             "analysis/classification/disagreement_summary.json",
                             "analysis/classification/class_area_inventory.csv",
+                            "analysis/classification/area_accounting.json",
                         ],
                         "preview_products": [
                             path
@@ -1438,6 +1449,9 @@ def execute_recipe(
         }
         if classification_result is not None:
             manifest["classification"] = {
+                "confidence_provenance": classification_result[
+                    "confidence_provenance"
+                ],
                 "mapping_id": classification_result["mapping"]["mapping_id"],
                 "mapping_version": classification_result["mapping"][
                     "contract_version"

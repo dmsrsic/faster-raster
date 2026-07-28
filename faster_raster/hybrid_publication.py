@@ -20,7 +20,9 @@ from faster_raster.ag_classification_publication import (
     _read_naip,
     _read_single,
 )
+from faster_raster.ag_classification import require_confidence_provenance
 from faster_raster.ag_recipes import AgriculturalRecipeV4
+from faster_raster.preview_templates import require_audit_evidence
 
 
 SPECIALIST_COLORS = (
@@ -156,6 +158,10 @@ def render_hybrid_classification_audit(
     network_bytes: int,
     reused_bytes: int,
 ) -> tuple[Path, dict[str, Any]]:
+    confidence_provenance = require_confidence_provenance(
+        general_result.get("confidence_provenance"),
+        uncertainty_reported=True,
+    )
     destination.parent.mkdir(parents=True, exist_ok=True)
     width, height = 3840, 2160
     canvas = Image.new("RGB", (width, height), BACKGROUND)
@@ -273,6 +279,21 @@ def render_hybrid_classification_audit(
         first_specialist.output_code
     ]
     candidate_image = Image.fromarray(candidate_rgb, "RGB")
+    display_labels = {
+        0: "unknown / uncertain",
+        **{
+            int(item["code"]): str(item["name"])
+            for item in general_result.get("mapping", {}).get(
+                "output_classes",
+                [],
+            )
+        },
+    }
+    for specialist in recipe.classification.specialists.classes:
+        display_labels[specialist.output_code] = specialist.label
+    display_labels[
+        recipe.classification.arbitration.unresolved_code
+    ] = "unresolved specialist overlap"
     summary = Image.new("RGB", (panel_width, image_height), CARD)
     summary_draw = ImageDraw.Draw(summary)
     summary_draw.text(
@@ -301,6 +322,11 @@ def render_hybrid_classification_audit(
             f"{hybrid_result['hybrid_receipt']['unresolved_pixels']:,}",
         ),
         ("Network / reused", f"{network_bytes:,} / {reused_bytes:,} bytes"),
+        (
+            "Confidence threshold",
+            f"{confidence_provenance['confidence_threshold']:.2f} "
+            f"({confidence_provenance['threshold_source']})",
+        ),
     ]
     y = 78
     for label, value in rows:
@@ -317,6 +343,47 @@ def render_hybrid_classification_audit(
     for line in _wrap(limitations, 66):
         summary_draw.text((26, y), line, fill=TEXT, font=_font(19))
         y += 31
+    y += 8
+    summary_draw.text(
+        (26, y),
+        "Broad + specialist color legend",
+        fill=(80, 205, 196),
+        font=_font(22, bold=True),
+    )
+    y += 32
+    for index, (code, label) in enumerate(
+        sorted(display_labels.items())
+    ):
+        column = index % 2
+        row = index // 2
+        legend_x = 26 + column * 445
+        legend_y = y + row * 28
+        summary_draw.rectangle(
+            (
+                legend_x,
+                legend_y + 3,
+                legend_x + 16,
+                legend_y + 19,
+            ),
+            fill=palette[code],
+            outline=(225, 231, 233),
+        )
+        summary_draw.text(
+            (legend_x + 24, legend_y),
+            f"{code}: {label}",
+            fill=TEXT,
+            font=_font(18),
+        )
+    y += ((len(display_labels) + 1) // 2) * 28 + 4
+    summary_draw.text(
+        (26, y),
+        (
+            "Decision states: gray retains the broad class; teal applies a "
+            "specialist; white marks unresolved overlap."
+        ),
+        fill=TEXT,
+        font=_font(18),
+    )
 
     panels = (
         ("1 · Source NAIP natural color", natural),
@@ -328,7 +395,7 @@ def render_hybrid_classification_audit(
             index_image,
         ),
         (
-            f"6 · {first_specialist.label} · {score_target_direction}; not probability",
+            f"6 · {first_specialist.label} score · not probability",
             score_image,
         ),
         (
@@ -336,6 +403,28 @@ def render_hybrid_classification_audit(
             candidate_image,
         ),
         ("8 · Decision state · general / specialist / unresolved", decision_image),
+    )
+    provenance_footer = (
+        "Analytical rasters are unchanged by rendering; broad and specialist "
+        "colors, threshold provenance, and arbitration are receipt-bound."
+    )
+    audit_contract = require_audit_evidence(
+        "ag_hybrid_classification_audit_v1",
+        panel_titles=[label for label, _ in panels],
+        legends_present={
+            "broad_classes",
+            "specialist_classes",
+            "decision_states",
+        },
+        explanations_present={
+            "unknown_uncertain",
+            "confidence_threshold",
+            "retained_general_vs_specialist",
+        },
+        class_codes=display_labels,
+        supported_class_codes=palette,
+        confidence_provenance=confidence_provenance,
+        provenance_footer=provenance_footer,
     )
     gap_x = 20
     gap_y = 20
@@ -353,32 +442,33 @@ def render_hybrid_classification_audit(
     footer_y = 2120
     draw.text(
         (40, footer_y),
-        (
-            "Analytical rasters are unchanged by publication rendering · "
-            "specialist priority and eligible parents are recorded in receipts"
-        ),
+        provenance_footer,
         fill=MUTED,
         font=_font(18),
     )
     canvas.save(destination, format="PNG", optimize=False, compress_level=9)
     if Image.open(destination).size != (3840, 2160):
         raise RuntimeError("hybrid classification preview did not render at 4K")
-
-    labels = {
-        0: "unknown_or_invalid",
-        **{
-            int(item["code"]): str(item["name"])
-            for item in general_result.get("mapping", {}).get(
-                "output_classes",
-                [],
-            )
-        },
-    }
-    for specialist in recipe.classification.specialists.classes:
-        labels[specialist.output_code] = specialist.label
-    labels[recipe.classification.arbitration.unresolved_code] = (
-        "unresolved specialist overlap"
+    derivative_contract = audit_contract[
+        "documentation_derivative"
+    ]
+    documentation_destination = destination.with_name(
+        destination.stem.replace("_4k", "") + "_docs.png"
     )
+    canvas.resize(
+        (
+            int(derivative_contract["width"]),
+            int(derivative_contract["height"]),
+        ),
+        Image.Resampling.LANCZOS,
+    ).save(
+        documentation_destination,
+        format="PNG",
+        optimize=False,
+        compress_level=9,
+    )
+
+    labels = display_labels
     legend = {
         "schema_version": "fasterraster.hybrid-classification-legend/v1",
         "palette": {
@@ -413,6 +503,15 @@ def render_hybrid_classification_audit(
             "target_direction": score_target_direction,
         },
         "analytical_rasters_modified": False,
+        "preview_template_id": audit_contract["template_id"],
+        "preview_template_schema_version": audit_contract[
+            "template_schema_version"
+        ],
+        "preview_template_contract_sha256": audit_contract[
+            "template_sha256"
+        ],
+        "minimum_font_size": audit_contract["minimum_font_size"],
+        "provenance_footer": provenance_footer,
     }
     legend_path = destination.parent / "classification_legend.json"
     _write_json(legend_path, legend)
@@ -421,6 +520,22 @@ def render_hybrid_classification_audit(
         "preview": destination.relative_to(destination.parents[2]).as_posix(),
         "legend": legend_path.relative_to(destination.parents[2]).as_posix(),
         "dimensions": [3840, 2160],
+        "documentation_derivative": (
+            documentation_destination.relative_to(
+                destination.parents[2]
+            ).as_posix()
+        ),
+        "documentation_dimensions": [
+            int(derivative_contract["width"]),
+            int(derivative_contract["height"]),
+        ],
+        "preview_template_id": audit_contract["template_id"],
+        "preview_template_schema_version": audit_contract[
+            "template_schema_version"
+        ],
+        "preview_template_contract_sha256": audit_contract[
+            "template_sha256"
+        ],
         "panels": [label for label, _ in panels],
         "panel_selection_rule": (
             "recipe display indices in declared order, then first specialist "
@@ -449,6 +564,7 @@ def render_hybrid_classification_audit(
         "network_bytes": network_bytes,
         "reused_bytes": reused_bytes,
         "analysis_aoi_mask_applied": analysis_aoi_epsg_4326 is not None,
+        **confidence_provenance,
     }
     return destination, receipt
 

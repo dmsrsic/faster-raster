@@ -9,6 +9,12 @@ from faster_raster.adapter_contract import stable_json
 
 ALTERNATIVES_SCHEMA_VERSION = "fasterraster.temporal-alternatives/v1"
 RESOLUTION_SCHEMA_VERSION = "fasterraster.temporal-resolution/v1"
+CLASSIFICATION_ALTERNATIVES_SCHEMA_VERSION = (
+    "fasterraster.classification-temporal-alternatives/v1"
+)
+CLASSIFICATION_RESOLUTION_SCHEMA_VERSION = (
+    "fasterraster.classification-temporal-resolution/v1"
+)
 
 
 def _hash(value: Mapping[str, Any]) -> str:
@@ -311,4 +317,264 @@ def alternatives_from_years(
         provider=provider,
         product=product,
         tolerance_days=tolerance_days,
+    )
+
+
+def build_classification_temporal_alternatives(
+    requested_imagery_year: int,
+    requested_cdl_year: int,
+    available_imagery_years: Sequence[int],
+    *,
+    available_cdl_years: Sequence[int] | None = None,
+    coverage_by_imagery_year: Mapping[int, float | None] | None = None,
+    source_evidence: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Build explicit imagery-only and coherent-pair repair choices."""
+
+    requested_imagery = int(requested_imagery_year)
+    requested_cdl = int(requested_cdl_year)
+    imagery_years = sorted(
+        {
+            int(year)
+            for year in available_imagery_years
+            if int(year) != requested_imagery
+        }
+    )
+    cdl_years = (
+        {int(year) for year in available_cdl_years}
+        if available_cdl_years is not None
+        else set()
+    )
+    exact_available = (
+        requested_imagery in {
+            int(year) for year in available_imagery_years
+        }
+        and (
+            available_cdl_years is None
+            or requested_cdl in cdl_years
+        )
+    )
+    coverage = coverage_by_imagery_year or {}
+    candidates: list[dict[str, Any]] = []
+    for year in imagery_years:
+        if year in cdl_years:
+            candidates.append(
+                {
+                    "candidate_id": f"coherent:{year}:{year}",
+                    "repair_mode": (
+                        "coherent_imagery_and_weak_labels"
+                    ),
+                    "imagery_year": year,
+                    "cdl_year": year,
+                    "distance_years": abs(
+                        year - requested_imagery
+                    ),
+                    "coverage_fraction": (
+                        coverage.get(year)
+                        if coverage.get(year) is not None
+                        else "unknown"
+                    ),
+                    "coherent_pair": True,
+                }
+            )
+        candidates.append(
+            {
+                "candidate_id": (
+                    f"imagery_only:{year}:{requested_cdl}"
+                ),
+                "repair_mode": "imagery_only",
+                "imagery_year": year,
+                "cdl_year": requested_cdl,
+                "distance_years": abs(year - requested_imagery),
+                "coverage_fraction": (
+                    coverage.get(year)
+                    if coverage.get(year) is not None
+                    else "unknown"
+                ),
+                "coherent_pair": year == requested_cdl,
+            }
+        )
+    candidates.sort(
+        key=lambda item: (
+            0 if item["coherent_pair"] else 1,
+            0
+            if item["coverage_fraction"] == 1.0
+            else 1,
+            1
+            if item["coverage_fraction"] == "unknown"
+            else 0,
+            -(
+                0.0
+                if item["coverage_fraction"] == "unknown"
+                else float(item["coverage_fraction"])
+            ),
+            int(item["distance_years"]),
+            int(item["imagery_year"]),
+            str(item["candidate_id"]),
+        )
+    )
+    for rank, candidate in enumerate(candidates, start=1):
+        candidate["rank"] = rank
+        candidate["reason_codes"] = [
+            (
+                "coherent_imagery_and_cdl_year"
+                if candidate["coherent_pair"]
+                else "imagery_only_preserves_requested_cdl"
+            ),
+            "closest_available_imagery_year"
+            if candidate["distance_years"]
+            == min(
+                (
+                    item["distance_years"]
+                    for item in candidates
+                ),
+                default=candidate["distance_years"],
+            )
+            else "available_imagery_year",
+        ]
+    coherent_candidates = [
+        item for item in candidates if item["coherent_pair"]
+    ]
+    if exact_available:
+        status = "EXACT_TIME_AVAILABLE"
+    elif candidates:
+        status = "AWAITING_TEMPORAL_SELECTION"
+    else:
+        status = "NO_COHERENT_ALTERNATIVE"
+    search_contract = {
+        "schema_version": (
+            CLASSIFICATION_ALTERNATIVES_SCHEMA_VERSION
+        ),
+        "requested_pair": {
+            "imagery_year": requested_imagery,
+            "cdl_year": requested_cdl,
+        },
+        "available_imagery_years": imagery_years,
+        "available_cdl_years": sorted(cdl_years),
+        "source_evidence": dict(source_evidence or {}),
+    }
+    result = {
+        "schema_version": (
+            CLASSIFICATION_ALTERNATIVES_SCHEMA_VERSION
+        ),
+        "status": status,
+        "coherent_pair_status": (
+            "EXACT_TIME_AVAILABLE"
+            if exact_available
+            else (
+                "AWAITING_TEMPORAL_SELECTION"
+                if coherent_candidates
+                else "NO_COHERENT_ALTERNATIVE"
+            )
+        ),
+        "requested_pair": search_contract["requested_pair"],
+        "original_request_unchanged": True,
+        "selection_required": status
+        == "AWAITING_TEMPORAL_SELECTION",
+        "raster_acquisition_authorized": False,
+        "network_bytes": 0,
+        "search_contract_sha256": _hash(search_contract),
+        "candidate_count": len(candidates),
+        "candidates": candidates,
+        "ranking_policy": [
+            "coherent_imagery_and_cdl_pair",
+            "complete_or_highest_known_coverage",
+            "absolute_year_distance",
+            "earlier_year_then_candidate_id",
+        ],
+    }
+    result["temporal_alternatives_sha256"] = _hash(result)
+    return result
+
+
+def select_classification_temporal_candidate(
+    alternatives: Mapping[str, Any],
+    candidate_id: str,
+    *,
+    selection_method: str = "explicit_user_selection",
+) -> dict[str, Any]:
+    if alternatives.get("schema_version") != (
+        CLASSIFICATION_ALTERNATIVES_SCHEMA_VERSION
+    ):
+        raise ValueError(
+            "unsupported classification temporal alternatives schema"
+        )
+    if alternatives.get("status") != (
+        "AWAITING_TEMPORAL_SELECTION"
+    ):
+        raise ValueError(
+            "classification alternatives are not awaiting selection"
+        )
+    matches = [
+        dict(item)
+        for item in alternatives.get("candidates") or []
+        if str(item.get("candidate_id")) == candidate_id
+    ]
+    if len(matches) != 1:
+        raise ValueError(
+            f"candidate {candidate_id!r} is not a unique alternative"
+        )
+    selected = matches[0]
+    stable = {
+        "schema_version": (
+            CLASSIFICATION_RESOLUTION_SCHEMA_VERSION
+        ),
+        "status": "TEMPORAL_SELECTION_RESOLVED",
+        "requested_pair": dict(
+            alternatives.get("requested_pair") or {}
+        ),
+        "resolved_pair": {
+            "imagery_year": int(selected["imagery_year"]),
+            "cdl_year": int(selected["cdl_year"]),
+        },
+        "selected_candidate": selected,
+        "selection_method": selection_method,
+        "original_request_unchanged": True,
+        "raster_acquisition_during_selection": False,
+        "search_contract_sha256": alternatives.get(
+            "search_contract_sha256"
+        ),
+        "temporal_alternatives_sha256": alternatives.get(
+            "temporal_alternatives_sha256"
+        ),
+    }
+    stable["resolved_contract_sha256"] = _hash(stable)
+    return stable
+
+
+def explicit_classification_temporal_resolution(
+    requested_imagery_year: int,
+    requested_cdl_year: int,
+    resolved_imagery_year: int,
+    resolved_cdl_year: int,
+) -> dict[str, Any]:
+    candidate_id = (
+        f"coherent:{resolved_imagery_year}:{resolved_cdl_year}"
+        if resolved_imagery_year == resolved_cdl_year
+        else (
+            f"imagery_only:{resolved_imagery_year}:"
+            f"{resolved_cdl_year}"
+        )
+    )
+    alternatives = build_classification_temporal_alternatives(
+        requested_imagery_year,
+        requested_cdl_year,
+        [resolved_imagery_year],
+        available_cdl_years=(
+            [resolved_cdl_year]
+            if resolved_imagery_year == resolved_cdl_year
+            else []
+        ),
+        source_evidence={
+            "selection_source": "explicit_cli_year_arguments"
+        },
+    )
+    if alternatives["status"] != "AWAITING_TEMPORAL_SELECTION":
+        raise ValueError(
+            "explicit temporal resolution does not change the request"
+        )
+    return select_classification_temporal_candidate(
+        alternatives,
+        candidate_id,
+        selection_method="explicit_cli_year_arguments",
     )

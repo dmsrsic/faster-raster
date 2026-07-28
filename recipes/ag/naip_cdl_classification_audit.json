@@ -94,6 +94,7 @@
     "class_agreement_matrix.json",
     "disagreement_summary.json",
     "class_area_inventory.csv",
+    "area_accounting.json",
     "checksums.sha256"
   ]
 }

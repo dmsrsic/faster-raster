@@ -400,7 +400,6 @@ def arbitrate_hybrid(
                     "left_class_id": left.class_id,
                     "right_class_id": right.class_id,
                     "pixel_count": count,
-                    "area_square_meters": count * pixel_area_m2,
                 }
             )
     codes, counts = np.unique(final[valid], return_counts=True)
@@ -408,7 +407,6 @@ def arbitrate_hybrid(
         {
             "class_code": int(code),
             "pixel_count": int(count),
-            "area_square_meters": int(count) * pixel_area_m2,
         }
         for code, count in zip(codes, counts, strict=True)
     ]
@@ -435,6 +433,12 @@ def arbitrate_hybrid(
         "unresolved_pixels": int(unresolved.sum()),
         "valid_pixels": int(valid.sum()),
         "class_inventory": inventory,
+        "area_accounting": {
+            "status": "DEFERRED_TO_FINAL_CATEGORICAL_RASTER",
+            "reason": (
+                "physical area requires the finalized raster CRS and mask"
+            ),
+        },
         "winner_reason": (
             "highest declared priority; equal-priority behavior follows the "
             "explicit arbitration contract; raw unrelated index scores are "
