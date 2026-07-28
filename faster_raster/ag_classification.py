@@ -29,6 +29,9 @@ from faster_raster.ag_recipes import (
     ClassificationSpec,
     GeneralClassificationSpec,
 )
+from faster_raster.area_accounting import (
+    account_categorical_raster_area,
+)
 from faster_raster.aoi_geometry import raster_aoi_mask
 from faster_raster.contract_repair import intervention_reference
 from faster_raster.spectral_indices import (
@@ -56,6 +59,11 @@ AGREEMENT_STATE_LABELS = {
     2: "low_confidence_or_unknown",
     3: "high_confidence_disagreement",
 }
+CONFIDENCE_METRIC = "maximum_class_probability"
+UNKNOWN_CLASS_CODE = 0
+CONFIDENCE_THRESHOLD_SOURCES = frozenset(
+    {"recipe_default", "configured_override"}
+)
 
 
 class ClassificationError(RuntimeError):
@@ -134,6 +142,69 @@ def classification_dependency_status() -> dict[str, Any]:
         "install_command": "pip install -e '.[classification]'",
         "required_before_network_transfer": True,
     }
+
+
+def classification_confidence_provenance(
+    spec: ClassificationSpec | GeneralClassificationSpec,
+    *,
+    threshold_source: str = "recipe_default",
+) -> dict[str, Any]:
+    if threshold_source not in CONFIDENCE_THRESHOLD_SOURCES:
+        raise ClassificationError(
+            "confidence threshold source must be recipe_default or "
+            "configured_override"
+        )
+    return {
+        "confidence_metric": CONFIDENCE_METRIC,
+        "confidence_threshold": float(spec.confidence_threshold),
+        "unknown_class_code": UNKNOWN_CLASS_CODE,
+        "threshold_source": threshold_source,
+    }
+
+
+def require_confidence_provenance(
+    value: Mapping[str, Any] | None,
+    *,
+    uncertainty_reported: bool,
+) -> dict[str, Any]:
+    provenance = dict(value or {})
+    required = (
+        "confidence_metric",
+        "confidence_threshold",
+        "unknown_class_code",
+        "threshold_source",
+    )
+    missing = [
+        field
+        for field in required
+        if provenance.get(field) is None
+    ]
+    if uncertainty_reported and missing:
+        raise ClassificationError(
+            "uncertainty finalization requires confidence provenance: "
+            + ", ".join(missing)
+        )
+    if not missing:
+        if provenance["confidence_metric"] != CONFIDENCE_METRIC:
+            raise ClassificationError(
+                "unsupported classification confidence metric"
+            )
+        if provenance["threshold_source"] not in (
+            CONFIDENCE_THRESHOLD_SOURCES
+        ):
+            raise ClassificationError(
+                "unsupported confidence threshold source"
+            )
+        threshold = float(provenance["confidence_threshold"])
+        if not 0.0 <= threshold <= 1.0:
+            raise ClassificationError(
+                "confidence threshold must be between zero and one"
+            )
+        if int(provenance["unknown_class_code"]) != UNKNOWN_CLASS_CODE:
+            raise ClassificationError(
+                "classification unknown class code must be zero"
+            )
+    return provenance
 
 
 def _load_sklearn() -> tuple[Any, Any, str]:
@@ -1218,11 +1289,20 @@ def audit_cdl_agreement(
         writer.writerow(["cdl_superclass", *range(0, 7)])
         for code, row in zip(range(1, 7), matrix.tolist(), strict=True):
             writer.writerow([code, *row])
+    area_accounting = account_categorical_raster_area(
+        inference["classification_path"],
+        valid_mask_path=inference["confidence_path"],
+        class_codes=range(0, 7),
+    )
+    _write_json(
+        analysis_directory / "area_accounting.json",
+        area_accounting,
+    )
+    summary["area_accounting"] = area_accounting
     _write_json(
         analysis_directory / "disagreement_summary.json",
         summary,
     )
-    pixel_hectares = grid.pixel_area_m2 / 10_000.0
     with (
         analysis_directory / "class_area_inventory.csv"
     ).open("w", newline="", encoding="utf-8") as stream:
@@ -1232,14 +1312,35 @@ def audit_cdl_agreement(
                 "predicted_class_code",
                 "predicted_class_name",
                 "pixel_count",
+                "area_method",
+                "area_reference_crs",
+                "square_meters",
                 "hectares",
             ]
         )
         labels = CDL_SURFACE_SUPERCLASSES.class_labels
         for code in range(0, 7):
-            count = int(inference["post_sieve_class_counts"][str(code)])
+            count = int(
+                area_accounting["native_class_pixel_counts"][str(code)]
+            )
             writer.writerow(
-                [code, labels[code], count, round(count * pixel_hectares, 6)]
+                [
+                    code,
+                    labels[code],
+                    count,
+                    area_accounting["area_method"],
+                    area_accounting["area_reference_crs"],
+                    round(
+                        area_accounting["class_area_square_meters"][
+                            str(code)
+                        ],
+                        6,
+                    ),
+                    round(
+                        area_accounting["class_area_hectares"][str(code)],
+                        6,
+                    ),
+                ]
             )
     return {
         **summary,
@@ -1264,12 +1365,21 @@ def execute_classification(
     cdl_year: int | None = None,
     analysis_aoi_epsg_4326: Mapping[str, Any] | None = None,
     contract_repair: Mapping[str, Any] | None = None,
+    confidence_threshold_source: str = "recipe_default",
 ) -> dict[str, Any]:
     resolved_cdl_year = cdl_year if cdl_year is not None else year
     spec: ClassificationSpec | GeneralClassificationSpec = (
         recipe.classification.general
         if isinstance(recipe, AgriculturalRecipeV4)
         else recipe.classification
+    )
+    confidence_provenance = classification_confidence_provenance(
+        spec,
+        threshold_source=confidence_threshold_source,
+    )
+    require_confidence_provenance(
+        confidence_provenance,
+        uncertainty_reported=True,
     )
     _, _, _ = _load_sklearn()
     source_validation = validate_naip_multispectral(naip_path)
@@ -1302,12 +1412,14 @@ def execute_classification(
             analysis_aoi_epsg_4326 is not None
         ),
         "repair_provenance": repair_provenance,
+        "confidence_provenance": confidence_provenance,
         "interpretation": (
             "Metrics measure spatial holdout agreement with weak CDL "
             "labels, not independent ground-truth accuracy."
         ),
     }
     model_receipt.update(analysis_context)
+    model_receipt.update(confidence_provenance)
     metrics = {**metrics, "analysis_context": analysis_context}
     _write_confusion_matrix(analysis, metrics)
     _write_json(analysis / "weak_label_metrics.json", metrics)
@@ -1361,6 +1473,7 @@ def execute_classification(
         "cdl_year": resolved_cdl_year,
         "temporal_mismatch": year != resolved_cdl_year,
         "repair_provenance": repair_provenance,
+        "confidence_provenance": confidence_provenance,
         "sample_coordinate_digest_sha256": samples[
             "coordinate_digest_sha256"
         ],
@@ -1447,6 +1560,7 @@ def execute_classification(
         },
         "training_receipt": training_receipt,
         "model_receipt": model_receipt,
+        "confidence_provenance": confidence_provenance,
         "feature_contract": feature_contract,
         "metrics": metrics,
         "inference": {

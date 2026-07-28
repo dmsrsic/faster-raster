@@ -3,7 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import Any
 
 from faster_raster.adapter_contract import stable_json
@@ -31,12 +31,20 @@ def sha256_file(path: Path) -> str:
 
 def write_json(path: Path, value: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(value, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
 
 
 def write_jsonl(path: Path, rows: list[dict[str, Any]]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text("".join(json.dumps(row, sort_keys=True) + "\n" for row in rows), encoding="utf-8")
+    path.write_text(
+        "".join(json.dumps(row, sort_keys=True) + "\n" for row in rows),
+        encoding="utf-8",
+        newline="\n",
+    )
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -60,9 +68,22 @@ def normalize_contract_value(value: Any, repo_root: Path | None = None) -> Any:
         try:
             path = Path(value)
             if path.is_absolute():
-                return str(path.relative_to(repo_root))
+                return path.relative_to(repo_root).as_posix()
         except (ValueError, OSError):
-            return value
+            pass
+        # Receipt contracts can be verified on a different operating system
+        # from the one that produced them. Native Path semantics alone treat a
+        # POSIX absolute path as relative on Windows (and vice versa).
+        portable_pairs = (
+            (PurePosixPath(value), PurePosixPath(repo_root.as_posix())),
+            (PureWindowsPath(value), PureWindowsPath(str(repo_root))),
+        )
+        for path, root in portable_pairs:
+            try:
+                if path.is_absolute() and root.is_absolute():
+                    return path.relative_to(root).as_posix()
+            except ValueError:
+                continue
     return value
 
 

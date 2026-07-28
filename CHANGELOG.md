@@ -4,7 +4,48 @@ All notable changes are documented here. Versions follow [Semantic Versioning](h
 
 ## Unreleased
 
-- No changes yet.
+### Added
+
+- Declarative `fasterraster.source-pack/v1` Source Packs with offline
+  validation, deterministic fixtures and archives, bounded opt-in probes,
+  opaque credential requirements, two shipped examples, and `fr sauce`
+  lifecycle commands.
+- Explicit `fasterraster.temporal-alternatives/v1` ranking and
+  `fasterraster.temporal-resolution/v1` selection contracts. Exact requested
+  time remains authoritative until a user selects a candidate.
+- Registry-driven `fasterraster.preview-template/v1` layouts, including
+  agricultural audit and general multi-source templates, CLI discovery, JSON
+  Schema, deterministic hashes, and legacy-task compatibility mappings.
+- Canonical public capability registry, generated website and GPT surfaces,
+  drift tests, and a content-hashed Flavortown Sauce Wizard grounding bundle.
+- CRS-aware categorical area accounting that preserves native class counts,
+  measures physical area on a declared equal-area grid, and reconciles class
+  totals to the valid footprint.
+- Mandatory maximum-class-probability threshold provenance across plans,
+  receipts, publications, and inspection, including truthful legacy behavior.
+- Explicit coherent NAIP–CDL temporal alternatives and immutable resolution
+  contracts, with paired noninteractive CLI year arguments and zero raster
+  acquisition during selection.
+- Classification audit-template checks for readable legends, decision and
+  confidence explanations, title bounds, supported class codes, minimum text
+  size, provenance footers, and deterministic documentation derivatives.
+
+### Security and compatibility
+
+- Source Packs reject arbitrary code, traversal, escaping symlinks, unsafe
+  hosts and redirects, embedded credentials, unsafe categorical resampling,
+  unbounded templates, ambiguous nodata behavior, and volatile archives.
+- Public credential requirements contain only scheme, opaque reference, and
+  host scope. The public runtime fails before network access when a resolver is
+  required; resolved secrets remain outside plans, logs, cache keys, receipts,
+  and archives.
+- Existing noninteractive exact-year behavior remains fail-closed. Existing
+  preview tasks compile through released compatibility templates; render
+  contracts now additionally bind their template schema, ID, and hash.
+
+These contracts are implemented in the current tree but remain experimental
+until a separate release decision; they are not retroactively part of
+`v1.0.0-beta.4`.
 
 ## 1.0.0-beta.4 - 2026-07-25
 

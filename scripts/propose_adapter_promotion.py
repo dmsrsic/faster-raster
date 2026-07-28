@@ -73,9 +73,17 @@ def write_reports(proposal: dict[str, Any], out_dir: Path) -> tuple[Path, Path]:
     out_dir.mkdir(parents=True, exist_ok=True)
     json_path = out_dir / f"{proposal['source_id']}_promotion_proposal.json"
     md_path = out_dir / f"{proposal['source_id']}_promotion_proposal.md"
-    json_path.write_text(json.dumps(proposal, indent=2, sort_keys=True) + '\n', encoding='utf-8')
+    json_path.write_text(
+        json.dumps(proposal, indent=2, sort_keys=True) + '\n',
+        encoding='utf-8',
+        newline='\n',
+    )
     lines = ['# Adapter Promotion Proposal', '', f"- Source: `{proposal['source_id']}`", f"- Decision: `{proposal['promotion_decision']}`", f"- Endpoint status: `{proposal['endpoint_status']}`", f"- Credential status: `{proposal['credential_status']}`", f"- Expected adapter: `{proposal['expected_adapter_type']}`", '', 'No runtime registry files were edited.']
-    md_path.write_text('\n'.join(lines) + '\n', encoding='utf-8')
+    md_path.write_text(
+        '\n'.join(lines) + '\n',
+        encoding='utf-8',
+        newline='\n',
+    )
     return json_path, md_path
 
 

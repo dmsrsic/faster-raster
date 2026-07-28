@@ -1,0 +1,42 @@
+schema_version: fasterraster.source-pack/v1
+pack_id: copernicus-cdse-stac
+display_name: Copernicus Data Space Sentinel-2 L2A
+description: Public credential-requirement and STAC planning contract with no resolved secret.
+adapter:
+  family: stac_search
+  endpoint: https://stac.dataspace.copernicus.eu/v1
+  media_types: [application/geo+json, image/tiff]
+  asset_roles: [red, green, blue, nir]
+capabilities:
+  planning: true
+  preview: true
+  materialization: false
+  analysis: false
+  temporal_discovery: true
+source:
+  semantic_type: continuous
+  crs: EPSG:4326
+  resampling: bilinear
+  nodata: null
+  mask_policy: alpha_or_dataset_mask
+access:
+  authentication_scheme: bearer
+  credential_ref: copernicus-production
+  allowed_hosts:
+    - stac.dataspace.copernicus.eu
+  redirect_hosts: []
+network:
+  max_requests: 1
+  max_bytes: 65536
+  timeout_seconds: 8
+  maximum_redirects: 0
+temporal:
+  mode: exact
+  requested: "2023"
+  tolerance_days: 800
+  template_variables: {}
+preview:
+  template_id: general_multisource_v1
+  role: natural_color
+  theme: optical_imagery
+  target_crs: EPSG:4326

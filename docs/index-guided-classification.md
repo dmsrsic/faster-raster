@@ -280,7 +280,11 @@ contract.
 
 The decision-state raster distinguishes invalid/excluded pixels, retained
 general classes, specialist overrides, and unresolved overlap. Receipts record
-pairwise overlap counts, winner counts, reasons, and final class areas.
+pairwise overlap counts, winner counts, reasons, and final class areas. Native
+class counts remain exact; final broad and specialist hectares come from the
+same CRS-aware equal-area authority used by V3 and reconcile to the valid
+footprint. Intermediate overlapping candidate masks report counts only because
+their areas are not disjoint.
 
 ## Analytical outputs
 
@@ -302,6 +306,7 @@ analysis/indices/index_candidate_ranking.json
 analysis/indices/specialist_class_rules.json
 analysis/indices/specialist_overlap_matrix.json
 analysis/indices/hybrid_class_inventory.json
+analysis/classification/area_accounting.json
 analysis/indices/index_validation_metrics.json
 
 receipts/index_calculation_receipt.json
@@ -319,7 +324,12 @@ separate metadata and never alter analytical values.
 The deterministic 3840×2160 audit publication selects panels by a stable rule
 and shows natural color, broad classification, final hybrid classes, selected
 index, specialist score/candidate, decision state, legends, and receipt
-evidence. Normalized differences use zero-aware displays; specialist scores use
+evidence. Its reusable audit template requires readable broad and specialist
+legends, an unknown/uncertain entry, retained-general versus specialist
+decision explanation, confidence-threshold provenance, 18-pixel minimum text,
+bounded titles, and a provenance footer. A deterministic 1920×1080
+documentation derivative is written beside the 4K image. Normalized
+differences use zero-aware displays; specialist scores use
 sequential displays; no generic rainbow palette is used. Circular AOI masks
 apply to analysis and display statistics.
 

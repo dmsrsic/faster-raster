@@ -1,0 +1,60 @@
+{
+  "adapter": {
+    "asset_roles": [
+      "red",
+      "green",
+      "blue",
+      "nir"
+    ],
+    "family": "stac_search",
+    "media_types": [
+      "application/geo+json",
+      "image/tiff"
+    ],
+    "public_adapter_id": "stac_api"
+  },
+  "capabilities": {
+    "analysis": false,
+    "materialization": false,
+    "planning": true,
+    "preview": true,
+    "temporal_discovery": true
+  },
+  "credential_requirement": {
+    "allowed_hosts": [
+      "stac.dataspace.copernicus.eu"
+    ],
+    "authentication_scheme": "bearer",
+    "credential_ref": "copernicus-production",
+    "credential_requirement_sha256": "3c080541ab65901480fbbc35b4623016de01003d12a324940078ecd2db50b881",
+    "redirect_hosts": [],
+    "resolved_secret_present": false,
+    "resolver_capability_required": "bearer",
+    "schema_version": "fasterraster.credential-requirement/v1"
+  },
+  "network_policy": {
+    "allowed_hosts": [
+      "stac.dataspace.copernicus.eu"
+    ],
+    "default": "disabled",
+    "max_bytes": 65536,
+    "max_requests": 1,
+    "redirect_hosts": []
+  },
+  "original_pack_unchanged": true,
+  "pack_id": "copernicus-cdse-stac",
+  "plan_sha256": "360d120347cdcfa04dd88b6ba439740c4a09efc21901bdd7fbba3676b0bb06c3",
+  "preview": {
+    "role": "natural_color",
+    "target_crs": "EPSG:4326",
+    "template_id": "general_multisource_v1",
+    "theme": "optical_imagery"
+  },
+  "requested_time": "2023",
+  "resolved_time": "2023",
+  "schema_version": "fasterraster.source-pack-plan/v1",
+  "source_pack_sha256": "89545a9b4da8f16c6bfa0e650160e47327061f7078c9730f0cefa9ce6690a419",
+  "status": "CREDENTIAL_REQUIRED",
+  "temporal_alternatives": null,
+  "temporal_resolution": null
+}

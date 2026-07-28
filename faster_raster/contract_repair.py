@@ -21,6 +21,7 @@ from faster_raster.aoi_geometry import (
     build_point_buffer_area,
     explicit_bbox_area,
 )
+from faster_raster.temporal_alternatives import alternatives_from_years
 from faster_raster.workfiles import TimeSpec, Workfile, WorkfileError, WorkfileSpec
 
 
@@ -47,7 +48,7 @@ class RecoverableContractFailure:
     evidence: dict[str, Any]
 
     def as_dict(self) -> dict[str, Any]:
-        return {
+        result = {
             "schema_version": "fasterraster.recoverable-contract-failure/v1",
             "failure_type": self.failure_type,
             "logical_asset": self.logical_asset,
@@ -58,6 +59,23 @@ class RecoverableContractFailure:
             "compatible_alternatives": list(self.compatible_alternatives),
             "source_evidence": self.evidence,
         }
+        if (
+            self.failure_type == "imagery_year_unavailable"
+            and str(self.original_requested_value).isdigit()
+        ):
+            years = [
+                int(value)
+                for value in self.compatible_alternatives
+                if str(value).isdigit()
+            ]
+            result["temporal_alternatives"] = alternatives_from_years(
+                int(self.original_requested_value),
+                years,
+                source_id="usgs_naip_imageserver",
+                provider="USGS",
+                product="NAIP",
+            )
+        return result
 
 
 def recoverable_failure_from_document(
@@ -155,6 +173,7 @@ class ClassificationRuntimeRequest:
     cdl_year: int
     analysis_aoi_epsg_4326: dict[str, Any] | None = None
     spatial_construction: dict[str, Any] | None = None
+    temporal_resolution: dict[str, Any] | None = None
 
     @classmethod
     def from_workfile(cls, workfile: Workfile) -> "ClassificationRuntimeRequest":
@@ -190,6 +209,7 @@ class ClassificationRuntimeRequest:
             "cdl_year": self.cdl_year,
             "analysis_aoi_epsg_4326": self.analysis_aoi_epsg_4326,
             "spatial_construction": self.spatial_construction,
+            "temporal_resolution": self.temporal_resolution,
             "temporal_mismatch": self.temporal_mismatch,
             "acquisition_geometry_differs_from_analysis_aoi": (
                 self.acquisition_geometry_differs
@@ -213,6 +233,31 @@ class ClassificationRuntimeRequest:
             imagery_start=start,
             imagery_end=end,
             imagery_year=int(year),
+        )
+
+    def with_coherent_year(
+        self,
+        year: int,
+    ) -> "ClassificationRuntimeRequest":
+        updated = self.with_imagery_year(year)
+        return replace(updated, cdl_year=int(year))
+
+    def with_temporal_resolution(
+        self,
+        resolution: Mapping[str, Any],
+    ) -> "ClassificationRuntimeRequest":
+        resolved_pair = resolution.get("resolved_pair") or {}
+        if (
+            int(resolved_pair.get("imagery_year"))
+            != self.imagery_year
+            or int(resolved_pair.get("cdl_year")) != self.cdl_year
+        ):
+            raise ValueError(
+                "temporal resolution pair does not match runtime request"
+            )
+        return replace(
+            self,
+            temporal_resolution=dict(resolution),
         )
 
     def with_imagery_dates(
@@ -250,6 +295,14 @@ def amended_workfile(
 ) -> Workfile:
     raw = copy.deepcopy(workfile.front_matter)
     raw.setdefault("area", {})["bbox"] = list(request.request_bbox_epsg_4326)
+    if request.imagery_year == request.cdl_year:
+        raw.setdefault("time", {})["start"] = (
+            request.imagery_start.isoformat()
+        )
+        raw.setdefault("time", {})["end"] = (
+            request.imagery_end.isoformat()
+        )
+        raw.setdefault("time", {})["crop_year"] = request.cdl_year
     try:
         spec = WorkfileSpec.model_validate(raw)
         TimeSpec(
@@ -333,11 +386,35 @@ def prompt_imagery_year(
     request: ClassificationRuntimeRequest,
     session: PromptSession,
 ) -> ClassificationRuntimeRequest:
+    from faster_raster.temporal_alternatives import (
+        build_classification_temporal_alternatives,
+        explicit_classification_temporal_resolution,
+        select_classification_temporal_candidate,
+    )
+
     years = [
         int(value)
         for value in failure.compatible_alternatives
         if str(value).isdigit()
     ]
+    raw_cdl_years = (
+        failure.evidence.get("available_cdl_years")
+        or failure.evidence.get("coherent_cdl_years")
+        or []
+    )
+    cdl_years = [
+        int(value)
+        for value in raw_cdl_years
+        if str(value).isdigit()
+    ]
+    alternatives = build_classification_temporal_alternatives(
+        request.imagery_year,
+        request.cdl_year,
+        years,
+        available_cdl_years=cdl_years,
+        source_evidence=failure.evidence,
+    )
+    choices = list(alternatives.get("candidates") or [])
     session.write("Source resolution blocked")
     session.write("")
     session.write("Asset: NAIP multispectral imagery")
@@ -345,11 +422,21 @@ def prompt_imagery_year(
     session.write(f"Reason: {failure.detail}")
     while True:
         session.write("")
-        if years:
-            session.write("Source-reported compatible years:")
-            for index, year in enumerate(years, start=1):
-                session.write(f"  [{index}] {year}")
-            session.write(f"  [{len(years) + 1}] Enter another year")
+        if choices:
+            session.write("Ranked temporal repair choices:")
+            for index, item in enumerate(choices, start=1):
+                mode = (
+                    "coherent NAIP/CDL pair"
+                    if item["coherent_pair"]
+                    else "imagery-only; requested CDL retained"
+                )
+                session.write(
+                    f"  [{index}] {item['imagery_year']} / "
+                    f"{item['cdl_year']} ({mode})"
+                )
+            session.write(
+                f"  [{len(choices) + 1}] Enter another imagery year"
+            )
         else:
             session.write("No compatible year list was reported.")
             session.write("  [1] Enter another year")
@@ -360,9 +447,16 @@ def prompt_imagery_year(
         except ValueError:
             session.invalid("selection must be a listed number or q")
             continue
-        manual_index = len(years) + 1 if years else 1
-        if 1 <= index <= len(years):
-            candidate = years[index - 1]
+        manual_index = len(choices) + 1 if choices else 1
+        resolution: dict[str, Any]
+        if 1 <= index <= len(choices):
+            selected = choices[index - 1]
+            resolution = select_classification_temporal_candidate(
+                alternatives,
+                str(selected["candidate_id"]),
+            )
+            candidate = int(selected["imagery_year"])
+            candidate_cdl = int(selected["cdl_year"])
         elif index == manual_index:
             raw = session.read("Replacement imagery year: ")
             try:
@@ -370,11 +464,29 @@ def prompt_imagery_year(
             except ValueError:
                 session.invalid("imagery year must be an integer")
                 continue
+            candidate_cdl = request.cdl_year
+            try:
+                resolution = (
+                    explicit_classification_temporal_resolution(
+                        request.imagery_year,
+                        request.cdl_year,
+                        candidate,
+                        candidate_cdl,
+                    )
+                )
+            except ValueError as exc:
+                session.invalid(str(exc))
+                continue
         else:
             session.invalid("selection is outside the listed choices")
             continue
         try:
-            return request.with_imagery_year(candidate)
+            updated = (
+                request.with_coherent_year(candidate)
+                if candidate == candidate_cdl
+                else request.with_imagery_year(candidate)
+            )
+            return updated.with_temporal_resolution(resolution)
         except (ValueError, ValidationError) as exc:
             session.invalid(str(exc))
 
@@ -621,6 +733,7 @@ def build_intervention_record(
             ),
         },
         "spatial_construction": resolved_request.spatial_construction,
+        "temporal_resolution": resolved_request.temporal_resolution,
     }
     intervention_id = "fri_" + hashlib.sha256(
         json.dumps(
@@ -637,6 +750,70 @@ def build_intervention_record(
         "workfile_write_back": {
             "performed": False,
             "extension_point": "future_explicit_atomic_write_back",
+        },
+    }
+
+
+def intervention_from_explicit_temporal_resolution(
+    *,
+    original_request: Mapping[str, Any],
+    resolved_request: ClassificationRuntimeRequest,
+    resolution: Mapping[str, Any],
+) -> dict[str, Any]:
+    stable = {
+        "schema_version": "fasterraster.contract-intervention/v1",
+        "human_intervention_occurred": True,
+        "recovery_reason": (
+            "explicit noninteractive classification temporal resolution"
+        ),
+        "structured_failure_type": (
+            "explicit_classification_temporal_resolution"
+        ),
+        "source_failure_code": None,
+        "affected_logical_asset": "naip_multispectral+cdl_classes",
+        "source": "explicit_cli_year_arguments",
+        "original_request": dict(original_request),
+        "resolved_request": resolved_request.as_dict(),
+        "alternatives_shown": [
+            dict(resolution.get("selected_candidate") or {})
+        ],
+        "selected_replacement": resolved_request.as_dict(),
+        "confirmation_outcome": "accepted_explicit_cli_arguments",
+        "source_evidence_used": {
+            "raster_acquisition_during_selection": False,
+            "resolved_contract_sha256": resolution.get(
+                "resolved_contract_sha256"
+            ),
+        },
+        "original_plan_sha256": None,
+        "resolved_plan_sha256": None,
+        "temporal_mismatch": {
+            "present": resolved_request.temporal_mismatch,
+            "imagery_year": resolved_request.imagery_year,
+            "cdl_year": resolved_request.cdl_year,
+            "explicitly_accepted": (
+                resolved_request.temporal_mismatch
+            ),
+        },
+        "spatial_construction": (
+            resolved_request.spatial_construction
+        ),
+        "temporal_resolution": dict(resolution),
+    }
+    intervention_id = "fri_" + hashlib.sha256(
+        json.dumps(
+            stable,
+            sort_keys=True,
+            separators=(",", ":"),
+            default=str,
+        ).encode("utf-8")
+    ).hexdigest()[:20]
+    return {
+        **stable,
+        "intervention_id": intervention_id,
+        "workfile_write_back": {
+            "performed": False,
+            "reason": "explicit CLI resolution is in-memory only",
         },
     }
 
@@ -692,6 +869,9 @@ def intervention_reference(
             intervention.get("resolved_request")
         ),
         "temporal_mismatch": intervention.get("temporal_mismatch"),
+        "temporal_resolution": intervention.get(
+            "temporal_resolution"
+        ),
     }
 
 

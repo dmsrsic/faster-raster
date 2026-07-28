@@ -19,6 +19,11 @@ The export is deterministic: the same code version writes byte-identical schema 
   deterministic arbitration.
 - `workfile_v1.schema.json` remains backward compatible and adds an optional
   V4-only classification override for the index-guided workflow.
+- `classification_temporal_alternatives.schema.json` and
+  `classification_temporal_resolution.schema.json` define ranked
+  imagery/weak-label pairs and explicit immutable selection.
+- `categorical_area_accounting.schema.json` defines the CRS, units, exact
+  native counts, equal-area inventory, reconciliation, and content hash.
 
 The V4 recipe is also part of the discriminated agricultural recipe union.
 Schema export ordering and JSON formatting are deterministic; generated

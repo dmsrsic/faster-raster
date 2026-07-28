@@ -1,9 +1,22 @@
 # Five-minute quickstart
 
-This quickstart creates and validates the small Meridian human-development study without contacting a raster service.
+This quickstart begins from a fresh clone, validates a declarative source
+integration, and creates the small Meridian human-development plan without
+contacting a raster service.
 
 ```sh
+git clone https://github.com/dmsrsic/faster-raster.git
+cd faster-raster
+python3.12 -m venv .venv
+. .venv/bin/activate
+python -m pip install .
+
+fr --version
 fr doctor --offline
+fr capabilities --json
+fr sauce validate examples/sauce-packs/prism-daily.sauce
+fr sauce test examples/sauce-packs/prism-daily.sauce
+fr preview-templates list
 fr templates list
 
 mkdir -p studies
@@ -19,6 +32,18 @@ fr explain studies/meridian.fr.md --offline --verbose --out build/meridian-expla
 ```
 
 Review `studies/meridian.fr.md` and the plan artifacts before any live run. The workfile front matter is executable; its prose is explanatory and is never executed.
+
+The offline plan is intentionally provisional when no verified cache exists:
+exact-year coverage is `NOT_CHECKED`, metadata requests remain zero, and the
+plan records `requires_coverage_validation: true`. It cannot be executed as
+evidence. Re-plan without `--offline` only when you are ready to authorize the
+bounded metadata coverage check.
+
+The Source Pack commands above are Unreleased / experimental in this source
+tree. They are offline and prove schema, host, CRS, nodata, resampling,
+temporal, preview, secret-exclusion, canonicalization, and golden-plan
+behavior. Continue with [Bring Your Own Sauce](bring-your-own-sauce.md) or the
+[first-cook troubleshooting matrix](first-cook-troubleshooting.md).
 
 For a live cook, explicitly set `data.allow_network: true` in the workfile, confirm the study byte ceiling, then run:
 
@@ -50,3 +75,16 @@ Review source-band compatibility, persisted indices, specialist parents,
 selection mode, candidate bounds, expected rasters, and transfer ceiling before
 enabling a cook. See
 [Index-guided hybrid classification](index-guided-classification.md).
+
+If planning reports that a requested NAIP/CDL pair is unavailable, review its
+ranked coherent and imagery-only alternatives. A noninteractive coherent
+selection is explicit:
+
+```sh
+fr plan studies/index-hybrid.fr.md \
+  --resolve-imagery-year 2019 \
+  --resolve-cdl-year 2019
+```
+
+The paired arguments create a hashed resolution contract; they do not edit the
+workfile or download rasters during selection.

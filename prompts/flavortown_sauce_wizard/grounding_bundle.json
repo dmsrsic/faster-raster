@@ -1,0 +1,199 @@
+{
+  "bundle_version": "1.0.0",
+  "capability_registry_sha256": "65da21e291fcd03a496993bb0fe25b1af17038a140bdace5d45a8b08de03a0c2",
+  "contract_schema_versions": [
+    "fasterraster.source-pack/v1",
+    "fasterraster.credential-requirement/v1",
+    "fasterraster.temporal-alternatives/v1",
+    "fasterraster.temporal-resolution/v1",
+    "fasterraster.classification-temporal-alternatives/v1",
+    "fasterraster.classification-temporal-resolution/v1",
+    "fasterraster.categorical-area-accounting/v1",
+    "fasterraster.preview-template/v1",
+    "fasterraster.capability-registry/v1"
+  ],
+  "files": [
+    {
+      "bytes": 9374,
+      "path": "schemas/source_pack.schema.json",
+      "role": "source_pack_schema",
+      "sha256": "dbe2e90bd02b4c418c70c73512cc6b41c38963d230a38e49c4e46956c615f646"
+    },
+    {
+      "bytes": 1101,
+      "path": "schemas/credential_requirement.schema.json",
+      "role": "credential_schema",
+      "sha256": "d488f2e384c508132a9feaee852a2f75583c73dd1bf77fcf64488a51d91c7532"
+    },
+    {
+      "bytes": 2256,
+      "path": "schemas/temporal_alternatives.schema.json",
+      "role": "temporal_schema",
+      "sha256": "9ff21e8b15ba44746089c3001f40fa30214accfe0889dd9715903b39cad54508"
+    },
+    {
+      "bytes": 1174,
+      "path": "schemas/temporal_resolution.schema.json",
+      "role": "temporal_schema",
+      "sha256": "7f56ecd573201c4392d6d81335a17652cf6058d7eea84ca50791c484bf8657a7"
+    },
+    {
+      "bytes": 3384,
+      "path": "schemas/classification_temporal_alternatives.schema.json",
+      "role": "classification_temporal_schema",
+      "sha256": "8cd5dac3d907c8d6e856f7d433b7745f43b1b446d1148fe636d1cc8cc23d8878"
+    },
+    {
+      "bytes": 1955,
+      "path": "schemas/classification_temporal_resolution.schema.json",
+      "role": "classification_temporal_schema",
+      "sha256": "53b39976ab0b120637e70412d3aa8c275c4de92596941b24dec73ed3d0b4e30a"
+    },
+    {
+      "bytes": 4241,
+      "path": "schemas/categorical_area_accounting.schema.json",
+      "role": "scientific_accounting_schema",
+      "sha256": "505db9eb8b0a7e7961e67300333713cf19a5204472b47306ef4307e9d029a3fb"
+    },
+    {
+      "bytes": 1600,
+      "path": "schemas/preview_template.schema.json",
+      "role": "preview_schema",
+      "sha256": "0132ec7ac94140ea07ccbcdebdab38ad20260c2867d1451e255b206f4981e10a"
+    },
+    {
+      "bytes": 3224,
+      "path": "schemas/capability_registry.schema.json",
+      "role": "capability_schema",
+      "sha256": "bde0c5829c1df99be12676dd617e20ba8fdf9535695444a1acdf6a4ab885d458"
+    },
+    {
+      "bytes": 6884,
+      "path": "configs/public_capabilities.yaml",
+      "role": "capability_registry",
+      "sha256": "0288d6cabc61158f9e38bab14ce11971a87ddde1d0dfb2f65e2f0eed3bd19ef5"
+    },
+    {
+      "bytes": 7247,
+      "path": "configs/preview_templates.yaml",
+      "role": "preview_registry",
+      "sha256": "cdc1a20986856eaad562255755569dc68f3f45d32b8e429c54cf18c279453c09"
+    },
+    {
+      "bytes": 2240,
+      "path": "docs/generated/capabilities.md",
+      "role": "capability_reference",
+      "sha256": "0b6a16f0c879e9db45773eba2b3b5ec5d7da7d7b79b5732b0ebac1e5f485d34f"
+    },
+    {
+      "bytes": 4528,
+      "path": "docs/bring-your-own-sauce.md",
+      "role": "source_pack_guide",
+      "sha256": "c405a20aa87f3fd96adf44a7317bb70d19cd6f2e57d98d6af088f375748bd949"
+    },
+    {
+      "bytes": 2927,
+      "path": "docs/sauce-time.md",
+      "role": "temporal_guide",
+      "sha256": "d515bb7df9d3d7c378362a7d030980f2af28051537d3c87cf094fa7030bb0ffd"
+    },
+    {
+      "bytes": 2825,
+      "path": "docs/preview-templates.md",
+      "role": "preview_guide",
+      "sha256": "ec0adb65607f89109511e6620330d82d7bfe4191ae75c17d1b4d10f820b5fd29"
+    },
+    {
+      "bytes": 18967,
+      "path": "docs/ag-classification.md",
+      "role": "classification_methodology",
+      "sha256": "04b3365a22a0845879cb543fd2c7bc2aafcf45adc6cbfdf3e8eeb2f70c1ea408"
+    },
+    {
+      "bytes": 14448,
+      "path": "docs/index-guided-classification.md",
+      "role": "hybrid_classification_methodology",
+      "sha256": "11bc414ed0c0765e55af4ebd41a2c20994b699110056d0ac5ab2bd27d931f160"
+    },
+    {
+      "bytes": 3152,
+      "path": "docs/limitations.md",
+      "role": "limitations",
+      "sha256": "94f027ed5c82a87bf743c24989b09dfbc9b083bc548bb99e00c230b62fd7d7e1"
+    },
+    {
+      "bytes": 1295,
+      "path": "examples/sauce-packs/prism-daily.sauce/sauce.yaml",
+      "role": "no_auth_example",
+      "sha256": "964250f04e380c9652e7656a6fa4bbfd9d93b41b9fe7680b79ce9963b82b0d42"
+    },
+    {
+      "bytes": 1213,
+      "path": "examples/sauce-packs/prism-daily.sauce/golden_plan.json",
+      "role": "no_auth_golden_plan",
+      "sha256": "4e672d58c309c05c030a88d627c814d0aa0e67d00de46067658d01d1e4dcb07f"
+    },
+    {
+      "bytes": 563,
+      "path": "examples/sauce-packs/prism-daily.sauce/probe_fixture.json",
+      "role": "temporal_fixture",
+      "sha256": "eb59a1ea83b3b6edab5552e37b5c9f2c2c177fb68958097c5ffa79ee43b05552"
+    },
+    {
+      "bytes": 1089,
+      "path": "examples/sauce-packs/copernicus-cdse.sauce/sauce.yaml",
+      "role": "credential_example",
+      "sha256": "8e2042cc3b0b5a06a114dc93dcf2c6ac6d4b76092d6b2eb018464d69e74d43a5"
+    },
+    {
+      "bytes": 1673,
+      "path": "examples/sauce-packs/copernicus-cdse.sauce/golden_plan.json",
+      "role": "credential_golden_plan",
+      "sha256": "2f5b955b384a4c6393bf59a153ceb3d32c1c996d4582e9d4825007926074828c"
+    },
+    {
+      "bytes": 311,
+      "path": "examples/sauce-packs/copernicus-cdse.sauce/probe_fixture.json",
+      "role": "temporal_fixture",
+      "sha256": "a1400c5c52458c73e6c8ef47448bfdc49dbe97b8d933677c7917b81d9baccc9c"
+    },
+    {
+      "bytes": 1357,
+      "path": "prompts/flavortown_sauce_wizard/CLI_REFERENCE.md",
+      "role": "cli_reference",
+      "sha256": "7ae7033135c2240746054949725a5d9421b0314521122c765756d1ef2f3c5540"
+    },
+    {
+      "bytes": 1461,
+      "path": "prompts/flavortown_sauce_wizard/PUBLIC_PRIVATE_BOUNDARY.md",
+      "role": "architecture_boundary",
+      "sha256": "7a1dee6435c59b6675d019d6573810a6782e2b459b8c4134ce0d0424c6494613"
+    },
+    {
+      "bytes": 2146,
+      "path": "prompts/flavortown_sauce_wizard/SYSTEM_GUIDE.md",
+      "role": "system_guide",
+      "sha256": "d67ec2fee33aa916809caf6ae599d69690b24c04e78adbe13aaf4be8b9e9f5dc"
+    },
+    {
+      "bytes": 8400,
+      "path": "prompts/flavortown_sauce_wizard/capabilities.json",
+      "role": "machine_capabilities",
+      "sha256": "000ca5266e676c42f54b4fc838cd0ff751d89987c79246bfc27b7ef763cea728"
+    }
+  ],
+  "grounding_bundle_sha256": "d27bfe1582770957269ce6fe1e577314f6c1f8718769b6b78e879ef3043574fb",
+  "release": {
+    "contract_status": "experimental",
+    "development_label": "Unreleased",
+    "package_version": "1.0.0b4",
+    "public_release": "v1.0.0-beta.4"
+  },
+  "schema_version": "fasterraster.grounding-bundle/v1",
+  "validation_authority": [
+    "fr validate",
+    "fr sauce validate",
+    "fr preview-templates validate",
+    "checked-in public JSON Schemas"
+  ]
+}

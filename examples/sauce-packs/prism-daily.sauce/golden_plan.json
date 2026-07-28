@@ -1,0 +1,45 @@
+{
+  "adapter": {
+    "asset_roles": [
+      "precipitation"
+    ],
+    "family": "static_https_template",
+    "media_types": [
+      "application/zip"
+    ],
+    "public_adapter_id": "generic_https_template"
+  },
+  "capabilities": {
+    "analysis": false,
+    "materialization": false,
+    "planning": true,
+    "preview": true,
+    "temporal_discovery": true
+  },
+  "credential_requirement": null,
+  "network_policy": {
+    "allowed_hosts": [
+      "data.prism.oregonstate.edu"
+    ],
+    "default": "disabled",
+    "max_bytes": 65536,
+    "max_requests": 1,
+    "redirect_hosts": []
+  },
+  "original_pack_unchanged": true,
+  "pack_id": "prism-daily-public",
+  "plan_sha256": "be0e67e6c08450795000f8937aa1196321b7e7d5ac42f5ffa64bac2221f5a870",
+  "preview": {
+    "role": "environmental_context",
+    "target_crs": "EPSG:4326",
+    "template_id": "general_multisource_v1",
+    "theme": "climate_continuous"
+  },
+  "requested_time": "2023-01-01",
+  "resolved_time": "2023-01-01",
+  "schema_version": "fasterraster.source-pack-plan/v1",
+  "source_pack_sha256": "f65644ef0e8a3b5997561daff4e19c6892741f24b9822b0b73ea2d5b045a5e03",
+  "status": "READY",
+  "temporal_alternatives": null,
+  "temporal_resolution": null
+}

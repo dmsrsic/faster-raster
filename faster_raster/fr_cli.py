@@ -10,6 +10,8 @@ import sys
 from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
 
+import yaml
+
 from faster_raster import __version__
 from faster_raster.ag_execution import (
     RecoverableRecipeExecutionError,
@@ -69,6 +71,7 @@ from faster_raster.contract_repair import (
     RepairCancelled,
     amended_workfile,
     build_intervention_record,
+    intervention_from_explicit_temporal_resolution,
     prompt_repair_candidate,
     stable_plan_hash,
     terminal_interaction_enabled,
@@ -263,6 +266,11 @@ def _plan_text(plan: Mapping[str, Any], *, verbose: bool = False) -> None:
                 f"Planning made {request_count} bounded metadata/catalog requests; "
                 "no raster pixels were transferred."
             )
+        elif plan.get("requires_coverage_validation"):
+            print(
+                "Offline planning made no network requests. Exact-year "
+                "coverage remains NOT_CHECKED and must be validated before execution."
+            )
         else:
             print("Planning used complete verified cache evidence. No network requests were made.")
         asset_plan = plan["asset_plan"]
@@ -366,6 +374,223 @@ def command_templates(args: argparse.Namespace) -> int:
     else:
         print(show_study_template(args.template_id), end="")
     return 0
+
+
+def command_capabilities(args: argparse.Namespace) -> int:
+    from faster_raster.capability_registry import (
+        capability_rows,
+        load_capability_registry,
+        markdown_table,
+        public_json,
+    )
+
+    registry = load_capability_registry()
+    if args.json:
+        _json(public_json(registry))
+    else:
+        release = registry["release"]
+        print(
+            f"Published: {release['public_release']} "
+            f"({release['package_version']}); development: "
+            f"{release['development_label']} / {release['contract_status']}"
+        )
+        print(
+            f"Capability registry: {registry['capability_registry_sha256']}"
+        )
+        print()
+        print(markdown_table(capability_rows(registry)))
+    return 0
+
+
+def command_preview_templates(args: argparse.Namespace) -> int:
+    from faster_raster.preview_templates import (
+        get_template,
+        load_registry,
+        template_catalog,
+        validate_template,
+        validate_template_path,
+    )
+
+    if args.preview_templates_command == "list":
+        registry = load_registry()
+        items = template_catalog()
+        payload = {
+            "schema_version": registry["schema_version"],
+            "registry_version": registry["registry_version"],
+            "registry_sha256": registry["registry_sha256"],
+            "templates": items,
+        }
+        if args.json:
+            _json(payload)
+        else:
+            for item in items:
+                print(
+                    f"{item['template_id']:<36} "
+                    f"{item['status']:<12} "
+                    f"{item['layout']['rows']}x{item['layout']['columns']} "
+                    + ", ".join(item["panel_roles"])
+                )
+        return 0
+    if args.preview_templates_command == "show":
+        template = get_template(args.template_id)
+        if args.json:
+            _json(template)
+        else:
+            print(yaml.safe_dump(template, sort_keys=False), end="")
+        return 0
+    target = Path(args.target)
+    if target.exists():
+        result = validate_template_path(target)
+    else:
+        registry = load_registry()
+        template = get_template(args.target)
+        result = validate_template(
+            template,
+            template_id=args.target,
+            roles=registry["roles"],
+        )
+    _json(result) if args.json else print(
+        f"{result['status']}: preview template "
+        f"{result.get('template_id') or args.target}"
+        + (
+            "\n" + "\n".join(f"ERROR: {item}" for item in result["errors"])
+            if result.get("errors")
+            else ""
+        )
+    )
+    return 0 if result["status"] == "PASS" else 2
+
+
+def command_sauce(args: argparse.Namespace) -> int:
+    from faster_raster.source_pack import (
+        compile_source_pack_plan,
+        explain_source_pack,
+        pack_source_pack,
+        probe_source_pack,
+        scaffold_source_pack,
+        test_source_pack,
+        validate_source_pack,
+        write_json_atomic,
+    )
+
+    command = args.sauce_command
+    if command == "init":
+        target = scaffold_source_pack(args.destination, force=args.force)
+        print(f"Created Source Pack: {target}")
+        print("No network requests were made.")
+        return 0
+    if command == "validate":
+        result = validate_source_pack(args.pack)
+        if args.json:
+            _json(result)
+        else:
+            print(f"{result['status']}: {args.pack}")
+            print(f"Network requests: {result['network_requests']}")
+            for item in result["errors"]:
+                print(f"ERROR: {item}")
+            for item in result["warnings"]:
+                print(f"WARNING: {item}")
+            if result.get("source_pack_sha256"):
+                print(f"Source Pack SHA-256: {result['source_pack_sha256']}")
+        return 0 if result["status"] == "PASS" else 2
+    if command == "explain":
+        result = explain_source_pack(args.pack)
+        if args.json:
+            _json(result)
+        else:
+            print(f"{result['display_name']} ({result['pack_id']})")
+            print(f"Status: {result['status']}")
+            print("Can: " + ", ".join(result["can"]))
+            print("Cannot: " + ", ".join(result["cannot"]))
+            print(f"Plan SHA-256: {result['plan_sha256']}")
+            print("No network requests were made.")
+        return 0
+    if command == "test":
+        result = test_source_pack(args.pack)
+        if args.json:
+            _json(result)
+        else:
+            print(f"{result['status']}: offline Source Pack fixtures")
+            if result.get("actual_plan_sha256"):
+                print(f"Plan SHA-256: {result['actual_plan_sha256']}")
+            for item in result.get("errors") or []:
+                print(f"ERROR: {item}")
+            print("Network requests: 0")
+        return 0 if result["status"] == "PASS" else 2
+    if command == "probe":
+        try:
+            result = probe_source_pack(
+                args.pack,
+                allow_network=args.allow_network,
+            )
+        except ValueError as exc:
+            if "credential resolver capability is required" in str(exc):
+                raise BlockedCommandError(str(exc)) from exc
+            raise
+        if args.out:
+            write_json_atomic(args.out, result)
+        _json(result) if args.json else print(
+            f"{result['status']}: {result['request_count']} request, "
+            f"{result['bytes_transferred']} bytes; "
+            f"materialized_asset={result['materialized_asset']}"
+        )
+        return 0 if result["status"] == "PASS" else 2
+    if command == "pack":
+        result = pack_source_pack(args.pack, args.out)
+        _json(result) if args.json else print(
+            f"Packed {result['archive_path']}\n"
+            f"Archive SHA-256: {result['archive_sha256']}"
+        )
+        return 0
+    if command == "time":
+        plan = compile_source_pack_plan(
+            args.pack,
+            requested_time=args.requested,
+            selected_time=(
+                args.candidate if args.sauce_time_command == "select" else None
+            ),
+        )
+        if args.sauce_time_command == "alternatives":
+            result = plan.get("temporal_alternatives")
+            if result is None:
+                result = {
+                    "schema_version": "fasterraster.temporal-alternatives/v1",
+                    "requested_time": str(args.requested),
+                    "status": "EXACT_TIME_AVAILABLE",
+                    "candidate_count": 0,
+                    "candidates": [],
+                    "selection_required": False,
+                    "original_request_unchanged": True,
+                    "search_contract_sha256": None,
+                    "temporal_alternatives_sha256": None,
+                }
+        else:
+            result = plan.get("temporal_resolution")
+            if result is None:
+                raise CommandError("temporal candidate was not resolved")
+            if args.out:
+                write_json_atomic(args.out, result)
+        if args.json:
+            _json(result)
+        else:
+            print(f"Status: {result['status']}")
+            if result.get("candidates"):
+                for item in result["candidates"]:
+                    print(
+                        f"[{item['rank']}] {item['candidate_time']} "
+                        f"distance={item['distance_days']}d "
+                        f"coverage={item['coverage_fraction']} "
+                        f"reasons={','.join(item['reason_codes'])}"
+                    )
+            if result.get("selected_time"):
+                print(f"Selected time: {result['selected_time']}")
+                print(
+                    f"Resolved contract SHA-256: "
+                    f"{result['resolved_contract_sha256']}"
+                )
+            print("Original Source Pack was not modified.")
+        return 0 if result["status"] != "NO_TEMPORAL_ALTERNATIVES" else 2
+    raise CommandError(f"unknown sauce command: {command}")
 
 
 def command_indices(args: argparse.Namespace) -> int:
@@ -654,6 +879,53 @@ def command_validate(args: argparse.Namespace) -> int:
 def _load_and_plan(args: argparse.Namespace) -> tuple[Any, Any, LocalPaths, dict[str, Any]]:
     root = repository_root()
     workfile = load_workfile(args.workfile, repository_root=root)
+    resolved_imagery_year = getattr(
+        args,
+        "resolve_imagery_year",
+        None,
+    )
+    resolved_cdl_year = getattr(args, "resolve_cdl_year", None)
+    temporal_resolution = None
+    original_runtime_request = None
+    if (resolved_imagery_year is None) != (
+        resolved_cdl_year is None
+    ):
+        raise CommandError(
+            "--resolve-imagery-year and --resolve-cdl-year must be "
+            "provided together"
+        )
+    if resolved_imagery_year is not None:
+        from faster_raster.temporal_alternatives import (
+            explicit_classification_temporal_resolution,
+        )
+
+        original = ClassificationRuntimeRequest.from_workfile(workfile)
+        original_runtime_request = original.as_dict()
+        temporal_resolution = (
+            explicit_classification_temporal_resolution(
+                original.imagery_year,
+                original.cdl_year,
+                int(resolved_imagery_year),
+                int(resolved_cdl_year),
+            )
+        )
+        resolved = (
+            original.with_coherent_year(int(resolved_imagery_year))
+            if int(resolved_imagery_year)
+            == int(resolved_cdl_year)
+            else original.with_imagery_year(
+                int(resolved_imagery_year)
+            )
+        )
+        if resolved.cdl_year != int(resolved_cdl_year):
+            raise CommandError(
+                "a noncoherent explicit repair must retain the "
+                "requested CDL year"
+            )
+        resolved = resolved.with_temporal_resolution(
+            temporal_resolution
+        )
+        workfile = amended_workfile(workfile, resolved)
     paths = _paths(workfile.path.parent)
     config, _ = resolved_config_document(paths)
     _refresh_if_requested(args, paths, config)
@@ -663,7 +935,22 @@ def _load_and_plan(args: argparse.Namespace) -> tuple[Any, Any, LocalPaths, dict
         paths,
         cli_overrides=_cli_overrides(args),
         output_dir=args.out.resolve() if getattr(args, "out", None) else None,
+        runtime_request=(
+            resolved.as_dict()
+            if temporal_resolution is not None
+            else None
+        ),
     )
+    if temporal_resolution is not None:
+        plan["classification_temporal_resolution"] = (
+            temporal_resolution
+        )
+        plan["classification_temporal_original_request"] = (
+            original_runtime_request
+        )
+        plan["classification_temporal_resolved_request"] = (
+            resolved.as_dict()
+        )
     return root, workfile, paths, plan
 
 
@@ -850,6 +1137,12 @@ def _execute_classification_request(
         ),
         analysis_aoi_epsg_4326=request.analysis_aoi_epsg_4326,
         contract_repair=contract_repair,
+        confidence_threshold_source=(
+            "configured_override"
+            if isinstance(recipe, AgriculturalRecipeV4)
+            and workfile.spec.classification is not None
+            else "recipe_default"
+        ),
         recommendation_selector=recommendation_selector,
     )
 
@@ -1256,6 +1549,35 @@ def command_cook(args: argparse.Namespace) -> int:
             )
     recipe_raw = json.loads((root / "recipes" / "ag" / f"{recipe.recipe_id}.json").read_text(encoding="utf-8"))
     request = ClassificationRuntimeRequest.from_workfile(workfile)
+    explicit_contract_repair = None
+    if plan.get("classification_temporal_resolution"):
+        resolved_pair = plan[
+            "classification_temporal_resolution"
+        ]["resolved_pair"]
+        request = (
+            request.with_coherent_year(
+                int(resolved_pair["imagery_year"])
+            )
+            if int(resolved_pair["imagery_year"])
+            == int(resolved_pair["cdl_year"])
+            else request.with_imagery_year(
+                int(resolved_pair["imagery_year"])
+            )
+        )
+        request = request.with_temporal_resolution(
+            plan["classification_temporal_resolution"]
+        )
+        explicit_contract_repair = (
+            intervention_from_explicit_temporal_resolution(
+                original_request=plan[
+                    "classification_temporal_original_request"
+                ],
+                resolved_request=request,
+                resolution=plan[
+                    "classification_temporal_resolution"
+                ],
+            )
+        )
     try:
         execution_output = (
             contextlib.redirect_stdout(io.StringIO())
@@ -1270,6 +1592,7 @@ def command_cook(args: argparse.Namespace) -> int:
                 request,
                 recipe=recipe,
                 recipe_raw=recipe_raw,
+                contract_repair=explicit_contract_repair,
                 recommendation_selector=recommendation_selector,
             )
     except SelectionReviewReady as review:
@@ -1486,6 +1809,18 @@ def command_inspect(args: argparse.Namespace) -> int:
                     else:
                         rendered = f"{float(value):.3f}"
                     print(f"    {label}: {rendered}")
+                print(
+                    "    Confidence provenance: "
+                    f"{classification['confidence_metric'] or 'unavailable'}; "
+                    f"source={classification['threshold_source'] or 'unavailable'}; "
+                    f"status={classification['confidence_provenance_status']}"
+                )
+                print(
+                    "    Physical area: "
+                    f"method={classification['area_method'] or 'unavailable'}; "
+                    f"reference={classification['area_reference_crs'] or 'unavailable'}; "
+                    f"reconciliation={classification['area_reconciliation_status'] or 'unavailable'}"
+                )
                 print("    Predicted hectares by class:")
                 hectares = classification["predicted_hectares_by_class"]
                 if hectares:
@@ -1673,6 +2008,22 @@ def _add_plan_options(parser: argparse.ArgumentParser, *, include_out: bool = Tr
     parser.add_argument("--reuse", choices=("auto", "only", "never"), help="override data reuse policy")
     parser.add_argument("--service-tile-size", type=int)
     parser.add_argument("--maximum-parallel-tasks", type=int)
+    parser.add_argument(
+        "--resolve-imagery-year",
+        type=int,
+        help=(
+            "explicitly resolve classification imagery year; requires "
+            "--resolve-cdl-year and creates an immutable resolution contract"
+        ),
+    )
+    parser.add_argument(
+        "--resolve-cdl-year",
+        type=int,
+        help=(
+            "explicitly resolve classification weak-label year; requires "
+            "--resolve-imagery-year"
+        ),
+    )
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -1680,6 +2031,13 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     parser.add_argument("--debug", action="store_true", help="show tracebacks for unexpected failures")
     commands = parser.add_subparsers(dest="command", required=True)
+
+    capabilities = commands.add_parser(
+        "capabilities",
+        help="show the canonical public capability and source status matrix",
+    )
+    capabilities.add_argument("--json", action="store_true")
+    capabilities.set_defaults(handler=command_capabilities)
 
     templates = commands.add_parser("templates", help="discover and inspect built-in study templates")
     template_commands = templates.add_subparsers(dest="templates_command", required=True)
@@ -1690,6 +2048,100 @@ def build_parser() -> argparse.ArgumentParser:
     templates_show.add_argument("template_id")
     templates_show.add_argument("--json", action="store_true")
     templates_show.set_defaults(handler=command_templates)
+
+    preview_templates = commands.add_parser(
+        "preview-templates",
+        help="discover, inspect, and validate reusable preview layouts",
+    )
+    preview_template_commands = preview_templates.add_subparsers(
+        dest="preview_templates_command",
+        required=True,
+    )
+    preview_templates_list = preview_template_commands.add_parser(
+        "list",
+        help="list registered preview templates",
+    )
+    preview_templates_list.add_argument("--json", action="store_true")
+    preview_templates_list.set_defaults(handler=command_preview_templates)
+    preview_templates_show = preview_template_commands.add_parser(
+        "show",
+        help="show a registered preview-template contract",
+    )
+    preview_templates_show.add_argument("template_id")
+    preview_templates_show.add_argument("--json", action="store_true")
+    preview_templates_show.set_defaults(handler=command_preview_templates)
+    preview_templates_validate = preview_template_commands.add_parser(
+        "validate",
+        help="validate a template ID or declarative YAML file",
+    )
+    preview_templates_validate.add_argument("target")
+    preview_templates_validate.add_argument("--json", action="store_true")
+    preview_templates_validate.set_defaults(handler=command_preview_templates)
+
+    sauce = commands.add_parser(
+        "sauce",
+        help="create, validate, test, probe, and pack declarative Source Packs",
+    )
+    sauce_commands = sauce.add_subparsers(dest="sauce_command", required=True)
+    sauce_init = sauce_commands.add_parser(
+        "init",
+        help="scaffold a minimal valid .sauce directory",
+    )
+    sauce_init.add_argument("destination", type=Path)
+    sauce_init.add_argument("--force", action="store_true")
+    sauce_init.set_defaults(handler=command_sauce)
+    for command_name, command_help in (
+        ("validate", "validate a Source Pack offline"),
+        ("explain", "explain Source Pack capabilities and limitations offline"),
+        ("test", "run deterministic offline fixtures and golden-plan tests"),
+    ):
+        sauce_parser = sauce_commands.add_parser(command_name, help=command_help)
+        sauce_parser.add_argument("pack", type=Path)
+        sauce_parser.add_argument("--json", action="store_true")
+        sauce_parser.set_defaults(handler=command_sauce)
+    sauce_probe = sauce_commands.add_parser(
+        "probe",
+        help="run one explicitly authorized metadata-only bounded request",
+    )
+    sauce_probe.add_argument("pack", type=Path)
+    sauce_probe.add_argument("--allow-network", action="store_true")
+    sauce_probe.add_argument("--out", type=Path)
+    sauce_probe.add_argument("--json", action="store_true")
+    sauce_probe.set_defaults(handler=command_sauce)
+    sauce_pack = sauce_commands.add_parser(
+        "pack",
+        help="create a deterministic, checksummed Source Pack archive",
+    )
+    sauce_pack.add_argument("pack", type=Path)
+    sauce_pack.add_argument("--out", type=Path, required=True)
+    sauce_pack.add_argument("--json", action="store_true")
+    sauce_pack.set_defaults(handler=command_sauce)
+    sauce_time = sauce_commands.add_parser(
+        "time",
+        help="emit ranked temporal alternatives or an explicit resolution",
+    )
+    sauce_time_commands = sauce_time.add_subparsers(
+        dest="sauce_time_command",
+        required=True,
+    )
+    sauce_time_alternatives = sauce_time_commands.add_parser(
+        "alternatives",
+        help="rank bounded alternatives without changing the Source Pack",
+    )
+    sauce_time_alternatives.add_argument("pack", type=Path)
+    sauce_time_alternatives.add_argument("--requested", required=True)
+    sauce_time_alternatives.add_argument("--json", action="store_true")
+    sauce_time_alternatives.set_defaults(handler=command_sauce)
+    sauce_time_select = sauce_time_commands.add_parser(
+        "select",
+        help="create a new resolution contract for an explicit candidate",
+    )
+    sauce_time_select.add_argument("pack", type=Path)
+    sauce_time_select.add_argument("--requested", required=True)
+    sauce_time_select.add_argument("--candidate", required=True)
+    sauce_time_select.add_argument("--out", type=Path)
+    sauce_time_select.add_argument("--json", action="store_true")
+    sauce_time_select.set_defaults(handler=command_sauce)
 
     indices = commands.add_parser(
         "indices",

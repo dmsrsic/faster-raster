@@ -96,7 +96,15 @@ def write_effective_reports(data: dict[str, Any], out_json: Path, out_md: Path) 
     report = {'status': 'PASS' if not errors else 'FAIL', 'errors': errors, 'effective_toggles': effective}
     out_json.parent.mkdir(parents=True, exist_ok=True)
     out_md.parent.mkdir(parents=True, exist_ok=True)
-    out_json.write_text(json.dumps(report, indent=2, sort_keys=True) + '\n', encoding='utf-8')
+    out_json.write_text(
+        json.dumps(report, indent=2, sort_keys=True) + '\n',
+        encoding='utf-8',
+        newline='\n',
+    )
     lines = ['# User Toggles Effective', '', f"- Status: `{report['status']}`", f"- Lingo mode: `{effective['lingo_mode']}`", f"- Network mode: `{effective['network_mode']}`", f"- No-auth only: `{effective['source_scope']['no_auth_only']}`", f"- Max bytes/source: `{effective['dip_limits']['max_bytes_per_source']}`", f"- Promotion policy: `{effective['promotion_policy']['mode']}`"]
-    out_md.write_text('\n'.join(lines) + '\n', encoding='utf-8')
+    out_md.write_text(
+        '\n'.join(lines) + '\n',
+        encoding='utf-8',
+        newline='\n',
+    )
     return report

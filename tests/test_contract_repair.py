@@ -436,9 +436,9 @@ def test_prompt_year_uses_listed_alternative(tmp_path):
         request,
         session(["1"]),
     )
-    assert result.imagery_year == 2021
+    assert result.imagery_year == 2022
     assert result.cdl_year == 2023
-    assert result.imagery_start == date(2021, 4, 1)
+    assert result.imagery_start == date(2022, 4, 1)
 
 
 def test_prompt_year_manual_invalid_then_valid(tmp_path):
@@ -1106,6 +1106,140 @@ def test_interactive_json_is_rejected_before_planning_or_network(monkeypatch):
         )
 
 
+def test_cli_temporal_year_arguments_must_be_paired(
+    tmp_path,
+    monkeypatch,
+):
+    monkeypatch.setattr(fr_cli, "repository_root", lambda: ROOT)
+    monkeypatch.setattr(
+        fr_cli,
+        "load_workfile",
+        lambda *args, **kwargs: workfile(tmp_path),
+    )
+    with pytest.raises(
+        fr_cli.CommandError,
+        match="must be provided together",
+    ):
+        fr_cli._load_and_plan(
+            SimpleNamespace(
+                workfile=tmp_path / "study.fr.md",
+                resolve_imagery_year=2019,
+                resolve_cdl_year=None,
+            )
+        )
+
+
+def test_cli_coherent_temporal_resolution_reaches_plan_without_acquisition(
+    tmp_path,
+    monkeypatch,
+):
+    original = workfile(tmp_path)
+    observed: dict = {}
+    monkeypatch.setattr(fr_cli, "repository_root", lambda: ROOT)
+    monkeypatch.setattr(
+        fr_cli,
+        "load_workfile",
+        lambda *args, **kwargs: original,
+    )
+    monkeypatch.setattr(fr_cli, "_paths", lambda *args: None)
+    monkeypatch.setattr(
+        fr_cli,
+        "resolved_config_document",
+        lambda *args: ({}, None),
+    )
+
+    def compile_plan(
+        root,
+        repaired,
+        paths,
+        *,
+        runtime_request,
+        **kwargs,
+    ):
+        observed["runtime_request"] = runtime_request
+        observed["workfile"] = repaired
+        return {"blocking": False, "rows": []}
+
+    monkeypatch.setattr(fr_cli, "compile_study_plan", compile_plan)
+    _, repaired, _, plan = fr_cli._load_and_plan(
+        SimpleNamespace(
+            workfile=original.path,
+            resolve_imagery_year=2019,
+            resolve_cdl_year=2019,
+            out=None,
+            refresh_sources=False,
+            offline=True,
+        )
+    )
+    resolution = plan["classification_temporal_resolution"]
+    assert resolution["status"] == "TEMPORAL_SELECTION_RESOLVED"
+    assert resolution["requested_pair"] == {
+        "imagery_year": 2023,
+        "cdl_year": 2023,
+    }
+    assert resolution["resolved_pair"] == {
+        "imagery_year": 2019,
+        "cdl_year": 2019,
+    }
+    assert resolution["raster_acquisition_during_selection"] is False
+    assert observed["runtime_request"]["imagery_year"] == 2019
+    assert observed["runtime_request"]["cdl_year"] == 2019
+    assert repaired.spec.time.crop_year == 2019
+
+
+def test_v4_workfile_threshold_override_source_reaches_execution(
+    tmp_path,
+    monkeypatch,
+):
+    captured: dict = {}
+    recipe = load_named_recipe(
+        ROOT,
+        "naip_cdl_index_hybrid_classification_audit",
+    )
+    request = ClassificationRuntimeRequest(
+        request_bbox_epsg_4326=(-83.1, 39.9, -83.0, 40.0),
+        imagery_start=date(2023, 4, 1),
+        imagery_end=date(2023, 10, 31),
+        imagery_year=2023,
+        cdl_year=2023,
+    )
+    plan = {
+        "resolved_config": {
+            "values": {
+                "reuse_mode": {"value": "auto"},
+                "open_when_complete": {"value": False},
+                "maximum_download_mb": {"value": 75},
+                "service_tile_size": {"value": 512},
+                "resolution_m": {"value": 1.2},
+            }
+        }
+    }
+
+    def fake_execute(*args, **kwargs):
+        captured.update(kwargs)
+        return tmp_path / "preview.png"
+
+    monkeypatch.setattr(fr_cli, "execute_recipe", fake_execute)
+    monkeypatch.setattr(fr_cli, "_recipe_renderer", lambda: object())
+    fr_cli._execute_classification_request(
+        ROOT,
+        SimpleNamespace(
+            spec=SimpleNamespace(
+                name="override",
+                classification=recipe.classification,
+            )
+        ),
+        plan,
+        request,
+        recipe=recipe,
+        recipe_raw={},
+    )
+    assert (
+        captured["confidence_threshold_source"]
+        == "configured_override"
+    )
+
+
 def test_main_emits_pure_structured_blocked_json(monkeypatch, capsys):
     error = RecoverableRecipeExecutionError(
         failure_document(
@@ -1272,6 +1406,7 @@ def test_repaired_values_and_intervention_reach_handoff_and_receipts(
             "class_agreement_matrix.json",
             "disagreement_summary.json",
             "class_area_inventory.csv",
+            "area_accounting.json",
         ):
             path = analysis / filename
             if filename in {"training_receipt.json", "model_receipt.json"}:
@@ -1295,6 +1430,12 @@ def test_repaired_values_and_intervention_reach_handoff_and_receipts(
             },
             "mapping_sha256": "a" * 64,
             "source_validation": {"status": "PASS"},
+            "confidence_provenance": {
+                "confidence_metric": "maximum_class_probability",
+                "confidence_threshold": 0.6,
+                "unknown_class_code": 0,
+                "threshold_source": "recipe_default",
+            },
             "model_receipt": {"repair_provenance": repair_summary},
             "training_receipt": {"repair_provenance": repair_summary},
             "metrics": {"status": "PASS"},

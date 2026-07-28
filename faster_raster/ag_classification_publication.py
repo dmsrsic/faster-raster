@@ -15,6 +15,7 @@ from rasterio.features import sieve
 from faster_raster.ag_classification import (
     AGREEMENT_STATE_LABELS,
     FEATURE_EPSILON,
+    require_confidence_provenance,
 )
 from faster_raster.ag_classification_contracts import (
     CDL_SURFACE_SUPERCLASSES,
@@ -23,6 +24,7 @@ from faster_raster.ag_classification_contracts import (
 from faster_raster.ag_recipes import AgriculturalRecipeV3
 from faster_raster.aoi_geometry import raster_aoi_mask
 from faster_raster.contract_repair import intervention_reference
+from faster_raster.preview_templates import require_audit_evidence
 
 
 CLASSIFICATION_PALETTE = {
@@ -360,24 +362,28 @@ def _panel(
     )
     panel.paste(fitted, (2, 52))
     if footer:
-        footer_top = height - 34
+        footer_top = height - 42
         draw.rectangle((2, footer_top, width - 2, height - 2), fill=(13, 22, 29))
         cursor = 12
-        footer_font = _font(14)
+        footer_font = _font(18)
         for footer_label, color in footer:
             draw.rectangle(
-                (cursor, footer_top + 9, cursor + 13, footer_top + 22),
+                (cursor, footer_top + 10, cursor + 15, footer_top + 25),
                 fill=color,
                 outline=(225, 231, 233),
             )
             cursor += 19
             draw.text(
-                (cursor, footer_top + 7),
+                (cursor, footer_top + 8),
                 footer_label,
                 fill=TEXT,
                 font=footer_font,
             )
-            bounds = draw.textbbox((cursor, footer_top + 7), footer_label, font=footer_font)
+            bounds = draw.textbbox(
+                (cursor, footer_top + 8),
+                footer_label,
+                font=footer_font,
+            )
             cursor = bounds[2] + 14
     return panel
 
@@ -490,6 +496,10 @@ def render_classification_audit(
     interpreted_evidence = interpret_naip_date_evidence(
         acquisition_evidence.get("acquisition_date_evidence")
     )
+    confidence_provenance = require_confidence_provenance(
+        classification_result.get("confidence_provenance"),
+        uncertainty_reported=True,
+    )
     if interpreted_evidence["interpreted_naip_date_utc"]:
         evidence_display = (
             f"{interpreted_evidence['interpreted_naip_date_utc']} UTC"
@@ -540,7 +550,11 @@ def render_classification_audit(
         ("Weak-label agreement", _metric(metrics["overall_agreement"])),
         ("Macro F1", _metric(metrics["macro_f1"])),
         ("Cohen’s kappa", _metric(metrics["cohen_kappa"])),
-        ("Confidence threshold", f"{recipe.classification.confidence_threshold:.2f}"),
+        (
+            "Confidence threshold",
+            f"{confidence_provenance['confidence_threshold']:.2f} "
+            f"({confidence_provenance['threshold_source']})",
+        ),
         ("Classified coverage", f"{classified / valid:.1%}"),
         ("Uncertain fraction", f"{uncertain / valid:.1%}"),
         (
@@ -574,6 +588,47 @@ def render_classification_audit(
     for line in textwrap.wrap(limitation, width=69):
         draw.text((x, y), line, fill=TEXT, font=small_font)
         y += 27
+    y += 12
+    draw.text(
+        (x, y),
+        "Broad-class color legend",
+        fill=ACCENT,
+        font=label_font,
+    )
+    y += 38
+    class_labels = CDL_SURFACE_SUPERCLASSES.class_labels
+    for index, code in enumerate(range(0, 7)):
+        column = index % 2
+        row = index // 2
+        legend_x = x + column * 475
+        legend_y = y + row * 34
+        draw.rectangle(
+            (
+                legend_x,
+                legend_y + 4,
+                legend_x + 20,
+                legend_y + 24,
+            ),
+            fill=CLASSIFICATION_PALETTE[code],
+            outline=(225, 231, 233),
+        )
+        draw.text(
+            (legend_x + 30, legend_y),
+            f"{code}: {class_labels[code]}",
+            fill=TEXT,
+            font=small_font,
+        )
+    y += 4 * 34 + 8
+    draw.text(
+        (x, y),
+        (
+            "Audit states: green = agrees with CDL; gray = unknown or "
+            f"below {confidence_provenance['confidence_threshold']:.2f}; "
+            "red = high-confidence disagreement."
+        ),
+        fill=TEXT,
+        font=small_font,
+    )
 
     panel_y = 1510
     gap = 16
@@ -635,8 +690,39 @@ def render_classification_audit(
         (
             "5 · Confidence / CDL audit",
             _confidence_agreement_image(panel_confidence, panel_agreement),
-            (),
+            (
+                ("agree", (42, 139, 109)),
+                (
+                    f"unknown <{confidence_provenance['confidence_threshold']:.2f}",
+                    (113, 117, 121),
+                ),
+                ("disagree", (220, 78, 64)),
+            ),
         ),
+    )
+    provenance_footer = (
+        "Colors, threshold source, years, area method, and analytical hashes "
+        "are recorded in the legend and receipts."
+    )
+    audit_contract = require_audit_evidence(
+        "ag_classification_audit_v1",
+        panel_titles=[item[0] for item in lower],
+        legends_present={"broad_classes", "confidence_states"},
+        explanations_present={
+            "unknown_uncertain",
+            "confidence_threshold",
+            "decision_states",
+        },
+        class_codes=[
+            int(code)
+            for code, count in classification_result["inference"][
+                "post_sieve_class_counts"
+            ].items()
+            if int(count) > 0
+        ],
+        supported_class_codes=CLASSIFICATION_PALETTE,
+        confidence_provenance=confidence_provenance,
+        provenance_footer=provenance_footer,
     )
     for index, (label, image, footer) in enumerate(lower):
         panel = _panel(
@@ -648,9 +734,33 @@ def render_classification_audit(
         )
         canvas.paste(panel, (40 + index * (panel_width + gap), panel_y))
 
+    draw.text(
+        (40, 2128),
+        provenance_footer,
+        fill=MUTED,
+        font=_font(18),
+    )
     canvas.save(destination, format="PNG", optimize=False, compress_level=9)
     if Image.open(destination).size != (3840, 2160):
         raise RuntimeError("classification audit preview did not render at 4K")
+    derivative_contract = audit_contract[
+        "documentation_derivative"
+    ]
+    documentation_destination = destination.with_name(
+        destination.stem.replace("_4k", "") + "_docs.png"
+    )
+    canvas.resize(
+        (
+            int(derivative_contract["width"]),
+            int(derivative_contract["height"]),
+        ),
+        Image.Resampling.LANCZOS,
+    ).save(
+        documentation_destination,
+        format="PNG",
+        optimize=False,
+        compress_level=9,
+    )
     legend = {
         "schema_version": "fasterraster.classification-legend/v1",
         "mapping_id": CDL_SURFACE_SUPERCLASSES.mapping_id,
@@ -690,6 +800,15 @@ def render_classification_audit(
         "agreement_states": {
             str(code): label for code, label in AGREEMENT_STATE_LABELS.items()
         },
+        "preview_template_id": audit_contract["template_id"],
+        "preview_template_schema_version": audit_contract[
+            "template_schema_version"
+        ],
+        "preview_template_contract_sha256": audit_contract[
+            "template_sha256"
+        ],
+        "minimum_font_size": audit_contract["minimum_font_size"],
+        "provenance_footer": provenance_footer,
     }
     legend_path = destination.parent / "classification_legend.json"
     _write_json(legend_path, legend)
@@ -697,6 +816,22 @@ def render_classification_audit(
         "preview": destination.relative_to(destination.parents[2]).as_posix(),
         "legend": legend_path.relative_to(destination.parents[2]).as_posix(),
         "dimensions": [3840, 2160],
+        "documentation_derivative": (
+            documentation_destination.relative_to(
+                destination.parents[2]
+            ).as_posix()
+        ),
+        "documentation_dimensions": [
+            int(derivative_contract["width"]),
+            int(derivative_contract["height"]),
+        ],
+        "preview_template_id": audit_contract["template_id"],
+        "preview_template_schema_version": audit_contract[
+            "template_schema_version"
+        ],
+        "preview_template_contract_sha256": audit_contract[
+            "template_sha256"
+        ],
         "panels": [item[0] for item in lower],
         "scientific_claim": classification_scientific_claim(
             year,
@@ -732,7 +867,7 @@ def render_classification_audit(
         "analytical_rasters_modified": False,
         "ndvi_display": panel_ndvi_contract,
         "predicted_class_display": legend["predicted_class_display"],
-        "confidence_threshold": recipe.classification.confidence_threshold,
+        **confidence_provenance,
         **interpreted_evidence,
     }
     return destination, publication_receipt

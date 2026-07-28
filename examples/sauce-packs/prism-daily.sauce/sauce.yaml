@@ -1,0 +1,47 @@
+schema_version: fasterraster.source-pack/v1
+pack_id: prism-daily-public
+display_name: PRISM Daily Precipitation
+description: Official bounded PRISM daily ZIP path using the existing generic HTTPS adapter family.
+adapter:
+  family: static_https_template
+  url_template: https://data.prism.oregonstate.edu/time_series/{region}/an/{resolution}/{variable}/{temporal_frequency}/{year}/prism_{variable}_{region}_25m_{yyyymmdd}.zip
+  media_types: [application/zip]
+  asset_roles: [precipitation]
+capabilities:
+  planning: true
+  preview: true
+  materialization: false
+  analysis: false
+  temporal_discovery: true
+source:
+  semantic_type: continuous
+  crs: EPSG:4326
+  resampling: bilinear
+  nodata: -9999
+  mask_policy: explicit_nodata
+access:
+  authentication_scheme: none
+  credential_ref: null
+  allowed_hosts: [data.prism.oregonstate.edu]
+  redirect_hosts: []
+network:
+  max_requests: 1
+  max_bytes: 65536
+  timeout_seconds: 8
+  maximum_redirects: 0
+temporal:
+  mode: exact
+  requested: "2023-01-01"
+  tolerance_days: 800
+  template_variables:
+    region: us
+    resolution: 4km
+    variable: ppt
+    temporal_frequency: daily
+    year: "2023"
+    yyyymmdd: "20230101"
+preview:
+  template_id: general_multisource_v1
+  role: environmental_context
+  theme: climate_continuous
+  target_crs: EPSG:4326

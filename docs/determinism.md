@@ -17,6 +17,14 @@ ranking/tie rules, selected thresholds and normalizations, parent constraints,
 overlap arbitration, and output hashes. Timestamps do not enter semantic
 hashes.
 
+Classification handoffs also bind confidence metric, configured threshold,
+unknown class code, and threshold source. Physical inventories preserve exact
+native class counts while binding the equal-area CRS, grid, nearest-neighbor
+method, reconciliation tolerance, footprint totals, and area-accounting
+SHA-256. Temporal repair binds the unmodified requested pair, ranked
+alternatives, explicit selection, resolved pair, and three immutable hashes;
+selection performs no raster acquisition.
+
 Automatic search reserves the existing outer spatial holdout before candidate
 selection. Equivalent inputs and contracts produce equivalent formula plans,
 candidate order, ranking, thresholds, and analytical rasters. Recommendation

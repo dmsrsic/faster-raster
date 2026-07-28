@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import io
 import json
+import os
 import stat
 import urllib.error
 from pathlib import Path
@@ -462,7 +463,10 @@ def test_transient_http_error_is_retried():
 def test_quick_smoke_script_contract():
     path = Path("scripts/fr-beta-smoke")
     contents = path.read_text(encoding="utf-8")
-    assert path.stat().st_mode & stat.S_IXUSR
+    if os.name != "nt":
+        assert path.stat().st_mode & stat.S_IXUSR
+    else:
+        assert contents.startswith("#!/usr/bin/env sh")
     assert "--quick" in contents and "--full" in contents
     assert "index_hash_before" in contents and "index_hash_after" in contents
     assert "--allow-network" not in contents

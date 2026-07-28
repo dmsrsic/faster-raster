@@ -61,7 +61,13 @@ fr-prism-canary = "faster_raster.prism_canary:main"
 
 [tool.hatch.build.targets.wheel.force-include]
 "configs" = "configs"
+"docs/bring-your-own-sauce.md" = "docs/bring-your-own-sauce.md"
+"docs/generated/capabilities.md" = "docs/generated/capabilities.md"
+"docs/limitations.md" = "docs/limitations.md"
+"docs/preview-templates.md" = "docs/preview-templates.md"
+"docs/sauce-time.md" = "docs/sauce-time.md"
 "examples" = "examples"
+"prompts" = "prompts"
 "recipes" = "recipes"
 "schemas" = "schemas"
 "scripts/fr-cook-ag" = "scripts/fr-cook-ag"

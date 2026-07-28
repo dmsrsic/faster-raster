@@ -528,13 +528,13 @@ def _stage_handlers(
         cache_path, sidecar_path = _write_runtime_cache(job, row, retained, result, options.max_bytes_per_source, now(), options.cache_root)
         logical_cache_path = _logical_runtime_cache_path(cache_path, options.cache_root)
         logical_sidecar_path = _logical_runtime_cache_path(sidecar_path, options.cache_root)
-        result["cache_path"] = str(logical_cache_path)
+        result["cache_path"] = logical_cache_path.as_posix()
         state["cache_entries"].append(
             {
                 "source_id": job["source_id"],
                 "request_id": job["request_id"],
-                "cache_path": str(logical_cache_path),
-                "receipt_path": str(logical_sidecar_path),
+                "cache_path": logical_cache_path.as_posix(),
+                "receipt_path": logical_sidecar_path.as_posix(),
                 "cache_status": "invalid_refetched" if cache_errors else "fetched",
                 "validation_errors": cache_errors,
                 "payload_sha256": result["sha256"],
@@ -843,8 +843,10 @@ def _read_valid_cache(job: dict[str, Any], row: dict[str, Any], max_bytes: int, 
         "detected_content_family": magic.content_family,
         "sha256": digest,
         "sha256_short": digest[:12],
-        "cache_path": str(_logical_runtime_cache_path(path, cache_root)),
-        "cache_receipt_path": str(_logical_runtime_cache_path(sidecar, cache_root)),
+        "cache_path": _logical_runtime_cache_path(path, cache_root).as_posix(),
+        "cache_receipt_path": _logical_runtime_cache_path(
+            sidecar, cache_root
+        ).as_posix(),
         "warnings": [],
         "retry_count": 0,
     }, []

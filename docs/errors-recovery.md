@@ -2,7 +2,12 @@
 
 ## No coverage for the requested year
 
-FasterRaster reports the failed exact year and available intersecting years when known. Select another year explicitly; never relabel a later image as evidence for the earlier analytical year.
+FasterRaster reports the failed exact year and available intersecting years
+when known. For a Source Pack, run
+`fr sauce time alternatives PACK --requested YYYY --json`, review the ranked
+metadata, then create an explicit resolution with
+`fr sauce time select PACK --requested YYYY --candidate YYYY --out resolution.json`.
+Never relabel a later image as evidence for the earlier analytical year.
 
 ## Reuse-only is blocked
 
@@ -49,3 +54,6 @@ fr inspect latest --verbose
 ```
 
 Final study results are under `outputs/handoffs/`; hybrid outputs are under `outputs/publications/`. The printed path and `manifest.json` identify the relevant result.
+
+See the [first-cook troubleshooting matrix](first-cook-troubleshooting.md) for
+exact corrective commands.

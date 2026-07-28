@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "candidate_count": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "candidates": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "candidate_id": {
+            "type": "string"
+          },
+          "cdl_year": {
+            "type": "integer"
+          },
+          "coherent_pair": {
+            "type": "boolean"
+          },
+          "coverage_fraction": {
+            "oneOf": [
+              {
+                "maximum": 1,
+                "minimum": 0,
+                "type": "number"
+              },
+              {
+                "const": "unknown"
+              }
+            ]
+          },
+          "distance_years": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "imagery_year": {
+            "type": "integer"
+          },
+          "rank": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "reason_codes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "repair_mode": {
+            "enum": [
+              "coherent_imagery_and_weak_labels",
+              "imagery_only"
+            ]
+          }
+        },
+        "required": [
+          "candidate_id",
+          "repair_mode",
+          "imagery_year",
+          "cdl_year",
+          "distance_years",
+          "coverage_fraction",
+          "coherent_pair",
+          "rank",
+          "reason_codes"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "coherent_pair_status": {
+      "enum": [
+        "EXACT_TIME_AVAILABLE",
+        "AWAITING_TEMPORAL_SELECTION",
+        "NO_COHERENT_ALTERNATIVE"
+      ]
+    },
+    "network_bytes": {
+      "const": 0
+    },
+    "original_request_unchanged": {
+      "const": true
+    },
+    "ranking_policy": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "raster_acquisition_authorized": {
+      "const": false
+    },
+    "requested_pair": {
+      "additionalProperties": false,
+      "properties": {
+        "cdl_year": {
+          "type": "integer"
+        },
+        "imagery_year": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "imagery_year",
+        "cdl_year"
+      ],
+      "type": "object"
+    },
+    "schema_version": {
+      "const": "fasterraster.classification-temporal-alternatives/v1"
+    },
+    "search_contract_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "selection_required": {
+      "type": "boolean"
+    },
+    "status": {
+      "enum": [
+        "EXACT_TIME_AVAILABLE",
+        "AWAITING_TEMPORAL_SELECTION",
+        "NO_COHERENT_ALTERNATIVE"
+      ]
+    },
+    "temporal_alternatives_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "status",
+    "coherent_pair_status",
+    "requested_pair",
+    "original_request_unchanged",
+    "selection_required",
+    "raster_acquisition_authorized",
+    "network_bytes",
+    "search_contract_sha256",
+    "candidate_count",
+    "candidates",
+    "ranking_policy",
+    "temporal_alternatives_sha256"
+  ],
+  "title": "FasterRaster classification temporal alternatives v1",
+  "type": "object"
+}

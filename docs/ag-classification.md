@@ -118,10 +118,30 @@ zero-division policy. They do not constitute independent accuracy.
 ## Inference, confidence, and agreement
 
 Inference is blockwise on the raw NAIP grid. Maximum class probability becomes
-confidence. Predictions below `0.60` become class 0; valid-pixel confidence is
+confidence. Predictions below the configured threshold become class 0;
+valid-pixel confidence is
 stored as rounded percent `1–100`, while invalid pixels use 0. The optional
 nine-pixel sieve is currently recorded as disabled to preserve invalid gaps and
 exact blockwise results; pre/post counts are still reported.
+
+The threshold is not inferred from the rendered image. Planning, the model
+receipt, final receipt, publication evidence, and `fr inspect` carry one
+mandatory provenance object:
+
+```json
+{
+  "confidence_metric": "maximum_class_probability",
+  "confidence_threshold": 0.60,
+  "unknown_class_code": 0,
+  "threshold_source": "recipe_default"
+}
+```
+
+The numeric value is the actual recipe or workfile value, and
+`threshold_source` becomes `configured_override` for a workfile override.
+Finalization fails closed if uncertainty products exist without this evidence.
+Inspection of an older handoff remains supported but reports the provenance as
+legacy-unavailable rather than guessing a value.
 
 The agreement-state raster uses:
 
@@ -149,10 +169,29 @@ data/naip_{year}_cdl_agreement_state.cog.tif
 
 Machine-readable analysis includes feature, training, and model receipts;
 holdout confusion matrices and metrics; class agreement matrices; disagreement
-summary; and class-area inventory. The 3840×2160 preview contains natural
+summary; class-area inventory; and
+`analysis/classification/area_accounting.json`. The 3840×2160 preview contains natural
 color, CIR, numeric NDVI, predicted classes, and confidence/agreement panels.
 Its main map uses a muted prediction overlay and high-confidence disagreement
 outlines—not universal CDL pixel boundaries.
+
+### Physical area accounting
+
+Categorical class counts are counted exactly on the native analytical raster.
+Physical area is a separate deterministic calculation. A raster already in a
+declared equal-area CRS uses its native grid; other rasters are reprojected
+with nearest-neighbor categorical resampling to EPSG:6933 before area is
+measured. Nodata and the analytical AOI mask are preserved. This prevents the
+latitude-dependent inflation produced by multiplying nominal EPSG:3857 pixel
+width and height.
+
+The area receipt records the method, source and equal-area grids, reference
+CRS, units, native and equal-area counts, square metres, hectares,
+reconciliation tolerance, valid-footprint area, summed class area, status, and
+SHA-256. Summed class area must reconcile to the valid footprint within
+`0.001` (0.1%). The Greeley regression bbox
+`[-104.80, 40.34, -104.58, 40.51]` measures approximately 352.432 km², not the
+approximately 608.851 km² implied by nominal Web Mercator pixel area.
 
 The asset plan is written before acquisition. Reuse-only performs no network
 transfer, selective acquisition fetches only missing assets, and the four-band
@@ -214,6 +253,30 @@ analytical hash is unchanged, records the source handoff and manifest hash,
 sets network bytes to zero, and regenerates checksums. It never mutates the
 historical source handoff.
 
+## Explicit coherent temporal repair
+
+Classification planning uses Sauce Time contracts specialized for an
+imagery/weak-label pair. When the requested pair is unavailable it reports one
+of `EXACT_TIME_AVAILABLE`, `AWAITING_TEMPORAL_SELECTION`, or
+`NO_COHERENT_ALTERNATIVE`. Coherent same-year candidates rank before
+imagery-only candidates; the latter remain available when the operator accepts
+temporally mismatched weak supervision.
+
+Selection is explicit and produces
+`fasterraster.classification-temporal-resolution/v1` with original and resolved
+years plus search, alternatives, and resolution hashes. The original workfile
+is unchanged, and selection authorizes no raster acquisition. Noninteractive
+planning, explanation, or cooking can resolve a pair directly:
+
+```bash
+fr plan study.fr.md --resolve-imagery-year 2019 --resolve-cdl-year 2019
+fr cook study.fr.md --resolve-imagery-year 2019 --resolve-cdl-year 2019
+```
+
+Both arguments are required together. For the Greeley 2023/2023 case, an
+available 2019/2019 pair is the preferred coherent replacement and is applied
+only after one explicit approval or the paired CLI arguments.
+
 ## Interactive contract repair
 
 `fr cook` can repair a bounded source-contract failure for this workflow when
@@ -260,10 +323,11 @@ Source-reported compatible years:
   [q] Cancel
 ```
 
-The listed choice or manually entered year is validated. Imagery dates move to
-that imagery year, while the CDL crop-label year remains the workfile year. If
-those years differ, FasterRaster displays a prominent warning and requires a
-separate explicit acceptance. Receipts describe the result as temporally
+The ranked choices distinguish a coherent imagery/CDL replacement from an
+imagery-only replacement. A coherent choice moves both years; an imagery-only
+choice preserves the workfile CDL year. If those years differ, FasterRaster
+displays a prominent warning and requires a separate explicit acceptance.
+Receipts describe the result as temporally
 mismatched weak supervision; they do not claim that the replacement imagery
 represents the originally requested year. Date-range recovery asks for start
 and end separately in `YYYY-MM-DD` form and rejects malformed, cross-year, or

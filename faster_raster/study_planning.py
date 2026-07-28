@@ -526,6 +526,9 @@ def compile_study_plan(
                 "analysis_aoi_epsg_4326"
             ),
             "spatial_construction": runtime.get("spatial_construction"),
+            "temporal_resolution": runtime.get(
+                "temporal_resolution"
+            ),
             "temporal_mismatch": imagery_year != cdl_year,
             "acquisition_geometry_differs_from_analysis_aoi": bool(
                 runtime.get(
@@ -536,12 +539,31 @@ def compile_study_plan(
         },
     }
     if recipe.schema_version in {3, 4}:
-        from faster_raster.ag_classification import classification_dependency_status
+        from faster_raster.ag_classification import (
+            classification_confidence_provenance,
+            classification_dependency_status,
+        )
 
         requested_resolution = float(
             resolved["values"]["resolution_m"]["value"]
         )
         dependency = classification_dependency_status()
+        classification_spec = (
+            recipe.classification.general
+            if isinstance(recipe, AgriculturalRecipeV4)
+            else recipe.classification
+        )
+        confidence_provenance = (
+            classification_confidence_provenance(
+                classification_spec,
+                threshold_source=(
+                    "configured_override"
+                    if isinstance(recipe, AgriculturalRecipeV4)
+                    and workfile.spec.classification is not None
+                    else "recipe_default"
+                ),
+            )
+        )
         estimated_transfer = estimate_uncompressed_asset_bytes(
             request_bbox,
             asset_safety_profile(
@@ -571,6 +593,7 @@ def compile_study_plan(
             "mapping_sha256": CDL_SURFACE_SUPERCLASSES.sha256,
             "estimated_uncompressed_transfer_bytes": estimated_transfer,
             "dependency_readiness": dependency,
+            "confidence_provenance": confidence_provenance,
             "scientific_claim": (
                 classification_scientific_claim(
                     imagery_year,

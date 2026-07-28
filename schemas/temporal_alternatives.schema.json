@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "candidate_count": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "candidates": {
+      "items": {
+        "properties": {
+          "candidate_time": {
+            "type": "string"
+          },
+          "coverage_fraction": {
+            "oneOf": [
+              {
+                "maximum": 1,
+                "minimum": 0,
+                "type": "number"
+              },
+              {
+                "const": "unknown"
+              }
+            ]
+          },
+          "distance_days": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "rank": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "reason_codes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "candidate_time",
+          "distance_days",
+          "coverage_fraction",
+          "rank",
+          "reason_codes"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "original_request_unchanged": {
+      "const": true
+    },
+    "ranking_policy": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "requested_time": {
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "fasterraster.temporal-alternatives/v1"
+    },
+    "search_contract_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "selection_required": {
+      "type": "boolean"
+    },
+    "source_id": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "AWAITING_TEMPORAL_SELECTION",
+        "NO_TEMPORAL_ALTERNATIVES"
+      ]
+    },
+    "temporal_alternatives_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "source_id",
+    "requested_time",
+    "status",
+    "search_contract_sha256",
+    "selection_required",
+    "original_request_unchanged",
+    "candidate_count",
+    "candidates",
+    "ranking_policy",
+    "temporal_alternatives_sha256"
+  ],
+  "title": "FasterRaster temporal alternatives v1",
+  "type": "object"
+}

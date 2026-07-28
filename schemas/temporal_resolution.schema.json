@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "original_request_unchanged": {
+      "const": true
+    },
+    "requested_time": {
+      "type": "string"
+    },
+    "resolved_contract_sha256": {
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "fasterraster.temporal-resolution/v1"
+    },
+    "search_contract_sha256": {
+      "type": "string"
+    },
+    "selected_candidate": {
+      "type": "object"
+    },
+    "selected_time": {
+      "type": "string"
+    },
+    "selection_method": {
+      "const": "explicit_user_selection"
+    },
+    "source_id": {
+      "type": "string"
+    },
+    "status": {
+      "const": "RESOLVED"
+    },
+    "temporal_alternatives_sha256": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "status",
+    "source_id",
+    "requested_time",
+    "selected_time",
+    "selected_candidate",
+    "search_contract_sha256",
+    "temporal_alternatives_sha256",
+    "selection_method",
+    "original_request_unchanged",
+    "resolved_contract_sha256"
+  ],
+  "title": "FasterRaster explicit temporal resolution v1",
+  "type": "object"
+}

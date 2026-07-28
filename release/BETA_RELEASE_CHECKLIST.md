@@ -1,6 +1,10 @@
 # Public beta release checklist
 
-Target release: `v1.0.0-beta.1` / package `1.0.0b1`
+Published release: `v1.0.0-beta.4` / package `1.0.0b4`
+
+The Bring Your Own Sauce, Sauce Time, preview-template, and public credential
+contracts in the current tree are Unreleased / experimental until a maintainer
+performs a separate release decision.
 
 ## Local release candidate
 

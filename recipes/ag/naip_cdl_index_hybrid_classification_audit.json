@@ -207,6 +207,7 @@
     "general_classification_cog",
     "confidence_cog",
     "agreement_cog",
+    "area_accounting.json",
     "final_hybrid_classification_cog",
     "hybrid_decision_state_cog",
     "index_registry.json",

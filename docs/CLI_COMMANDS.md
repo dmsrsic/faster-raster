@@ -1,5 +1,37 @@
 ﻿# FasterRaster CLI Commands
 
+## Public `fr` Source Pack, time, and preview contracts
+
+The following commands are implemented in the current source tree as
+Unreleased / experimental public contracts:
+
+```bash
+fr capabilities --json
+fr sauce init my-source
+fr sauce validate my-source.sauce
+fr sauce explain my-source.sauce --json
+fr sauce test my-source.sauce
+fr sauce probe my-source.sauce --allow-network --out build/probe.json
+fr sauce pack my-source.sauce --out dist/
+fr sauce time alternatives my-source.sauce --requested 2022 --json
+fr sauce time select my-source.sauce --requested 2022 --candidate 2021 --out resolution.json --json
+fr preview-templates list
+fr preview-templates show ag_classification_audit_v1 --json
+fr preview-templates validate general_multisource_v1
+fr plan study.fr.md --resolve-imagery-year 2019 --resolve-cdl-year 2019
+fr explain study.fr.md --resolve-imagery-year 2019 --resolve-cdl-year 2019
+```
+
+`validate`, `explain`, `test`, preview-template discovery, and Sauce Time
+fixture ranking are offline. `probe` requires `--allow-network`, remains
+metadata-only and byte-capped, and fails before network access if the pack
+requires a credential resolver. `credential_ref` values are opaque names, not
+secret values.
+
+The paired classification year arguments create an immutable coherent or
+imagery-only temporal-resolution contract. Both are required; neither edits
+the workfile or authorizes raster acquisition during selection.
+
 Professional commands remain stable:
 
 Materialization commands are available in v0.9:

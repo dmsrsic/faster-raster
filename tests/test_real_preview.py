@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import tempfile
 from pathlib import Path
 
 import pytest
@@ -37,9 +38,13 @@ def png_bytes(colors):
     img = bytearray()
     for color in colors:
         img.extend(color)
-    path = Path("/tmp/fr_test_preview.png")
-    real_preview._write_png(path, width, height, img)
-    return path.read_bytes()
+    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as handle:
+        path = Path(handle.name)
+    try:
+        real_preview._write_png(path, width, height, img)
+        return path.read_bytes()
+    finally:
+        path.unlink(missing_ok=True)
 
 
 def task_with_sources(sources):

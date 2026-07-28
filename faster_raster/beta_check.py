@@ -187,6 +187,7 @@ def run_beta_check(
             system_grade.RUN_ROOT,
             system_grade.MATERIALIZATION_ROOT,
             static_http_range.DEFAULT_REPORT_DIR,
+            system_grade.preview_alpha2.SOURCE_REPORT_ROOT,
         )
         task_compiler.TASK_COMPILE_ROOT = temp / "reports" / "task_compiles"
         task_compiler.EXECUTION_PACKAGE_ROOT = temp / "reports" / "execution_packages"
@@ -194,6 +195,9 @@ def run_beta_check(
         system_grade.RUN_ROOT = temp / "reports" / "runs"
         system_grade.MATERIALIZATION_ROOT = temp / "reports" / "materializations"
         static_http_range.DEFAULT_REPORT_DIR = temp / "reports" / "static_http_range"
+        system_grade.preview_alpha2.SOURCE_REPORT_ROOT = (
+            temp / "reports" / "sources"
+        )
 
         workfile_path = root / "examples" / "colby-study.fr.md"
         _step("fr doctor --offline", lambda: fr_main(["doctor", "--offline", "--json"]), steps)
@@ -281,6 +285,7 @@ def run_beta_check(
         system_grade.RUN_ROOT,
         system_grade.MATERIALIZATION_ROOT,
         static_http_range.DEFAULT_REPORT_DIR,
+        system_grade.preview_alpha2.SOURCE_REPORT_ROOT,
     ) = original_report_roots
     for key, value in original_environment.items():
         if value is None:

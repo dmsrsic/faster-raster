@@ -364,6 +364,8 @@ def test_classification_summary_missing_metrics_is_bounded(tmp_path):
     assert summary is not None
     assert summary["available"] is False
     assert "weak_label_metrics" in summary["missing_fields"]
+    assert summary["confidence_provenance_status"] == "LEGACY_UNAVAILABLE"
+    assert "legacy_confidence_provenance" in summary["missing_fields"]
 
 
 def test_inspect_latest_ignores_staging_directories(tmp_path):

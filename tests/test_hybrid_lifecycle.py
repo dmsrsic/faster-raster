@@ -202,6 +202,22 @@ def test_hybrid_explain_reports_indices_specialists_and_bounds(
     capsys,
 ) -> None:
     _offline_local_plan(monkeypatch)
+    monkeypatch.setenv(
+        "FASTERRASTER_CONFIG_HOME",
+        str(tmp_path / "config"),
+    )
+    monkeypatch.setenv(
+        "FASTERRASTER_STATE_HOME",
+        str(tmp_path / "state"),
+    )
+    monkeypatch.setenv(
+        "FASTERRASTER_CACHE_HOME",
+        str(tmp_path / "cache"),
+    )
+    monkeypatch.setenv(
+        "FASTERRASTER_TEMP_HOME",
+        str(tmp_path / "temp"),
+    )
     path = tmp_path / "hybrid.fr.md"
     path.write_text(
         render_study_template(

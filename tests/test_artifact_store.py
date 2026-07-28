@@ -48,7 +48,12 @@ def test_symlink_artifact_root_rejected(tmp_path):
     target.mkdir()
     link = tmp_path / "cache" / "artifacts" / "sha256"
     link.parent.mkdir(parents=True)
-    link.symlink_to(target, target_is_directory=True)
+    try:
+        link.symlink_to(target, target_is_directory=True)
+    except OSError as exc:
+        if getattr(exc, "winerror", None) == 1314:
+            pytest.skip("Windows symlink privilege is unavailable")
+        raise
     try:
         artifact_store.validate_artifact_root_policy(link, boundary=tmp_path)
     except artifact_store.ArtifactStoreError as exc:

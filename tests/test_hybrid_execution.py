@@ -152,6 +152,12 @@ def _inputs(tmp_path: Path) -> tuple[Path, dict]:
             "overall_agreement": 0.8,
             "interpretation": "weak-label agreement, not accuracy",
         },
+        "confidence_provenance": {
+            "confidence_metric": "maximum_class_probability",
+            "confidence_threshold": 0.6,
+            "unknown_class_code": 0,
+            "threshold_source": "recipe_default",
+        },
         "mapping": CDL_SURFACE_SUPERCLASSES.as_dict(),
     }
 
@@ -365,11 +371,19 @@ def test_hybrid_publication_is_4k_deterministic_and_display_only(
     assert {
         key: value
         for key, value in first_receipt.items()
-        if key not in {"preview", "legend"}
+            if key not in {
+                "preview",
+                "legend",
+                "documentation_derivative",
+            }
     } == {
         key: value
         for key, value in second_receipt.items()
-        if key not in {"preview", "legend"}
+            if key not in {
+                "preview",
+                "legend",
+                "documentation_derivative",
+            }
     }
     assert first_receipt["analytical_rasters_modified"] is False
     assert first_receipt["network_bytes"] == 0
@@ -661,7 +675,7 @@ def test_v4_execute_recipe_transaction_finalizes_complete_offline_handoff(
         shutil.copy2(cdl, data / "cdl_2023_classes.cog.tif")
 
     def verify(staging, *args, **kwargs):
-        return {
+            return {
             "naip_multispectral": record(
                 "naip_multispectral",
                 staging / "data/naip_2021_multispectral.cog.tif",
@@ -730,6 +744,18 @@ def test_v4_execute_recipe_transaction_finalizes_complete_offline_handoff(
             ),
             encoding="utf-8",
         )
+        (analysis / "area_accounting.json").write_text(
+            json.dumps(
+                {
+                    "area_method": (
+                        "nearest_neighbor_reprojection_to_equal_area_grid"
+                    ),
+                    "area_reference_crs": "EPSG:6933",
+                    "area_reconciliation_status": "PASS",
+                }
+            ),
+            encoding="utf-8",
+        )
         return {
             "source_validation": {
                 "status": "PASS",
@@ -739,6 +765,12 @@ def test_v4_execute_recipe_transaction_finalizes_complete_offline_handoff(
             "model_receipt": {
                 "backend": "synthetic_fixture",
                 "mapping_id": CDL_SURFACE_SUPERCLASSES.mapping_id,
+            },
+            "confidence_provenance": {
+                "confidence_metric": "maximum_class_probability",
+                "confidence_threshold": 0.6,
+                "unknown_class_code": 0,
+                "threshold_source": "recipe_default",
             },
             "training_receipt": {
                 "train_sample_total": 100,
