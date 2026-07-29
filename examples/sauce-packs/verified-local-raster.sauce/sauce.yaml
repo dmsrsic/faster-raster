@@ -1,0 +1,46 @@
+schema_version: fasterraster.source-pack/v1
+pack_id: verified-local-raster
+display_name: Verified synthetic local categorical raster
+description: Synthetic checksum-pinned GeoTIFF fixture for the verified local raster family.
+adapter:
+  family: verified_local_raster
+  local_path: fixture.tif
+  local_sha256: 28a63c0533b155cbcd066ef8006d444f767366eb0cbba37aa5c0b4e898543e6a
+  media_types: [image/tiff]
+  asset_roles: [classification]
+capabilities:
+  planning: true
+  preview: true
+  materialization: false
+  analysis: false
+  temporal_discovery: false
+source:
+  semantic_type: categorical
+  crs: EPSG:4326
+  resampling: nearest
+  nodata: 255
+  mask_policy: explicit_nodata
+access:
+  authentication_scheme: none
+  credential_ref: null
+  allowed_hosts: []
+  redirect_hosts: []
+  asset_hosts: []
+network:
+  max_requests: 1
+  max_bytes: 65536
+  max_asset_bytes: 65536
+  max_total_bytes: 65536
+  timeout_seconds: 8
+  maximum_redirects: 0
+  max_parallel_requests: 1
+temporal:
+  mode: static
+  requested: null
+  tolerance_days: null
+  template_variables: {}
+preview:
+  template_id: general_multisource_v1
+  role: classification
+  theme: categorical_classes
+  target_crs: EPSG:4326

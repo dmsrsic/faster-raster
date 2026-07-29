@@ -6,6 +6,12 @@ All notable changes are documented here. Versions follow [Semantic Versioning](h
 
 ### Added
 
+- A public
+  [FasterRaster Flavortown Sauce Wizard](https://chatgpt.com/g/g-6a692bb17b9c8191a318997fd0435bf7-fasterraster-flavortown-sauce-wizard)
+  entry point, four family-specific Source Pack fixtures, explicit
+  provider-evidence/readiness states, and deterministic frozen
+  `fasterraster.source-pack-plan/v1` handoff compilation. These remain
+  Unreleased / experimental.
 - Declarative `fasterraster.source-pack/v1` Source Packs with offline
   validation, deterministic fixtures and archives, bounded opt-in probes,
   opaque credential requirements, two shipped examples, and `fr sauce`

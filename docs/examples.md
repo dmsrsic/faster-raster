@@ -1,5 +1,11 @@
 # Examples
 
+For provider adapters, the
+[FasterRaster Flavortown Sauce Wizard](https://chatgpt.com/g/g-6a692bb17b9c8191a318997fd0435bf7-fasterraster-flavortown-sauce-wizard)
+can help audit the four shipped Source Pack family fixtures. The examples are
+patterns, not proof of another provider's facts; follow the
+[evidence-to-validation workflow](flavortown-wizard.md).
+
 ## Buckeye–Verrado, Arizona
 
 ![Buckeye–Verrado publication](assets/examples/buckeye-verrado-publication.png)

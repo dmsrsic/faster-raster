@@ -24,11 +24,15 @@ access:
   credential_ref: null
   allowed_hosts: [data.prism.oregonstate.edu]
   redirect_hosts: []
+  asset_hosts: []
 network:
   max_requests: 1
   max_bytes: 65536
+  max_asset_bytes: 64000000
+  max_total_bytes: 64000000
   timeout_seconds: 8
   maximum_redirects: 0
+  max_parallel_requests: 1
 temporal:
   mode: exact
   requested: "2023-01-01"

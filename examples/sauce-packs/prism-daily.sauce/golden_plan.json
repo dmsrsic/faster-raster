@@ -9,6 +9,8 @@
     ],
     "public_adapter_id": "generic_https_template"
   },
+  "blocked_before_network": false,
+  "blocked_details": [],
   "capabilities": {
     "analysis": false,
     "materialization": false,
@@ -17,29 +19,97 @@
     "temporal_discovery": true
   },
   "credential_requirement": null,
+  "endpoint_contract": {
+    "endpoint": null,
+    "family_contract": {
+      "archive": {
+        "format": "zip",
+        "member_pattern": "*.bil",
+        "selection": "single_match"
+      },
+      "request_selection": "bounded_template_variables"
+    },
+    "kind": "static_https_template",
+    "rendered_request_url": "https://data.prism.oregonstate.edu/time_series/us/an/4km/ppt/daily/2023/prism_ppt_us_25m_20230101.zip",
+    "url_template": "https://data.prism.oregonstate.edu/time_series/{region}/an/{resolution}/{variable}/{temporal_frequency}/{year}/prism_{variable}_{region}_25m_{yyyymmdd}.zip"
+  },
+  "executable": true,
+  "identity": {
+    "collection": "PRISM Time Series Daily",
+    "product": "PRISM Time Series Daily",
+    "provider": "PRISM Climate Group"
+  },
   "network_policy": {
-    "allowed_hosts": [
+    "asset_hosts": [],
+    "default": "disabled",
+    "max_asset_bytes": 64000000,
+    "max_bytes": 65536,
+    "max_parallel_requests": 1,
+    "max_requests": 1,
+    "max_total_bytes": 64000000,
+    "maximum_redirects": 0,
+    "redirect_hosts": [],
+    "request_hosts": [
       "data.prism.oregonstate.edu"
     ],
-    "default": "disabled",
-    "max_bytes": 65536,
-    "max_requests": 1,
-    "redirect_hosts": []
+    "timeout_seconds": 8.0
   },
   "original_pack_unchanged": true,
   "pack_id": "prism-daily-public",
-  "plan_sha256": "be0e67e6c08450795000f8937aa1196321b7e7d5ac42f5ffa64bac2221f5a870",
+  "plan_sha256": "75105be130de2413fa6a99c1622bc960eb938ff5af03b1290590279373f7e189",
   "preview": {
     "role": "environmental_context",
     "target_crs": "EPSG:4326",
     "template_id": "general_multisource_v1",
     "theme": "climate_continuous"
   },
+  "provider_evidence": {
+    "evidence_sha256": "3980256291d0f754bcb5f52460e8b25af07199c01b18d4b7b81b851bf0ed3b0d",
+    "official_documentation": [
+      "https://prism.oregonstate.edu/data/",
+      "https://prism.oregonstate.edu/downloads/",
+      "https://www.prism.oregonstate.edu/formats/"
+    ],
+    "status": "complete"
+  },
+  "public_capability": {
+    "private_execution_available_from_public_repository": false,
+    "public_execution": "validation_and_bounded_probe_only",
+    "release": "Unreleased",
+    "status": "experimental"
+  },
   "requested_time": "2023-01-01",
   "resolved_time": "2023-01-01",
   "schema_version": "fasterraster.source-pack-plan/v1",
-  "source_pack_sha256": "f65644ef0e8a3b5997561daff4e19c6892741f24b9822b0b73ea2d5b045a5e03",
+  "source_contract": {
+    "crs": "EPSG:4326",
+    "mask_policy": "explicit_nodata",
+    "nodata": -9999,
+    "resampling": "bilinear",
+    "semantic_type": "continuous"
+  },
+  "source_pack_sha256": "565b718dd536628e582ce844c5585bc9cea2016611af03ec2c8f6de9913af9c5",
   "status": "READY",
   "temporal_alternatives": null,
-  "temporal_resolution": null
+  "temporal_contract": {
+    "mode": "exact",
+    "requested": "2023-01-01",
+    "template_variables": {
+      "region": "us",
+      "resolution": "4km",
+      "temporal_frequency": "daily",
+      "variable": "ppt",
+      "year": "2023",
+      "yyyymmdd": "20230101"
+    },
+    "tolerance_days": 800
+  },
+  "temporal_resolution": null,
+  "validation": {
+    "family_contract": "VALID",
+    "offline_planning": "READY_FOR_OFFLINE_DETERMINISTIC_PLANNING",
+    "provider_evidence": "COMPLETE",
+    "schema": "SCHEMA_VALID",
+    "validation_sha256": "a42b1055337d986b3bf48b507161582bc1bda70943dc37d00da6d8921b0d6f2b"
+  }
 }

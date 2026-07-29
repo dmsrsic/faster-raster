@@ -34,6 +34,7 @@ GROUNDING_FILES: tuple[tuple[str, str], ...] = (
     ("configs/public_capabilities.yaml", "capability_registry"),
     ("configs/preview_templates.yaml", "preview_registry"),
     ("docs/generated/capabilities.md", "capability_reference"),
+    ("docs/flavortown-wizard.md", "wizard_workflow"),
     ("docs/bring-your-own-sauce.md", "source_pack_guide"),
     ("docs/sauce-time.md", "temporal_guide"),
     ("docs/preview-templates.md", "preview_guide"),
@@ -66,6 +67,30 @@ GROUNDING_FILES: tuple[tuple[str, str], ...] = (
     (
         "examples/sauce-packs/copernicus-cdse.sauce/probe_fixture.json",
         "temporal_fixture",
+    ),
+    (
+        "examples/sauce-packs/usda-cdl-imageserver.sauce/sauce.yaml",
+        "arcgis_example",
+    ),
+    (
+        "examples/sauce-packs/usda-cdl-imageserver.sauce/golden_plan.json",
+        "arcgis_golden_plan",
+    ),
+    (
+        "examples/sauce-packs/usda-cdl-imageserver.sauce/probe_fixture.json",
+        "arcgis_evidence_fixture",
+    ),
+    (
+        "examples/sauce-packs/verified-local-raster.sauce/sauce.yaml",
+        "verified_local_example",
+    ),
+    (
+        "examples/sauce-packs/verified-local-raster.sauce/golden_plan.json",
+        "verified_local_golden_plan",
+    ),
+    (
+        "examples/sauce-packs/verified-local-raster.sauce/probe_fixture.json",
+        "synthetic_evidence_fixture",
     ),
     (
         "prompts/flavortown_sauce_wizard/CLI_REFERENCE.md",
@@ -138,6 +163,7 @@ def build_grounding_bundle(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
         ],
         "contract_schema_versions": [
             "fasterraster.source-pack/v1",
+            "fasterraster.source-pack-plan/v1",
             "fasterraster.credential-requirement/v1",
             "fasterraster.temporal-alternatives/v1",
             "fasterraster.temporal-resolution/v1",

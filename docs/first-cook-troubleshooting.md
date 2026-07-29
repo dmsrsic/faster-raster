@@ -14,6 +14,8 @@ disappear.
 | Reported class area differs from nominal pixel width × height | Physical area was measured on an equal-area grid | Inspect `analysis/classification/area_accounting.json`; compare reconciliation and reference CRS, not projected nominal pixel area |
 | Source Pack validation fails | Schema, host, template, CRS, resampling, nodata, secret, or preview policy is unsafe | `fr sauce validate my-source.sauce --json` |
 | Source Pack golden test fails | Authored contract and checked-in expected plan drifted | `fr sauce explain my-source.sauce --json`; review the diff before intentionally regenerating evidence |
+| Wizard output cites only a similar example | An example is not official provider evidence and the Wizard is not the validator | Return to official provider documentation, then run `fr sauce validate`, `fr sauce explain --json`, and `fr sauce test` |
+| Source Pack compile is blocked | Provider evidence is incomplete, time selection is unresolved, or a family/host/secret check failed | Read `blocked_details`; correct evidence or explicitly select a listed time before `fr sauce compile` |
 | Probe says network permission is required | Network is disabled by default | Review the pack, then run `fr sauce probe PACK --allow-network --out build/probe.json` |
 | Probe says a credential resolver is required | The public runtime has only an opaque credential requirement | Use `fr sauce explain PACK --json`; do not paste a token into the pack |
 | Categorical resampling is rejected | Bilinear/cubic interpolation would invent class values | Set `source.resampling: nearest` or `mode`, then run `fr sauce validate PACK` |

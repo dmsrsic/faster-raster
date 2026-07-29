@@ -1,0 +1,93 @@
+{
+  "adapter": {
+    "asset_roles": [
+      "classification"
+    ],
+    "family": "verified_local_raster",
+    "media_types": [
+      "image/tiff"
+    ],
+    "public_adapter_id": "verified_local_raster"
+  },
+  "blocked_before_network": false,
+  "blocked_details": [],
+  "capabilities": {
+    "analysis": false,
+    "materialization": false,
+    "planning": true,
+    "preview": true,
+    "temporal_discovery": false
+  },
+  "credential_requirement": null,
+  "endpoint_contract": {
+    "kind": "verified_local_reference",
+    "local_reference": "fixture.tif",
+    "local_sha256": "28a63c0533b155cbcd066ef8006d444f767366eb0cbba37aa5c0b4e898543e6a"
+  },
+  "executable": true,
+  "identity": {
+    "collection": null,
+    "product": "Synthetic categorical GeoTIFF",
+    "provider": "FasterRaster test fixtures"
+  },
+  "network_policy": {
+    "asset_hosts": [],
+    "default": "disabled",
+    "max_asset_bytes": 65536,
+    "max_bytes": 65536,
+    "max_parallel_requests": 1,
+    "max_requests": 1,
+    "max_total_bytes": 65536,
+    "maximum_redirects": 0,
+    "redirect_hosts": [],
+    "request_hosts": [],
+    "timeout_seconds": 8.0
+  },
+  "original_pack_unchanged": true,
+  "pack_id": "verified-local-raster",
+  "plan_sha256": "9e2048fa7f069801ae4ad5d05e346c903702e6fb106d4a0f0d223c2bb44b41ba",
+  "preview": {
+    "role": "classification",
+    "target_crs": "EPSG:4326",
+    "template_id": "general_multisource_v1",
+    "theme": "categorical_classes"
+  },
+  "provider_evidence": {
+    "evidence_sha256": "6555bc2eb20c7c61b4358da1a339272f93886a1701e1f425784a7bfdcb4fecbc",
+    "official_documentation": [],
+    "status": "synthetic"
+  },
+  "public_capability": {
+    "private_execution_available_from_public_repository": false,
+    "public_execution": "validation_and_bounded_probe_only",
+    "release": "Unreleased",
+    "status": "experimental"
+  },
+  "requested_time": null,
+  "resolved_time": null,
+  "schema_version": "fasterraster.source-pack-plan/v1",
+  "source_contract": {
+    "crs": "EPSG:4326",
+    "mask_policy": "explicit_nodata",
+    "nodata": 255,
+    "resampling": "nearest",
+    "semantic_type": "categorical"
+  },
+  "source_pack_sha256": "f2955bea74ea0171cafa9da74223d48bc4d281fbd7ce0659623e5bf96652eaf2",
+  "status": "READY",
+  "temporal_alternatives": null,
+  "temporal_contract": {
+    "mode": "static",
+    "requested": null,
+    "template_variables": {},
+    "tolerance_days": null
+  },
+  "temporal_resolution": null,
+  "validation": {
+    "family_contract": "VALID",
+    "offline_planning": "READY_FOR_OFFLINE_DETERMINISTIC_PLANNING",
+    "provider_evidence": "COMPLETE",
+    "schema": "SCHEMA_VALID",
+    "validation_sha256": "0069909e2a6bf7c2c2af9cefc8aa876f7bdfae13eed8d2b5f75a96daa9e2ea3c"
+  }
+}

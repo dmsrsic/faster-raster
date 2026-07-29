@@ -1,0 +1,45 @@
+schema_version: fasterraster.source-pack/v1
+pack_id: usda-cdl-imageserver
+display_name: USDA NASS Cropland Data Layer ImageServer
+description: Bounded offline planning contract for the already registered CDL ImageServer exportImage family.
+adapter:
+  family: arcgis_imageserver
+  endpoint: https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer
+  media_types: [image/tiff]
+  asset_roles: [classification]
+capabilities:
+  planning: true
+  preview: true
+  materialization: false
+  analysis: false
+  temporal_discovery: false
+source:
+  semantic_type: categorical
+  crs: EPSG:3857
+  resampling: nearest
+  nodata: null
+  mask_policy: alpha_or_dataset_mask
+access:
+  authentication_scheme: none
+  credential_ref: null
+  allowed_hosts: [pdi.scinet.usda.gov]
+  redirect_hosts: []
+  asset_hosts: []
+network:
+  max_requests: 1
+  max_bytes: 65536
+  max_asset_bytes: 64000000
+  max_total_bytes: 64000000
+  timeout_seconds: 8
+  maximum_redirects: 0
+  max_parallel_requests: 1
+temporal:
+  mode: exact
+  requested: "2023"
+  tolerance_days: 0
+  template_variables: {}
+preview:
+  template_id: general_multisource_v1
+  role: classification
+  theme: categorical_classes
+  target_crs: EPSG:3857

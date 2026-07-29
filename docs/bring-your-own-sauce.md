@@ -5,11 +5,35 @@ declarative source-extension seam. Its technical contract is
 `fasterraster.source-pack/v1`. It is **Unreleased / experimental** in this
 source tree and is not part of the published beta.4 contract.
 
+[Open the FasterRaster Flavortown Sauce Wizard](https://chatgpt.com/g/g-6a692bb17b9c8191a318997fd0435bf7-fasterraster-flavortown-sauce-wizard)
+to research, draft, or audit a pack from official provider documentation. The
+Wizard never replaces the checked-in schema, capability registry, or public CLI
+validators and never needs a resolved credential.
+
 A Source Pack is a directory or deterministic ZIP archive. It declares a
 source family, media and asset roles, temporal behavior, CRS, nodata or mask
 semantics, safe resampling, host scope, request and byte ceilings, and optional
 preview defaults. It cannot execute Python, import a module, invoke a shell
 hook, or evaluate an unrestricted template.
+
+## Evidence-to-validation path
+
+```text
+Official provider documentation
+-> Flavortown Sauce Wizard
+-> generated or audited declarative Source Pack
+-> fr sauce validate
+-> fr sauce explain --json
+-> fr sauce test
+-> optional explicitly authorized bounded probe
+-> deterministic pack/archive
+-> private execution only where a compatible private resolver/backend exists
+```
+
+An existing example is not provider evidence. Validation reports structural
+schema validity, family-contract validity, provider-evidence completeness,
+offline-planning readiness, credential requirements, and temporal-selection
+state separately.
 
 ## Offline-first path
 
@@ -37,6 +61,7 @@ fr sauce init my-source
 fr sauce validate my-source.sauce
 fr sauce explain my-source.sauce --json
 fr sauce test my-source.sauce
+fr sauce compile my-source.sauce --out build/source-pack-plan.json
 fr sauce pack my-source.sauce --out dist/
 ```
 
@@ -44,6 +69,14 @@ fr sauce pack my-source.sauce --out dist/
 explicit. The archive command sorts paths, fixes ZIP timestamps and file modes,
 adds `CHECKSUMS.sha256`, excludes caches, and rejects traversal, symlinks, local
 absolute paths, and secret-bearing content.
+
+`compile` emits the deterministic `fasterraster.source-pack-plan/v1` frozen
+handoff. It includes identity, endpoint/template or local-reference contract,
+request/redirect/asset host boundaries, media and roles, time and explicit
+resolution, CRS, semantic type, nodata/mask/resampling, archive selection,
+resource ceilings, opaque credential requirements, public capability status,
+stable hashes, and corrective blocked details. Provider-evidence or temporal
+blocked states cannot become executable handoffs.
 
 ## Complete manifest example
 
@@ -74,11 +107,15 @@ access:
   credential_ref: null
   allowed_hosts: [data.prism.oregonstate.edu]
   redirect_hosts: []
+  asset_hosts: []
 network:
   max_requests: 1
   max_bytes: 65536
+  max_asset_bytes: 64000000
+  max_total_bytes: 64000000
   timeout_seconds: 8
   maximum_redirects: 0
+  max_parallel_requests: 1
 temporal:
   mode: exact
   requested: "2023-01-01"
@@ -127,6 +164,7 @@ access:
   credential_ref: copernicus-production
   allowed_hosts: [stac.dataspace.copernicus.eu]
   redirect_hosts: []
+  asset_hosts: [stac.dataspace.copernicus.eu]
 ```
 
 `credential_ref` is an opaque identifier, never a token. Offline planning ends
@@ -134,6 +172,16 @@ in `CREDENTIAL_REQUIRED`. `fr sauce probe` stops before network access because
 the public runtime has no resolver. A private backend may consume the frozen
 credential requirement only if it declares a compatible resolver capability.
 
+Authenticated execution is separate and unavailable from this public
+repository. A third-party backend can consume the frozen versioned handoff
+without private FasterRaster code, but it must verify hashes and readiness,
+enforce every host/resource ceiling, resolve credentials only at request time,
+and keep resolved values out of logs, receipts, cache keys, errors, and
+serialized artifacts.
+
 Source Packs reject credentials in URLs, query parameters, headers, fixtures,
 environment snapshots, archives, and token-looking strings. Resolved secrets
 must never enter public plans, logs, cache keys, receipts, or archive checksums.
+
+Sauce Time never silently changes the requested date. Preview templates define
+reusable layout and role contracts; they do not add source capabilities.

@@ -1,4 +1,25 @@
 {
+  "family_contract": {
+    "archive": {
+      "format": "zip",
+      "member_pattern": "*.bil",
+      "selection": "single_match"
+    },
+    "request_selection": "bounded_template_variables"
+  },
+  "identity": {
+    "collection": "PRISM Time Series Daily",
+    "product": "PRISM Time Series Daily",
+    "provider": "PRISM Climate Group"
+  },
+  "provider_evidence": {
+    "official_documentation": [
+      "https://prism.oregonstate.edu/data/",
+      "https://prism.oregonstate.edu/downloads/",
+      "https://www.prism.oregonstate.edu/formats/"
+    ],
+    "status": "complete"
+  },
   "available_times": [
     "2022-01-01",
     "2023-01-01",

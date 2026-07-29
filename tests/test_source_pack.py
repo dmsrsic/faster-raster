@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import io
 import json
+import shutil
 import zipfile
 from pathlib import Path
 
@@ -11,7 +12,9 @@ import yaml
 
 from faster_raster import fr_cli
 from faster_raster.source_pack import (
+    compile_source_pack_handoff,
     compile_source_pack_plan,
+    explain_source_pack,
     pack_source_pack,
     probe_source_pack,
     scaffold_source_pack,
@@ -23,6 +26,8 @@ from faster_raster.source_pack import (
 ROOT = Path(__file__).resolve().parent.parent
 PRISM = ROOT / "examples" / "sauce-packs" / "prism-daily.sauce"
 CDSE = ROOT / "examples" / "sauce-packs" / "copernicus-cdse.sauce"
+ARCGIS = ROOT / "examples" / "sauce-packs" / "usda-cdl-imageserver.sauce"
+LOCAL = ROOT / "examples" / "sauce-packs" / "verified-local-raster.sauce"
 
 
 def _manifest(path: Path) -> dict:
@@ -38,8 +43,11 @@ def _write_manifest(path: Path, value: dict) -> None:
 
 
 def test_shipped_source_packs_validate_and_pass_offline_goldens():
-    for path in (PRISM, CDSE):
-        assert validate_source_pack(path)["status"] == "PASS"
+    for path in (PRISM, CDSE, ARCGIS, LOCAL):
+        validation = validate_source_pack(path)
+        assert validation["status"] == "PASS"
+        assert validation["family_contract_status"] == "VALID"
+        assert validation["provider_evidence_status"] == "COMPLETE"
         assert run_source_pack_test(path)["status"] == "PASS"
 
 
@@ -129,35 +137,116 @@ def test_categorical_bilinear_resampling_is_rejected(tmp_path):
     assert any("categorical sources require" in item for item in result["errors"])
 
 
-def test_arcgis_and_verified_local_adapter_families_validate(tmp_path):
-    arcgis = scaffold_source_pack(tmp_path / "arcgis-source")
-    arcgis_manifest = _manifest(arcgis)
-    arcgis_manifest["adapter"].update(
-        {
-            "family": "arcgis_imageserver",
-            "endpoint": "https://example.com/arcgis/rest/services/demo/ImageServer",
-            "url_template": None,
-        }
-    )
-    _write_manifest(arcgis, arcgis_manifest)
-    assert validate_source_pack(arcgis)["status"] == "PASS"
+def test_arcgis_and_verified_local_adapter_families_are_explicit():
+    arcgis = compile_source_pack_plan(ARCGIS)
+    assert arcgis["endpoint_contract"]["family_contract"]["operation"] == "exportImage"
+    assert arcgis["source_contract"]["semantic_type"] == "categorical"
+    assert arcgis["source_contract"]["resampling"] == "nearest"
+    local = compile_source_pack_plan(LOCAL)
+    assert local["endpoint_contract"]["kind"] == "verified_local_reference"
+    assert local["endpoint_contract"]["local_sha256"] == hashlib.sha256(
+        (LOCAL / "fixture.tif").read_bytes()
+    ).hexdigest()
 
-    local = scaffold_source_pack(tmp_path / "local-source")
-    payload = b"verified-local-raster-fixture"
-    (local / "fixture.tif").write_bytes(payload)
-    local_manifest = _manifest(local)
-    local_manifest["adapter"].update(
-        {
-            "family": "verified_local_raster",
-            "endpoint": None,
-            "url_template": None,
-            "local_path": "fixture.tif",
-            "local_sha256": hashlib.sha256(payload).hexdigest(),
-        }
+
+def test_frozen_handoff_compiles_byte_identically_and_never_resolves_credentials(
+    tmp_path,
+):
+    first = compile_source_pack_handoff(CDSE, tmp_path / "one.json")
+    second = compile_source_pack_handoff(CDSE, tmp_path / "two.json")
+    assert first["handoff_sha256"] == second["handoff_sha256"]
+    assert (tmp_path / "one.json").read_bytes() == (tmp_path / "two.json").read_bytes()
+    plan = json.loads((tmp_path / "one.json").read_text(encoding="utf-8"))
+    assert plan["status"] == "CREDENTIAL_REQUIRED"
+    assert plan["executable"] is True
+    assert plan["credential_requirement"]["credential_ref"] == "copernicus-production"
+    assert plan["credential_requirement"]["resolved_secret_present"] is False
+    assert plan["network_policy"]["asset_hosts"] == ["stac.dataspace.copernicus.eu"]
+    serialized = json.dumps(plan, sort_keys=True).lower()
+    assert "authorization" not in serialized
+    assert "bearer " not in serialized
+
+
+def test_incomplete_provider_evidence_is_structurally_valid_but_not_executable(
+    tmp_path,
+):
+    path = scaffold_source_pack(tmp_path / "incomplete")
+    validation = validate_source_pack(path)
+    assert validation["status"] == "PASS"
+    assert validation["provider_evidence_status"] == "INCOMPLETE"
+    plan = compile_source_pack_plan(path)
+    assert plan["status"] == "BLOCKED_PROVIDER_EVIDENCE"
+    assert plan["blocked_before_network"] is True
+    with pytest.raises(ValueError, match="blocked Source Pack"):
+        compile_source_pack_handoff(path, tmp_path / "blocked.json")
+
+
+def test_stac_asset_scope_missing_role_and_unsupported_placeholder_fail_closed(
+    tmp_path,
+):
+    stac = tmp_path / "stac.sauce"
+    shutil.copytree(CDSE, stac)
+    manifest = _manifest(stac)
+    manifest["access"]["asset_hosts"] = ["assets.example.com"]
+    _write_manifest(stac, manifest)
+    result = validate_source_pack(stac)
+    assert result["status"] == "FAIL"
+    assert any("asset_host_scope" in item for item in result["errors"])
+
+    fixture = json.loads((stac / "probe_fixture.json").read_text(encoding="utf-8"))
+    fixture["family_contract"]["asset_host_scope"] = ["assets.example.com"]
+    fixture["family_contract"]["asset_selection"]["required_roles"] = ["missing"]
+    (stac / "probe_fixture.json").write_text(
+        json.dumps(fixture, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+        newline="\n",
     )
-    local_manifest["access"]["allowed_hosts"] = []
-    _write_manifest(local, local_manifest)
-    assert validate_source_pack(local)["status"] == "PASS"
+    result = validate_source_pack(stac)
+    assert any("required asset roles" in item for item in result["errors"])
+
+    static = tmp_path / "static.sauce"
+    shutil.copytree(PRISM, static)
+    manifest = _manifest(static)
+    manifest["adapter"]["url_template"] = "https://data.prism.oregonstate.edu/{password}.zip"
+    manifest["temporal"]["template_variables"]["password"] = "opaque"
+    _write_manifest(static, manifest)
+    result = validate_source_pack(static)
+    assert any("unsupported variables" in item for item in result["errors"])
+
+
+def test_temporal_selection_and_line_endings_are_explicit_and_deterministic(
+    tmp_path,
+):
+    path = tmp_path / "temporal.sauce"
+    shutil.copytree(PRISM, path)
+    manifest = _manifest(path)
+    manifest["temporal"]["requested"] = "2021-01-01"
+    _write_manifest(path, manifest)
+    plan = compile_source_pack_plan(path)
+    assert plan["status"] == "AWAITING_TEMPORAL_SELECTION"
+    assert plan["executable"] is False
+    selected = compile_source_pack_plan(path, selected_time="2022-01-01")
+    assert selected["temporal_resolution"]["selection_method"] == "explicit_user_selection"
+    assert selected["requested_time"] == "2021-01-01"
+    assert selected["resolved_time"] == "2022-01-01"
+
+    lf_hash = validate_source_pack(PRISM)["source_pack_sha256"]
+    copied = tmp_path / "crlf.sauce"
+    shutil.copytree(PRISM, copied)
+    manifest_path = copied / "sauce.yaml"
+    manifest_path.write_bytes(
+        manifest_path.read_bytes().replace(b"\r\n", b"\n").replace(b"\n", b"\r\n")
+    )
+    assert validate_source_pack(copied)["source_pack_sha256"] == lf_hash
+
+
+def test_explanation_distinguishes_schema_family_evidence_and_readiness():
+    result = explain_source_pack(CDSE)
+    assert result["structural_status"] == "SCHEMA_VALID"
+    assert result["family_contract_status"] == "VALID"
+    assert result["provider_evidence_status"] == "COMPLETE"
+    assert result["offline_planning_status"] == "READY_FOR_OFFLINE_DETERMINISTIC_PLANNING"
+    assert result["handoff_schema_version"] == "fasterraster.source-pack-plan/v1"
 
 
 def test_credential_pack_plans_but_probe_stops_before_network():

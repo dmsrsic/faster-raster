@@ -63,7 +63,13 @@ fr sauce test examples/sauce-packs/prism-daily.sauce
 fr preview-templates list
 ```
 
-See [Bring Your Own Sauce](docs/bring-your-own-sauce.md),
+[Open the FasterRaster Flavortown Sauce Wizard](https://chatgpt.com/g/g-6a692bb17b9c8191a318997fd0435bf7-fasterraster-flavortown-sauce-wizard)
+to research, draft, or audit a Source Pack from official provider evidence.
+The Wizard is not the validator: checked-in schemas, the capability registry,
+and the public CLI remain authoritative.
+
+See the [Wizard workflow](docs/flavortown-wizard.md),
+[Bring Your Own Sauce](docs/bring-your-own-sauce.md),
 [Sauce Time](docs/sauce-time.md), and
 [Preview templates](docs/preview-templates.md).
 

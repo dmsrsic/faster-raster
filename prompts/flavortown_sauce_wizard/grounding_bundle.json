@@ -3,6 +3,7 @@
   "capability_registry_sha256": "65da21e291fcd03a496993bb0fe25b1af17038a140bdace5d45a8b08de03a0c2",
   "contract_schema_versions": [
     "fasterraster.source-pack/v1",
+    "fasterraster.source-pack-plan/v1",
     "fasterraster.credential-requirement/v1",
     "fasterraster.temporal-alternatives/v1",
     "fasterraster.temporal-resolution/v1",
@@ -14,16 +15,16 @@
   ],
   "files": [
     {
-      "bytes": 9374,
+      "bytes": 10112,
       "path": "schemas/source_pack.schema.json",
       "role": "source_pack_schema",
-      "sha256": "dbe2e90bd02b4c418c70c73512cc6b41c38963d230a38e49c4e46956c615f646"
+      "sha256": "3f92893c219827cc0459239d52e45a787f55e19c65b3486f24059ab63695c4f8"
     },
     {
-      "bytes": 1101,
+      "bytes": 1221,
       "path": "schemas/credential_requirement.schema.json",
       "role": "credential_schema",
-      "sha256": "d488f2e384c508132a9feaee852a2f75583c73dd1bf77fcf64488a51d91c7532"
+      "sha256": "655e7c7bcb69f9efdb22956866ce0a0526798093e6ec1f17533951b7334e8034"
     },
     {
       "bytes": 2256,
@@ -86,10 +87,16 @@
       "sha256": "0b6a16f0c879e9db45773eba2b3b5ec5d7da7d7b79b5732b0ebac1e5f485d34f"
     },
     {
-      "bytes": 4528,
+      "bytes": 3339,
+      "path": "docs/flavortown-wizard.md",
+      "role": "wizard_workflow",
+      "sha256": "978541c2d77d1b5c401314db6d99ee9e498ce0710ae835f7ff43a84e97f8f20d"
+    },
+    {
+      "bytes": 6768,
       "path": "docs/bring-your-own-sauce.md",
       "role": "source_pack_guide",
-      "sha256": "c405a20aa87f3fd96adf44a7317bb70d19cd6f2e57d98d6af088f375748bd949"
+      "sha256": "00f38f645933a179bf7e69a420ace632735b2ce0e2fa06d717ca77809cd9445b"
     },
     {
       "bytes": 2927,
@@ -122,46 +129,82 @@
       "sha256": "94f027ed5c82a87bf743c24989b09dfbc9b083bc548bb99e00c230b62fd7d7e1"
     },
     {
-      "bytes": 1295,
+      "bytes": 1396,
       "path": "examples/sauce-packs/prism-daily.sauce/sauce.yaml",
       "role": "no_auth_example",
-      "sha256": "964250f04e380c9652e7656a6fa4bbfd9d93b41b9fe7680b79ce9963b82b0d42"
+      "sha256": "285a26f35e7dbf38a301e9476088047e7309d926f1e7f1bf4b8d25a8f7142bc4"
     },
     {
-      "bytes": 1213,
+      "bytes": 3537,
       "path": "examples/sauce-packs/prism-daily.sauce/golden_plan.json",
       "role": "no_auth_golden_plan",
-      "sha256": "4e672d58c309c05c030a88d627c814d0aa0e67d00de46067658d01d1e4dcb07f"
+      "sha256": "4054dc26c3272e6449068c97c1009edda8624654a67fa4f43adc18bd74b7b8d4"
     },
     {
-      "bytes": 563,
+      "bytes": 1145,
       "path": "examples/sauce-packs/prism-daily.sauce/probe_fixture.json",
       "role": "temporal_fixture",
-      "sha256": "eb59a1ea83b3b6edab5552e37b5c9f2c2c177fb68958097c5ffa79ee43b05552"
+      "sha256": "3dee8b0ee660c779c7a2e066aba62f1bfa3ae2eff13e9fccc6ed07d290232071"
     },
     {
-      "bytes": 1089,
+      "bytes": 1220,
       "path": "examples/sauce-packs/copernicus-cdse.sauce/sauce.yaml",
       "role": "credential_example",
-      "sha256": "8e2042cc3b0b5a06a114dc93dcf2c6ac6d4b76092d6b2eb018464d69e74d43a5"
+      "sha256": "3f5f23a080378c3a8ad8295a87e828f7de99826d0c6429ddc91a49f571aff63b"
     },
     {
-      "bytes": 1673,
+      "bytes": 3891,
       "path": "examples/sauce-packs/copernicus-cdse.sauce/golden_plan.json",
       "role": "credential_golden_plan",
-      "sha256": "2f5b955b384a4c6393bf59a153ceb3d32c1c996d4582e9d4825007926074828c"
+      "sha256": "7ea5e968976bb04a2b91239f4a74421730ea3741b448d265dc1cea96949175a5"
     },
     {
-      "bytes": 311,
+      "bytes": 1079,
       "path": "examples/sauce-packs/copernicus-cdse.sauce/probe_fixture.json",
       "role": "temporal_fixture",
-      "sha256": "a1400c5c52458c73e6c8ef47448bfdc49dbe97b8d933677c7917b81d9baccc9c"
+      "sha256": "6b9f23a107a8ed244897b6dde4af929b9494adfcb9b956ad21473e1b4eccec32"
     },
     {
-      "bytes": 1357,
+      "bytes": 1187,
+      "path": "examples/sauce-packs/usda-cdl-imageserver.sauce/sauce.yaml",
+      "role": "arcgis_example",
+      "sha256": "934b9170b983726b55a27b882d84e9007e4e20d7f1a9cb85dd7aed45e983d1bf"
+    },
+    {
+      "bytes": 3320,
+      "path": "examples/sauce-packs/usda-cdl-imageserver.sauce/golden_plan.json",
+      "role": "arcgis_golden_plan",
+      "sha256": "3c7da72f15778cd1042bdbfde4f9daa470aef5706d23ed8fe33f265be61df0a4"
+    },
+    {
+      "bytes": 791,
+      "path": "examples/sauce-packs/usda-cdl-imageserver.sauce/probe_fixture.json",
+      "role": "arcgis_evidence_fixture",
+      "sha256": "d046c5fdc4410f96b0843c929e04c6b9ce9f20bd59eaf2cd763608792a9ef68b"
+    },
+    {
+      "bytes": 1174,
+      "path": "examples/sauce-packs/verified-local-raster.sauce/sauce.yaml",
+      "role": "verified_local_example",
+      "sha256": "717a05bc488c214cbd12c454ef519877d9b224ddeb07bf1509d21592d59fbfc3"
+    },
+    {
+      "bytes": 2718,
+      "path": "examples/sauce-packs/verified-local-raster.sauce/golden_plan.json",
+      "role": "verified_local_golden_plan",
+      "sha256": "2445ecdc3e63053a6ea5bd68cab6f4da9fcf63cb02def03cca23ddf9a5eb6218"
+    },
+    {
+      "bytes": 555,
+      "path": "examples/sauce-packs/verified-local-raster.sauce/probe_fixture.json",
+      "role": "synthetic_evidence_fixture",
+      "sha256": "67f3e95efa33c34faf2eada247b00593c137e44f548ee6cdde8429ee79cd10b2"
+    },
+    {
+      "bytes": 1544,
       "path": "prompts/flavortown_sauce_wizard/CLI_REFERENCE.md",
       "role": "cli_reference",
-      "sha256": "7ae7033135c2240746054949725a5d9421b0314521122c765756d1ef2f3c5540"
+      "sha256": "19ca3faa56b4f2b80dfcef244ad7e378e35a8e775613388c98dcd4fef7e7974a"
     },
     {
       "bytes": 1461,
@@ -170,10 +213,10 @@
       "sha256": "7a1dee6435c59b6675d019d6573810a6782e2b459b8c4134ce0d0424c6494613"
     },
     {
-      "bytes": 2146,
+      "bytes": 2726,
       "path": "prompts/flavortown_sauce_wizard/SYSTEM_GUIDE.md",
       "role": "system_guide",
-      "sha256": "d67ec2fee33aa916809caf6ae599d69690b24c04e78adbe13aaf4be8b9e9f5dc"
+      "sha256": "1c83e85a58b03c527503e3631fe38413ce7d70a588c45042c6e3524721779714"
     },
     {
       "bytes": 8400,
@@ -182,7 +225,7 @@
       "sha256": "000ca5266e676c42f54b4fc838cd0ff751d89987c79246bfc27b7ef763cea728"
     }
   ],
-  "grounding_bundle_sha256": "d27bfe1582770957269ce6fe1e577314f6c1f8718769b6b78e879ef3043574fb",
+  "grounding_bundle_sha256": "34ff62b2ef86328050440255039ea46a758278d8ec1d6c0661b5a8bbaaafdfa6",
   "release": {
     "contract_status": "experimental",
     "development_label": "Unreleased",

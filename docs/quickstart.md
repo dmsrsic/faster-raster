@@ -45,6 +45,11 @@ temporal, preview, secret-exclusion, canonicalization, and golden-plan
 behavior. Continue with [Bring Your Own Sauce](bring-your-own-sauce.md) or the
 [first-cook troubleshooting matrix](first-cook-troubleshooting.md).
 
+For a new provider, start from official documentation and
+[open the FasterRaster Flavortown Sauce Wizard](https://chatgpt.com/g/g-6a692bb17b9c8191a318997fd0435bf7-fasterraster-flavortown-sauce-wizard).
+Return to `fr sauce validate`, `fr sauce explain --json`, and `fr sauce test`
+for authoritative checks; the Wizard is an authoring and audit aid.
+
 For a live cook, explicitly set `data.allow_network: true` in the workfile, confirm the study byte ceiling, then run:
 
 ```sh
