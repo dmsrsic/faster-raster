@@ -17,6 +17,15 @@ does not contact providers.
 | Copernicus Data Space STAC | `experimental` | yes | no | no | no | `resolver_required` |
 <!-- END GENERATED SOURCE CAPABILITY MATRIX -->
 
+The four declarative Source Pack families—`static_https_template`,
+`arcgis_imageserver`, `stac_search`, and `verified_local_raster`—have offline
+family validation and frozen planning contracts. This does not make every
+provider executable. The capability registry and each pack's provider-evidence,
+temporal, credential, and host-boundary states remain authoritative. Use the
+[Flavortown Sauce Wizard workflow](flavortown-wizard.md) to author from official
+evidence, then validate with the public CLI.
+
+
 Routine CI never contacts USDA, USGS, ArcGIS, PRISM, STAC, THREDDS, or other raster services.
 
 PRISM daily packages are treated as ZIP containers whose primary raster is a date-matched GeoTIFF accompanied by provider metadata and ancillary files. The archive profile validates paths, compression bounds, member CRCs, naming, and exactly one primary raster. The decoded-raster stage then streams only that selected member, verifies its declared size and CRC, promotes it content-addressably, opens it with Rasterio in sidecar-isolated mode, validates the declared COG layout, and cross-checks grid, projection, nodata, statistics, units, date, and bounds against the provider sidecars. Spatial subsetting and target-grid harmonization are implemented for the guarded PRISM product path. The normal `prism_dem_ndvi_correlation_audit` workflow uses these contracts to build a bounded common-grid environmental association handoff.

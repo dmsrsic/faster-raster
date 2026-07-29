@@ -47,6 +47,7 @@ nav:
   - Workflows:
       - Concepts and architecture: concepts.md
       - Supported sources: supported-sources.md
+      - Flavortown Sauce Wizard: flavortown-wizard.md
       - Bring Your Own Sauce: bring-your-own-sauce.md
       - Sauce Time: sauce-time.md
       - Preview templates: preview-templates.md

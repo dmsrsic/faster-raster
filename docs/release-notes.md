@@ -14,6 +14,13 @@ experimental** and are not retroactively claimed as beta.4 capabilities. The
 canonical status matrix is the
 [public capability registry](generated/capabilities.md).
 
+The Unreleased Source Pack path also links the public
+[FasterRaster Flavortown Sauce Wizard](https://chatgpt.com/g/g-6a692bb17b9c8191a318997fd0435bf7-fasterraster-flavortown-sauce-wizard),
+adds family/evidence/readiness checks for all four declared adapter families,
+and compiles executable plans into deterministic frozen v1 handoffs. The Wizard
+is an authoring aid; public schemas, registry, and CLI validators remain
+authoritative.
+
 The Unreleased tranche also corrects categorical physical-area reporting with
 a deterministic equal-area authority, preserves confidence-threshold
 provenance across planning through inspection, adds explicit coherent NAIP–CDL

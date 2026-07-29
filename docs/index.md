@@ -28,6 +28,7 @@ hide:
     <div class="fr-actions" aria-label="Primary actions">
       <a class="fr-button fr-button--primary" href="quickstart/">Get started</a>
       <a class="fr-button fr-button--secondary" href="examples/">Explore workflows</a>
+      <a class="fr-button fr-button--secondary" href="https://chatgpt.com/g/g-6a692bb17b9c8191a318997fd0435bf7-fasterraster-flavortown-sauce-wizard">Open the Sauce Wizard<span aria-hidden="true"> (external)</span></a>
       <a class="fr-button fr-button--text" href="https://github.com/dmsrsic/faster-raster">View on GitHub<span aria-hidden="true"> (external)</span></a>
     </div>
   </div>
@@ -73,6 +74,19 @@ The result is not just an image or array. It is a bounded workflow with the mani
 </ol>
 
 [Understand the architecture](concepts.md){ .fr-inline-link }
+
+</section>
+
+<section class="fr-section" markdown="1">
+
+## Bring official source evidence into a public contract
+
+The [FasterRaster Flavortown Sauce Wizard](flavortown-wizard.md) helps research,
+build, and audit declarative Source Packs. Start with official provider
+documentation, then validate and compile locally; the Wizard cannot establish a
+provider fact or resolve a credential.
+
+[Open the FasterRaster Flavortown Sauce Wizard](https://chatgpt.com/g/g-6a692bb17b9c8191a318997fd0435bf7-fasterraster-flavortown-sauce-wizard){ .fr-button .fr-button--primary }
 
 </section>
 
