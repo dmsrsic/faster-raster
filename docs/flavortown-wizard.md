@@ -3,7 +3,7 @@
 The FasterRaster Flavortown Sauce Wizard is a public research, authoring, and
 audit assistant for declarative Source Packs.
 
-[Open the FasterRaster Flavortown Sauce Wizard](https://chatgpt.com/g/g-6a692bb17b9c8191a318997fd0435bf7-fasterraster-flavortown-sauce-wizard){ .md-button .md-button--primary }
+[Open the FasterRaster Flavortown Sauce Wizard](https://chatgpt.com/g/g-6a692bb17b9c8191a318997fd0435bf7-fasterraster-flavortown-sauce-wizard)
 
 Source Packs, Sauce Time, preview templates, opaque credential references, and
 the frozen Source Pack handoff are **Unreleased / experimental**. The Wizard
