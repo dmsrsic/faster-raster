@@ -463,6 +463,7 @@ def command_preview_templates(args: argparse.Namespace) -> int:
 
 def command_sauce(args: argparse.Namespace) -> int:
     from faster_raster.source_pack import (
+        compile_source_pack_handoff,
         compile_source_pack_plan,
         explain_source_pack,
         pack_source_pack,
@@ -540,6 +541,19 @@ def command_sauce(args: argparse.Namespace) -> int:
         _json(result) if args.json else print(
             f"Packed {result['archive_path']}\n"
             f"Archive SHA-256: {result['archive_sha256']}"
+        )
+        return 0
+    if command == "compile":
+        result = compile_source_pack_handoff(
+            args.pack,
+            args.out,
+            requested_time=args.requested,
+            selected_time=args.selected,
+        )
+        _json(result) if args.json else print(
+            f"Compiled {result['handoff_path']}\n"
+            f"Plan SHA-256: {result['plan_sha256']}\n"
+            "No network requests were made and no credential was resolved."
         )
         return 0
     if command == "time":
@@ -2116,6 +2130,16 @@ def build_parser() -> argparse.ArgumentParser:
     sauce_pack.add_argument("--out", type=Path, required=True)
     sauce_pack.add_argument("--json", action="store_true")
     sauce_pack.set_defaults(handler=command_sauce)
+    sauce_compile = sauce_commands.add_parser(
+        "compile",
+        help="compile an executable frozen Source Pack v1 handoff offline",
+    )
+    sauce_compile.add_argument("pack", type=Path)
+    sauce_compile.add_argument("--out", type=Path, required=True)
+    sauce_compile.add_argument("--requested")
+    sauce_compile.add_argument("--selected")
+    sauce_compile.add_argument("--json", action="store_true")
+    sauce_compile.set_defaults(handler=command_sauce)
     sauce_time = sauce_commands.add_parser(
         "time",
         help="emit ranked temporal alternatives or an explicit resolution",

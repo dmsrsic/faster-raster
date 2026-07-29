@@ -1,0 +1,37 @@
+{
+  "available_times": [
+    "2023",
+    "2024"
+  ],
+  "family_contract": {
+    "bbox_crs": "EPSG:4326",
+    "export_crs": "EPSG:3857",
+    "maximum_dimensions": {
+      "height": 4097,
+      "width": 4097
+    },
+    "operation": "exportImage",
+    "query_parameter_order": [
+      "bbox",
+      "bboxSR",
+      "f",
+      "format",
+      "imageSR",
+      "size",
+      "time"
+    ],
+    "temporal_parameter": "time"
+  },
+  "identity": {
+    "collection": "CDL_WM",
+    "product": "Cropland Data Layer",
+    "provider": "USDA_NASS"
+  },
+  "provider_evidence": {
+    "official_documentation": [
+      "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer?f=pjson",
+      "https://www.nass.usda.gov/Research_and_Science/Cropland/SARS1a.php"
+    ],
+    "status": "complete"
+  }
+}

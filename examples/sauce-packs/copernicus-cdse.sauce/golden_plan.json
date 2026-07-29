@@ -13,6 +13,8 @@
     ],
     "public_adapter_id": "stac_api"
   },
+  "blocked_before_network": false,
+  "blocked_details": [],
   "capabilities": {
     "analysis": false,
     "materialization": false,
@@ -24,37 +26,116 @@
     "allowed_hosts": [
       "stac.dataspace.copernicus.eu"
     ],
+    "asset_hosts": [
+      "stac.dataspace.copernicus.eu"
+    ],
     "authentication_scheme": "bearer",
     "credential_ref": "copernicus-production",
-    "credential_requirement_sha256": "3c080541ab65901480fbbc35b4623016de01003d12a324940078ecd2db50b881",
+    "credential_requirement_sha256": "d521f463479fb4651eccddb36a02a04509c5c84bf8b31bfead985496dcbabf31",
     "redirect_hosts": [],
     "resolved_secret_present": false,
     "resolver_capability_required": "bearer",
     "schema_version": "fasterraster.credential-requirement/v1"
   },
+  "endpoint_contract": {
+    "endpoint": "https://stac.dataspace.copernicus.eu/v1",
+    "family_contract": {
+      "asset_host_scope": [
+        "stac.dataspace.copernicus.eu"
+      ],
+      "asset_selection": {
+        "item_limit": 2,
+        "item_order": [
+          "datetime",
+          "id"
+        ],
+        "required_media_types": [
+          "image/tiff"
+        ],
+        "required_roles": [
+          "red",
+          "green",
+          "blue",
+          "nir"
+        ]
+      },
+      "search_path": "/search",
+      "temporal_representation": "interval"
+    },
+    "kind": "stac_search",
+    "rendered_request_url": null,
+    "url_template": null
+  },
+  "executable": true,
+  "identity": {
+    "collection": "sentinel-2-l2a",
+    "product": "Sentinel-2 L2A",
+    "provider": "COPERNICUS_CDSE"
+  },
   "network_policy": {
-    "allowed_hosts": [
+    "asset_hosts": [
       "stac.dataspace.copernicus.eu"
     ],
     "default": "disabled",
+    "max_asset_bytes": 1000000,
     "max_bytes": 65536,
-    "max_requests": 1,
-    "redirect_hosts": []
+    "max_parallel_requests": 2,
+    "max_requests": 4,
+    "max_total_bytes": 9000000,
+    "maximum_redirects": 0,
+    "redirect_hosts": [],
+    "request_hosts": [
+      "stac.dataspace.copernicus.eu"
+    ],
+    "timeout_seconds": 8.0
   },
   "original_pack_unchanged": true,
   "pack_id": "copernicus-cdse-stac",
-  "plan_sha256": "360d120347cdcfa04dd88b6ba439740c4a09efc21901bdd7fbba3676b0bb06c3",
+  "plan_sha256": "f02b6c6b8999f30b7e3c1b7fd4f098e77b97d8b7b7cf10b5d478b08661734740",
   "preview": {
     "role": "natural_color",
     "target_crs": "EPSG:4326",
     "template_id": "general_multisource_v1",
     "theme": "optical_imagery"
   },
+  "provider_evidence": {
+    "evidence_sha256": "a7dcdc6c67cbdf7fc236b99f5b864f5b36bc89c95ad4456f06f7218271e550ad",
+    "official_documentation": [
+      "https://documentation.dataspace.copernicus.eu/APIs/STAC.html"
+    ],
+    "status": "complete"
+  },
+  "public_capability": {
+    "private_execution_available_from_public_repository": false,
+    "public_execution": "validation_and_bounded_probe_only",
+    "release": "Unreleased",
+    "status": "experimental"
+  },
   "requested_time": "2023",
   "resolved_time": "2023",
   "schema_version": "fasterraster.source-pack-plan/v1",
-  "source_pack_sha256": "89545a9b4da8f16c6bfa0e650160e47327061f7078c9730f0cefa9ce6690a419",
+  "source_contract": {
+    "crs": "EPSG:4326",
+    "mask_policy": "alpha_or_dataset_mask",
+    "nodata": null,
+    "resampling": "bilinear",
+    "semantic_type": "continuous"
+  },
+  "source_pack_sha256": "4fca04739802c0977b0455f3faa81bbeffd16e0893651303fcddc6fed5a594fb",
   "status": "CREDENTIAL_REQUIRED",
   "temporal_alternatives": null,
-  "temporal_resolution": null
+  "temporal_contract": {
+    "mode": "exact",
+    "requested": "2023",
+    "template_variables": {},
+    "tolerance_days": 800
+  },
+  "temporal_resolution": null,
+  "validation": {
+    "family_contract": "VALID",
+    "offline_planning": "READY_FOR_OFFLINE_DETERMINISTIC_PLANNING",
+    "provider_evidence": "COMPLETE",
+    "schema": "SCHEMA_VALID",
+    "validation_sha256": "6628504f18e9b6149bad878ec01ab0df8564013292f9f05fe8103435966411de"
+  }
 }

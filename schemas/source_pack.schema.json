@@ -10,6 +10,13 @@
           "title": "Allowed Hosts",
           "type": "array"
         },
+        "asset_hosts": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Asset Hosts",
+          "type": "array"
+        },
         "authentication_scheme": {
           "default": "none",
           "enum": [
@@ -165,6 +172,13 @@
     "NetworkContract": {
       "additionalProperties": false,
       "properties": {
+        "max_asset_bytes": {
+          "default": 64000000,
+          "maximum": 1000000000,
+          "minimum": 1,
+          "title": "Max Asset Bytes",
+          "type": "integer"
+        },
         "max_bytes": {
           "default": 65536,
           "maximum": 1000000,
@@ -172,11 +186,25 @@
           "title": "Max Bytes",
           "type": "integer"
         },
+        "max_parallel_requests": {
+          "default": 1,
+          "maximum": 8,
+          "minimum": 1,
+          "title": "Max Parallel Requests",
+          "type": "integer"
+        },
         "max_requests": {
           "default": 1,
           "maximum": 4,
           "minimum": 1,
           "title": "Max Requests",
+          "type": "integer"
+        },
+        "max_total_bytes": {
+          "default": 128000000,
+          "maximum": 2000000000,
+          "minimum": 1,
+          "title": "Max Total Bytes",
           "type": "integer"
         },
         "maximum_redirects": {

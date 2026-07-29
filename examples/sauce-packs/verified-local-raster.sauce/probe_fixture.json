@@ -1,0 +1,26 @@
+{
+  "family_contract": {
+    "raster_identity": {
+      "asset_roles": [
+        "classification"
+      ],
+      "crs": "EPSG:4326",
+      "mask_policy": "explicit_nodata",
+      "media_types": [
+        "image/tiff"
+      ],
+      "nodata": 255,
+      "resampling": "nearest",
+      "semantic_type": "categorical"
+    }
+  },
+  "identity": {
+    "collection": null,
+    "product": "Synthetic categorical GeoTIFF",
+    "provider": "FasterRaster test fixtures"
+  },
+  "provider_evidence": {
+    "official_documentation": [],
+    "status": "synthetic"
+  }
+}

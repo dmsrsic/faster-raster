@@ -1,4 +1,39 @@
 {
+  "collection": "sentinel-2-l2a",
+  "family_contract": {
+    "asset_host_scope": [
+      "stac.dataspace.copernicus.eu"
+    ],
+    "asset_selection": {
+      "item_limit": 2,
+      "item_order": [
+        "datetime",
+        "id"
+      ],
+      "required_media_types": [
+        "image/tiff"
+      ],
+      "required_roles": [
+        "red",
+        "green",
+        "blue",
+        "nir"
+      ]
+    },
+    "search_path": "/search",
+    "temporal_representation": "interval"
+  },
+  "identity": {
+    "collection": "sentinel-2-l2a",
+    "product": "Sentinel-2 L2A",
+    "provider": "COPERNICUS_CDSE"
+  },
+  "provider_evidence": {
+    "official_documentation": [
+      "https://documentation.dataspace.copernicus.eu/APIs/STAC.html"
+    ],
+    "status": "complete"
+  },
   "available_times": [
     "2022",
     "2023"

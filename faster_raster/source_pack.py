@@ -154,6 +154,7 @@ class AccessContract(BaseModel):
     credential_ref: str | None = None
     allowed_hosts: list[str] = Field(default_factory=list)
     redirect_hosts: list[str] = Field(default_factory=list)
+    asset_hosts: list[str] = Field(default_factory=list)
 
 
 class NetworkContract(BaseModel):
@@ -161,8 +162,11 @@ class NetworkContract(BaseModel):
 
     max_requests: int = Field(default=1, ge=1, le=4)
     max_bytes: int = Field(default=65_536, ge=1, le=MAX_PROBE_BYTES)
+    max_asset_bytes: int = Field(default=64_000_000, ge=1, le=1_000_000_000)
+    max_total_bytes: int = Field(default=128_000_000, ge=1, le=2_000_000_000)
     timeout_seconds: float = Field(default=8.0, gt=0, le=30)
     maximum_redirects: int = Field(default=0, ge=0, le=2)
+    max_parallel_requests: int = Field(default=1, ge=1, le=8)
 
 
 class TemporalContract(BaseModel):
@@ -398,6 +402,194 @@ def _secret_findings(files: Mapping[str, bytes]) -> list[str]:
     return sorted(set(findings))
 
 
+def _family_contract(
+    pack: SourcePack,
+    *,
+    errors: list[str],
+    warnings: list[str],
+) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
+    """Validate public evidence and adapter-family semantics without discovery."""
+    fixture = _fixture(pack)
+    identity = fixture.get("identity")
+    if not isinstance(identity, Mapping):
+        identity = {
+            "provider": fixture.get("provider"),
+            "product": fixture.get("product"),
+            "collection": fixture.get("collection"),
+        }
+    identity = {
+        "provider": str(identity.get("provider") or ""),
+        "product": str(identity.get("product") or ""),
+        "collection": (
+            str(identity["collection"])
+            if identity.get("collection") is not None
+            else None
+        ),
+    }
+    if not identity["provider"] or not identity["product"]:
+        warnings.append("provider evidence is incomplete: provider and product are required")
+
+    evidence = fixture.get("provider_evidence")
+    if not isinstance(evidence, Mapping):
+        evidence = {}
+    evidence_status = str(evidence.get("status") or "incomplete")
+    official_documentation = evidence.get("official_documentation") or []
+    if not isinstance(official_documentation, list):
+        errors.append("provider_evidence.official_documentation must be an array")
+        official_documentation = []
+    invalid_evidence_urls = [
+        str(item)
+        for item in official_documentation
+        if not isinstance(item, str)
+        or urllib.parse.urlsplit(item).scheme != "https"
+        or not urllib.parse.urlsplit(item).hostname
+    ]
+    if invalid_evidence_urls:
+        errors.append("provider evidence URLs must be absolute HTTPS URLs")
+    if evidence_status not in {"complete", "incomplete", "synthetic"}:
+        errors.append("provider_evidence.status must be complete, incomplete, or synthetic")
+    if evidence_status == "complete" and not official_documentation:
+        errors.append("complete provider evidence requires official_documentation")
+    evidence_result = {
+        "status": evidence_status,
+        "official_documentation": sorted(str(item) for item in official_documentation),
+        "evidence_sha256": _canonical_hash(
+            {
+                "identity": identity,
+                "provider_evidence": dict(evidence),
+            }
+        ),
+    }
+
+    raw_contract = fixture.get("family_contract")
+    if not isinstance(raw_contract, Mapping):
+        raw_contract = {}
+    contract = dict(raw_contract)
+    adapter = pack.manifest.adapter
+    source = pack.manifest.source
+    temporal = pack.manifest.temporal
+
+    if adapter.family == "static_https_template":
+        if adapter.endpoint or adapter.local_path or adapter.local_sha256:
+            errors.append("static_https_template accepts only adapter.url_template")
+        if temporal.mode == "exact" and temporal.requested is None:
+            errors.append("exact static HTTPS sources require temporal.requested")
+        if "application/zip" in adapter.media_types:
+            archive = contract.get("archive")
+            if not isinstance(archive, Mapping):
+                errors.append("ZIP products require a family_contract.archive selection contract")
+            else:
+                if archive.get("format") != "zip":
+                    errors.append("archive format must be zip")
+                member_pattern = str(archive.get("member_pattern") or "")
+                if (
+                    not member_pattern
+                    or member_pattern.startswith(("/", "\\"))
+                    or ".." in PurePosixPath(member_pattern).parts
+                ):
+                    errors.append("archive member_pattern must be a safe relative pattern")
+                if archive.get("selection") not in {"single_match", "lexicographic_first"}:
+                    errors.append("archive selection must be deterministic")
+    elif adapter.family == "arcgis_imageserver":
+        parsed = urllib.parse.urlsplit(adapter.endpoint or "")
+        if not parsed.path.rstrip("/").endswith("/ImageServer"):
+            errors.append("arcgis_imageserver endpoint must end in /ImageServer")
+        if parsed.query or parsed.fragment:
+            errors.append("arcgis_imageserver endpoint must not contain query or fragment data")
+        if contract.get("operation") != "exportImage":
+            errors.append("arcgis_imageserver family_contract.operation must be exportImage")
+        for field in ("bbox_crs", "export_crs"):
+            if not re.fullmatch(r"EPSG:[1-9][0-9]{2,5}", str(contract.get(field) or "")):
+                errors.append(f"arcgis_imageserver {field} must be an explicit EPSG code")
+        dimensions = contract.get("maximum_dimensions")
+        if (
+            not isinstance(dimensions, Mapping)
+            or not isinstance(dimensions.get("width"), int)
+            or not isinstance(dimensions.get("height"), int)
+            or not 1 <= int(dimensions["width"]) <= 16_384
+            or not 1 <= int(dimensions["height"]) <= 16_384
+        ):
+            errors.append("arcgis_imageserver requires bounded maximum_dimensions")
+        if contract.get("temporal_parameter") not in {"time", "mosaicRule"}:
+            errors.append("arcgis_imageserver requires an explicit temporal_parameter")
+        query_order = contract.get("query_parameter_order")
+        if (
+            not isinstance(query_order, list)
+            or query_order != sorted(set(str(item) for item in query_order))
+        ):
+            errors.append("ArcGIS query parameters require unique deterministic ordering")
+        if source.semantic_type == "categorical" and source.resampling not in {"nearest", "mode"}:
+            errors.append("ArcGIS categorical exports require nearest or mode resampling")
+    elif adapter.family == "stac_search":
+        parsed = urllib.parse.urlsplit(adapter.endpoint or "")
+        if parsed.query or parsed.fragment:
+            errors.append("stac_search endpoint must be a root URL without query or fragment data")
+        search_path = str(contract.get("search_path") or "")
+        if not search_path.startswith("/") or ".." in PurePosixPath(search_path).parts:
+            errors.append("stac_search requires a safe absolute search_path")
+        if not identity["collection"]:
+            errors.append("stac_search requires collection identity")
+        if contract.get("temporal_representation") not in {"datetime", "interval"}:
+            errors.append("stac_search requires datetime or interval temporal representation")
+        selection = contract.get("asset_selection")
+        if not isinstance(selection, Mapping):
+            errors.append("stac_search requires deterministic asset_selection")
+        else:
+            required_roles = selection.get("required_roles")
+            if not isinstance(required_roles, list) or not required_roles:
+                errors.append("stac_search asset_selection requires required_roles")
+            elif not set(str(item) for item in required_roles).issubset(adapter.asset_roles):
+                errors.append("STAC required asset roles must be declared by adapter.asset_roles")
+            required_media = selection.get("required_media_types")
+            if not isinstance(required_media, list) or not required_media:
+                errors.append("stac_search asset_selection requires required_media_types")
+            elif not set(str(item) for item in required_media).issubset(adapter.media_types):
+                errors.append("STAC required media types must be declared by adapter.media_types")
+            if selection.get("item_order") != ["datetime", "id"]:
+                errors.append("STAC item selection order must be ['datetime', 'id']")
+            item_limit = selection.get("item_limit")
+            if not isinstance(item_limit, int) or not 1 <= item_limit <= 100:
+                errors.append("STAC item_limit must be between 1 and 100")
+        if not pack.manifest.access.asset_hosts:
+            errors.append("stac_search requires a separate nonempty asset_hosts scope")
+        if sorted(contract.get("asset_host_scope") or []) != sorted(
+            pack.manifest.access.asset_hosts
+        ):
+            errors.append("STAC asset_host_scope must exactly match access.asset_hosts")
+    elif adapter.family == "verified_local_raster":
+        if adapter.endpoint or adapter.url_template:
+            errors.append("verified_local_raster must not declare a network endpoint")
+        if not re.fullmatch(r"[a-f0-9]{64}", str(adapter.local_sha256 or "")):
+            errors.append("verified_local_raster requires a lowercase SHA-256 checksum")
+        raster_identity = contract.get("raster_identity")
+        if not isinstance(raster_identity, Mapping):
+            errors.append("verified_local_raster requires family_contract.raster_identity")
+        else:
+            expected = {
+                "media_types": sorted(adapter.media_types),
+                "asset_roles": sorted(adapter.asset_roles),
+                "crs": source.crs,
+                "semantic_type": source.semantic_type,
+                "nodata": source.nodata,
+                "mask_policy": source.mask_policy,
+                "resampling": source.resampling,
+            }
+            observed = {
+                "media_types": sorted(raster_identity.get("media_types") or []),
+                "asset_roles": sorted(raster_identity.get("asset_roles") or []),
+                "crs": raster_identity.get("crs"),
+                "semantic_type": raster_identity.get("semantic_type"),
+                "nodata": raster_identity.get("nodata"),
+                "mask_policy": raster_identity.get("mask_policy"),
+                "resampling": raster_identity.get("resampling"),
+            }
+            if observed != expected:
+                errors.append(
+                    "verified local raster identity must match the explicit source contract"
+                )
+    return identity, evidence_result, contract
+
+
 def validate_loaded_source_pack(pack: SourcePack) -> dict[str, Any]:
     manifest = pack.manifest
     errors: list[str] = []
@@ -420,6 +612,12 @@ def validate_loaded_source_pack(pack: SourcePack) -> dict[str, Any]:
         errors.append("redirect_hosts must be a subset of allowed_hosts")
     if manifest.network.maximum_redirects and not redirect_hosts:
         errors.append("maximum_redirects requires explicit redirect_hosts")
+    asset_hosts: set[str] = set()
+    for host in manifest.access.asset_hosts:
+        try:
+            asset_hosts.add(_valid_host(host))
+        except ValueError as exc:
+            errors.append(str(exc))
     adapter = manifest.adapter
     url = adapter.url_template or adapter.endpoint
     if adapter.family == "static_https_template" and not adapter.url_template:
@@ -429,7 +627,7 @@ def validate_loaded_source_pack(pack: SourcePack) -> dict[str, Any]:
     if adapter.family == "verified_local_raster":
         if not adapter.local_path or not adapter.local_sha256:
             errors.append("verified_local_raster requires local_path and local_sha256")
-        if allowed_hosts or redirect_hosts:
+        if allowed_hosts or redirect_hosts or asset_hosts:
             errors.append("verified_local_raster must not declare network hosts")
         if adapter.local_path:
             try:
@@ -477,6 +675,11 @@ def validate_loaded_source_pack(pack: SourcePack) -> dict[str, Any]:
         errors.append("continuous source resampling is unsupported")
     if source.nodata is None and source.mask_policy == "none":
         errors.append("source must declare nodata or mask semantics")
+    identity, provider_evidence, family_contract = _family_contract(
+        pack,
+        errors=errors,
+        warnings=warnings,
+    )
     access = manifest.access
     if access.authentication_scheme == "none" and access.credential_ref:
         errors.append("credential_ref requires a non-none authentication_scheme")
@@ -502,24 +705,44 @@ def validate_loaded_source_pack(pack: SourcePack) -> dict[str, Any]:
     if preview.target_crs and not re.fullmatch(r"EPSG:[1-9][0-9]{2,5}", preview.target_crs):
         errors.append("preview.target_crs must be an explicit EPSG code")
     errors.extend(_secret_findings(pack.files))
+    provider_evidence_complete = provider_evidence["status"] in {
+        "complete",
+        "synthetic",
+    } and bool(identity["provider"]) and bool(identity["product"])
+    family_contract_valid = not errors
     result = {
         "schema_version": "fasterraster.source-pack-validation/v1",
         "status": "PASS" if not errors else "FAIL",
         "pack_id": manifest.pack_id,
         "source_pack_sha256": pack.source_pack_sha256,
         "adapter_family": adapter.family,
+        "structural_status": "SCHEMA_VALID",
+        "family_contract_status": "VALID" if family_contract_valid else "INVALID",
+        "provider_evidence_status": (
+            "COMPLETE" if provider_evidence_complete else "INCOMPLETE"
+        ),
+        "planning_readiness": (
+            "READY_FOR_OFFLINE_DETERMINISTIC_PLANNING"
+            if not errors and provider_evidence_complete
+            else "BLOCKED_BEFORE_NETWORK"
+        ),
         "credential_required": access.authentication_scheme != "none",
         "network_requests": 0,
         "network_bytes": 0,
         "checks": {
             "schema": not any("manifest" in item for item in errors),
             "hosts": not any("host" in item for item in errors),
+            "family_contract": family_contract_valid,
+            "provider_evidence_complete": provider_evidence_complete,
             "secrets": not any("secret" in item.lower() or "token" in item.lower() for item in errors),
             "categorical_resampling": not any("categorical" in item for item in errors),
             "preview_compatibility": not any("preview" in item for item in errors),
         },
         "errors": sorted(set(errors)),
         "warnings": sorted(set(warnings)),
+        "identity": identity,
+        "provider_evidence": provider_evidence,
+        "family_contract": family_contract,
     }
     result["validation_sha256"] = _canonical_hash(result, {"validation_sha256"})
     return result
@@ -535,12 +758,19 @@ def validate_source_pack(path: Path) -> dict[str, Any]:
             "pack_id": None,
             "source_pack_sha256": None,
             "adapter_family": None,
+            "structural_status": "SCHEMA_INVALID",
+            "family_contract_status": "NOT_EVALUATED",
+            "provider_evidence_status": "NOT_EVALUATED",
+            "planning_readiness": "BLOCKED_BEFORE_NETWORK",
             "credential_required": None,
             "network_requests": 0,
             "network_bytes": 0,
             "checks": {},
             "errors": [str(exc)],
             "warnings": [],
+            "identity": {},
+            "provider_evidence": {},
+            "family_contract": {},
             "validation_sha256": None,
         }
 
@@ -555,6 +785,7 @@ def credential_requirement(manifest: SourcePackManifest) -> dict[str, Any] | Non
         "credential_ref": access.credential_ref,
         "allowed_hosts": sorted(access.allowed_hosts),
         "redirect_hosts": sorted(access.redirect_hosts),
+        "asset_hosts": sorted(access.asset_hosts),
         "resolver_capability_required": access.authentication_scheme,
         "resolved_secret_present": False,
     }
@@ -632,17 +863,54 @@ def compile_source_pack_plan(
             )
             resolved_time = temporal_resolution["selected_time"]
     requirement = credential_requirement(manifest)
-    if temporal_alternatives and temporal_resolution is None:
+    provider_evidence_complete = validation["provider_evidence_status"] == "COMPLETE"
+    if not provider_evidence_complete:
+        status = "BLOCKED_PROVIDER_EVIDENCE"
+    elif temporal_alternatives and temporal_resolution is None:
         status = temporal_alternatives["status"]
     elif requirement is not None:
         status = "CREDENTIAL_REQUIRED"
     else:
         status = "READY"
+    endpoint_contract: dict[str, Any]
+    if manifest.adapter.family == "verified_local_raster":
+        endpoint_contract = {
+            "kind": "verified_local_reference",
+            "local_reference": manifest.adapter.local_path,
+            "local_sha256": manifest.adapter.local_sha256,
+        }
+    else:
+        endpoint_contract = {
+            "kind": manifest.adapter.family,
+            "endpoint": manifest.adapter.endpoint,
+            "url_template": manifest.adapter.url_template,
+            "rendered_request_url": (
+                _render_endpoint(pack)
+                if manifest.adapter.family == "static_https_template"
+                else None
+            ),
+            "family_contract": validation["family_contract"],
+        }
+    executable = status in {"READY", "CREDENTIAL_REQUIRED"}
+    blocked_details = []
+    if status == "BLOCKED_PROVIDER_EVIDENCE":
+        blocked_details.append(
+            "Complete official provider evidence before compiling executable work."
+        )
+    if status in {"AWAITING_TEMPORAL_SELECTION", "NO_TEMPORAL_ALTERNATIVES"}:
+        blocked_details.append(
+            "Select an explicit temporal candidate; the requested time was not changed."
+        )
     stable = {
         "schema_version": SOURCE_PLAN_SCHEMA_VERSION,
         "pack_id": manifest.pack_id,
         "source_pack_sha256": pack.source_pack_sha256,
         "status": status,
+        "executable": executable,
+        "blocked_before_network": not executable,
+        "blocked_details": blocked_details,
+        "identity": validation["identity"],
+        "provider_evidence": validation["provider_evidence"],
         "adapter": {
             "family": manifest.adapter.family,
             "public_adapter_id": {
@@ -654,9 +922,18 @@ def compile_source_pack_plan(
             "media_types": manifest.adapter.media_types,
             "asset_roles": manifest.adapter.asset_roles,
         },
+        "endpoint_contract": endpoint_contract,
         "capabilities": manifest.capabilities.model_dump(mode="json"),
+        "public_capability": {
+            "status": "experimental",
+            "release": "Unreleased",
+            "public_execution": "validation_and_bounded_probe_only",
+            "private_execution_available_from_public_repository": False,
+        },
+        "source_contract": manifest.source.model_dump(mode="json"),
         "requested_time": requested,
         "resolved_time": resolved_time,
+        "temporal_contract": manifest.temporal.model_dump(mode="json"),
         "temporal_alternatives": temporal_alternatives,
         "temporal_resolution": temporal_resolution,
         "credential_requirement": requirement,
@@ -664,14 +941,61 @@ def compile_source_pack_plan(
             "default": "disabled",
             "max_requests": manifest.network.max_requests,
             "max_bytes": manifest.network.max_bytes,
-            "allowed_hosts": sorted(manifest.access.allowed_hosts),
+            "max_asset_bytes": manifest.network.max_asset_bytes,
+            "max_total_bytes": manifest.network.max_total_bytes,
+            "timeout_seconds": manifest.network.timeout_seconds,
+            "maximum_redirects": manifest.network.maximum_redirects,
+            "max_parallel_requests": manifest.network.max_parallel_requests,
+            "request_hosts": sorted(manifest.access.allowed_hosts),
             "redirect_hosts": sorted(manifest.access.redirect_hosts),
+            "asset_hosts": sorted(manifest.access.asset_hosts),
         },
         "preview": manifest.preview.model_dump(mode="json"),
+        "validation": {
+            "schema": validation["structural_status"],
+            "family_contract": validation["family_contract_status"],
+            "provider_evidence": validation["provider_evidence_status"],
+            "offline_planning": validation["planning_readiness"],
+            "validation_sha256": validation["validation_sha256"],
+        },
         "original_pack_unchanged": True,
     }
     stable["plan_sha256"] = _canonical_hash(stable, {"plan_sha256"})
     return stable
+
+
+def compile_source_pack_handoff(
+    path: Path,
+    output: Path,
+    *,
+    requested_time: str | int | None = None,
+    selected_time: str | None = None,
+) -> dict[str, Any]:
+    """Write the existing v1 plan as a frozen, public-safe execution handoff."""
+    plan = compile_source_pack_plan(
+        path,
+        requested_time=requested_time,
+        selected_time=selected_time,
+    )
+    if not plan["executable"]:
+        details = "; ".join(plan["blocked_details"]) or str(plan["status"])
+        raise ValueError(f"blocked Source Pack cannot compile executable work: {details}")
+    destination = output
+    if output.suffix.lower() != ".json":
+        destination = output / f"{plan['pack_id']}.source-pack-plan.json"
+    write_json_atomic(destination, plan)
+    return {
+        "schema_version": "fasterraster.source-pack-handoff-compile/v1",
+        "status": "PASS",
+        "handoff_schema_version": plan["schema_version"],
+        "pack_id": plan["pack_id"],
+        "source_pack_sha256": plan["source_pack_sha256"],
+        "plan_sha256": plan["plan_sha256"],
+        "handoff_path": str(destination),
+        "handoff_sha256": hashlib.sha256(destination.read_bytes()).hexdigest(),
+        "credential_resolved": False,
+        "network_requests": 0,
+    }
 
 
 def explain_source_pack(path: Path) -> dict[str, Any]:
@@ -688,6 +1012,13 @@ def explain_source_pack(path: Path) -> dict[str, Any]:
         "description": manifest.description,
         "source_pack_sha256": pack.source_pack_sha256,
         "status": plan["status"],
+        "executable": plan["executable"],
+        "blocked_before_network": plan["blocked_before_network"],
+        "blocked_details": plan["blocked_details"],
+        "structural_status": validation["structural_status"],
+        "family_contract_status": validation["family_contract_status"],
+        "provider_evidence_status": validation["provider_evidence_status"],
+        "offline_planning_status": validation["planning_readiness"],
         "adapter_family": manifest.adapter.family,
         "can": [
             field
@@ -701,6 +1032,8 @@ def explain_source_pack(path: Path) -> dict[str, Any]:
         ]
         + ["execute arbitrary code", "resolve public credentials"],
         "credential_requirement": plan["credential_requirement"],
+        "public_capability": plan["public_capability"],
+        "handoff_schema_version": plan["schema_version"],
         "temporal": {
             "mode": manifest.temporal.mode,
             "requested": manifest.temporal.requested,
