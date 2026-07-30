@@ -1,0 +1,14 @@
+{
+  "materialization_request_sha256": "32d463020a74a633ed79c422a21c7c0c402b058b270304194c0220859dc9c8c3",
+  "original_source_plan_unchanged": true,
+  "output_shape": null,
+  "pack_id": "prism-daily-public",
+  "requested_asset_roles": [
+    "precipitation"
+  ],
+  "schema_version": "fasterraster.source-materialization-request/v1",
+  "source_plan_sha256": "61d8691f8f1ed65169d07db213195569f5a73f928227598628512c2d580cf5eb",
+  "spatial_request": {
+    "mode": "full_object"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "materialization_request_sha256": "79b1c4dcf89c54dad43e1002eb9d24345f217d65c49f9d48e0a2c7a580f8dc75",
+  "original_source_plan_unchanged": true,
+  "output_shape": {
+    "height": 256,
+    "width": 512
+  },
+  "pack_id": "usda-cdl-imageserver",
+  "requested_asset_roles": [
+    "classification"
+  ],
+  "schema_version": "fasterraster.source-materialization-request/v1",
+  "source_plan_sha256": "437c663886d0967445ccd44b233fc6dff4b1afe12bf3054db24e25e21e55e05a",
+  "spatial_request": {
+    "bbox": [
+      -77.1,
+      38.8,
+      -76.9,
+      39.0
+    ],
+    "bbox_crs": "EPSG:4326",
+    "mode": "bbox"
+  }
+}

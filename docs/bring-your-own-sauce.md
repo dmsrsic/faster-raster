@@ -62,6 +62,9 @@ fr sauce validate my-source.sauce
 fr sauce explain my-source.sauce --json
 fr sauce test my-source.sauce
 fr sauce compile my-source.sauce --out build/source-pack-plan.json
+fr sauce materialize-request build/source-pack-plan.json \
+  --out build/source-materialization-request.json \
+  --role precipitation --full-object
 fr sauce pack my-source.sauce --out dist/
 ```
 
@@ -77,6 +80,20 @@ resolution, CRS, semantic type, nodata/mask/resampling, archive selection,
 resource ceilings, opaque credential requirements, public capability status,
 stable hashes, and corrective blocked details. Provider-evidence or temporal
 blocked states cannot become executable handoffs.
+
+Reusable Source Pack facts remain separate from per-study intent.
+`materialize-request` emits the deterministic
+`fasterraster.source-materialization-request/v1` contract without network
+access. Static HTTPS and verified-local sources require an explicit
+`--full-object`; STAC and ImageServer sources require `--bbox` and
+`--bbox-crs`; ImageServer additionally requires bounded `--width` and
+`--height`. Requested roles must be a nonempty subset of the frozen plan.
+The request is bound to the exact plan hash and cannot change time, endpoint,
+hosts, credentials, or resource ceilings.
+
+Source Pack v1 remains Unreleased. The additional archive, ImageServer,
+STAC-bbox, and verified-local delivery fields are additive safety facts for
+the single existing v1 meaning; no released contract is reinterpreted.
 
 ## Complete manifest example
 

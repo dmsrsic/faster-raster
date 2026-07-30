@@ -29,6 +29,15 @@ The V4 recipe is also part of the discriminated agricultural recipe union.
 Schema export ordering and JSON formatting are deterministic; generated
 schemas are checked against the committed files in tests and release gates.
 
+## `source_materialization_request.schema.json`
+
+Validates the public-safe, per-study
+`fasterraster.source-materialization-request/v1` contract. The contract binds
+requested roles and either a canonical bbox or an explicit full-object mode to
+one frozen Source Pack plan hash. ImageServer requests also carry bounded
+output dimensions. It contains no endpoint overrides, network-policy
+overrides, temporal substitutions, resolved credentials, or filesystem paths.
+
 ## `research_spec.schema.json`
 
 Validates user-authored semantic research specs. It covers project metadata, AOI fields, target grid fields, source requests, and output settings.

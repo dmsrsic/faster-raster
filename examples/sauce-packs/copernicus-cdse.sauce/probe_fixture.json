@@ -4,6 +4,7 @@
     "asset_host_scope": [
       "stac.dataspace.copernicus.eu"
     ],
+    "bbox_crs": "EPSG:4326",
     "asset_selection": {
       "item_limit": 2,
       "item_order": [

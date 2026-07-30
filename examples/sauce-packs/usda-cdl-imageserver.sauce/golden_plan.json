@@ -23,13 +23,20 @@
     "endpoint": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer",
     "family_contract": {
       "bbox_crs": "EPSG:4326",
+      "estimated_bytes_per_pixel": 1,
       "export_crs": "EPSG:3857",
+      "fixed_query_parameters": {
+        "adjustAspectRatio": "false",
+        "f": "image",
+        "format": "tiff"
+      },
       "maximum_dimensions": {
         "height": 4097,
         "width": 4097
       },
       "operation": "exportImage",
       "query_parameter_order": [
+        "adjustAspectRatio",
         "bbox",
         "bboxSR",
         "f",
@@ -38,7 +45,8 @@
         "size",
         "time"
       ],
-      "temporal_parameter": "time"
+      "temporal_parameter": "time",
+      "tiling_order": "row_major_exact_grid"
     },
     "kind": "arcgis_imageserver",
     "rendered_request_url": null,
@@ -67,7 +75,7 @@
   },
   "original_pack_unchanged": true,
   "pack_id": "usda-cdl-imageserver",
-  "plan_sha256": "f390a45cdf5ffdb46ae7ae4b56be1346c722d121c4c45f8a9a1bb6a6d2206a24",
+  "plan_sha256": "437c663886d0967445ccd44b233fc6dff4b1afe12bf3054db24e25e21e55e05a",
   "preview": {
     "role": "classification",
     "target_crs": "EPSG:3857",
@@ -113,6 +121,6 @@
     "offline_planning": "READY_FOR_OFFLINE_DETERMINISTIC_PLANNING",
     "provider_evidence": "COMPLETE",
     "schema": "SCHEMA_VALID",
-    "validation_sha256": "45e433f4f428498957b954b5d20256ac9b0728fede4b28ff584bd1bc8a31c4a5"
+    "validation_sha256": "c6254b3be5dd8f1b649dd30e0342e1ef95c4fc29f431420402f1d1867524c2b1"
   }
 }

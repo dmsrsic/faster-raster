@@ -1,0 +1,21 @@
+{
+  "materialization_request_sha256": "1177c58925010182313da7dc4c785143b8b86bb6199ab0fe3d3d6f60ba2d3135",
+  "original_source_plan_unchanged": true,
+  "output_shape": null,
+  "pack_id": "copernicus-cdse-stac",
+  "requested_asset_roles": [
+    "red"
+  ],
+  "schema_version": "fasterraster.source-materialization-request/v1",
+  "source_plan_sha256": "e968beac978f44ed24af0ad6b8285b1be11700a0f77d2377e5f914ce731ac07c",
+  "spatial_request": {
+    "bbox": [
+      -77.1,
+      38.8,
+      -76.9,
+      39.0
+    ],
+    "bbox_crs": "EPSG:4326",
+    "mode": "bbox"
+  }
+}

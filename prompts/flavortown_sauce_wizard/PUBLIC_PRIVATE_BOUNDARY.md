@@ -4,6 +4,10 @@ The public repository owns user intent and frozen, versioned contracts:
 workfiles, Source Packs, temporal alternatives and resolutions, preview
 templates, capability evidence, execution packages, schemas, and public-safe
 receipts. It validates and hashes these contracts without resolving secrets.
+A Source Pack materialization request binds a requested role and either a
+WGS84 bounding box or explicit full-object intent to one exact frozen plan
+hash. It cannot override endpoints, selected time, credential references, or
+family safety limits.
 
 A private execution backend may consume a frozen public contract and resolve
 an opaque credential reference only when it declares a compatible resolver

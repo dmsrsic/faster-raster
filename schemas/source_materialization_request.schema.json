@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "materialization_request_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "original_source_plan_unchanged": {
+      "const": true
+    },
+    "output_shape": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "height": {
+              "maximum": 16384,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "width": {
+              "maximum": 16384,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "width",
+            "height"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "pack_id": {
+      "pattern": "^[a-z][a-z0-9_-]{2,63}$",
+      "type": "string"
+    },
+    "requested_asset_roles": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "schema_version": {
+      "const": "fasterraster.source-materialization-request/v1"
+    },
+    "source_plan_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "spatial_request": {
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bbox": {
+              "maxItems": 4,
+              "minItems": 4,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            "bbox_crs": {
+              "pattern": "^EPSG:[1-9][0-9]{2,5}$",
+              "type": "string"
+            },
+            "mode": {
+              "const": "bbox"
+            }
+          },
+          "required": [
+            "mode",
+            "bbox",
+            "bbox_crs"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "mode": {
+              "const": "full_object"
+            }
+          },
+          "required": [
+            "mode"
+          ],
+          "type": "object"
+        }
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "pack_id",
+    "source_plan_sha256",
+    "requested_asset_roles",
+    "spatial_request",
+    "output_shape",
+    "original_source_plan_unchanged",
+    "materialization_request_sha256"
+  ],
+  "title": "FasterRaster Source Pack materialization request v1",
+  "type": "object"
+}
