@@ -10,7 +10,7 @@ fr sauce test my-source.sauce
 fr sauce compile my-source.sauce --out build/source-pack-plan.json
 fr sauce materialize-request build/source-pack-plan.json \
   --role raster \
-  --bbox=-75,39,-74,40 \
+  --bbox -75 39 -74 40 \
   --out build/source-materialization-request.json
 fr sauce probe my-source.sauce --allow-network --out build/probe.json
 fr sauce pack my-source.sauce --out dist/

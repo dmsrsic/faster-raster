@@ -235,7 +235,7 @@
       "bytes": 1967,
       "path": "prompts/flavortown_sauce_wizard/CLI_REFERENCE.md",
       "role": "cli_reference",
-      "sha256": "53a64a588caaedf3b23fdfc129387da506d97b8e146a6057a99a02e4f115c8cb"
+      "sha256": "ba73c386105c52c0748eb0955004862eea645ff2ad19915ce9bac510db65ef93"
     },
     {
       "bytes": 1709,
@@ -256,7 +256,7 @@
       "sha256": "000ca5266e676c42f54b4fc838cd0ff751d89987c79246bfc27b7ef763cea728"
     }
   ],
-  "grounding_bundle_sha256": "2bb6a7030ff7bc5c87e118d2a2d7cd60a0a82d6a7d1d47d2e4ec6a0a6b740aa1",
+  "grounding_bundle_sha256": "54d88bb26de89020860844d1da3ef042a6c33e56164c375a99b79c35605623f3",
   "release": {
     "contract_status": "experimental",
     "development_label": "Unreleased",
