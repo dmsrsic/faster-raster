@@ -8,6 +8,7 @@
     "estimated_bytes_per_pixel": 1,
     "export_crs": "EPSG:3857",
     "fixed_query_parameters": {
+      "adjustAspectRatio": "false",
       "f": "image",
       "format": "tiff"
     },
@@ -17,6 +18,7 @@
     },
     "operation": "exportImage",
     "query_parameter_order": [
+      "adjustAspectRatio",
       "bbox",
       "bboxSR",
       "f",

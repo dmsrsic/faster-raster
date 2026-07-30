@@ -438,6 +438,26 @@ def test_stac_asset_scope_missing_role_and_unsupported_placeholder_fail_closed(
     assert any("unsupported variables" in item for item in result["errors"])
 
 
+def test_stac_accepts_the_standard_cloud_optimized_geotiff_media_profile(tmp_path):
+    stac = tmp_path / "stac-cog-profile.sauce"
+    shutil.copytree(CDSE, stac)
+    manifest = _manifest(stac)
+    media_type = "image/tiff; application=geotiff; profile=cloud-optimized"
+    manifest["adapter"]["media_types"] = ["application/geo+json", media_type]
+    _write_manifest(stac, manifest)
+    fixture = json.loads((stac / "probe_fixture.json").read_text(encoding="utf-8"))
+    fixture["family_contract"]["asset_selection"]["required_media_types"] = [
+        media_type
+    ]
+    (stac / "probe_fixture.json").write_text(
+        json.dumps(fixture, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
+
+    assert validate_source_pack(stac)["status"] == "PASS"
+
+
 def test_temporal_selection_and_line_endings_are_explicit_and_deterministic(
     tmp_path,
 ):

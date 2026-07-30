@@ -190,22 +190,22 @@
       "sha256": "934b9170b983726b55a27b882d84e9007e4e20d7f1a9cb85dd7aed45e983d1bf"
     },
     {
-      "bytes": 3494,
+      "bytes": 3561,
       "path": "examples/sauce-packs/usda-cdl-imageserver.sauce/golden_plan.json",
       "role": "arcgis_golden_plan",
-      "sha256": "fef52c056e3734ff6d8065e7cf6ef41f38bb9f6d9e9f8502d6e4a9c2d149466a"
+      "sha256": "54886baa9e9e2bd8cc3195c02d67f5b34642b18ea3e0a5df23e8ff04bc77443b"
     },
     {
       "bytes": 610,
       "path": "examples/sauce-packs/usda-cdl-imageserver.sauce/golden_materialization_request.json",
       "role": "arcgis_golden_materialization_request",
-      "sha256": "d150a681640e9487df24a35801ca3e00651d75373fc4782f9a1ebe3110244bbb"
+      "sha256": "54c7df265fec5278a83731f089fc89437a91f61c04a168d128c7209d6d8fa9d7"
     },
     {
-      "bytes": 953,
+      "bytes": 1016,
       "path": "examples/sauce-packs/usda-cdl-imageserver.sauce/probe_fixture.json",
       "role": "arcgis_evidence_fixture",
-      "sha256": "d4b7be0e5c873ed3750777916e028b19c24d237529b934cac4e42bd1a85eb93a"
+      "sha256": "df4d25f56a1fadf686b8bb9220cb9f1cf9a9449ef148fa436c6deec7dec39573"
     },
     {
       "bytes": 1174,
@@ -256,7 +256,7 @@
       "sha256": "000ca5266e676c42f54b4fc838cd0ff751d89987c79246bfc27b7ef763cea728"
     }
   ],
-  "grounding_bundle_sha256": "54d88bb26de89020860844d1da3ef042a6c33e56164c375a99b79c35605623f3",
+  "grounding_bundle_sha256": "712ca7f150c7454427e3aeb68f04d49989ff6e68a02f2643bfa58a7a41dc6b5c",
   "release": {
     "contract_status": "experimental",
     "development_label": "Unreleased",

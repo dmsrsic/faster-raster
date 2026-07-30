@@ -26,6 +26,7 @@
       "estimated_bytes_per_pixel": 1,
       "export_crs": "EPSG:3857",
       "fixed_query_parameters": {
+        "adjustAspectRatio": "false",
         "f": "image",
         "format": "tiff"
       },
@@ -35,6 +36,7 @@
       },
       "operation": "exportImage",
       "query_parameter_order": [
+        "adjustAspectRatio",
         "bbox",
         "bboxSR",
         "f",
@@ -73,7 +75,7 @@
   },
   "original_pack_unchanged": true,
   "pack_id": "usda-cdl-imageserver",
-  "plan_sha256": "3ec12ace6c6e885315601c868f1372a1218fb74c5a88049a5a312e6b92b41712",
+  "plan_sha256": "437c663886d0967445ccd44b233fc6dff4b1afe12bf3054db24e25e21e55e05a",
   "preview": {
     "role": "classification",
     "target_crs": "EPSG:3857",
@@ -119,6 +121,6 @@
     "offline_planning": "READY_FOR_OFFLINE_DETERMINISTIC_PLANNING",
     "provider_evidence": "COMPLETE",
     "schema": "SCHEMA_VALID",
-    "validation_sha256": "cdc43d3554988dc195a50e4b80892d4d8213c6d2fc27d416f4ec992ba7bf2181"
+    "validation_sha256": "c6254b3be5dd8f1b649dd30e0342e1ef95c4fc29f431420402f1d1867524c2b1"
   }
 }

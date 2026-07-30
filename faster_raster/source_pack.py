@@ -61,6 +61,7 @@ ALLOWED_MEDIA_TYPES = {
     "application/zip",
     "image/tiff",
     "image/tiff; application=geotiff",
+    "image/tiff; application=geotiff; profile=cloud-optimized",
 }
 EXCLUDED_PARTS = {
     ".git",
@@ -559,11 +560,13 @@ def _family_contract(
             errors.append("arcgis_imageserver requires an explicit temporal_parameter")
         fixed_query = contract.get("fixed_query_parameters")
         if not isinstance(fixed_query, Mapping) or fixed_query != {
+            "adjustAspectRatio": "false",
             "f": "image",
             "format": "tiff",
         }:
             errors.append(
-                "arcgis_imageserver fixed_query_parameters must request a TIFF image"
+                "arcgis_imageserver fixed_query_parameters must request a TIFF image "
+                "without server-side aspect-ratio expansion"
             )
         if contract.get("tiling_order") != "row_major_exact_grid":
             errors.append(
@@ -580,6 +583,7 @@ def _family_contract(
             )
         query_order = contract.get("query_parameter_order")
         expected_query_keys = {
+            "adjustAspectRatio",
             "bbox",
             "bboxSR",
             "f",

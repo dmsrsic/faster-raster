@@ -1,5 +1,5 @@
 {
-  "materialization_request_sha256": "2a2eb38164437ff3bc8cb69058ce5cc3c4a273bb047c6feafa89ef48116159bf",
+  "materialization_request_sha256": "79b1c4dcf89c54dad43e1002eb9d24345f217d65c49f9d48e0a2c7a580f8dc75",
   "original_source_plan_unchanged": true,
   "output_shape": {
     "height": 256,
@@ -10,7 +10,7 @@
     "classification"
   ],
   "schema_version": "fasterraster.source-materialization-request/v1",
-  "source_plan_sha256": "3ec12ace6c6e885315601c868f1372a1218fb74c5a88049a5a312e6b92b41712",
+  "source_plan_sha256": "437c663886d0967445ccd44b233fc6dff4b1afe12bf3054db24e25e21e55e05a",
   "spatial_request": {
     "bbox": [
       -77.1,
