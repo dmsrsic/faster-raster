@@ -5,7 +5,12 @@
   ],
   "family_contract": {
     "bbox_crs": "EPSG:4326",
+    "estimated_bytes_per_pixel": 1,
     "export_crs": "EPSG:3857",
+    "fixed_query_parameters": {
+      "f": "image",
+      "format": "tiff"
+    },
     "maximum_dimensions": {
       "height": 4097,
       "width": 4097
@@ -20,7 +25,8 @@
       "size",
       "time"
     ],
-    "temporal_parameter": "time"
+    "temporal_parameter": "time",
+    "tiling_order": "row_major_exact_grid"
   },
   "identity": {
     "collection": "CDL_WM",

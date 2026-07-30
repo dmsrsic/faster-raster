@@ -1,8 +1,19 @@
 {
   "family_contract": {
     "archive": {
+      "allowed_compression_methods": [
+        "deflated",
+        "stored"
+      ],
       "format": "zip",
+      "maximum_compression_ratio": 100,
+      "maximum_members": 16,
+      "maximum_uncompressed_bytes": 128000000,
       "member_pattern": "*.bil",
+      "required_companions": [
+        "{stem}.hdr",
+        "{stem}.prj"
+      ],
       "selection": "single_match"
     },
     "request_selection": "bounded_template_variables"

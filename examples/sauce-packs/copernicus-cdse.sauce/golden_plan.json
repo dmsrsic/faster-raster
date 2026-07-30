@@ -59,6 +59,7 @@
           "nir"
         ]
       },
+      "bbox_crs": "EPSG:4326",
       "search_path": "/search",
       "temporal_representation": "interval"
     },
@@ -91,7 +92,7 @@
   },
   "original_pack_unchanged": true,
   "pack_id": "copernicus-cdse-stac",
-  "plan_sha256": "f02b6c6b8999f30b7e3c1b7fd4f098e77b97d8b7b7cf10b5d478b08661734740",
+  "plan_sha256": "e968beac978f44ed24af0ad6b8285b1be11700a0f77d2377e5f914ce731ac07c",
   "preview": {
     "role": "natural_color",
     "target_crs": "EPSG:4326",
@@ -136,6 +137,6 @@
     "offline_planning": "READY_FOR_OFFLINE_DETERMINISTIC_PLANNING",
     "provider_evidence": "COMPLETE",
     "schema": "SCHEMA_VALID",
-    "validation_sha256": "6628504f18e9b6149bad878ec01ab0df8564013292f9f05fe8103435966411de"
+    "validation_sha256": "7810103b0969f5f6c00bdb09f47ba73925a03f5faa18ba6fd3d5a26839c93848"
   }
 }

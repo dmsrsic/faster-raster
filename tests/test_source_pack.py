@@ -11,7 +11,9 @@ import pytest
 import yaml
 
 from faster_raster import fr_cli
+from faster_raster.adapter_contract import stable_json
 from faster_raster.source_pack import (
+    compile_source_materialization_request,
     compile_source_pack_handoff,
     compile_source_pack_plan,
     explain_source_pack,
@@ -19,6 +21,7 @@ from faster_raster.source_pack import (
     probe_source_pack,
     scaffold_source_pack,
     test_source_pack as run_source_pack_test,
+    validate_source_materialization_request,
     validate_source_pack,
 )
 
@@ -49,6 +52,227 @@ def test_shipped_source_packs_validate_and_pass_offline_goldens():
         assert validation["family_contract_status"] == "VALID"
         assert validation["provider_evidence_status"] == "COMPLETE"
         assert run_source_pack_test(path)["status"] == "PASS"
+
+
+def test_materialization_requests_are_family_specific_hash_bound_and_deterministic():
+    cases = (
+        (
+            PRISM,
+            {
+                "requested_asset_roles": ["precipitation"],
+                "full_object": True,
+            },
+        ),
+        (
+            CDSE,
+            {
+                "requested_asset_roles": ["red"],
+                "bbox": [-77.1, 38.8, -76.9, 39.0],
+                "bbox_crs": "EPSG:4326",
+            },
+        ),
+        (
+            ARCGIS,
+            {
+                "requested_asset_roles": ["classification"],
+                "bbox": [-77.1, 38.8, -76.9, 39.0],
+                "bbox_crs": "EPSG:4326",
+                "output_width": 512,
+                "output_height": 256,
+            },
+        ),
+        (
+            LOCAL,
+            {
+                "requested_asset_roles": ["classification"],
+                "full_object": True,
+            },
+        ),
+    )
+    hashes: set[str] = set()
+    for pack, kwargs in cases:
+        plan = compile_source_pack_plan(pack)
+        first = compile_source_materialization_request(plan, **kwargs)
+        second = compile_source_materialization_request(plan, **kwargs)
+        assert first == second
+        assert first == json.loads(
+            (pack / "golden_materialization_request.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        assert validate_source_materialization_request(plan, first) == first
+        assert first["source_plan_sha256"] == plan["plan_sha256"]
+        assert first["original_source_plan_unchanged"] is True
+        hashes.add(first["materialization_request_sha256"])
+    assert len(hashes) == 4
+
+
+@pytest.mark.parametrize(
+    ("pack", "kwargs", "message"),
+    (
+        (
+            CDSE,
+            {"requested_asset_roles": ["red"], "full_object": True},
+            "requires an explicit spatial bbox",
+        ),
+        (
+            PRISM,
+            {
+                "requested_asset_roles": ["precipitation"],
+                "bbox": [0, 0, 1, 1],
+                "bbox_crs": "EPSG:4326",
+            },
+            "requires an explicit full-object request",
+        ),
+        (
+            ARCGIS,
+            {
+                "requested_asset_roles": ["classification"],
+                "bbox": [1, 0, 0, 1],
+                "bbox_crs": "EPSG:4326",
+                "output_width": 1,
+                "output_height": 1,
+            },
+            "strictly increasing",
+        ),
+        (
+            ARCGIS,
+            {
+                "requested_asset_roles": ["classification"],
+                "bbox": [0, 0, 1, 1],
+                "bbox_crs": "EPSG:3857",
+                "output_width": 1,
+                "output_height": 1,
+            },
+            "must exactly match",
+        ),
+        (
+            ARCGIS,
+            {
+                "requested_asset_roles": ["classification"],
+                "bbox": [0, 0, 1, 1],
+                "bbox_crs": "EPSG:4326",
+                "output_width": 0,
+                "output_height": 1,
+            },
+            "integers from 1 to 16384",
+        ),
+        (
+            LOCAL,
+            {
+                "requested_asset_roles": ["undeclared"],
+                "full_object": True,
+            },
+            "must be declared",
+        ),
+    ),
+)
+def test_materialization_request_rejects_invalid_family_intent(
+    pack,
+    kwargs,
+    message,
+):
+    with pytest.raises(ValueError, match=message):
+        compile_source_materialization_request(
+            compile_source_pack_plan(pack),
+            **kwargs,
+        )
+
+
+def test_materialization_request_rejects_plan_and_request_hash_mismatches():
+    plan = compile_source_pack_plan(LOCAL)
+    request = compile_source_materialization_request(
+        plan,
+        requested_asset_roles=["classification"],
+        full_object=True,
+    )
+    changed_plan = json.loads(json.dumps(plan))
+    changed_plan["plan_sha256"] = "0" * 64
+    with pytest.raises(ValueError, match="plan SHA-256 mismatch"):
+        compile_source_materialization_request(
+            changed_plan,
+            requested_asset_roles=["classification"],
+            full_object=True,
+        )
+    changed_request = json.loads(json.dumps(request))
+    changed_request["source_plan_sha256"] = "0" * 64
+    with pytest.raises(ValueError, match="different plan hash"):
+        validate_source_materialization_request(plan, changed_request)
+
+
+def test_materialization_request_rejects_blocked_plans_and_override_fields():
+    plan = compile_source_pack_plan(CDSE)
+    blocked = json.loads(json.dumps(plan))
+    blocked["status"] = "BLOCKED_PROVIDER_EVIDENCE"
+    blocked["executable"] = False
+    blocked["blocked_before_network"] = True
+    blocked["plan_sha256"] = hashlib.sha256(
+        stable_json(
+            {
+                key: item
+                for key, item in blocked.items()
+                if key != "plan_sha256"
+            }
+        ).encode("utf-8")
+    ).hexdigest()
+    with pytest.raises(ValueError, match="blocked or non-executable"):
+        compile_source_materialization_request(
+            blocked,
+            requested_asset_roles=["red"],
+            bbox=[-77.1, 38.8, -76.9, 39.0],
+            bbox_crs="EPSG:4326",
+        )
+
+    request = compile_source_materialization_request(
+        plan,
+        requested_asset_roles=["red"],
+        bbox=[-77.1, 38.8, -76.9, 39.0],
+        bbox_crs="EPSG:4326",
+    )
+    for field, value in (
+        ("network_policy", {"max_requests": 999}),
+        ("credential", "secret"),
+        ("resolved_time", "2099"),
+        ("endpoint", "https://evil.example"),
+    ):
+        changed = json.loads(json.dumps(request))
+        changed[field] = value
+        with pytest.raises(ValueError, match="unknown or missing fields"):
+            validate_source_materialization_request(plan, changed)
+
+
+def test_materialization_request_cli_is_zero_network(tmp_path, monkeypatch):
+    plan_path = tmp_path / "plan.json"
+    request_path = tmp_path / "request.json"
+    plan_path.write_text(
+        json.dumps(compile_source_pack_plan(LOCAL)),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(
+        "urllib.request.urlopen",
+        lambda *args, **kwargs: (_ for _ in ()).throw(
+            AssertionError("network called")
+        ),
+    )
+    assert (
+        fr_cli.main(
+            [
+                "sauce",
+                "materialize-request",
+                str(plan_path),
+                "--out",
+                str(request_path),
+                "--role",
+                "classification",
+                "--full-object",
+            ]
+        )
+        == 0
+    )
+    assert validate_source_materialization_request(
+        plan_path,
+        request_path,
+    )["pack_id"] == "verified-local-raster"
 
 
 def test_scaffold_is_valid_and_never_overwrites_without_force(tmp_path):

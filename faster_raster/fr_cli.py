@@ -463,6 +463,7 @@ def command_preview_templates(args: argparse.Namespace) -> int:
 
 def command_sauce(args: argparse.Namespace) -> int:
     from faster_raster.source_pack import (
+        compile_source_materialization_request,
         compile_source_pack_handoff,
         compile_source_pack_plan,
         explain_source_pack,
@@ -554,6 +555,24 @@ def command_sauce(args: argparse.Namespace) -> int:
             f"Compiled {result['handoff_path']}\n"
             f"Plan SHA-256: {result['plan_sha256']}\n"
             "No network requests were made and no credential was resolved."
+        )
+        return 0
+    if command == "materialize-request":
+        request = compile_source_materialization_request(
+            args.plan,
+            requested_asset_roles=args.role,
+            full_object=args.full_object,
+            bbox=args.bbox,
+            bbox_crs=args.bbox_crs,
+            output_width=args.width,
+            output_height=args.height,
+        )
+        write_json_atomic(args.out, request)
+        _json(request) if args.json else print(
+            f"Compiled {args.out}\n"
+            f"Materialization request SHA-256: "
+            f"{request['materialization_request_sha256']}\n"
+            "No network requests were made and the frozen plan was not modified."
         )
         return 0
     if command == "time":
@@ -2140,6 +2159,29 @@ def build_parser() -> argparse.ArgumentParser:
     sauce_compile.add_argument("--selected")
     sauce_compile.add_argument("--json", action="store_true")
     sauce_compile.set_defaults(handler=command_sauce)
+    sauce_request = sauce_commands.add_parser(
+        "materialize-request",
+        help="compile canonical per-study Source Pack materialization intent offline",
+    )
+    sauce_request.add_argument("plan", type=Path)
+    sauce_request.add_argument("--out", type=Path, required=True)
+    sauce_request.add_argument("--role", action="append", required=True)
+    sauce_request.add_argument(
+        "--full-object",
+        action="store_true",
+        help="request the complete frozen object for static or verified-local sources",
+    )
+    sauce_request.add_argument(
+        "--bbox",
+        type=float,
+        nargs=4,
+        metavar=("MINX", "MINY", "MAXX", "MAXY"),
+    )
+    sauce_request.add_argument("--bbox-crs")
+    sauce_request.add_argument("--width", type=int)
+    sauce_request.add_argument("--height", type=int)
+    sauce_request.add_argument("--json", action="store_true")
+    sauce_request.set_defaults(handler=command_sauce)
     sauce_time = sauce_commands.add_parser(
         "time",
         help="emit ranked temporal alternatives or an explicit resolution",

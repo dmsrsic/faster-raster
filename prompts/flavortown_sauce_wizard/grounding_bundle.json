@@ -4,6 +4,7 @@
   "contract_schema_versions": [
     "fasterraster.source-pack/v1",
     "fasterraster.source-pack-plan/v1",
+    "fasterraster.source-materialization-request/v1",
     "fasterraster.credential-requirement/v1",
     "fasterraster.temporal-alternatives/v1",
     "fasterraster.temporal-resolution/v1",
@@ -19,6 +20,12 @@
       "path": "schemas/source_pack.schema.json",
       "role": "source_pack_schema",
       "sha256": "3f92893c219827cc0459239d52e45a787f55e19c65b3486f24059ab63695c4f8"
+    },
+    {
+      "bytes": 2826,
+      "path": "schemas/source_materialization_request.schema.json",
+      "role": "source_materialization_request_schema",
+      "sha256": "9453576bb4495a437509781f64888db3741e3c64461857c9e92440830acb7bfd"
     },
     {
       "bytes": 1221,
@@ -87,16 +94,16 @@
       "sha256": "0b6a16f0c879e9db45773eba2b3b5ec5d7da7d7b79b5732b0ebac1e5f485d34f"
     },
     {
-      "bytes": 3339,
+      "bytes": 3305,
       "path": "docs/flavortown-wizard.md",
       "role": "wizard_workflow",
-      "sha256": "978541c2d77d1b5c401314db6d99ee9e498ce0710ae835f7ff43a84e97f8f20d"
+      "sha256": "bc86f1ae31f1a31ffa55db8d173ef0dc371a1b8aa5bb729888fecac4eb1ed76f"
     },
     {
-      "bytes": 6768,
+      "bytes": 7722,
       "path": "docs/bring-your-own-sauce.md",
       "role": "source_pack_guide",
-      "sha256": "00f38f645933a179bf7e69a420ace632735b2ce0e2fa06d717ca77809cd9445b"
+      "sha256": "11a0ed5be1990f9c99d20d1b1d67703c8e7196cecc660657814072f9841a8ba1"
     },
     {
       "bytes": 2927,
@@ -135,16 +142,22 @@
       "sha256": "285a26f35e7dbf38a301e9476088047e7309d926f1e7f1bf4b8d25a8f7142bc4"
     },
     {
-      "bytes": 3537,
+      "bytes": 3843,
       "path": "examples/sauce-packs/prism-daily.sauce/golden_plan.json",
       "role": "no_auth_golden_plan",
-      "sha256": "4054dc26c3272e6449068c97c1009edda8624654a67fa4f43adc18bd74b7b8d4"
+      "sha256": "bab6d35755101e653227d1c264a8cce37977d145e3386ca9eec216efc9efc55f"
     },
     {
-      "bytes": 1145,
+      "bytes": 478,
+      "path": "examples/sauce-packs/prism-daily.sauce/golden_materialization_request.json",
+      "role": "no_auth_golden_materialization_request",
+      "sha256": "ac27ab4904d8c8331eeb40e6a8ec7bc062bfca5de10584ce6f9d7a50fcb8b74c"
+    },
+    {
+      "bytes": 1429,
       "path": "examples/sauce-packs/prism-daily.sauce/probe_fixture.json",
       "role": "temporal_fixture",
-      "sha256": "3dee8b0ee660c779c7a2e066aba62f1bfa3ae2eff13e9fccc6ed07d290232071"
+      "sha256": "ab47912462a71f9b4959e6d79f957a101d12254fa5d1393a92c555e45e98018e"
     },
     {
       "bytes": 1220,
@@ -153,16 +166,22 @@
       "sha256": "3f5f23a080378c3a8ad8295a87e828f7de99826d0c6429ddc91a49f571aff63b"
     },
     {
-      "bytes": 3891,
+      "bytes": 3922,
       "path": "examples/sauce-packs/copernicus-cdse.sauce/golden_plan.json",
       "role": "credential_golden_plan",
-      "sha256": "7ea5e968976bb04a2b91239f4a74421730ea3741b448d265dc1cea96949175a5"
+      "sha256": "2ba9b36d1cf7792ba1328f28baa5695e660457296e6294fde4e8c93539125200"
     },
     {
-      "bytes": 1079,
+      "bytes": 562,
+      "path": "examples/sauce-packs/copernicus-cdse.sauce/golden_materialization_request.json",
+      "role": "credential_golden_materialization_request",
+      "sha256": "4b6caa50a6ee34ba66aba930b7129b061158663ae32d9c0b275872e8e5c105cc"
+    },
+    {
+      "bytes": 1108,
       "path": "examples/sauce-packs/copernicus-cdse.sauce/probe_fixture.json",
       "role": "temporal_fixture",
-      "sha256": "6b9f23a107a8ed244897b6dde4af929b9494adfcb9b956ad21473e1b4eccec32"
+      "sha256": "5f826d81efe6093dea500f854c16ed87a5a0aed5a4aa35a8d3df468199790036"
     },
     {
       "bytes": 1187,
@@ -171,16 +190,22 @@
       "sha256": "934b9170b983726b55a27b882d84e9007e4e20d7f1a9cb85dd7aed45e983d1bf"
     },
     {
-      "bytes": 3320,
+      "bytes": 3494,
       "path": "examples/sauce-packs/usda-cdl-imageserver.sauce/golden_plan.json",
       "role": "arcgis_golden_plan",
-      "sha256": "3c7da72f15778cd1042bdbfde4f9daa470aef5706d23ed8fe33f265be61df0a4"
+      "sha256": "fef52c056e3734ff6d8065e7cf6ef41f38bb9f6d9e9f8502d6e4a9c2d149466a"
     },
     {
-      "bytes": 791,
+      "bytes": 610,
+      "path": "examples/sauce-packs/usda-cdl-imageserver.sauce/golden_materialization_request.json",
+      "role": "arcgis_golden_materialization_request",
+      "sha256": "d150a681640e9487df24a35801ca3e00651d75373fc4782f9a1ebe3110244bbb"
+    },
+    {
+      "bytes": 953,
       "path": "examples/sauce-packs/usda-cdl-imageserver.sauce/probe_fixture.json",
       "role": "arcgis_evidence_fixture",
-      "sha256": "d046c5fdc4410f96b0843c929e04c6b9ce9f20bd59eaf2cd763608792a9ef68b"
+      "sha256": "d4b7be0e5c873ed3750777916e028b19c24d237529b934cac4e42bd1a85eb93a"
     },
     {
       "bytes": 1174,
@@ -189,34 +214,40 @@
       "sha256": "717a05bc488c214cbd12c454ef519877d9b224ddeb07bf1509d21592d59fbfc3"
     },
     {
-      "bytes": 2718,
+      "bytes": 3257,
       "path": "examples/sauce-packs/verified-local-raster.sauce/golden_plan.json",
       "role": "verified_local_golden_plan",
-      "sha256": "2445ecdc3e63053a6ea5bd68cab6f4da9fcf63cb02def03cca23ddf9a5eb6218"
+      "sha256": "9d470ed793027932168879e75bbec9286a37fdfe2abfc7ec87fe028dd78dc855"
     },
     {
-      "bytes": 555,
+      "bytes": 482,
+      "path": "examples/sauce-packs/verified-local-raster.sauce/golden_materialization_request.json",
+      "role": "verified_local_golden_materialization_request",
+      "sha256": "ca7948d8d054c177ba8b96318ef5a3fde9e5a9539ab43b4d1414e737934817d3"
+    },
+    {
+      "bytes": 730,
       "path": "examples/sauce-packs/verified-local-raster.sauce/probe_fixture.json",
       "role": "synthetic_evidence_fixture",
-      "sha256": "67f3e95efa33c34faf2eada247b00593c137e44f548ee6cdde8429ee79cd10b2"
+      "sha256": "8f287d3310f08ef59f323ad111e6efa81a33aa117d5e2ed587859c39c9de871e"
     },
     {
-      "bytes": 1544,
+      "bytes": 1967,
       "path": "prompts/flavortown_sauce_wizard/CLI_REFERENCE.md",
       "role": "cli_reference",
-      "sha256": "19ca3faa56b4f2b80dfcef244ad7e378e35a8e775613388c98dcd4fef7e7974a"
+      "sha256": "53a64a588caaedf3b23fdfc129387da506d97b8e146a6057a99a02e4f115c8cb"
     },
     {
-      "bytes": 1461,
+      "bytes": 1709,
       "path": "prompts/flavortown_sauce_wizard/PUBLIC_PRIVATE_BOUNDARY.md",
       "role": "architecture_boundary",
-      "sha256": "7a1dee6435c59b6675d019d6573810a6782e2b459b8c4134ce0d0424c6494613"
+      "sha256": "e04005706254cf824650405265f1214de27fc104f441d0b114f626462c0f02fc"
     },
     {
-      "bytes": 2726,
+      "bytes": 2817,
       "path": "prompts/flavortown_sauce_wizard/SYSTEM_GUIDE.md",
       "role": "system_guide",
-      "sha256": "1c83e85a58b03c527503e3631fe38413ce7d70a588c45042c6e3524721779714"
+      "sha256": "61d5845f6a5587065f326eae3277d32c462d98fd21645bc43eb9c443d01f6554"
     },
     {
       "bytes": 8400,
@@ -225,7 +256,7 @@
       "sha256": "000ca5266e676c42f54b4fc838cd0ff751d89987c79246bfc27b7ef763cea728"
     }
   ],
-  "grounding_bundle_sha256": "34ff62b2ef86328050440255039ea46a758278d8ec1d6c0661b5a8bbaaafdfa6",
+  "grounding_bundle_sha256": "2bb6a7030ff7bc5c87e118d2a2d7cd60a0a82d6a7d1d47d2e4ec6a0a6b740aa1",
   "release": {
     "contract_status": "experimental",
     "development_label": "Unreleased",

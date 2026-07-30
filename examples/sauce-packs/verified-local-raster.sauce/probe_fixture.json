@@ -1,5 +1,10 @@
 {
   "family_contract": {
+    "delivery": {
+      "member": "fixture.tif",
+      "mode": "source_pack_member",
+      "sha256": "28a63c0533b155cbcd066ef8006d444f767366eb0cbba37aa5c0b4e898543e6a"
+    },
     "raster_identity": {
       "asset_roles": [
         "classification"

@@ -15,6 +15,91 @@ def source_pack_schema() -> dict[str, Any]:
     return schema
 
 
+def source_materialization_request_schema() -> dict[str, Any]:
+    sha256 = {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+    bbox = {
+        "type": "object",
+        "additionalProperties": False,
+        "required": ["mode", "bbox", "bbox_crs"],
+        "properties": {
+            "mode": {"const": "bbox"},
+            "bbox": {
+                "type": "array",
+                "prefixItems": [{"type": "number"}] * 4,
+                "minItems": 4,
+                "maxItems": 4,
+            },
+            "bbox_crs": {
+                "type": "string",
+                "pattern": "^EPSG:[1-9][0-9]{2,5}$",
+            },
+        },
+    }
+    full_object = {
+        "type": "object",
+        "additionalProperties": False,
+        "required": ["mode"],
+        "properties": {"mode": {"const": "full_object"}},
+    }
+    return {
+        "$schema": DRAFT,
+        "title": "FasterRaster Source Pack materialization request v1",
+        "type": "object",
+        "additionalProperties": False,
+        "required": [
+            "schema_version",
+            "pack_id",
+            "source_plan_sha256",
+            "requested_asset_roles",
+            "spatial_request",
+            "output_shape",
+            "original_source_plan_unchanged",
+            "materialization_request_sha256",
+        ],
+        "properties": {
+            "schema_version": {
+                "const": "fasterraster.source-materialization-request/v1"
+            },
+            "pack_id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_-]{2,63}$",
+            },
+            "source_plan_sha256": sha256,
+            "requested_asset_roles": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": True,
+                "items": {"type": "string", "minLength": 1},
+            },
+            "spatial_request": {"oneOf": [bbox, full_object]},
+            "output_shape": {
+                "oneOf": [
+                    {"type": "null"},
+                    {
+                        "type": "object",
+                        "additionalProperties": False,
+                        "required": ["width", "height"],
+                        "properties": {
+                            "width": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 16_384,
+                            },
+                            "height": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 16_384,
+                            },
+                        },
+                    },
+                ]
+            },
+            "original_source_plan_unchanged": {"const": True},
+            "materialization_request_sha256": sha256,
+        },
+    }
+
+
 def temporal_alternatives_schema() -> dict[str, Any]:
     return {
         "$schema": DRAFT,

@@ -1,0 +1,14 @@
+{
+  "materialization_request_sha256": "c7cd6aaa838b305fa62292a8eff7ab3a6a979b72d7b9cd75994b4a0de00263f0",
+  "original_source_plan_unchanged": true,
+  "output_shape": null,
+  "pack_id": "verified-local-raster",
+  "requested_asset_roles": [
+    "classification"
+  ],
+  "schema_version": "fasterraster.source-materialization-request/v1",
+  "source_plan_sha256": "a4eb7c4c0228721b9f77163b8b4555d16d58ca37fbecf91d422b0def28e87538",
+  "spatial_request": {
+    "mode": "full_object"
+  }
+}

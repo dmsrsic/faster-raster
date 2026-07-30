@@ -14,6 +14,10 @@ DEFAULT_ROOT = Path(__file__).resolve().parent.parent
 
 GROUNDING_FILES: tuple[tuple[str, str], ...] = (
     ("schemas/source_pack.schema.json", "source_pack_schema"),
+    (
+        "schemas/source_materialization_request.schema.json",
+        "source_materialization_request_schema",
+    ),
     ("schemas/credential_requirement.schema.json", "credential_schema"),
     ("schemas/temporal_alternatives.schema.json", "temporal_schema"),
     ("schemas/temporal_resolution.schema.json", "temporal_schema"),
@@ -53,6 +57,10 @@ GROUNDING_FILES: tuple[tuple[str, str], ...] = (
         "no_auth_golden_plan",
     ),
     (
+        "examples/sauce-packs/prism-daily.sauce/golden_materialization_request.json",
+        "no_auth_golden_materialization_request",
+    ),
+    (
         "examples/sauce-packs/prism-daily.sauce/probe_fixture.json",
         "temporal_fixture",
     ),
@@ -63,6 +71,10 @@ GROUNDING_FILES: tuple[tuple[str, str], ...] = (
     (
         "examples/sauce-packs/copernicus-cdse.sauce/golden_plan.json",
         "credential_golden_plan",
+    ),
+    (
+        "examples/sauce-packs/copernicus-cdse.sauce/golden_materialization_request.json",
+        "credential_golden_materialization_request",
     ),
     (
         "examples/sauce-packs/copernicus-cdse.sauce/probe_fixture.json",
@@ -77,6 +89,10 @@ GROUNDING_FILES: tuple[tuple[str, str], ...] = (
         "arcgis_golden_plan",
     ),
     (
+        "examples/sauce-packs/usda-cdl-imageserver.sauce/golden_materialization_request.json",
+        "arcgis_golden_materialization_request",
+    ),
+    (
         "examples/sauce-packs/usda-cdl-imageserver.sauce/probe_fixture.json",
         "arcgis_evidence_fixture",
     ),
@@ -87,6 +103,10 @@ GROUNDING_FILES: tuple[tuple[str, str], ...] = (
     (
         "examples/sauce-packs/verified-local-raster.sauce/golden_plan.json",
         "verified_local_golden_plan",
+    ),
+    (
+        "examples/sauce-packs/verified-local-raster.sauce/golden_materialization_request.json",
+        "verified_local_golden_materialization_request",
     ),
     (
         "examples/sauce-packs/verified-local-raster.sauce/probe_fixture.json",
@@ -164,6 +184,7 @@ def build_grounding_bundle(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
         "contract_schema_versions": [
             "fasterraster.source-pack/v1",
             "fasterraster.source-pack-plan/v1",
+            "fasterraster.source-materialization-request/v1",
             "fasterraster.credential-requirement/v1",
             "fasterraster.temporal-alternatives/v1",
             "fasterraster.temporal-resolution/v1",

@@ -13,8 +13,9 @@ import urllib.parse
 import urllib.request
 import zipfile
 from dataclasses import dataclass
+from math import isfinite
 from pathlib import Path, PurePosixPath
-from typing import Any, Literal, Mapping
+from typing import Any, Literal, Mapping, Sequence
 
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
@@ -31,6 +32,9 @@ SOURCE_PACK_SCHEMA_VERSION = "fasterraster.source-pack/v1"
 SOURCE_PLAN_SCHEMA_VERSION = "fasterraster.source-pack-plan/v1"
 CREDENTIAL_SCHEMA_VERSION = "fasterraster.credential-requirement/v1"
 PACK_ARCHIVE_SCHEMA_VERSION = "fasterraster.source-pack-archive/v1"
+MATERIALIZATION_REQUEST_SCHEMA_VERSION = (
+    "fasterraster.source-materialization-request/v1"
+)
 ADAPTER_FAMILIES = {
     "static_https_template",
     "arcgis_imageserver",
@@ -490,6 +494,47 @@ def _family_contract(
                     errors.append("archive member_pattern must be a safe relative pattern")
                 if archive.get("selection") not in {"single_match", "lexicographic_first"}:
                     errors.append("archive selection must be deterministic")
+                companions = archive.get("required_companions")
+                if not isinstance(companions, list):
+                    errors.append("archive required_companions must be an array")
+                else:
+                    for companion in companions:
+                        companion_pattern = str(companion or "")
+                        if (
+                            not companion_pattern
+                            or companion_pattern.startswith(("/", "\\"))
+                            or ".." in PurePosixPath(
+                                companion_pattern.replace("{stem}", "primary")
+                            ).parts
+                            or set(_template_fields(companion_pattern)) - {"stem"}
+                        ):
+                            errors.append(
+                                "archive companion patterns must be safe relative {stem} templates"
+                            )
+                archive_limits = {
+                    "maximum_members": (1, 10_000),
+                    "maximum_uncompressed_bytes": (1, 2_000_000_000),
+                    "maximum_compression_ratio": (1, 10_000),
+                }
+                for field, (minimum, maximum) in archive_limits.items():
+                    value = archive.get(field)
+                    if (
+                        not isinstance(value, int)
+                        or isinstance(value, bool)
+                        or not minimum <= value <= maximum
+                    ):
+                        errors.append(f"archive {field} is outside supported bounds")
+                compression_methods = archive.get("allowed_compression_methods")
+                if (
+                    not isinstance(compression_methods, list)
+                    or not compression_methods
+                    or compression_methods
+                    != sorted(set(str(item) for item in compression_methods))
+                    or not set(compression_methods).issubset({"stored", "deflated"})
+                ):
+                    errors.append(
+                        "archive allowed_compression_methods must be a canonical safe subset"
+                    )
     elif adapter.family == "arcgis_imageserver":
         parsed = urllib.parse.urlsplit(adapter.endpoint or "")
         if not parsed.path.rstrip("/").endswith("/ImageServer"):
@@ -512,12 +557,45 @@ def _family_contract(
             errors.append("arcgis_imageserver requires bounded maximum_dimensions")
         if contract.get("temporal_parameter") not in {"time", "mosaicRule"}:
             errors.append("arcgis_imageserver requires an explicit temporal_parameter")
+        fixed_query = contract.get("fixed_query_parameters")
+        if not isinstance(fixed_query, Mapping) or fixed_query != {
+            "f": "image",
+            "format": "tiff",
+        }:
+            errors.append(
+                "arcgis_imageserver fixed_query_parameters must request a TIFF image"
+            )
+        if contract.get("tiling_order") != "row_major_exact_grid":
+            errors.append(
+                "arcgis_imageserver tiling_order must be row_major_exact_grid"
+            )
+        estimated_bytes = contract.get("estimated_bytes_per_pixel")
+        if (
+            not isinstance(estimated_bytes, int)
+            or isinstance(estimated_bytes, bool)
+            or not 1 <= estimated_bytes <= 64
+        ):
+            errors.append(
+                "arcgis_imageserver estimated_bytes_per_pixel is outside supported bounds"
+            )
         query_order = contract.get("query_parameter_order")
+        expected_query_keys = {
+            "bbox",
+            "bboxSR",
+            "f",
+            "format",
+            "imageSR",
+            "size",
+            str(contract.get("temporal_parameter") or ""),
+        }
         if (
             not isinstance(query_order, list)
             or query_order != sorted(set(str(item) for item in query_order))
+            or set(query_order) != expected_query_keys
         ):
-            errors.append("ArcGIS query parameters require unique deterministic ordering")
+            errors.append(
+                "ArcGIS query parameters require the exact canonical key set"
+            )
         if source.semantic_type == "categorical" and source.resampling not in {"nearest", "mode"}:
             errors.append("ArcGIS categorical exports require nearest or mode resampling")
     elif adapter.family == "stac_search":
@@ -531,6 +609,8 @@ def _family_contract(
             errors.append("stac_search requires collection identity")
         if contract.get("temporal_representation") not in {"datetime", "interval"}:
             errors.append("stac_search requires datetime or interval temporal representation")
+        if contract.get("bbox_crs") != "EPSG:4326":
+            errors.append("stac_search bbox_crs must be EPSG:4326")
         selection = contract.get("asset_selection")
         if not isinstance(selection, Mapping):
             errors.append("stac_search requires deterministic asset_selection")
@@ -587,6 +667,17 @@ def _family_contract(
                 errors.append(
                     "verified local raster identity must match the explicit source contract"
                 )
+        delivery = contract.get("delivery")
+        if not isinstance(delivery, Mapping):
+            errors.append("verified_local_raster requires a delivery contract")
+        elif delivery != {
+            "mode": "source_pack_member",
+            "member": adapter.local_path,
+            "sha256": adapter.local_sha256,
+        }:
+            errors.append(
+                "verified local delivery must exactly identify the checksum-pinned pack member"
+            )
     return identity, evidence_result, contract
 
 
@@ -878,6 +969,7 @@ def compile_source_pack_plan(
             "kind": "verified_local_reference",
             "local_reference": manifest.adapter.local_path,
             "local_sha256": manifest.adapter.local_sha256,
+            "family_contract": validation["family_contract"],
         }
     else:
         endpoint_contract = {
@@ -962,6 +1054,239 @@ def compile_source_pack_plan(
     }
     stable["plan_sha256"] = _canonical_hash(stable, {"plan_sha256"})
     return stable
+
+
+def _load_json_object(
+    source: Path | Mapping[str, Any],
+    *,
+    contract_name: str,
+) -> dict[str, Any]:
+    if isinstance(source, Path):
+        try:
+            value = json.loads(source.read_text(encoding="utf-8"))
+        except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+            raise ValueError(f"unable to read {contract_name}: {exc}") from exc
+    else:
+        value = dict(source)
+    if not isinstance(value, dict):
+        raise ValueError(f"{contract_name} must be a JSON object")
+    return value
+
+
+def _validated_frozen_source_plan(
+    source: Path | Mapping[str, Any],
+) -> dict[str, Any]:
+    plan = _load_json_object(source, contract_name="frozen Source Pack plan")
+    if plan.get("schema_version") != SOURCE_PLAN_SCHEMA_VERSION:
+        raise ValueError(
+            f"unsupported Source Pack plan schema version: {plan.get('schema_version')!r}"
+        )
+    expected_hash = plan.get("plan_sha256")
+    if (
+        not isinstance(expected_hash, str)
+        or not re.fullmatch(r"[a-f0-9]{64}", expected_hash)
+        or expected_hash != _canonical_hash(plan, {"plan_sha256"})
+    ):
+        raise ValueError("Source Pack plan SHA-256 mismatch")
+    if (
+        plan.get("status") not in {"READY", "CREDENTIAL_REQUIRED"}
+        or plan.get("executable") is not True
+        or plan.get("blocked_before_network") is not False
+    ):
+        raise ValueError("Source Pack plan is blocked or non-executable")
+    validation = plan.get("validation")
+    required_validation = {
+        "schema": "SCHEMA_VALID",
+        "family_contract": "VALID",
+        "provider_evidence": "COMPLETE",
+        "offline_planning": "READY_FOR_OFFLINE_DETERMINISTIC_PLANNING",
+    }
+    if not isinstance(validation, Mapping) or any(
+        validation.get(field) != expected
+        for field, expected in required_validation.items()
+    ):
+        raise ValueError("Source Pack plan validation state is not executable")
+    if plan.get("temporal_alternatives") is not None and plan.get(
+        "temporal_resolution"
+    ) is None:
+        raise ValueError("Source Pack plan has unresolved temporal alternatives")
+    return plan
+
+
+def compile_source_materialization_request(
+    source_plan: Path | Mapping[str, Any],
+    *,
+    requested_asset_roles: Sequence[str],
+    full_object: bool = False,
+    bbox: Sequence[int | float] | None = None,
+    bbox_crs: str | None = None,
+    output_width: int | None = None,
+    output_height: int | None = None,
+) -> dict[str, Any]:
+    """Compile deterministic per-study intent without network access."""
+    plan = _validated_frozen_source_plan(source_plan)
+    adapter = plan.get("adapter")
+    if not isinstance(adapter, Mapping):
+        raise ValueError("Source Pack plan adapter is missing")
+    family = str(adapter.get("family") or "")
+    declared_roles = [str(item) for item in adapter.get("asset_roles") or []]
+    roles = sorted(set(str(item) for item in requested_asset_roles))
+    if not roles:
+        raise ValueError("requested_asset_roles must be nonempty")
+    if any(not role or role not in declared_roles for role in roles):
+        raise ValueError("requested asset roles must be declared by the Source Pack plan")
+
+    spatial_families = {"stac_search", "arcgis_imageserver"}
+    full_object_families = {"static_https_template", "verified_local_raster"}
+    if family in spatial_families:
+        if full_object:
+            raise ValueError(f"{family} requires an explicit spatial bbox")
+        if bbox is None or len(bbox) != 4:
+            raise ValueError(f"{family} requires a four-value bbox")
+        try:
+            canonical_bbox = [float(item) for item in bbox]
+        except (TypeError, ValueError) as exc:
+            raise ValueError("bbox values must be finite numbers") from exc
+        if not all(isfinite(item) for item in canonical_bbox):
+            raise ValueError("bbox values must be finite numbers")
+        if (
+            canonical_bbox[0] >= canonical_bbox[2]
+            or canonical_bbox[1] >= canonical_bbox[3]
+        ):
+            raise ValueError("bbox bounds must be strictly increasing")
+        endpoint = plan.get("endpoint_contract")
+        family_contract = (
+            endpoint.get("family_contract")
+            if isinstance(endpoint, Mapping)
+            else None
+        )
+        required_crs = (
+            family_contract.get("bbox_crs")
+            if isinstance(family_contract, Mapping)
+            else None
+        )
+        if (
+            not isinstance(bbox_crs, str)
+            or not re.fullmatch(r"EPSG:[1-9][0-9]{2,5}", bbox_crs)
+            or bbox_crs != required_crs
+        ):
+            raise ValueError(
+                f"bbox_crs must exactly match the frozen family contract {required_crs!r}"
+            )
+        spatial_request: dict[str, Any] = {
+            "mode": "bbox",
+            "bbox": canonical_bbox,
+            "bbox_crs": bbox_crs,
+        }
+    elif family in full_object_families:
+        if not full_object:
+            raise ValueError(f"{family} requires an explicit full-object request")
+        if bbox is not None or bbox_crs is not None:
+            raise ValueError(f"{family} does not accept a spatial bbox")
+        spatial_request = {"mode": "full_object"}
+    else:
+        raise ValueError(f"unsupported Source Pack adapter family: {family!r}")
+
+    if family == "arcgis_imageserver":
+        if (
+            not isinstance(output_width, int)
+            or isinstance(output_width, bool)
+            or not isinstance(output_height, int)
+            or isinstance(output_height, bool)
+            or not 1 <= output_width <= 16_384
+            or not 1 <= output_height <= 16_384
+        ):
+            raise ValueError(
+                "ImageServer output width and height must be integers from 1 to 16384"
+            )
+        output_shape: dict[str, int] | None = {
+            "width": output_width,
+            "height": output_height,
+        }
+    else:
+        if output_width is not None or output_height is not None:
+            raise ValueError(f"{family} does not accept an output shape")
+        output_shape = None
+
+    stable = {
+        "schema_version": MATERIALIZATION_REQUEST_SCHEMA_VERSION,
+        "pack_id": plan["pack_id"],
+        "source_plan_sha256": plan["plan_sha256"],
+        "requested_asset_roles": roles,
+        "spatial_request": spatial_request,
+        "output_shape": output_shape,
+        "original_source_plan_unchanged": True,
+    }
+    stable["materialization_request_sha256"] = _canonical_hash(
+        stable,
+        {"materialization_request_sha256"},
+    )
+    return stable
+
+
+def validate_source_materialization_request(
+    source_plan: Path | Mapping[str, Any],
+    request: Path | Mapping[str, Any],
+) -> dict[str, Any]:
+    plan = _validated_frozen_source_plan(source_plan)
+    value = _load_json_object(
+        request,
+        contract_name="Source Pack materialization request",
+    )
+    expected_keys = {
+        "schema_version",
+        "pack_id",
+        "source_plan_sha256",
+        "requested_asset_roles",
+        "spatial_request",
+        "output_shape",
+        "original_source_plan_unchanged",
+        "materialization_request_sha256",
+    }
+    if set(value) != expected_keys:
+        raise ValueError("materialization request contains unknown or missing fields")
+    if value.get("schema_version") != MATERIALIZATION_REQUEST_SCHEMA_VERSION:
+        raise ValueError(
+            "unsupported Source Pack materialization-request schema version"
+        )
+    if value.get("pack_id") != plan.get("pack_id"):
+        raise ValueError("materialization request pack_id differs from the plan")
+    if value.get("source_plan_sha256") != plan.get("plan_sha256"):
+        raise ValueError("materialization request references a different plan hash")
+    if value.get("original_source_plan_unchanged") is not True:
+        raise ValueError("materialization request must preserve the frozen source plan")
+    expected_hash = value.get("materialization_request_sha256")
+    if (
+        not isinstance(expected_hash, str)
+        or not re.fullmatch(r"[a-f0-9]{64}", expected_hash)
+        or expected_hash
+        != _canonical_hash(value, {"materialization_request_sha256"})
+    ):
+        raise ValueError("materialization request SHA-256 mismatch")
+    spatial = value.get("spatial_request")
+    if not isinstance(spatial, Mapping):
+        raise ValueError("materialization request spatial_request is missing")
+    mode = spatial.get("mode")
+    compiled = compile_source_materialization_request(
+        plan,
+        requested_asset_roles=value.get("requested_asset_roles") or [],
+        full_object=mode == "full_object",
+        bbox=spatial.get("bbox") if mode == "bbox" else None,
+        bbox_crs=spatial.get("bbox_crs") if mode == "bbox" else None,
+        output_width=(
+            value["output_shape"].get("width")
+            if isinstance(value.get("output_shape"), Mapping)
+            else None
+        ),
+        output_height=(
+            value["output_shape"].get("height")
+            if isinstance(value.get("output_shape"), Mapping)
+            else None
+        ),
+    )
+    if value != compiled:
+        raise ValueError("materialization request is not canonical")
+    return value
 
 
 def compile_source_pack_handoff(

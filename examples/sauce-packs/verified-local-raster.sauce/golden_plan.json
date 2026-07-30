@@ -20,6 +20,26 @@
   },
   "credential_requirement": null,
   "endpoint_contract": {
+    "family_contract": {
+      "delivery": {
+        "member": "fixture.tif",
+        "mode": "source_pack_member",
+        "sha256": "28a63c0533b155cbcd066ef8006d444f767366eb0cbba37aa5c0b4e898543e6a"
+      },
+      "raster_identity": {
+        "asset_roles": [
+          "classification"
+        ],
+        "crs": "EPSG:4326",
+        "mask_policy": "explicit_nodata",
+        "media_types": [
+          "image/tiff"
+        ],
+        "nodata": 255,
+        "resampling": "nearest",
+        "semantic_type": "categorical"
+      }
+    },
     "kind": "verified_local_reference",
     "local_reference": "fixture.tif",
     "local_sha256": "28a63c0533b155cbcd066ef8006d444f767366eb0cbba37aa5c0b4e898543e6a"
@@ -45,7 +65,7 @@
   },
   "original_pack_unchanged": true,
   "pack_id": "verified-local-raster",
-  "plan_sha256": "9e2048fa7f069801ae4ad5d05e346c903702e6fb106d4a0f0d223c2bb44b41ba",
+  "plan_sha256": "a4eb7c4c0228721b9f77163b8b4555d16d58ca37fbecf91d422b0def28e87538",
   "preview": {
     "role": "classification",
     "target_crs": "EPSG:4326",
@@ -88,6 +108,6 @@
     "offline_planning": "READY_FOR_OFFLINE_DETERMINISTIC_PLANNING",
     "provider_evidence": "COMPLETE",
     "schema": "SCHEMA_VALID",
-    "validation_sha256": "0069909e2a6bf7c2c2af9cefc8aa876f7bdfae13eed8d2b5f75a96daa9e2ea3c"
+    "validation_sha256": "510cc4ab30d227d8cb916f399e60f0beb6eb07bed2feb728faecbc4d06bb4e0d"
   }
 }

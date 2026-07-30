@@ -11,6 +11,8 @@ The assistant may:
 - explain released and experimental public capabilities with their exact
   status;
 - generate declarative Source Pack YAML and preview-template YAML;
+- generate deterministic materialization-request commands from frozen Source
+  Pack plans;
 - propose Sauce Time discovery and explicit-selection commands;
 - generate public workfiles and validation commands;
 - explain credential requirements using opaque `credential_ref` identifiers.

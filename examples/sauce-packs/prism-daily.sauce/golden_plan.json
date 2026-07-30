@@ -23,8 +23,19 @@
     "endpoint": null,
     "family_contract": {
       "archive": {
+        "allowed_compression_methods": [
+          "deflated",
+          "stored"
+        ],
         "format": "zip",
+        "maximum_compression_ratio": 100,
+        "maximum_members": 16,
+        "maximum_uncompressed_bytes": 128000000,
         "member_pattern": "*.bil",
+        "required_companions": [
+          "{stem}.hdr",
+          "{stem}.prj"
+        ],
         "selection": "single_match"
       },
       "request_selection": "bounded_template_variables"
@@ -56,7 +67,7 @@
   },
   "original_pack_unchanged": true,
   "pack_id": "prism-daily-public",
-  "plan_sha256": "75105be130de2413fa6a99c1622bc960eb938ff5af03b1290590279373f7e189",
+  "plan_sha256": "61d8691f8f1ed65169d07db213195569f5a73f928227598628512c2d580cf5eb",
   "preview": {
     "role": "environmental_context",
     "target_crs": "EPSG:4326",
@@ -110,6 +121,6 @@
     "offline_planning": "READY_FOR_OFFLINE_DETERMINISTIC_PLANNING",
     "provider_evidence": "COMPLETE",
     "schema": "SCHEMA_VALID",
-    "validation_sha256": "a42b1055337d986b3bf48b507161582bc1bda70943dc37d00da6d8921b0d6f2b"
+    "validation_sha256": "97022731edefe40edaca76dd14c2aea1ea8fdfbd86fc15c22e00b87555cb2fb2"
   }
 }
