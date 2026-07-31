@@ -1,0 +1,13 @@
+{
+  "identity": {
+    "collection": "ESA/WorldCover/v200",
+    "product": "ESA WorldCover 2021",
+    "provider": "GOOGLE_EARTH_ENGINE"
+  },
+  "provider_evidence": {
+    "official_documentation": [
+      "https://developers.google.com/earth-engine/datasets/catalog/ESA_WorldCover_v200"
+    ],
+    "status": "complete"
+  }
+}

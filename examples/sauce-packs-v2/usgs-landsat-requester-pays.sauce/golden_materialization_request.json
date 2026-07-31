@@ -1,0 +1,33 @@
+{
+  "authorization": {
+    "allow_chargeable_access": true,
+    "credential_ref": "aws-research-account",
+    "project_ref": null
+  },
+  "earth_engine_selection": null,
+  "limits": {
+    "max_compute_requests": 0,
+    "max_network_bytes": 201000000,
+    "max_network_requests": 2
+  },
+  "materialization_content_sha256": "065baa81254ffdad9f7ca3874d12b8bd049ed02d3ba2b03826eabbbf61de7216",
+  "materialization_request_sha256": "2a5399e032183472a6aa7afa0e4bf009d1e3dd932de88da3afe15c99c5071e0e",
+  "original_source_plan_unchanged": true,
+  "output_grid": null,
+  "pack_id": "usgs-landsat-requester-pays",
+  "requested_asset_roles": [
+    "red"
+  ],
+  "schema_version": "fasterraster.source-materialization-request/v2",
+  "source_plan_sha256": "bbb338347894ee9840dd86619cd2d49b99b831c957706f20190ce2ddbb84c372",
+  "spatial_request": {
+    "bbox": [
+      -101.06,
+      39.38,
+      -101.04,
+      39.4
+    ],
+    "bbox_crs": "EPSG:4326",
+    "mode": "bbox"
+  }
+}

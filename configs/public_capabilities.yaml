@@ -100,6 +100,28 @@ capabilities:
     credential_requirement: opaque_reference_only
     public_execution: fails_before_network_without_resolver
     notes: Resolved secrets are excluded from public plans, logs, cache keys, receipts, and archives.
+  - capability_id: stac_asset_access_v2
+    label: Versioned generic STAC asset-access contracts
+    kind: boundary
+    status: experimental
+    planning: true
+    preview: false
+    materialization: false
+    analysis: false
+    credential_requirement: operation_scoped_opaque_reference
+    public_execution: frozen_contract_only
+    notes: Direct HTTPS, bearer HTTPS, ephemeral signer, public S3, and Requester Pays S3 are provider-neutral v2 contracts; authenticated execution is private.
+  - capability_id: earth_engine_compute_contract
+    label: Closed Earth Engine computation contracts
+    kind: boundary
+    status: experimental
+    planning: true
+    preview: false
+    materialization: false
+    analysis: false
+    credential_requirement: opaque_google_adc_and_project_reference
+    public_execution: contract_compilation_only
+    notes: The public compiler emits a deterministic closed operation list and output grid; the public repository does not execute Earth Engine.
   - capability_id: private_execution_backend
     label: Authenticated parallel execution backend
     kind: boundary

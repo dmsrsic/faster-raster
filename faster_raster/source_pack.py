@@ -15,7 +15,7 @@ import zipfile
 from dataclasses import dataclass
 from math import isfinite
 from pathlib import Path, PurePosixPath
-from typing import Any, Literal, Mapping, Sequence
+from typing import Annotated, Any, Literal, Mapping, Sequence
 
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
@@ -31,9 +31,15 @@ from faster_raster.temporal_alternatives import (
 SOURCE_PACK_SCHEMA_VERSION = "fasterraster.source-pack/v1"
 SOURCE_PLAN_SCHEMA_VERSION = "fasterraster.source-pack-plan/v1"
 CREDENTIAL_SCHEMA_VERSION = "fasterraster.credential-requirement/v1"
+SOURCE_PACK_SCHEMA_VERSION_V2 = "fasterraster.source-pack/v2"
+SOURCE_PLAN_SCHEMA_VERSION_V2 = "fasterraster.source-pack-plan/v2"
+CREDENTIAL_SCHEMA_VERSION_V2 = "fasterraster.credential-requirement/v2"
 PACK_ARCHIVE_SCHEMA_VERSION = "fasterraster.source-pack-archive/v1"
 MATERIALIZATION_REQUEST_SCHEMA_VERSION = (
     "fasterraster.source-materialization-request/v1"
+)
+MATERIALIZATION_REQUEST_SCHEMA_VERSION_V2 = (
+    "fasterraster.source-materialization-request/v2"
 )
 ADAPTER_FAMILIES = {
     "static_https_template",
@@ -42,6 +48,20 @@ ADAPTER_FAMILIES = {
     "verified_local_raster",
 }
 AUTH_SCHEMES = {"none", "bearer", "api_key", "oauth2"}
+ASSET_ACCESS_MODES = {
+    "direct_https",
+    "s3_public",
+    "s3_requester_pays",
+    "brokered_signed_https",
+    "bearer_https",
+    "s3_compatible_credentialed",
+}
+V2_CREDENTIAL_SCHEMES = {
+    "aws_sigv4",
+    "ephemeral_https_signer",
+    "oauth2_bearer",
+    "s3_compatible",
+}
 ALLOWED_TEMPLATE_VARIABLES = {
     "year",
     "month",
@@ -208,12 +228,190 @@ class SourcePackManifest(BaseModel):
     preview: PreviewContract
 
 
+class AdapterContractV2(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    family: Literal[
+        "static_https_template",
+        "arcgis_imageserver",
+        "stac_search",
+        "verified_local_raster",
+        "earth_engine_compute",
+    ]
+    endpoint: str | None = None
+    url_template: str | None = None
+    local_path: str | None = None
+    local_sha256: str | None = None
+    media_types: list[str] = Field(min_length=1)
+    asset_roles: list[str] = Field(min_length=1)
+
+
+class AccessContractV2(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    authentication_scheme: Literal["none", "bearer", "api_key", "oauth2"] = "none"
+    allowed_hosts: list[str] = Field(default_factory=list)
+    redirect_hosts: list[str] = Field(default_factory=list)
+    asset_hosts: list[str] = Field(default_factory=list)
+    asset_host_suffixes: list[str] = Field(default_factory=list)
+    resolver_hosts: list[str] = Field(default_factory=list)
+    resolver_host_suffixes: list[str] = Field(default_factory=list)
+
+
+class StableHrefIdentity(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    href_policy: Literal[
+        "selected_stac_asset",
+        "unsigned_selected_stac_asset",
+    ]
+
+
+class StableS3Identity(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    scheme: Literal["s3"] = "s3"
+    bucket: str
+    region: str
+    key_policy: Literal["selected_stac_asset"]
+
+
+class ResolverContract(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    scheme: Literal["ephemeral_https_signer"]
+    endpoint: str
+    method: Literal["GET"] = "GET"
+    href_parameter: Literal["href"] = "href"
+    response_field: Literal["href"] = "href"
+
+
+class DirectHttpsAssetAccess(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    mode: Literal["direct_https"]
+    stable_identity: StableHrefIdentity
+
+
+class PublicS3AssetAccess(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    mode: Literal["s3_public"]
+    stable_identity: StableS3Identity
+
+
+class RequesterPaysBilling(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    mode: Literal["requester_pays"]
+    explicit_study_consent_required: Literal[True] = True
+    explicit_runtime_permission_required: Literal[True] = True
+
+
+class RequesterPaysS3AssetAccess(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    mode: Literal["s3_requester_pays"]
+    stable_identity: StableS3Identity
+    credential_scheme: Literal["aws_sigv4"] = "aws_sigv4"
+    billing: RequesterPaysBilling
+
+
+class BrokeredSignedHttpsAssetAccess(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    mode: Literal["brokered_signed_https"]
+    stable_identity: StableHrefIdentity
+    resolver: ResolverContract
+
+
+class BearerHttpsAssetAccess(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    mode: Literal["bearer_https"]
+    stable_identity: StableHrefIdentity
+    credential_scheme: Literal["oauth2_bearer"] = "oauth2_bearer"
+
+
+class S3CompatibleCredentialedAssetAccess(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    mode: Literal["s3_compatible_credentialed"]
+    stable_identity: StableS3Identity
+    endpoint: str
+    credential_scheme: Literal["s3_compatible"] = "s3_compatible"
+    executable: Literal[False] = False
+
+
+AssetAccessContract = Annotated[
+    DirectHttpsAssetAccess
+    | PublicS3AssetAccess
+    | RequesterPaysS3AssetAccess
+    | BrokeredSignedHttpsAssetAccess
+    | BearerHttpsAssetAccess
+    | S3CompatibleCredentialedAssetAccess,
+    Field(discriminator="mode"),
+]
+
+
+class EarthEngineBandContract(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    name: str
+    semantic_type: Literal["categorical", "continuous"]
+    data_type: str
+
+
+class EarthEngineContract(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    dataset_id: str
+    dataset_type: Literal["image", "image_collection"]
+    bands: list[EarthEngineBandContract] = Field(min_length=1)
+    allowed_operations: list[
+        Literal[
+            "load_image",
+            "load_collection",
+            "filter_bounds",
+            "filter_date",
+            "sort_acquisition_time",
+            "tie_break_system_index",
+            "select_first",
+            "select_bands",
+        ]
+    ] = Field(min_length=1)
+    credential_scheme: Literal["google_adc"] = "google_adc"
+    max_uncompressed_response_bytes: int = Field(gt=0, le=48_000_000)
+    max_width: int = Field(gt=0, le=32_000)
+    max_height: int = Field(gt=0, le=32_000)
+    max_bands: int = Field(gt=0, le=1_024)
+
+
+class SourcePackManifestV2(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    schema_version: Literal["fasterraster.source-pack/v2"]
+    pack_id: str
+    display_name: str
+    description: str
+    adapter: AdapterContractV2
+    capabilities: CapabilityContract
+    source: SourceContract
+    access: AccessContractV2
+    asset_access: AssetAccessContract | None = None
+    network: NetworkContract
+    temporal: TemporalContract
+    preview: PreviewContract
+    family_contract: dict[str, Any]
+    earth_engine: EarthEngineContract | None = None
+
+
 @dataclass(frozen=True)
 class SourcePack:
     input_path: Path
     files: dict[str, bytes]
     manifest_name: str
-    manifest: SourcePackManifest
+    manifest: SourcePackManifest | SourcePackManifestV2
 
     @property
     def source_pack_sha256(self) -> str:
@@ -308,7 +506,13 @@ def load_source_pack(path: Path) -> SourcePack:
     manifest_name = manifests[0]
     try:
         raw = yaml.safe_load(files[manifest_name].decode("utf-8"))
-        manifest = SourcePackManifest.model_validate(raw)
+        schema_version = raw.get("schema_version") if isinstance(raw, Mapping) else None
+        manifest_model = (
+            SourcePackManifestV2
+            if schema_version == SOURCE_PACK_SCHEMA_VERSION_V2
+            else SourcePackManifest
+        )
+        manifest = manifest_model.model_validate(raw)
     except (UnicodeDecodeError, yaml.YAMLError, ValidationError) as exc:
         raise ValueError(f"invalid Source Pack manifest: {exc}") from exc
     return SourcePack(source, files, manifest_name, manifest)
@@ -327,6 +531,13 @@ def _valid_host(host: str) -> str:
             raise ValueError(f"invalid host {host!r}")
     else:
         raise ValueError(f"literal IP hosts are not allowed: {host!r}")
+    return value
+
+
+def _valid_host_suffix(host: str) -> str:
+    value = _valid_host(host)
+    if "." not in value:
+        raise ValueError(f"host suffix must contain a public DNS boundary: {host!r}")
     return value
 
 
@@ -369,6 +580,19 @@ def _secret_findings(files: Mapping[str, bytes]) -> list[str]:
         if isinstance(value, Mapping):
             for key, item in value.items():
                 key_text = str(key).lower()
+                if (
+                    key_text == "authorization"
+                    and isinstance(item, Mapping)
+                    and set(item).issubset(
+                        {
+                            "credential_ref",
+                            "project_ref",
+                            "allow_chargeable_access",
+                        }
+                    )
+                ):
+                    inspect(item, f"{location}.{key}")
+                    continue
                 if key_text in SECRET_KEYS:
                     findings.append(f"{location}: secret-bearing field {key!r} is forbidden")
                 inspect(item, f"{location}.{key}")
@@ -466,7 +690,11 @@ def _family_contract(
         ),
     }
 
-    raw_contract = fixture.get("family_contract")
+    raw_contract = (
+        pack.manifest.family_contract
+        if isinstance(pack.manifest, SourcePackManifestV2)
+        else fixture.get("family_contract")
+    )
     if not isinstance(raw_contract, Mapping):
         raw_contract = {}
     contract = dict(raw_contract)
@@ -634,8 +862,14 @@ def _family_contract(
             item_limit = selection.get("item_limit")
             if not isinstance(item_limit, int) or not 1 <= item_limit <= 100:
                 errors.append("STAC item_limit must be between 1 and 100")
-        if not pack.manifest.access.asset_hosts:
-            errors.append("stac_search requires a separate nonempty asset_hosts scope")
+        if not pack.manifest.access.asset_hosts and not getattr(
+            pack.manifest.access,
+            "asset_host_suffixes",
+            [],
+        ):
+            errors.append(
+                "stac_search requires a separate nonempty asset host scope"
+            )
         if sorted(contract.get("asset_host_scope") or []) != sorted(
             pack.manifest.access.asset_hosts
         ):
@@ -682,6 +916,36 @@ def _family_contract(
             errors.append(
                 "verified local delivery must exactly identify the checksum-pinned pack member"
             )
+    elif adapter.family == "earth_engine_compute":
+        if not isinstance(pack.manifest, SourcePackManifestV2):
+            errors.append("earth_engine_compute requires a v2 Source Pack")
+        else:
+            if adapter.endpoint or adapter.url_template or adapter.local_path:
+                errors.append(
+                    "earth_engine_compute must not declare a download endpoint or path"
+                )
+            earth_engine = pack.manifest.earth_engine
+            if earth_engine is None:
+                errors.append("earth_engine_compute requires earth_engine metadata")
+            else:
+                band_names = [item.name for item in earth_engine.bands]
+                if band_names != sorted(set(band_names)):
+                    errors.append("Earth Engine band names must be canonical and unique")
+                if not set(adapter.asset_roles).issubset(set(band_names)):
+                    errors.append(
+                        "Earth Engine adapter roles must be declared dataset bands"
+                    )
+                if (
+                    earth_engine.dataset_type == "image_collection"
+                    and "select_first" not in earth_engine.allowed_operations
+                ):
+                    errors.append(
+                        "Earth Engine image collections require deterministic terminal selection"
+                    )
+                if source.semantic_type == "categorical" and source.resampling != "nearest":
+                    errors.append(
+                        "Earth Engine categorical sources require nearest resampling"
+                    )
     return identity, evidence_result, contract
 
 
@@ -713,6 +977,25 @@ def validate_loaded_source_pack(pack: SourcePack) -> dict[str, Any]:
             asset_hosts.add(_valid_host(host))
         except ValueError as exc:
             errors.append(str(exc))
+    asset_host_suffixes: set[str] = set()
+    resolver_hosts: set[str] = set()
+    resolver_host_suffixes: set[str] = set()
+    if isinstance(manifest, SourcePackManifestV2):
+        for host in manifest.access.asset_host_suffixes:
+            try:
+                asset_host_suffixes.add(_valid_host_suffix(host))
+            except ValueError as exc:
+                errors.append(str(exc))
+        for host in manifest.access.resolver_hosts:
+            try:
+                resolver_hosts.add(_valid_host(host))
+            except ValueError as exc:
+                errors.append(str(exc))
+        for host in manifest.access.resolver_host_suffixes:
+            try:
+                resolver_host_suffixes.add(_valid_host_suffix(host))
+            except ValueError as exc:
+                errors.append(str(exc))
     adapter = manifest.adapter
     url = adapter.url_template or adapter.endpoint
     if adapter.family == "static_https_template" and not adapter.url_template:
@@ -734,6 +1017,13 @@ def validate_loaded_source_pack(pack: SourcePack) -> dict[str, Any]:
                     errors.append(f"verified local raster is missing: {local_name}")
                 elif adapter.local_sha256 and hashlib.sha256(pack.files[local_name]).hexdigest() != adapter.local_sha256:
                     errors.append("verified local raster SHA-256 does not match")
+    elif adapter.family == "earth_engine_compute":
+        if not isinstance(manifest, SourcePackManifestV2):
+            errors.append("earth_engine_compute requires a v2 Source Pack")
+        if allowed_hosts or redirect_hosts or asset_hosts or asset_host_suffixes:
+            errors.append(
+                "earth_engine_compute source metadata must not declare asset transport hosts"
+            )
     elif url:
         errors.extend(_url_errors(url, allowed_hosts))
         if not allowed_hosts:
@@ -776,13 +1066,45 @@ def validate_loaded_source_pack(pack: SourcePack) -> dict[str, Any]:
         warnings=warnings,
     )
     access = manifest.access
-    if access.authentication_scheme == "none" and access.credential_ref:
-        errors.append("credential_ref requires a non-none authentication_scheme")
-    if access.authentication_scheme != "none":
-        if not access.credential_ref or not re.fullmatch(
-            r"[a-z][a-z0-9._-]{2,127}", access.credential_ref
-        ):
-            errors.append("credential_ref must be an opaque identifier with safe syntax")
+    if isinstance(manifest, SourcePackManifestV2):
+        asset_access = manifest.asset_access
+        if adapter.family == "stac_search" and asset_access is None:
+            errors.append("v2 STAC sources require a first-class asset_access contract")
+        if adapter.family != "stac_search" and asset_access is not None:
+            errors.append("asset_access is currently valid only for stac_search")
+        if isinstance(asset_access, BrokeredSignedHttpsAssetAccess):
+            resolver_url_errors = _url_errors(
+                asset_access.resolver.endpoint,
+                resolver_hosts,
+            )
+            errors.extend(resolver_url_errors)
+        if isinstance(asset_access, (PublicS3AssetAccess, RequesterPaysS3AssetAccess)):
+            s3_identity = asset_access.stable_identity
+            if not re.fullmatch(
+                r"[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]",
+                s3_identity.bucket,
+            ):
+                errors.append("S3 bucket identity is invalid")
+            if not re.fullmatch(
+                r"[a-z]{2}(?:-gov)?-[a-z]+-[1-9]",
+                s3_identity.region,
+            ):
+                errors.append("S3 region identity is invalid")
+        if isinstance(asset_access, S3CompatibleCredentialedAssetAccess):
+            errors.extend(_url_errors(asset_access.endpoint, asset_hosts))
+        if access.authentication_scheme != "none":
+            errors.append(
+                "v2 Source Packs declare operation credentials in asset_access, "
+                "not a plan-wide access authentication scheme"
+            )
+    else:
+        if access.authentication_scheme == "none" and access.credential_ref:
+            errors.append("credential_ref requires a non-none authentication_scheme")
+        if access.authentication_scheme != "none":
+            if not access.credential_ref or not re.fullmatch(
+                r"[a-z][a-z0-9._-]{2,127}", access.credential_ref
+            ):
+                errors.append("credential_ref must be an opaque identifier with safe syntax")
     if manifest.capabilities.materialization:
         warnings.append(
             "materialization is a declared source capability; this public Source Pack runtime does not execute it"
@@ -821,7 +1143,7 @@ def validate_loaded_source_pack(pack: SourcePack) -> dict[str, Any]:
             if not errors and provider_evidence_complete
             else "BLOCKED_BEFORE_NETWORK"
         ),
-        "credential_required": access.authentication_scheme != "none",
+        "credential_required": credential_requirement(manifest) is not None,
         "network_requests": 0,
         "network_bytes": 0,
         "checks": {
@@ -870,7 +1192,54 @@ def validate_source_pack(path: Path) -> dict[str, Any]:
         }
 
 
-def credential_requirement(manifest: SourcePackManifest) -> dict[str, Any] | None:
+def credential_requirement(
+    manifest: SourcePackManifest | SourcePackManifestV2,
+) -> dict[str, Any] | None:
+    if isinstance(manifest, SourcePackManifestV2):
+        asset_access = manifest.asset_access
+        if isinstance(asset_access, RequesterPaysS3AssetAccess):
+            scheme = "aws_sigv4"
+            operations = ["asset"]
+            resolver_capability = "aws_sigv4_requester_pays"
+        elif isinstance(asset_access, BearerHttpsAssetAccess):
+            scheme = "oauth2_bearer"
+            operations = ["asset"]
+            resolver_capability = "host_bound_bearer"
+        elif isinstance(asset_access, BrokeredSignedHttpsAssetAccess):
+            scheme = "ephemeral_https_signer"
+            operations = ["resolver"]
+            resolver_capability = asset_access.resolver.scheme
+        elif isinstance(asset_access, S3CompatibleCredentialedAssetAccess):
+            scheme = "s3_compatible"
+            operations = ["asset"]
+            resolver_capability = "s3_compatible_credentials"
+        elif manifest.adapter.family == "earth_engine_compute":
+            scheme = "google_adc"
+            operations = ["compute"]
+            resolver_capability = "google_adc_project_bound"
+        else:
+            return None
+        result = {
+            "schema_version": CREDENTIAL_SCHEMA_VERSION_V2,
+            "credential_scheme": scheme,
+            "operations": operations,
+            "exact_hosts": {
+                "catalogue": sorted(manifest.access.allowed_hosts),
+                "resolver": sorted(manifest.access.resolver_hosts),
+                "asset": sorted(manifest.access.asset_hosts),
+            },
+            "host_suffixes": {
+                "resolver": sorted(manifest.access.resolver_host_suffixes),
+                "asset": sorted(manifest.access.asset_host_suffixes),
+            },
+            "resolver_capability_required": resolver_capability,
+            "resolved_secret_present": False,
+        }
+        result["credential_requirement_sha256"] = _canonical_hash(
+            result,
+            {"credential_requirement_sha256"},
+        )
+        return result
     access = manifest.access
     if access.authentication_scheme == "none":
         return None
@@ -975,6 +1344,15 @@ def compile_source_pack_plan(
             "local_sha256": manifest.adapter.local_sha256,
             "family_contract": validation["family_contract"],
         }
+    elif manifest.adapter.family == "earth_engine_compute":
+        assert isinstance(manifest, SourcePackManifestV2)
+        endpoint_contract = {
+            "kind": "earth_engine_compute",
+            "earth_engine": manifest.earth_engine.model_dump(mode="json")
+            if manifest.earth_engine is not None
+            else None,
+            "family_contract": validation["family_contract"],
+        }
     else:
         endpoint_contract = {
             "kind": manifest.adapter.family,
@@ -997,8 +1375,18 @@ def compile_source_pack_plan(
         blocked_details.append(
             "Select an explicit temporal candidate; the requested time was not changed."
         )
+    is_v2 = isinstance(manifest, SourcePackManifestV2)
+    source_content_identity = {
+        "identity": validation["identity"],
+        "source_contract": manifest.source.model_dump(mode="json"),
+        "requested_time": requested,
+        "resolved_time": resolved_time,
+        "family_contract": validation["family_contract"],
+    }
     stable = {
-        "schema_version": SOURCE_PLAN_SCHEMA_VERSION,
+        "schema_version": (
+            SOURCE_PLAN_SCHEMA_VERSION_V2 if is_v2 else SOURCE_PLAN_SCHEMA_VERSION
+        ),
         "pack_id": manifest.pack_id,
         "source_pack_sha256": pack.source_pack_sha256,
         "status": status,
@@ -1014,6 +1402,7 @@ def compile_source_pack_plan(
                 "arcgis_imageserver": "arcgis_imageserver",
                 "stac_search": "stac_api",
                 "verified_local_raster": "verified_local_raster",
+                "earth_engine_compute": "earth_engine_compute",
             }[manifest.adapter.family],
             "media_types": manifest.adapter.media_types,
             "asset_roles": manifest.adapter.asset_roles,
@@ -1045,6 +1434,19 @@ def compile_source_pack_plan(
             "request_hosts": sorted(manifest.access.allowed_hosts),
             "redirect_hosts": sorted(manifest.access.redirect_hosts),
             "asset_hosts": sorted(manifest.access.asset_hosts),
+            **(
+                {
+                    "asset_host_suffixes": sorted(
+                        manifest.access.asset_host_suffixes
+                    ),
+                    "resolver_hosts": sorted(manifest.access.resolver_hosts),
+                    "resolver_host_suffixes": sorted(
+                        manifest.access.resolver_host_suffixes
+                    ),
+                }
+                if is_v2
+                else {}
+            ),
         },
         "preview": manifest.preview.model_dump(mode="json"),
         "validation": {
@@ -1055,6 +1457,23 @@ def compile_source_pack_plan(
             "validation_sha256": validation["validation_sha256"],
         },
         "original_pack_unchanged": True,
+        **(
+            {
+                "source_content_identity_sha256": _canonical_hash(
+                    source_content_identity
+                ),
+                "asset_access": (
+                    manifest.asset_access.model_dump(mode="json")
+                    if manifest.asset_access is not None
+                    else None
+                ),
+                "evidence_bundle_sha256": validation["provider_evidence"][
+                    "evidence_sha256"
+                ]
+            }
+            if is_v2
+            else {}
+        ),
     }
     stable["plan_sha256"] = _canonical_hash(stable, {"plan_sha256"})
     return stable
@@ -1081,7 +1500,10 @@ def _validated_frozen_source_plan(
     source: Path | Mapping[str, Any],
 ) -> dict[str, Any]:
     plan = _load_json_object(source, contract_name="frozen Source Pack plan")
-    if plan.get("schema_version") != SOURCE_PLAN_SCHEMA_VERSION:
+    if plan.get("schema_version") not in {
+        SOURCE_PLAN_SCHEMA_VERSION,
+        SOURCE_PLAN_SCHEMA_VERSION_V2,
+    }:
         raise ValueError(
             f"unsupported Source Pack plan schema version: {plan.get('schema_version')!r}"
         )
@@ -1126,9 +1548,35 @@ def compile_source_materialization_request(
     bbox_crs: str | None = None,
     output_width: int | None = None,
     output_height: int | None = None,
+    output_crs: str | None = None,
+    output_transform: Sequence[int | float] | None = None,
+    credential_ref: str | None = None,
+    project_ref: str | None = None,
+    allow_chargeable_access: bool = False,
+    max_network_requests: int | None = None,
+    max_network_bytes: int | None = None,
+    max_compute_requests: int = 0,
 ) -> dict[str, Any]:
     """Compile deterministic per-study intent without network access."""
     plan = _validated_frozen_source_plan(source_plan)
+    if plan.get("schema_version") == SOURCE_PLAN_SCHEMA_VERSION_V2:
+        return _compile_source_materialization_request_v2(
+            plan,
+            requested_asset_roles=requested_asset_roles,
+            full_object=full_object,
+            bbox=bbox,
+            bbox_crs=bbox_crs,
+            output_width=output_width,
+            output_height=output_height,
+            output_crs=output_crs,
+            output_transform=output_transform,
+            credential_ref=credential_ref,
+            project_ref=project_ref,
+            allow_chargeable_access=allow_chargeable_access,
+            max_network_requests=max_network_requests,
+            max_network_bytes=max_network_bytes,
+            max_compute_requests=max_compute_requests,
+        )
     adapter = plan.get("adapter")
     if not isinstance(adapter, Mapping):
         raise ValueError("Source Pack plan adapter is missing")
@@ -1228,6 +1676,295 @@ def compile_source_materialization_request(
     return stable
 
 
+def _opaque_reference(value: str | None, *, name: str) -> str | None:
+    if value is None:
+        return None
+    if not re.fullmatch(r"[a-z][a-z0-9._-]{2,127}", value):
+        raise ValueError(f"{name} must be an opaque identifier with safe syntax")
+    if re.search(
+        r"(?i)(secret|password|private[_-]?key|access[_-]?token|session[_-]?token)",
+        value,
+    ):
+        raise ValueError(f"{name} must not describe secret material")
+    return value
+
+
+def _compiled_earth_engine_selection(
+    plan: Mapping[str, Any],
+    *,
+    roles: list[str],
+    bbox: list[float],
+) -> list[dict[str, Any]]:
+    endpoint = plan.get("endpoint_contract")
+    earth_engine = (
+        endpoint.get("earth_engine")
+        if isinstance(endpoint, Mapping)
+        else None
+    )
+    if not isinstance(earth_engine, Mapping):
+        raise ValueError("Earth Engine plan metadata is missing")
+    dataset_id = str(earth_engine.get("dataset_id") or "")
+    dataset_type = str(earth_engine.get("dataset_type") or "")
+    allowed = set(str(item) for item in earth_engine.get("allowed_operations") or [])
+    operations: list[dict[str, Any]]
+    if dataset_type == "image":
+        operations = [
+            {"operation": "load_image", "dataset_id": dataset_id},
+            {"operation": "select_bands", "bands": roles},
+        ]
+    elif dataset_type == "image_collection":
+        operations = [
+            {"operation": "load_collection", "dataset_id": dataset_id},
+            {"operation": "filter_bounds", "bbox": bbox},
+        ]
+        requested_time = str(plan.get("resolved_time") or "")
+        if "/" in requested_time:
+            start, end = requested_time.split("/", 1)
+            if not start or not end:
+                raise ValueError("Earth Engine date interval is incomplete")
+            operations.append(
+                {
+                    "operation": "filter_date",
+                    "start": start,
+                    "end": end,
+                }
+            )
+        operations.extend(
+            [
+                {
+                    "operation": "sort_acquisition_time",
+                    "property": "system:time_start",
+                    "direction": "ascending",
+                },
+                {
+                    "operation": "tie_break_system_index",
+                    "property": "system:index",
+                    "direction": "ascending",
+                },
+                {"operation": "select_first"},
+                {"operation": "select_bands", "bands": roles},
+            ]
+        )
+    else:
+        raise ValueError("unsupported Earth Engine dataset type")
+    selected = {str(item["operation"]) for item in operations}
+    if not selected.issubset(allowed):
+        missing = ", ".join(sorted(selected - allowed))
+        raise ValueError(
+            "Earth Engine selection requires undeclared operations: " + missing
+        )
+    return operations
+
+
+def _compile_source_materialization_request_v2(
+    plan: Mapping[str, Any],
+    *,
+    requested_asset_roles: Sequence[str],
+    full_object: bool,
+    bbox: Sequence[int | float] | None,
+    bbox_crs: str | None,
+    output_width: int | None,
+    output_height: int | None,
+    output_crs: str | None,
+    output_transform: Sequence[int | float] | None,
+    credential_ref: str | None,
+    project_ref: str | None,
+    allow_chargeable_access: bool,
+    max_network_requests: int | None,
+    max_network_bytes: int | None,
+    max_compute_requests: int,
+) -> dict[str, Any]:
+    adapter = plan.get("adapter")
+    if not isinstance(adapter, Mapping):
+        raise ValueError("Source Pack plan adapter is missing")
+    family = str(adapter.get("family") or "")
+    declared_roles = [str(item) for item in adapter.get("asset_roles") or []]
+    roles = sorted(set(str(item) for item in requested_asset_roles))
+    if not roles or any(role not in declared_roles for role in roles):
+        raise ValueError("requested asset roles must be a declared nonempty subset")
+
+    if family in {"stac_search", "arcgis_imageserver", "earth_engine_compute"}:
+        if full_object or bbox is None or len(bbox) != 4:
+            raise ValueError(f"{family} requires a four-value bbox")
+        try:
+            canonical_bbox = [float(item) for item in bbox]
+        except (TypeError, ValueError) as exc:
+            raise ValueError("bbox values must be finite numbers") from exc
+        if (
+            not all(isfinite(item) for item in canonical_bbox)
+            or canonical_bbox[0] >= canonical_bbox[2]
+            or canonical_bbox[1] >= canonical_bbox[3]
+        ):
+            raise ValueError("bbox must contain finite, strictly increasing bounds")
+        family_contract = plan["endpoint_contract"]["family_contract"]
+        required_crs = (
+            "EPSG:4326"
+            if family == "earth_engine_compute"
+            else family_contract.get("bbox_crs")
+        )
+        if bbox_crs != required_crs:
+            raise ValueError(
+                f"bbox_crs must exactly match the frozen family contract {required_crs!r}"
+            )
+        spatial_request: dict[str, Any] = {
+            "mode": "bbox",
+            "bbox": canonical_bbox,
+            "bbox_crs": bbox_crs,
+        }
+    elif family in {"static_https_template", "verified_local_raster"}:
+        if not full_object or bbox is not None or bbox_crs is not None:
+            raise ValueError(f"{family} requires an explicit full-object request")
+        spatial_request = {"mode": "full_object"}
+    else:
+        raise ValueError(f"unsupported Source Pack adapter family: {family!r}")
+
+    grid_values = (
+        output_width,
+        output_height,
+        output_crs,
+        output_transform,
+    )
+    if family == "earth_engine_compute" and any(item is None for item in grid_values):
+        raise ValueError("earth_engine_compute requires a complete output grid")
+    if any(item is not None for item in grid_values):
+        if any(item is None for item in grid_values):
+            raise ValueError(
+                "output grid requires width, height, CRS, and six-value transform"
+            )
+        if (
+            not isinstance(output_width, int)
+            or isinstance(output_width, bool)
+            or not isinstance(output_height, int)
+            or isinstance(output_height, bool)
+            or not 1 <= output_width <= 32_000
+            or not 1 <= output_height <= 32_000
+        ):
+            raise ValueError("output grid dimensions are outside supported bounds")
+        if not isinstance(output_crs, str) or not re.fullmatch(
+            r"EPSG:[1-9][0-9]{2,5}",
+            output_crs,
+        ):
+            raise ValueError("output grid CRS must be an explicit EPSG code")
+        if output_transform is None or len(output_transform) != 6:
+            raise ValueError("output grid transform must contain six values")
+        transform = [float(item) for item in output_transform]
+        if not all(isfinite(item) for item in transform):
+            raise ValueError("output grid transform values must be finite")
+        output_grid: dict[str, Any] | None = {
+            "crs": output_crs,
+            "transform": transform,
+            "width": output_width,
+            "height": output_height,
+        }
+    else:
+        output_grid = None
+
+    earth_engine_selection = (
+        _compiled_earth_engine_selection(
+            plan,
+            roles=roles,
+            bbox=canonical_bbox,
+        )
+        if family == "earth_engine_compute"
+        else None
+    )
+
+    requirement = plan.get("credential_requirement")
+    scheme = (
+        str(requirement.get("credential_scheme"))
+        if isinstance(requirement, Mapping)
+        else None
+    )
+    credential = _opaque_reference(credential_ref, name="credential_ref")
+    project = _opaque_reference(project_ref, name="project_ref")
+    credential_required = scheme in {
+        "aws_sigv4",
+        "google_adc",
+        "oauth2_bearer",
+        "s3_compatible",
+    }
+    if credential_required and credential is None:
+        raise ValueError(f"{scheme} requires an opaque credential_ref")
+    if not credential_required and credential is not None:
+        raise ValueError("credential_ref is not permitted for this source plan")
+    if family == "earth_engine_compute" and project is None:
+        raise ValueError("earth_engine_compute requires an opaque project_ref")
+    if family != "earth_engine_compute" and project is not None:
+        raise ValueError("project_ref is valid only for earth_engine_compute")
+
+    access = plan.get("asset_access")
+    access_mode = str(access.get("mode")) if isinstance(access, Mapping) else None
+    chargeable = access_mode == "s3_requester_pays"
+    if chargeable and allow_chargeable_access is not True:
+        raise ValueError(
+            "Requester Pays materialization requires explicit study consent"
+        )
+
+    policy = plan.get("network_policy")
+    if not isinstance(policy, Mapping):
+        raise ValueError("Source Pack plan network policy is missing")
+    provider_request_limit = int(policy["max_requests"])
+    provider_byte_limit = int(policy["max_total_bytes"])
+    request_limit = (
+        provider_request_limit
+        if max_network_requests is None
+        else int(max_network_requests)
+    )
+    byte_limit = (
+        provider_byte_limit
+        if max_network_bytes is None
+        else int(max_network_bytes)
+    )
+    if (
+        not 0 <= request_limit <= provider_request_limit
+        or not 0 <= byte_limit <= provider_byte_limit
+    ):
+        raise ValueError("materialization limits may narrow but not widen the plan")
+    if family == "earth_engine_compute":
+        if not 1 <= max_compute_requests <= provider_request_limit:
+            raise ValueError("Earth Engine compute request ceiling is invalid")
+    elif max_compute_requests != 0:
+        raise ValueError("compute requests are valid only for earth_engine_compute")
+
+    authorization = {
+        "credential_ref": credential,
+        "project_ref": project,
+        "allow_chargeable_access": bool(allow_chargeable_access),
+    }
+    limits = {
+        "max_network_requests": request_limit,
+        "max_network_bytes": byte_limit,
+        "max_compute_requests": int(max_compute_requests),
+    }
+    content_inputs = {
+        "source_content_identity_sha256": plan[
+            "source_content_identity_sha256"
+        ],
+        "requested_asset_roles": roles,
+        "spatial_request": spatial_request,
+        "output_grid": output_grid,
+        "earth_engine_selection": earth_engine_selection,
+    }
+    stable = {
+        "schema_version": MATERIALIZATION_REQUEST_SCHEMA_VERSION_V2,
+        "pack_id": plan["pack_id"],
+        "source_plan_sha256": plan["plan_sha256"],
+        "requested_asset_roles": roles,
+        "spatial_request": spatial_request,
+        "output_grid": output_grid,
+        "earth_engine_selection": earth_engine_selection,
+        "authorization": authorization,
+        "limits": limits,
+        "materialization_content_sha256": _canonical_hash(content_inputs),
+        "original_source_plan_unchanged": True,
+    }
+    stable["materialization_request_sha256"] = _canonical_hash(
+        stable,
+        {"materialization_request_sha256"},
+    )
+    return stable
+
+
 def validate_source_materialization_request(
     source_plan: Path | Mapping[str, Any],
     request: Path | Mapping[str, Any],
@@ -1237,6 +1974,8 @@ def validate_source_materialization_request(
         request,
         contract_name="Source Pack materialization request",
     )
+    if value.get("schema_version") == MATERIALIZATION_REQUEST_SCHEMA_VERSION_V2:
+        return _validate_v2_materialization_request(plan, value)
     expected_keys = {
         "schema_version",
         "pack_id",
@@ -1291,6 +2030,99 @@ def validate_source_materialization_request(
     if value != compiled:
         raise ValueError("materialization request is not canonical")
     return value
+
+
+def _validate_v2_materialization_request(
+    plan: Mapping[str, Any],
+    value: Mapping[str, Any],
+) -> dict[str, Any]:
+    if plan.get("schema_version") != SOURCE_PLAN_SCHEMA_VERSION_V2:
+        raise ValueError("v2 materialization request requires a v2 source plan")
+    expected_keys = {
+        "schema_version",
+        "pack_id",
+        "source_plan_sha256",
+        "requested_asset_roles",
+        "spatial_request",
+        "output_grid",
+        "earth_engine_selection",
+        "authorization",
+        "limits",
+        "materialization_content_sha256",
+        "original_source_plan_unchanged",
+        "materialization_request_sha256",
+    }
+    if set(value) != expected_keys:
+        raise ValueError("v2 materialization request contains unknown or missing fields")
+    if value.get("pack_id") != plan.get("pack_id"):
+        raise ValueError("materialization request pack_id differs from the plan")
+    if value.get("source_plan_sha256") != plan.get("plan_sha256"):
+        raise ValueError("materialization request references a different plan hash")
+    if value.get("original_source_plan_unchanged") is not True:
+        raise ValueError("materialization request must preserve the frozen source plan")
+    request_hash = value.get("materialization_request_sha256")
+    content_hash = value.get("materialization_content_sha256")
+    if (
+        not isinstance(request_hash, str)
+        or not re.fullmatch(r"[a-f0-9]{64}", request_hash)
+        or request_hash
+        != _canonical_hash(value, {"materialization_request_sha256"})
+    ):
+        raise ValueError("materialization request SHA-256 mismatch")
+    if not isinstance(content_hash, str) or not re.fullmatch(
+        r"[a-f0-9]{64}",
+        content_hash,
+    ):
+        raise ValueError("materialization content SHA-256 is malformed")
+    spatial = value.get("spatial_request")
+    output_grid = value.get("output_grid")
+    authorization = value.get("authorization")
+    limits = value.get("limits")
+    if not all(
+        isinstance(item, Mapping)
+        for item in (spatial, authorization, limits)
+    ):
+        raise ValueError("v2 materialization request objects are incomplete")
+    compiled = compile_source_materialization_request(
+        plan,
+        requested_asset_roles=value.get("requested_asset_roles") or [],
+        full_object=spatial.get("mode") == "full_object",
+        bbox=spatial.get("bbox") if spatial.get("mode") == "bbox" else None,
+        bbox_crs=(
+            spatial.get("bbox_crs") if spatial.get("mode") == "bbox" else None
+        ),
+        output_width=(
+            output_grid.get("width")
+            if isinstance(output_grid, Mapping)
+            else None
+        ),
+        output_height=(
+            output_grid.get("height")
+            if isinstance(output_grid, Mapping)
+            else None
+        ),
+        output_crs=(
+            output_grid.get("crs")
+            if isinstance(output_grid, Mapping)
+            else None
+        ),
+        output_transform=(
+            output_grid.get("transform")
+            if isinstance(output_grid, Mapping)
+            else None
+        ),
+        credential_ref=authorization.get("credential_ref"),
+        project_ref=authorization.get("project_ref"),
+        allow_chargeable_access=bool(
+            authorization.get("allow_chargeable_access")
+        ),
+        max_network_requests=limits.get("max_network_requests"),
+        max_network_bytes=limits.get("max_network_bytes"),
+        max_compute_requests=int(limits.get("max_compute_requests") or 0),
+    )
+    if dict(value) != compiled:
+        raise ValueError("v2 materialization request is not canonical")
+    return dict(value)
 
 
 def compile_source_pack_handoff(

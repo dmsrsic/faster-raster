@@ -1,0 +1,157 @@
+{
+  "adapter": {
+    "asset_roles": [
+      "B4",
+      "B3",
+      "B2"
+    ],
+    "family": "earth_engine_compute",
+    "media_types": [
+      "image/tiff"
+    ],
+    "public_adapter_id": "earth_engine_compute"
+  },
+  "asset_access": null,
+  "blocked_before_network": false,
+  "blocked_details": [],
+  "capabilities": {
+    "analysis": false,
+    "materialization": false,
+    "planning": true,
+    "preview": true,
+    "temporal_discovery": true
+  },
+  "credential_requirement": {
+    "credential_requirement_sha256": "41a4c0bfc972cc7cff8341725e7752262300cead735a286c2166d7851db2371e",
+    "credential_scheme": "google_adc",
+    "exact_hosts": {
+      "asset": [],
+      "catalogue": [],
+      "resolver": []
+    },
+    "host_suffixes": {
+      "asset": [],
+      "resolver": []
+    },
+    "operations": [
+      "compute"
+    ],
+    "resolved_secret_present": false,
+    "resolver_capability_required": "google_adc_project_bound",
+    "schema_version": "fasterraster.credential-requirement/v2"
+  },
+  "endpoint_contract": {
+    "earth_engine": {
+      "allowed_operations": [
+        "load_collection",
+        "filter_bounds",
+        "filter_date",
+        "sort_acquisition_time",
+        "tie_break_system_index",
+        "select_first",
+        "select_bands"
+      ],
+      "bands": [
+        {
+          "data_type": "uint16",
+          "name": "B2",
+          "semantic_type": "continuous"
+        },
+        {
+          "data_type": "uint16",
+          "name": "B3",
+          "semantic_type": "continuous"
+        },
+        {
+          "data_type": "uint16",
+          "name": "B4",
+          "semantic_type": "continuous"
+        }
+      ],
+      "credential_scheme": "google_adc",
+      "dataset_id": "COPERNICUS/S2_SR_HARMONIZED",
+      "dataset_type": "image_collection",
+      "max_bands": 3,
+      "max_height": 32000,
+      "max_uncompressed_response_bytes": 1000000,
+      "max_width": 32000
+    },
+    "family_contract": {
+      "dataset_identity": "COPERNICUS/S2_SR_HARMONIZED"
+    },
+    "kind": "earth_engine_compute"
+  },
+  "evidence_bundle_sha256": "e6d2ee8f9407cbfcf763d2f04e5cfe5a77342a4f03b7be40ba9475f2c5249416",
+  "executable": true,
+  "identity": {
+    "collection": "COPERNICUS/S2_SR_HARMONIZED",
+    "product": "Sentinel-2 Surface Reflectance Harmonized",
+    "provider": "GOOGLE_EARTH_ENGINE"
+  },
+  "network_policy": {
+    "asset_host_suffixes": [],
+    "asset_hosts": [],
+    "default": "disabled",
+    "max_asset_bytes": 5000000,
+    "max_bytes": 65536,
+    "max_parallel_requests": 1,
+    "max_requests": 1,
+    "max_total_bytes": 5000000,
+    "maximum_redirects": 0,
+    "redirect_hosts": [],
+    "request_hosts": [],
+    "resolver_host_suffixes": [],
+    "resolver_hosts": [],
+    "timeout_seconds": 10.0
+  },
+  "original_pack_unchanged": true,
+  "pack_id": "earth-engine-sentinel2",
+  "plan_sha256": "2a26d55143e2a1d99a90e16fa4b37db9b14778f7f8bab09bab207aa4f3df6b43",
+  "preview": {
+    "role": "natural_color",
+    "target_crs": "EPSG:32614",
+    "template_id": "general_multisource_v1",
+    "theme": "optical_imagery"
+  },
+  "provider_evidence": {
+    "evidence_sha256": "e6d2ee8f9407cbfcf763d2f04e5cfe5a77342a4f03b7be40ba9475f2c5249416",
+    "official_documentation": [
+      "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED"
+    ],
+    "status": "complete"
+  },
+  "public_capability": {
+    "private_execution_available_from_public_repository": false,
+    "public_execution": "validation_and_bounded_probe_only",
+    "release": "Unreleased",
+    "status": "experimental"
+  },
+  "requested_time": "2023-06-01/2023-06-10",
+  "resolved_time": "2023-06-01/2023-06-10",
+  "schema_version": "fasterraster.source-pack-plan/v2",
+  "source_content_identity_sha256": "d753250e9420f1bf26226ca4bbf0ede39d7810e06fa06a13179df0f19884aaf4",
+  "source_contract": {
+    "crs": "EPSG:4326",
+    "mask_policy": "alpha_or_dataset_mask",
+    "nodata": null,
+    "resampling": "bilinear",
+    "semantic_type": "continuous"
+  },
+  "source_pack_sha256": "52948f926d389d11af8289ae90f8256e8cd8d33d1cdb691c144fe6bd1e3d3f92",
+  "status": "CREDENTIAL_REQUIRED",
+  "temporal_alternatives": null,
+  "temporal_contract": {
+    "mode": "exact",
+    "requested": "2023-06-01/2023-06-10",
+    "template_variables": {},
+    "tolerance_days": 0
+  },
+  "temporal_resolution": null,
+  "validation": {
+    "family_contract": "VALID",
+    "offline_planning": "READY_FOR_OFFLINE_DETERMINISTIC_PLANNING",
+    "provider_evidence": "COMPLETE",
+    "schema": "SCHEMA_VALID",
+    "validation_sha256": "a0cd878d1ec96c3cc0ec94f5e3caa40d7e01f44e945b41a10d45d48ea2b4b5fd"
+  }
+}

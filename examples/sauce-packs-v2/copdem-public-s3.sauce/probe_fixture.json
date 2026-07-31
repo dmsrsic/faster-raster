@@ -1,0 +1,13 @@
+{
+  "identity": {
+    "collection": "cop-dem-glo-30",
+    "product": "Copernicus DEM GLO-30",
+    "provider": "AWS_OPEN_DATA"
+  },
+  "provider_evidence": {
+    "official_documentation": [
+      "https://registry.opendata.aws/copernicus-dem/"
+    ],
+    "status": "complete"
+  }
+}

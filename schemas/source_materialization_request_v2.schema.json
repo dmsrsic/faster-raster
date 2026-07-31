@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "authorization": {
+      "additionalProperties": false,
+      "properties": {
+        "allow_chargeable_access": {
+          "type": "boolean"
+        },
+        "credential_ref": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "pattern": "^[a-z][a-z0-9._-]{2,127}$",
+              "type": "string"
+            }
+          ]
+        },
+        "project_ref": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "pattern": "^[a-z][a-z0-9._-]{2,127}$",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "required": [
+        "credential_ref",
+        "project_ref",
+        "allow_chargeable_access"
+      ],
+      "type": "object"
+    },
+    "earth_engine_selection": {
+      "items": {
+        "properties": {
+          "operation": {
+            "enum": [
+              "load_image",
+              "load_collection",
+              "filter_bounds",
+              "filter_date",
+              "sort_acquisition_time",
+              "tie_break_system_index",
+              "select_first",
+              "select_bands"
+            ]
+          }
+        },
+        "required": [
+          "operation"
+        ],
+        "type": "object"
+      },
+      "type": [
+        "array",
+        "null"
+      ]
+    },
+    "limits": {
+      "additionalProperties": false,
+      "properties": {
+        "max_compute_requests": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "max_network_bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "max_network_requests": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "max_network_requests",
+        "max_network_bytes",
+        "max_compute_requests"
+      ],
+      "type": "object"
+    },
+    "materialization_content_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "materialization_request_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "original_source_plan_unchanged": {
+      "const": true
+    },
+    "output_grid": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "pack_id": {
+      "pattern": "^[a-z][a-z0-9_-]{2,63}$",
+      "type": "string"
+    },
+    "requested_asset_roles": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "schema_version": {
+      "const": "fasterraster.source-materialization-request/v2"
+    },
+    "source_plan_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "spatial_request": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema_version",
+    "pack_id",
+    "source_plan_sha256",
+    "requested_asset_roles",
+    "spatial_request",
+    "output_grid",
+    "earth_engine_selection",
+    "authorization",
+    "limits",
+    "materialization_content_sha256",
+    "original_source_plan_unchanged",
+    "materialization_request_sha256"
+  ],
+  "title": "FasterRaster Source Pack materialization request v2",
+  "type": "object"
+}

@@ -1,8 +1,9 @@
 # Bring Your Own Sauce
 
 Bring Your Own Sauce, also called the Flavortown Sauce Wizard, is the public
-declarative source-extension seam. Its technical contract is
-`fasterraster.source-pack/v1`. It is **Unreleased / experimental** in this
+declarative source-extension seam. Its stable v1 contract remains supported;
+new generic asset-access and computation planning use the separately versioned
+`fasterraster.source-pack/v2` contract. Both are **Unreleased / experimental** in this
 source tree and is not part of the published beta.4 contract.
 
 [Open the FasterRaster Flavortown Sauce Wizard](https://chatgpt.com/g/g-6a692bb17b9c8191a318997fd0435bf7-fasterraster-flavortown-sauce-wizard)
@@ -80,6 +81,18 @@ resolution, CRS, semantic type, nodata/mask/resampling, archive selection,
 resource ceilings, opaque credential requirements, public capability status,
 stable hashes, and corrective blocked details. Provider-evidence or temporal
 blocked states cannot become executable handoffs.
+
+Version 2 emits `fasterraster.source-pack-plan/v2` and
+`fasterraster.source-materialization-request/v2`. It adds a discriminated
+`asset_access` contract, operation-scoped credential requirements, exact and
+validated suffix host scopes, explicit Requester Pays billing declarations,
+study authorization, complete output grids, and a stable
+`materialization_content_sha256` distinct from the authorization-bound request
+hash. V1 inputs and outputs remain unchanged.
+
+Execution-critical STAC search, ordering, asset selection, access, host, and
+billing semantics live in `sauce.yaml` for v2. `probe_fixture.json` is evidence
+only and cannot silently change execution.
 
 Reusable Source Pack facts remain separate from per-study intent.
 `materialize-request` emits the deterministic

@@ -1,0 +1,155 @@
+{
+  "adapter": {
+    "asset_roles": [
+      "red"
+    ],
+    "family": "stac_search",
+    "media_types": [
+      "image/tiff; application=geotiff; profile=cloud-optimized"
+    ],
+    "public_adapter_id": "stac_api"
+  },
+  "asset_access": {
+    "credential_scheme": "oauth2_bearer",
+    "mode": "bearer_https",
+    "stable_identity": {
+      "href_policy": "unsigned_selected_stac_asset"
+    }
+  },
+  "blocked_before_network": false,
+  "blocked_details": [],
+  "capabilities": {
+    "analysis": false,
+    "materialization": true,
+    "planning": true,
+    "preview": true,
+    "temporal_discovery": true
+  },
+  "credential_requirement": {
+    "credential_requirement_sha256": "0852c1ee554a2e2143bdf93ecfa2f916669b76f1d61298913f714e69ac3eb386",
+    "credential_scheme": "oauth2_bearer",
+    "exact_hosts": {
+      "asset": [
+        "data.lpdaac.earthdatacloud.nasa.gov"
+      ],
+      "catalogue": [
+        "cmr.earthdata.nasa.gov"
+      ],
+      "resolver": []
+    },
+    "host_suffixes": {
+      "asset": [],
+      "resolver": []
+    },
+    "operations": [
+      "asset"
+    ],
+    "resolved_secret_present": false,
+    "resolver_capability_required": "host_bound_bearer",
+    "schema_version": "fasterraster.credential-requirement/v2"
+  },
+  "endpoint_contract": {
+    "endpoint": "https://cmr.earthdata.nasa.gov/stac/LPCLOUD",
+    "family_contract": {
+      "asset_host_scope": [
+        "data.lpdaac.earthdatacloud.nasa.gov"
+      ],
+      "asset_selection": {
+        "item_limit": 10,
+        "item_order": [
+          "datetime",
+          "id"
+        ],
+        "required_media_types": [
+          "image/tiff; application=geotiff; profile=cloud-optimized"
+        ],
+        "required_roles": [
+          "red"
+        ]
+      },
+      "bbox_crs": "EPSG:4326",
+      "search_path": "/search",
+      "temporal_representation": "interval"
+    },
+    "kind": "stac_search",
+    "rendered_request_url": null,
+    "url_template": null
+  },
+  "evidence_bundle_sha256": "4b48fa34b9754ba9adb0acf01fff5b4f5a8260e8cc3215e5b5ad426fd80b912c",
+  "executable": true,
+  "identity": {
+    "collection": "HLSL30_2.0",
+    "product": "Harmonized Landsat Sentinel-2 L30",
+    "provider": "NASA_LPCLOUD"
+  },
+  "network_policy": {
+    "asset_host_suffixes": [],
+    "asset_hosts": [
+      "data.lpdaac.earthdatacloud.nasa.gov"
+    ],
+    "default": "disabled",
+    "max_asset_bytes": 200000000,
+    "max_bytes": 65536,
+    "max_parallel_requests": 1,
+    "max_requests": 3,
+    "max_total_bytes": 201000000,
+    "maximum_redirects": 0,
+    "redirect_hosts": [],
+    "request_hosts": [
+      "cmr.earthdata.nasa.gov"
+    ],
+    "resolver_host_suffixes": [],
+    "resolver_hosts": [],
+    "timeout_seconds": 10.0
+  },
+  "original_pack_unchanged": true,
+  "pack_id": "nasa-hls-bearer",
+  "plan_sha256": "1bc24c8bb9e178218d71e57e814bcffc5c8f56575f3751a1d0c38a3828fd9051",
+  "preview": {
+    "role": "natural_color",
+    "target_crs": "EPSG:32614",
+    "template_id": "general_multisource_v1",
+    "theme": "optical_imagery"
+  },
+  "provider_evidence": {
+    "evidence_sha256": "4b48fa34b9754ba9adb0acf01fff5b4f5a8260e8cc3215e5b5ad426fd80b912c",
+    "official_documentation": [
+      "https://cmr.earthdata.nasa.gov/stac/LPCLOUD"
+    ],
+    "status": "complete"
+  },
+  "public_capability": {
+    "private_execution_available_from_public_repository": false,
+    "public_execution": "validation_and_bounded_probe_only",
+    "release": "Unreleased",
+    "status": "experimental"
+  },
+  "requested_time": "2023-06",
+  "resolved_time": "2023-06",
+  "schema_version": "fasterraster.source-pack-plan/v2",
+  "source_content_identity_sha256": "9399ec78ab0d972e1f1caeff078d14d6d5337127e0101bfa6591454308799040",
+  "source_contract": {
+    "crs": "EPSG:4326",
+    "mask_policy": "alpha_or_dataset_mask",
+    "nodata": null,
+    "resampling": "bilinear",
+    "semantic_type": "continuous"
+  },
+  "source_pack_sha256": "3790002417c7747f8dd2857a426446c79ac210732eab0bf6ebe87b5251199573",
+  "status": "CREDENTIAL_REQUIRED",
+  "temporal_alternatives": null,
+  "temporal_contract": {
+    "mode": "exact",
+    "requested": "2023-06",
+    "template_variables": {},
+    "tolerance_days": 60
+  },
+  "temporal_resolution": null,
+  "validation": {
+    "family_contract": "VALID",
+    "offline_planning": "READY_FOR_OFFLINE_DETERMINISTIC_PLANNING",
+    "provider_evidence": "COMPLETE",
+    "schema": "SCHEMA_VALID",
+    "validation_sha256": "fe54f60af4913c5e1ad791e01b8429d4c54730f024884e2582e43fa399621bc6"
+  }
+}

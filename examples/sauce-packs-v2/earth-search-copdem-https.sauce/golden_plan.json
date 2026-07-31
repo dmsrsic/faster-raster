@@ -1,0 +1,132 @@
+{
+  "adapter": {
+    "asset_roles": [
+      "data"
+    ],
+    "family": "stac_search",
+    "media_types": [
+      "image/tiff; application=geotiff; profile=cloud-optimized"
+    ],
+    "public_adapter_id": "stac_api"
+  },
+  "asset_access": {
+    "mode": "direct_https",
+    "stable_identity": {
+      "href_policy": "selected_stac_asset"
+    }
+  },
+  "blocked_before_network": false,
+  "blocked_details": [],
+  "capabilities": {
+    "analysis": false,
+    "materialization": true,
+    "planning": true,
+    "preview": true,
+    "temporal_discovery": false
+  },
+  "credential_requirement": null,
+  "endpoint_contract": {
+    "endpoint": "https://earth-search.aws.element84.com/v1",
+    "family_contract": {
+      "asset_host_scope": [
+        "copernicus-dem-30m.s3.eu-central-1.amazonaws.com"
+      ],
+      "asset_selection": {
+        "item_limit": 4,
+        "item_order": [
+          "datetime",
+          "id"
+        ],
+        "required_media_types": [
+          "image/tiff; application=geotiff; profile=cloud-optimized"
+        ],
+        "required_roles": [
+          "data"
+        ]
+      },
+      "bbox_crs": "EPSG:4326",
+      "search_path": "/search",
+      "temporal_representation": "datetime"
+    },
+    "kind": "stac_search",
+    "rendered_request_url": null,
+    "url_template": null
+  },
+  "evidence_bundle_sha256": "cb62139c619c3071abc3ce58e806b554dd9942cca6219f06253767cf907448a7",
+  "executable": true,
+  "identity": {
+    "collection": "cop-dem-glo-30",
+    "product": "Copernicus DEM GLO-30",
+    "provider": "ELEMENT84_EARTH_SEARCH"
+  },
+  "network_policy": {
+    "asset_host_suffixes": [],
+    "asset_hosts": [
+      "copernicus-dem-30m.s3.eu-central-1.amazonaws.com"
+    ],
+    "default": "disabled",
+    "max_asset_bytes": 75000000,
+    "max_bytes": 65536,
+    "max_parallel_requests": 1,
+    "max_requests": 2,
+    "max_total_bytes": 76000000,
+    "maximum_redirects": 0,
+    "redirect_hosts": [],
+    "request_hosts": [
+      "earth-search.aws.element84.com"
+    ],
+    "resolver_host_suffixes": [],
+    "resolver_hosts": [],
+    "timeout_seconds": 10.0
+  },
+  "original_pack_unchanged": true,
+  "pack_id": "earth-search-copdem-https",
+  "plan_sha256": "0c4bd0b5b28344f7351036fecf7c6e18be63c1c64154ced4bfad96d0550b400a",
+  "preview": {
+    "role": "natural_color",
+    "target_crs": "EPSG:32614",
+    "template_id": "general_multisource_v1",
+    "theme": "elevation"
+  },
+  "provider_evidence": {
+    "evidence_sha256": "cb62139c619c3071abc3ce58e806b554dd9942cca6219f06253767cf907448a7",
+    "official_documentation": [
+      "https://earth-search.aws.element84.com/v1"
+    ],
+    "status": "complete"
+  },
+  "public_capability": {
+    "private_execution_available_from_public_repository": false,
+    "public_execution": "validation_and_bounded_probe_only",
+    "release": "Unreleased",
+    "status": "experimental"
+  },
+  "requested_time": null,
+  "resolved_time": null,
+  "schema_version": "fasterraster.source-pack-plan/v2",
+  "source_content_identity_sha256": "0743de99c10d02088cc1046669f016e8fd54311481ca7e7d96fa755f24e40bd4",
+  "source_contract": {
+    "crs": "EPSG:4326",
+    "mask_policy": "alpha_or_dataset_mask",
+    "nodata": null,
+    "resampling": "bilinear",
+    "semantic_type": "continuous"
+  },
+  "source_pack_sha256": "5895c78d9c8f00f24d373c0f2f2c040b1ec3abec0582a52c4ebaeafca81fb221",
+  "status": "READY",
+  "temporal_alternatives": null,
+  "temporal_contract": {
+    "mode": "static",
+    "requested": null,
+    "template_variables": {},
+    "tolerance_days": null
+  },
+  "temporal_resolution": null,
+  "validation": {
+    "family_contract": "VALID",
+    "offline_planning": "READY_FOR_OFFLINE_DETERMINISTIC_PLANNING",
+    "provider_evidence": "COMPLETE",
+    "schema": "SCHEMA_VALID",
+    "validation_sha256": "5054e0d3047e2d5b8b58bceb7011ed42520c527e5170f76a9a8128a6401871ff"
+  }
+}

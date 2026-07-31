@@ -1,0 +1,163 @@
+{
+  "adapter": {
+    "asset_roles": [
+      "red"
+    ],
+    "family": "stac_search",
+    "media_types": [
+      "image/tiff; application=geotiff; profile=cloud-optimized"
+    ],
+    "public_adapter_id": "stac_api"
+  },
+  "asset_access": {
+    "billing": {
+      "explicit_runtime_permission_required": true,
+      "explicit_study_consent_required": true,
+      "mode": "requester_pays"
+    },
+    "credential_scheme": "aws_sigv4",
+    "mode": "s3_requester_pays",
+    "stable_identity": {
+      "bucket": "usgs-landsat",
+      "key_policy": "selected_stac_asset",
+      "region": "us-west-2",
+      "scheme": "s3"
+    }
+  },
+  "blocked_before_network": false,
+  "blocked_details": [],
+  "capabilities": {
+    "analysis": false,
+    "materialization": true,
+    "planning": true,
+    "preview": true,
+    "temporal_discovery": true
+  },
+  "credential_requirement": {
+    "credential_requirement_sha256": "a3ddece3be905d823b7a400045586a6daa0b835b712f3e96cb08c793c4b49426",
+    "credential_scheme": "aws_sigv4",
+    "exact_hosts": {
+      "asset": [
+        "usgs-landsat.s3.us-west-2.amazonaws.com"
+      ],
+      "catalogue": [
+        "landsatlook.usgs.gov"
+      ],
+      "resolver": []
+    },
+    "host_suffixes": {
+      "asset": [],
+      "resolver": []
+    },
+    "operations": [
+      "asset"
+    ],
+    "resolved_secret_present": false,
+    "resolver_capability_required": "aws_sigv4_requester_pays",
+    "schema_version": "fasterraster.credential-requirement/v2"
+  },
+  "endpoint_contract": {
+    "endpoint": "https://landsatlook.usgs.gov/stac-server",
+    "family_contract": {
+      "asset_host_scope": [
+        "usgs-landsat.s3.us-west-2.amazonaws.com"
+      ],
+      "asset_selection": {
+        "item_limit": 10,
+        "item_order": [
+          "datetime",
+          "id"
+        ],
+        "required_media_types": [
+          "image/tiff; application=geotiff; profile=cloud-optimized"
+        ],
+        "required_roles": [
+          "red"
+        ]
+      },
+      "bbox_crs": "EPSG:4326",
+      "search_path": "/search",
+      "temporal_representation": "interval"
+    },
+    "kind": "stac_search",
+    "rendered_request_url": null,
+    "url_template": null
+  },
+  "evidence_bundle_sha256": "ab371c6bdbf28514c788ced836c3dc497a09957e799080804a51b327388983cd",
+  "executable": true,
+  "identity": {
+    "collection": "landsat-c2l2-sr",
+    "product": "Landsat Collection 2 Level 2 Surface Reflectance",
+    "provider": "USGS"
+  },
+  "network_policy": {
+    "asset_host_suffixes": [],
+    "asset_hosts": [
+      "usgs-landsat.s3.us-west-2.amazonaws.com"
+    ],
+    "default": "disabled",
+    "max_asset_bytes": 200000000,
+    "max_bytes": 65536,
+    "max_parallel_requests": 1,
+    "max_requests": 2,
+    "max_total_bytes": 201000000,
+    "maximum_redirects": 0,
+    "redirect_hosts": [],
+    "request_hosts": [
+      "landsatlook.usgs.gov"
+    ],
+    "resolver_host_suffixes": [],
+    "resolver_hosts": [],
+    "timeout_seconds": 10.0
+  },
+  "original_pack_unchanged": true,
+  "pack_id": "usgs-landsat-requester-pays",
+  "plan_sha256": "bbb338347894ee9840dd86619cd2d49b99b831c957706f20190ce2ddbb84c372",
+  "preview": {
+    "role": "natural_color",
+    "target_crs": "EPSG:32614",
+    "template_id": "general_multisource_v1",
+    "theme": "optical_imagery"
+  },
+  "provider_evidence": {
+    "evidence_sha256": "ab371c6bdbf28514c788ced836c3dc497a09957e799080804a51b327388983cd",
+    "official_documentation": [
+      "https://www.usgs.gov/landsat-missions/landsat-commercial-cloud-data-access"
+    ],
+    "status": "complete"
+  },
+  "public_capability": {
+    "private_execution_available_from_public_repository": false,
+    "public_execution": "validation_and_bounded_probe_only",
+    "release": "Unreleased",
+    "status": "experimental"
+  },
+  "requested_time": "2023-06",
+  "resolved_time": "2023-06",
+  "schema_version": "fasterraster.source-pack-plan/v2",
+  "source_content_identity_sha256": "2269f771bdf805fd1c66abf43becfec011d6b18402aab8197e401cc65885826a",
+  "source_contract": {
+    "crs": "EPSG:4326",
+    "mask_policy": "alpha_or_dataset_mask",
+    "nodata": null,
+    "resampling": "bilinear",
+    "semantic_type": "continuous"
+  },
+  "source_pack_sha256": "87b4c442e8b812c561a75b2f920659c455274418c27e4f6521bb4619734826e9",
+  "status": "CREDENTIAL_REQUIRED",
+  "temporal_alternatives": null,
+  "temporal_contract": {
+    "mode": "exact",
+    "requested": "2023-06",
+    "template_variables": {},
+    "tolerance_days": 60
+  },
+  "temporal_resolution": null,
+  "validation": {
+    "family_contract": "VALID",
+    "offline_planning": "READY_FOR_OFFLINE_DETERMINISTIC_PLANNING",
+    "provider_evidence": "COMPLETE",
+    "schema": "SCHEMA_VALID",
+    "validation_sha256": "e3a535045c2c2bb2a66495ec709f92ed19ca627d713f23906f8d60bc4a4a83b3"
+  }
+}

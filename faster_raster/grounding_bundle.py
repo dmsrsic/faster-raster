@@ -14,11 +14,18 @@ DEFAULT_ROOT = Path(__file__).resolve().parent.parent
 
 GROUNDING_FILES: tuple[tuple[str, str], ...] = (
     ("schemas/source_pack.schema.json", "source_pack_schema"),
+    ("schemas/source_pack_v2.schema.json", "source_pack_schema"),
+    ("schemas/source_pack_plan_v2.schema.json", "source_pack_plan_schema"),
     (
         "schemas/source_materialization_request.schema.json",
         "source_materialization_request_schema",
     ),
+    (
+        "schemas/source_materialization_request_v2.schema.json",
+        "source_materialization_request_schema",
+    ),
     ("schemas/credential_requirement.schema.json", "credential_schema"),
+    ("schemas/credential_requirement_v2.schema.json", "credential_schema"),
     ("schemas/temporal_alternatives.schema.json", "temporal_schema"),
     ("schemas/temporal_resolution.schema.json", "temporal_schema"),
     (
@@ -40,6 +47,8 @@ GROUNDING_FILES: tuple[tuple[str, str], ...] = (
     ("docs/generated/capabilities.md", "capability_reference"),
     ("docs/flavortown-wizard.md", "wizard_workflow"),
     ("docs/bring-your-own-sauce.md", "source_pack_guide"),
+    ("docs/stac-asset-access.md", "source_access_guide"),
+    ("docs/earth-engine-compute.md", "compute_contract_guide"),
     ("docs/sauce-time.md", "temporal_guide"),
     ("docs/preview-templates.md", "preview_guide"),
     ("docs/ag-classification.md", "classification_methodology"),
@@ -111,6 +120,18 @@ GROUNDING_FILES: tuple[tuple[str, str], ...] = (
     (
         "examples/sauce-packs/verified-local-raster.sauce/probe_fixture.json",
         "synthetic_evidence_fixture",
+    ),
+    (
+        "examples/sauce-packs-v2/earth-search-copdem-https.sauce/sauce.yaml",
+        "direct_https_v2_example",
+    ),
+    (
+        "examples/sauce-packs-v2/usgs-landsat-requester-pays.sauce/sauce.yaml",
+        "requester_pays_v2_example",
+    ),
+    (
+        "examples/sauce-packs-v2/earth-engine-sentinel2.sauce/sauce.yaml",
+        "earth_engine_contract_example",
     ),
     (
         "prompts/flavortown_sauce_wizard/CLI_REFERENCE.md",
@@ -186,6 +207,10 @@ def build_grounding_bundle(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
             "fasterraster.source-pack-plan/v1",
             "fasterraster.source-materialization-request/v1",
             "fasterraster.credential-requirement/v1",
+            "fasterraster.source-pack/v2",
+            "fasterraster.source-pack-plan/v2",
+            "fasterraster.source-materialization-request/v2",
+            "fasterraster.credential-requirement/v2",
             "fasterraster.temporal-alternatives/v1",
             "fasterraster.temporal-resolution/v1",
             "fasterraster.classification-temporal-alternatives/v1",

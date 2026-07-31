@@ -1,0 +1,13 @@
+{
+  "identity": {
+    "collection": "landsat-c2-l2",
+    "product": "Landsat Collection 2 Level 2",
+    "provider": "MICROSOFT_PLANETARY_COMPUTER"
+  },
+  "provider_evidence": {
+    "official_documentation": [
+      "https://planetarycomputer.microsoft.com/docs/concepts/sas/"
+    ],
+    "status": "complete"
+  }
+}

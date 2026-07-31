@@ -15,6 +15,121 @@ def source_pack_schema() -> dict[str, Any]:
     return schema
 
 
+def source_pack_v2_schema() -> dict[str, Any]:
+    from faster_raster.source_pack import SourcePackManifestV2
+
+    schema = SourcePackManifestV2.model_json_schema()
+    schema["$schema"] = DRAFT
+    schema["title"] = "FasterRaster declarative Source Pack v2"
+    return schema
+
+
+def source_pack_plan_v2_schema() -> dict[str, Any]:
+    sha256 = {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+    required = [
+        "schema_version",
+        "pack_id",
+        "source_pack_sha256",
+        "status",
+        "executable",
+        "blocked_before_network",
+        "blocked_details",
+        "identity",
+        "provider_evidence",
+        "adapter",
+        "endpoint_contract",
+        "capabilities",
+        "public_capability",
+        "source_contract",
+        "source_content_identity_sha256",
+        "requested_time",
+        "resolved_time",
+        "temporal_contract",
+        "temporal_alternatives",
+        "temporal_resolution",
+        "credential_requirement",
+        "asset_access",
+        "network_policy",
+        "preview",
+        "validation",
+        "original_pack_unchanged",
+        "evidence_bundle_sha256",
+        "plan_sha256",
+    ]
+    properties: dict[str, Any] = {
+        "schema_version": {"const": "fasterraster.source-pack-plan/v2"},
+        "pack_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_-]{2,63}$",
+        },
+        "source_pack_sha256": sha256,
+        "source_content_identity_sha256": sha256,
+        "evidence_bundle_sha256": sha256,
+        "plan_sha256": sha256,
+        "status": {
+            "enum": [
+                "READY",
+                "CREDENTIAL_REQUIRED",
+                "BLOCKED_PROVIDER_EVIDENCE",
+                "AWAITING_TEMPORAL_SELECTION",
+                "NO_TEMPORAL_ALTERNATIVES",
+            ]
+        },
+        "executable": {"type": "boolean"},
+        "blocked_before_network": {"type": "boolean"},
+        "blocked_details": {"type": "array", "items": {"type": "string"}},
+        "identity": {"type": "object"},
+        "provider_evidence": {"type": "object"},
+        "adapter": {"type": "object"},
+        "endpoint_contract": {"type": "object"},
+        "capabilities": {"type": "object"},
+        "public_capability": {"type": "object"},
+        "source_contract": {"type": "object"},
+        "requested_time": {"type": ["string", "null"]},
+        "resolved_time": {"type": ["string", "null"]},
+        "temporal_contract": {"type": "object"},
+        "temporal_alternatives": {"type": ["object", "null"]},
+        "temporal_resolution": {"type": ["object", "null"]},
+        "credential_requirement": {"type": ["object", "null"]},
+        "asset_access": {"type": ["object", "null"]},
+        "network_policy": {"type": "object"},
+        "preview": {"type": "object"},
+        "validation": {"type": "object"},
+        "original_pack_unchanged": {"const": True},
+    }
+    return {
+        "$schema": DRAFT,
+        "title": "FasterRaster frozen Source Pack plan v2",
+        "type": "object",
+        "additionalProperties": False,
+        "required": required,
+        "properties": properties,
+        "allOf": [
+            {
+                "if": {
+                    "properties": {
+                        "asset_access": {
+                            "properties": {
+                                "mode": {"const": "s3_requester_pays"}
+                            }
+                        }
+                    }
+                },
+                "then": {
+                    "properties": {
+                        "credential_requirement": {
+                            "properties": {
+                                "credential_scheme": {"const": "aws_sigv4"}
+                            },
+                            "required": ["credential_scheme"],
+                        }
+                    }
+                },
+            }
+        ],
+    }
+
+
 def source_materialization_request_schema() -> dict[str, Any]:
     sha256 = {"type": "string", "pattern": "^[a-f0-9]{64}$"}
     bbox = {
@@ -94,6 +209,118 @@ def source_materialization_request_schema() -> dict[str, Any]:
                     },
                 ]
             },
+            "original_source_plan_unchanged": {"const": True},
+            "materialization_request_sha256": sha256,
+        },
+    }
+
+
+def source_materialization_request_v2_schema() -> dict[str, Any]:
+    sha256 = {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+    opaque_or_null = {
+        "oneOf": [
+            {"type": "null"},
+            {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9._-]{2,127}$",
+            },
+        ]
+    }
+    return {
+        "$schema": DRAFT,
+        "title": "FasterRaster Source Pack materialization request v2",
+        "type": "object",
+        "additionalProperties": False,
+        "required": [
+            "schema_version",
+            "pack_id",
+            "source_plan_sha256",
+            "requested_asset_roles",
+            "spatial_request",
+            "output_grid",
+            "earth_engine_selection",
+            "authorization",
+            "limits",
+            "materialization_content_sha256",
+            "original_source_plan_unchanged",
+            "materialization_request_sha256",
+        ],
+        "properties": {
+            "schema_version": {
+                "const": "fasterraster.source-materialization-request/v2"
+            },
+            "pack_id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_-]{2,63}$",
+            },
+            "source_plan_sha256": sha256,
+            "requested_asset_roles": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": True,
+                "items": {"type": "string", "minLength": 1},
+            },
+            "spatial_request": {"type": "object"},
+            "output_grid": {"type": ["object", "null"]},
+            "earth_engine_selection": {
+                "type": ["array", "null"],
+                "items": {
+                    "type": "object",
+                    "required": ["operation"],
+                    "properties": {
+                        "operation": {
+                            "enum": [
+                                "load_image",
+                                "load_collection",
+                                "filter_bounds",
+                                "filter_date",
+                                "sort_acquisition_time",
+                                "tie_break_system_index",
+                                "select_first",
+                                "select_bands",
+                            ]
+                        }
+                    },
+                },
+            },
+            "authorization": {
+                "type": "object",
+                "additionalProperties": False,
+                "required": [
+                    "credential_ref",
+                    "project_ref",
+                    "allow_chargeable_access",
+                ],
+                "properties": {
+                    "credential_ref": opaque_or_null,
+                    "project_ref": opaque_or_null,
+                    "allow_chargeable_access": {"type": "boolean"},
+                },
+            },
+            "limits": {
+                "type": "object",
+                "additionalProperties": False,
+                "required": [
+                    "max_network_requests",
+                    "max_network_bytes",
+                    "max_compute_requests",
+                ],
+                "properties": {
+                    "max_network_requests": {
+                        "type": "integer",
+                        "minimum": 0,
+                    },
+                    "max_network_bytes": {
+                        "type": "integer",
+                        "minimum": 0,
+                    },
+                    "max_compute_requests": {
+                        "type": "integer",
+                        "minimum": 0,
+                    },
+                },
+            },
+            "materialization_content_sha256": sha256,
             "original_source_plan_unchanged": {"const": True},
             "materialization_request_sha256": sha256,
         },
@@ -639,5 +866,52 @@ def credential_requirement_schema() -> dict[str, Any]:
             "resolver_capability_required": {"type": "string"},
             "resolved_secret_present": {"const": False},
             "credential_requirement_sha256": {"type": "string"},
+        },
+    }
+
+
+def credential_requirement_v2_schema() -> dict[str, Any]:
+    return {
+        "$schema": DRAFT,
+        "title": "FasterRaster public credential requirement v2",
+        "type": "object",
+        "additionalProperties": False,
+        "required": [
+            "schema_version",
+            "credential_scheme",
+            "operations",
+            "exact_hosts",
+            "host_suffixes",
+            "resolver_capability_required",
+            "resolved_secret_present",
+            "credential_requirement_sha256",
+        ],
+        "properties": {
+            "schema_version": {"const": "fasterraster.credential-requirement/v2"},
+            "credential_scheme": {
+                "enum": [
+                    "aws_sigv4",
+                    "ephemeral_https_signer",
+                    "google_adc",
+                    "oauth2_bearer",
+                    "s3_compatible",
+                ]
+            },
+            "operations": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": True,
+                "items": {
+                    "enum": ["catalogue", "resolver", "asset", "compute"]
+                },
+            },
+            "exact_hosts": {"type": "object"},
+            "host_suffixes": {"type": "object"},
+            "resolver_capability_required": {"type": "string"},
+            "resolved_secret_present": {"const": False},
+            "credential_requirement_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$",
+            },
         },
     }

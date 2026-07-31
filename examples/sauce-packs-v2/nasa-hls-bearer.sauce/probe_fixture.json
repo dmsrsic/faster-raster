@@ -1,0 +1,13 @@
+{
+  "identity": {
+    "collection": "HLSL30_2.0",
+    "product": "Harmonized Landsat Sentinel-2 L30",
+    "provider": "NASA_LPCLOUD"
+  },
+  "provider_evidence": {
+    "official_documentation": [
+      "https://cmr.earthdata.nasa.gov/stac/LPCLOUD"
+    ],
+    "status": "complete"
+  }
+}

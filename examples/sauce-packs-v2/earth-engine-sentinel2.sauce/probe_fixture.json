@@ -1,0 +1,13 @@
+{
+  "identity": {
+    "collection": "COPERNICUS/S2_SR_HARMONIZED",
+    "product": "Sentinel-2 Surface Reflectance Harmonized",
+    "provider": "GOOGLE_EARTH_ENGINE"
+  },
+  "provider_evidence": {
+    "official_documentation": [
+      "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED"
+    ],
+    "status": "complete"
+  }
+}

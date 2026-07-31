@@ -1,0 +1,56 @@
+{
+  "authorization": {
+    "allow_chargeable_access": false,
+    "credential_ref": "local-google-adc",
+    "project_ref": "earth-engine-research"
+  },
+  "earth_engine_selection": [
+    {
+      "dataset_id": "NASA/NASADEM_HGT/001",
+      "operation": "load_image"
+    },
+    {
+      "bands": [
+        "elevation"
+      ],
+      "operation": "select_bands"
+    }
+  ],
+  "limits": {
+    "max_compute_requests": 1,
+    "max_network_bytes": 5000000,
+    "max_network_requests": 1
+  },
+  "materialization_content_sha256": "e6b33a510ab8e563c3f822e94244d9e1b748deff5d98366e8fae7923ae9b5f75",
+  "materialization_request_sha256": "b14c9c6542e9adb742dd38bf74168d0b92ad4cfc4d6520bfb7a254b58ae4be91",
+  "original_source_plan_unchanged": true,
+  "output_grid": {
+    "crs": "EPSG:32614",
+    "height": 128,
+    "transform": [
+      30.0,
+      0.0,
+      321600.0,
+      0.0,
+      -30.0,
+      4363200.0
+    ],
+    "width": 128
+  },
+  "pack_id": "earth-engine-nasadem",
+  "requested_asset_roles": [
+    "elevation"
+  ],
+  "schema_version": "fasterraster.source-materialization-request/v2",
+  "source_plan_sha256": "47985bcc784a4ac08159704ca28e443e9d6ac2db1908374954e7cb088dcd4e28",
+  "spatial_request": {
+    "bbox": [
+      -101.06,
+      39.38,
+      -101.04,
+      39.4
+    ],
+    "bbox_crs": "EPSG:4326",
+    "mode": "bbox"
+  }
+}

@@ -1,0 +1,144 @@
+{
+  "adapter": {
+    "asset_roles": [
+      "Map"
+    ],
+    "family": "earth_engine_compute",
+    "media_types": [
+      "image/tiff"
+    ],
+    "public_adapter_id": "earth_engine_compute"
+  },
+  "asset_access": null,
+  "blocked_before_network": false,
+  "blocked_details": [],
+  "capabilities": {
+    "analysis": false,
+    "materialization": false,
+    "planning": true,
+    "preview": true,
+    "temporal_discovery": false
+  },
+  "credential_requirement": {
+    "credential_requirement_sha256": "41a4c0bfc972cc7cff8341725e7752262300cead735a286c2166d7851db2371e",
+    "credential_scheme": "google_adc",
+    "exact_hosts": {
+      "asset": [],
+      "catalogue": [],
+      "resolver": []
+    },
+    "host_suffixes": {
+      "asset": [],
+      "resolver": []
+    },
+    "operations": [
+      "compute"
+    ],
+    "resolved_secret_present": false,
+    "resolver_capability_required": "google_adc_project_bound",
+    "schema_version": "fasterraster.credential-requirement/v2"
+  },
+  "endpoint_contract": {
+    "earth_engine": {
+      "allowed_operations": [
+        "load_collection",
+        "filter_bounds",
+        "sort_acquisition_time",
+        "tie_break_system_index",
+        "select_first",
+        "select_bands"
+      ],
+      "bands": [
+        {
+          "data_type": "uint8",
+          "name": "Map",
+          "semantic_type": "categorical"
+        }
+      ],
+      "credential_scheme": "google_adc",
+      "dataset_id": "ESA/WorldCover/v200",
+      "dataset_type": "image_collection",
+      "max_bands": 1,
+      "max_height": 32000,
+      "max_uncompressed_response_bytes": 1000000,
+      "max_width": 32000
+    },
+    "family_contract": {
+      "dataset_identity": "ESA/WorldCover/v200"
+    },
+    "kind": "earth_engine_compute"
+  },
+  "evidence_bundle_sha256": "cb654b7f0b42fad60c9ec70218d77e3063f659b5acd931ff3c00a39db3e8f310",
+  "executable": true,
+  "identity": {
+    "collection": "ESA/WorldCover/v200",
+    "product": "ESA WorldCover 2021",
+    "provider": "GOOGLE_EARTH_ENGINE"
+  },
+  "network_policy": {
+    "asset_host_suffixes": [],
+    "asset_hosts": [],
+    "default": "disabled",
+    "max_asset_bytes": 5000000,
+    "max_bytes": 65536,
+    "max_parallel_requests": 1,
+    "max_requests": 1,
+    "max_total_bytes": 5000000,
+    "maximum_redirects": 0,
+    "redirect_hosts": [],
+    "request_hosts": [],
+    "resolver_host_suffixes": [],
+    "resolver_hosts": [],
+    "timeout_seconds": 10.0
+  },
+  "original_pack_unchanged": true,
+  "pack_id": "earth-engine-worldcover",
+  "plan_sha256": "9e1b73b0d0e4bd60698b26cc5d7529048afba0f2327c62a20966b3a1385f40e4",
+  "preview": {
+    "role": "natural_color",
+    "target_crs": "EPSG:32614",
+    "template_id": "general_multisource_v1",
+    "theme": "classification"
+  },
+  "provider_evidence": {
+    "evidence_sha256": "cb654b7f0b42fad60c9ec70218d77e3063f659b5acd931ff3c00a39db3e8f310",
+    "official_documentation": [
+      "https://developers.google.com/earth-engine/datasets/catalog/ESA_WorldCover_v200"
+    ],
+    "status": "complete"
+  },
+  "public_capability": {
+    "private_execution_available_from_public_repository": false,
+    "public_execution": "validation_and_bounded_probe_only",
+    "release": "Unreleased",
+    "status": "experimental"
+  },
+  "requested_time": "2021",
+  "resolved_time": "2021",
+  "schema_version": "fasterraster.source-pack-plan/v2",
+  "source_content_identity_sha256": "c127204234e0d91131eb3b1ec4cf9aade9fed51fbfc79d3de6900255163be87e",
+  "source_contract": {
+    "crs": "EPSG:4326",
+    "mask_policy": "alpha_or_dataset_mask",
+    "nodata": null,
+    "resampling": "nearest",
+    "semantic_type": "categorical"
+  },
+  "source_pack_sha256": "f4e9a68f90a369c4c4446d524055f254ddae56becdf4c23117a781996806eac4",
+  "status": "CREDENTIAL_REQUIRED",
+  "temporal_alternatives": null,
+  "temporal_contract": {
+    "mode": "static",
+    "requested": "2021",
+    "template_variables": {},
+    "tolerance_days": null
+  },
+  "temporal_resolution": null,
+  "validation": {
+    "family_contract": "VALID",
+    "offline_planning": "READY_FOR_OFFLINE_DETERMINISTIC_PLANNING",
+    "provider_evidence": "COMPLETE",
+    "schema": "SCHEMA_VALID",
+    "validation_sha256": "51d874502ac77f0750d12a97bbe96f2fa5b4e946ca40093a96a48e2ebf2bc76e"
+  }
+}

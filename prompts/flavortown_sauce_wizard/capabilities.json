@@ -105,6 +105,32 @@
       "status": "experimental"
     },
     {
+      "analysis": false,
+      "capability_id": "stac_asset_access_v2",
+      "credential_requirement": "operation_scoped_opaque_reference",
+      "kind": "boundary",
+      "label": "Versioned generic STAC asset-access contracts",
+      "materialization": false,
+      "notes": "Direct HTTPS, bearer HTTPS, ephemeral signer, public S3, and Requester Pays S3 are provider-neutral v2 contracts; authenticated execution is private.",
+      "planning": true,
+      "preview": false,
+      "public_execution": "frozen_contract_only",
+      "status": "experimental"
+    },
+    {
+      "analysis": false,
+      "capability_id": "earth_engine_compute_contract",
+      "credential_requirement": "opaque_google_adc_and_project_reference",
+      "kind": "boundary",
+      "label": "Closed Earth Engine computation contracts",
+      "materialization": false,
+      "notes": "The public compiler emits a deterministic closed operation list and output grid; the public repository does not execute Earth Engine.",
+      "planning": true,
+      "preview": false,
+      "public_execution": "contract_compilation_only",
+      "status": "experimental"
+    },
+    {
       "analysis": true,
       "capability_id": "private_execution_backend",
       "credential_requirement": "resolver_required",
@@ -131,7 +157,7 @@
       "status": "unsupported"
     }
   ],
-  "capability_registry_sha256": "65da21e291fcd03a496993bb0fe25b1af17038a140bdace5d45a8b08de03a0c2",
+  "capability_registry_sha256": "b9033f32ccb882b0265547697949b56c6a888922a46ba8d1157b74fdec144955",
   "registry_version": "1.0.0",
   "release": {
     "contract_status": "experimental",

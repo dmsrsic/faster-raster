@@ -16,6 +16,8 @@ A catalog entry never implies that every product, geography, date, or output is 
 | Classification confidence-threshold provenance | `experimental` | yes | yes | yes | yes | `fail_closed_provenance` |
 | Coherent NAIP-CDL temporal repair | `experimental` | yes | no | no | no | `explicit_selection_only` |
 | Public credential-requirement contract | `experimental` | yes | no | no | no | `fails_before_network_without_resolver` |
+| Versioned generic STAC asset-access contracts | `experimental` | yes | no | no | no | `frozen_contract_only` |
+| Closed Earth Engine computation contracts | `experimental` | yes | no | no | no | `contract_compilation_only` |
 | Authenticated parallel execution backend | `private` | no | no | yes | yes | `unavailable` |
 | Arbitrary-code source plugins | `unsupported` | no | no | no | no | `unavailable` |
 
@@ -30,4 +32,4 @@ A catalog entry never implies that every product, geography, date, or output is 
 | CHIRPS, gridMET, TerraClimate, and WorldClim | `experimental` | yes | yes | no | no | `bounded_probe_and_fixture_paths` |
 | Copernicus Data Space STAC | `experimental` | yes | no | no | no | `resolver_required` |
 
-Registry SHA-256: `65da21e291fcd03a496993bb0fe25b1af17038a140bdace5d45a8b08de03a0c2`
+Registry SHA-256: `b9033f32ccb882b0265547697949b56c6a888922a46ba8d1157b74fdec144955`

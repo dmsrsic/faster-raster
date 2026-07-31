@@ -1,0 +1,163 @@
+{
+  "adapter": {
+    "asset_roles": [
+      "red"
+    ],
+    "family": "stac_search",
+    "media_types": [
+      "image/tiff; application=geotiff; profile=cloud-optimized"
+    ],
+    "public_adapter_id": "stac_api"
+  },
+  "asset_access": {
+    "mode": "brokered_signed_https",
+    "resolver": {
+      "endpoint": "https://planetarycomputer.microsoft.com/api/sas/v1/sign",
+      "href_parameter": "href",
+      "method": "GET",
+      "response_field": "href",
+      "scheme": "ephemeral_https_signer"
+    },
+    "stable_identity": {
+      "href_policy": "unsigned_selected_stac_asset"
+    }
+  },
+  "blocked_before_network": false,
+  "blocked_details": [],
+  "capabilities": {
+    "analysis": false,
+    "materialization": true,
+    "planning": true,
+    "preview": true,
+    "temporal_discovery": true
+  },
+  "credential_requirement": {
+    "credential_requirement_sha256": "8fc7fb38356dc848c3cd2ec01526db90ee66dff7f9f6e5517ce678e71380132b",
+    "credential_scheme": "ephemeral_https_signer",
+    "exact_hosts": {
+      "asset": [],
+      "catalogue": [
+        "planetarycomputer.microsoft.com"
+      ],
+      "resolver": [
+        "planetarycomputer.microsoft.com"
+      ]
+    },
+    "host_suffixes": {
+      "asset": [
+        "blob.core.windows.net"
+      ],
+      "resolver": []
+    },
+    "operations": [
+      "resolver"
+    ],
+    "resolved_secret_present": false,
+    "resolver_capability_required": "ephemeral_https_signer",
+    "schema_version": "fasterraster.credential-requirement/v2"
+  },
+  "endpoint_contract": {
+    "endpoint": "https://planetarycomputer.microsoft.com/api/stac/v1",
+    "family_contract": {
+      "asset_host_scope": [],
+      "asset_selection": {
+        "item_limit": 10,
+        "item_order": [
+          "datetime",
+          "id"
+        ],
+        "required_media_types": [
+          "image/tiff; application=geotiff; profile=cloud-optimized"
+        ],
+        "required_roles": [
+          "red"
+        ]
+      },
+      "bbox_crs": "EPSG:4326",
+      "search_path": "/search",
+      "temporal_representation": "interval"
+    },
+    "kind": "stac_search",
+    "rendered_request_url": null,
+    "url_template": null
+  },
+  "evidence_bundle_sha256": "e49dce2422ef085074ffd1c74dbb7cc87f17421c53d9d12103b03c82544cdbda",
+  "executable": true,
+  "identity": {
+    "collection": "landsat-c2-l2",
+    "product": "Landsat Collection 2 Level 2",
+    "provider": "MICROSOFT_PLANETARY_COMPUTER"
+  },
+  "network_policy": {
+    "asset_host_suffixes": [
+      "blob.core.windows.net"
+    ],
+    "asset_hosts": [],
+    "default": "disabled",
+    "max_asset_bytes": 250000000,
+    "max_bytes": 65536,
+    "max_parallel_requests": 1,
+    "max_requests": 4,
+    "max_total_bytes": 251000000,
+    "maximum_redirects": 0,
+    "redirect_hosts": [],
+    "request_hosts": [
+      "planetarycomputer.microsoft.com"
+    ],
+    "resolver_host_suffixes": [],
+    "resolver_hosts": [
+      "planetarycomputer.microsoft.com"
+    ],
+    "timeout_seconds": 10.0
+  },
+  "original_pack_unchanged": true,
+  "pack_id": "planetary-computer-signed",
+  "plan_sha256": "a9557eb4a627ea8bcd735682698700cc08580a50bf8168f2516b6cd58cd1be30",
+  "preview": {
+    "role": "natural_color",
+    "target_crs": "EPSG:32614",
+    "template_id": "general_multisource_v1",
+    "theme": "optical_imagery"
+  },
+  "provider_evidence": {
+    "evidence_sha256": "e49dce2422ef085074ffd1c74dbb7cc87f17421c53d9d12103b03c82544cdbda",
+    "official_documentation": [
+      "https://planetarycomputer.microsoft.com/docs/concepts/sas/"
+    ],
+    "status": "complete"
+  },
+  "public_capability": {
+    "private_execution_available_from_public_repository": false,
+    "public_execution": "validation_and_bounded_probe_only",
+    "release": "Unreleased",
+    "status": "experimental"
+  },
+  "requested_time": "2023-06",
+  "resolved_time": "2023-06",
+  "schema_version": "fasterraster.source-pack-plan/v2",
+  "source_content_identity_sha256": "a66f41655e5daac45dbdf7887a84cecc3765a6210b2784aec8b43d6e67bfaec8",
+  "source_contract": {
+    "crs": "EPSG:4326",
+    "mask_policy": "alpha_or_dataset_mask",
+    "nodata": null,
+    "resampling": "bilinear",
+    "semantic_type": "continuous"
+  },
+  "source_pack_sha256": "ea4331da70f9d3e4ff570540f7695d696c73113edcdb217454c067a04afcd973",
+  "status": "CREDENTIAL_REQUIRED",
+  "temporal_alternatives": null,
+  "temporal_contract": {
+    "mode": "exact",
+    "requested": "2023-06",
+    "template_variables": {},
+    "tolerance_days": 60
+  },
+  "temporal_resolution": null,
+  "validation": {
+    "family_contract": "VALID",
+    "offline_planning": "READY_FOR_OFFLINE_DETERMINISTIC_PLANNING",
+    "provider_evidence": "COMPLETE",
+    "schema": "SCHEMA_VALID",
+    "validation_sha256": "a78c9aec76e417070fdbb090a57de565c7f37cd64083f500fec712ee69568f5b"
+  }
+}

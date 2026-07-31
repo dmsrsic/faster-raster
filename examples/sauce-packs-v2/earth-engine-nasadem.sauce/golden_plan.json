@@ -1,0 +1,140 @@
+{
+  "adapter": {
+    "asset_roles": [
+      "elevation"
+    ],
+    "family": "earth_engine_compute",
+    "media_types": [
+      "image/tiff"
+    ],
+    "public_adapter_id": "earth_engine_compute"
+  },
+  "asset_access": null,
+  "blocked_before_network": false,
+  "blocked_details": [],
+  "capabilities": {
+    "analysis": false,
+    "materialization": false,
+    "planning": true,
+    "preview": true,
+    "temporal_discovery": false
+  },
+  "credential_requirement": {
+    "credential_requirement_sha256": "41a4c0bfc972cc7cff8341725e7752262300cead735a286c2166d7851db2371e",
+    "credential_scheme": "google_adc",
+    "exact_hosts": {
+      "asset": [],
+      "catalogue": [],
+      "resolver": []
+    },
+    "host_suffixes": {
+      "asset": [],
+      "resolver": []
+    },
+    "operations": [
+      "compute"
+    ],
+    "resolved_secret_present": false,
+    "resolver_capability_required": "google_adc_project_bound",
+    "schema_version": "fasterraster.credential-requirement/v2"
+  },
+  "endpoint_contract": {
+    "earth_engine": {
+      "allowed_operations": [
+        "load_image",
+        "select_bands"
+      ],
+      "bands": [
+        {
+          "data_type": "int16",
+          "name": "elevation",
+          "semantic_type": "continuous"
+        }
+      ],
+      "credential_scheme": "google_adc",
+      "dataset_id": "NASA/NASADEM_HGT/001",
+      "dataset_type": "image",
+      "max_bands": 1,
+      "max_height": 32000,
+      "max_uncompressed_response_bytes": 1000000,
+      "max_width": 32000
+    },
+    "family_contract": {
+      "dataset_identity": "NASA/NASADEM_HGT/001"
+    },
+    "kind": "earth_engine_compute"
+  },
+  "evidence_bundle_sha256": "ff2adc368f4eef88bb1a49aab414e977238d1184598adf1859be1aa32a0ea64a",
+  "executable": true,
+  "identity": {
+    "collection": null,
+    "product": "NASADEM",
+    "provider": "GOOGLE_EARTH_ENGINE"
+  },
+  "network_policy": {
+    "asset_host_suffixes": [],
+    "asset_hosts": [],
+    "default": "disabled",
+    "max_asset_bytes": 5000000,
+    "max_bytes": 65536,
+    "max_parallel_requests": 1,
+    "max_requests": 1,
+    "max_total_bytes": 5000000,
+    "maximum_redirects": 0,
+    "redirect_hosts": [],
+    "request_hosts": [],
+    "resolver_host_suffixes": [],
+    "resolver_hosts": [],
+    "timeout_seconds": 10.0
+  },
+  "original_pack_unchanged": true,
+  "pack_id": "earth-engine-nasadem",
+  "plan_sha256": "47985bcc784a4ac08159704ca28e443e9d6ac2db1908374954e7cb088dcd4e28",
+  "preview": {
+    "role": "natural_color",
+    "target_crs": "EPSG:32614",
+    "template_id": "general_multisource_v1",
+    "theme": "elevation"
+  },
+  "provider_evidence": {
+    "evidence_sha256": "ff2adc368f4eef88bb1a49aab414e977238d1184598adf1859be1aa32a0ea64a",
+    "official_documentation": [
+      "https://developers.google.com/earth-engine/datasets/catalog/NASA_NASADEM_HGT_001"
+    ],
+    "status": "complete"
+  },
+  "public_capability": {
+    "private_execution_available_from_public_repository": false,
+    "public_execution": "validation_and_bounded_probe_only",
+    "release": "Unreleased",
+    "status": "experimental"
+  },
+  "requested_time": null,
+  "resolved_time": null,
+  "schema_version": "fasterraster.source-pack-plan/v2",
+  "source_content_identity_sha256": "3f8dd2d40363ebea0d853b23d1f11588202597be9baa7996cc2365bfe4e76018",
+  "source_contract": {
+    "crs": "EPSG:4326",
+    "mask_policy": "alpha_or_dataset_mask",
+    "nodata": null,
+    "resampling": "bilinear",
+    "semantic_type": "continuous"
+  },
+  "source_pack_sha256": "0cba8458ec44a2653a31336b663bd0ae8ce479cbf57925d1fe631af344c50e25",
+  "status": "CREDENTIAL_REQUIRED",
+  "temporal_alternatives": null,
+  "temporal_contract": {
+    "mode": "static",
+    "requested": null,
+    "template_variables": {},
+    "tolerance_days": null
+  },
+  "temporal_resolution": null,
+  "validation": {
+    "family_contract": "VALID",
+    "offline_planning": "READY_FOR_OFFLINE_DETERMINISTIC_PLANNING",
+    "provider_evidence": "COMPLETE",
+    "schema": "SCHEMA_VALID",
+    "validation_sha256": "d853cdde5936f5bb471e9067302882024b38a36d95f43f05f09fa22d0ce15abd"
+  }
+}

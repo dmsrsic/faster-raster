@@ -1,0 +1,33 @@
+{
+  "authorization": {
+    "allow_chargeable_access": false,
+    "credential_ref": null,
+    "project_ref": null
+  },
+  "earth_engine_selection": null,
+  "limits": {
+    "max_compute_requests": 0,
+    "max_network_bytes": 251000000,
+    "max_network_requests": 4
+  },
+  "materialization_content_sha256": "22d170895520c0ae9a5562e406dfaf9061d35a19b704a1a31bdff3216c378c1e",
+  "materialization_request_sha256": "c2a73d1c09c06c1e77947fde8bbb17a509c728a35a19e1c212320f0a3be4a4b5",
+  "original_source_plan_unchanged": true,
+  "output_grid": null,
+  "pack_id": "planetary-computer-signed",
+  "requested_asset_roles": [
+    "red"
+  ],
+  "schema_version": "fasterraster.source-materialization-request/v2",
+  "source_plan_sha256": "a9557eb4a627ea8bcd735682698700cc08580a50bf8168f2516b6cd58cd1be30",
+  "spatial_request": {
+    "bbox": [
+      -101.06,
+      39.38,
+      -101.04,
+      39.4
+    ],
+    "bbox_crs": "EPSG:4326",
+    "mode": "bbox"
+  }
+}

@@ -566,6 +566,14 @@ def command_sauce(args: argparse.Namespace) -> int:
             bbox_crs=args.bbox_crs,
             output_width=args.width,
             output_height=args.height,
+            output_crs=args.output_crs,
+            output_transform=args.output_transform,
+            credential_ref=args.credential_ref,
+            project_ref=args.project_ref,
+            allow_chargeable_access=args.allow_chargeable_access,
+            max_network_requests=args.max_network_requests,
+            max_network_bytes=args.max_network_bytes,
+            max_compute_requests=args.max_compute_requests,
         )
         write_json_atomic(args.out, request)
         _json(request) if args.json else print(
@@ -2180,6 +2188,19 @@ def build_parser() -> argparse.ArgumentParser:
     sauce_request.add_argument("--bbox-crs")
     sauce_request.add_argument("--width", type=int)
     sauce_request.add_argument("--height", type=int)
+    sauce_request.add_argument("--output-crs")
+    sauce_request.add_argument(
+        "--output-transform",
+        type=float,
+        nargs=6,
+        metavar=("A", "B", "C", "D", "E", "F"),
+    )
+    sauce_request.add_argument("--credential-ref")
+    sauce_request.add_argument("--project-ref")
+    sauce_request.add_argument("--allow-chargeable-access", action="store_true")
+    sauce_request.add_argument("--max-network-requests", type=int)
+    sauce_request.add_argument("--max-network-bytes", type=int)
+    sauce_request.add_argument("--max-compute-requests", type=int, default=0)
     sauce_request.add_argument("--json", action="store_true")
     sauce_request.set_defaults(handler=command_sauce)
     sauce_time = sauce_commands.add_parser(

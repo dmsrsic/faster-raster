@@ -1,0 +1,71 @@
+schema_version: fasterraster.source-pack/v2
+pack_id: usgs-landsat-requester-pays
+display_name: USGS Landsat Requester Pays
+description: Generic AWS SigV4 Requester Pays contract with explicit study and runtime gates.
+adapter:
+  family: stac_search
+  endpoint: https://landsatlook.usgs.gov/stac-server
+  media_types:
+    - image/tiff; application=geotiff; profile=cloud-optimized
+  asset_roles: [red]
+capabilities:
+  planning: true
+  preview: true
+  materialization: true
+  analysis: false
+  temporal_discovery: true
+source:
+  semantic_type: continuous
+  crs: EPSG:4326
+  resampling: bilinear
+  nodata: null
+  mask_policy: alpha_or_dataset_mask
+access:
+  authentication_scheme: none
+  allowed_hosts: [landsatlook.usgs.gov]
+  redirect_hosts: []
+  asset_hosts: [usgs-landsat.s3.us-west-2.amazonaws.com]
+  asset_host_suffixes: []
+  resolver_hosts: []
+  resolver_host_suffixes: []
+asset_access:
+  mode: s3_requester_pays
+  stable_identity:
+    scheme: s3
+    bucket: usgs-landsat
+    region: us-west-2
+    key_policy: selected_stac_asset
+  credential_scheme: aws_sigv4
+  billing:
+    mode: requester_pays
+    explicit_study_consent_required: true
+    explicit_runtime_permission_required: true
+network:
+  max_requests: 2
+  max_bytes: 65536
+  max_asset_bytes: 200000000
+  max_total_bytes: 201000000
+  timeout_seconds: 10
+  maximum_redirects: 0
+  max_parallel_requests: 1
+temporal:
+  mode: exact
+  requested: "2023-06"
+  tolerance_days: 60
+  template_variables: {}
+preview:
+  template_id: general_multisource_v1
+  role: natural_color
+  theme: optical_imagery
+  target_crs: EPSG:32614
+family_contract:
+  search_path: /search
+  temporal_representation: interval
+  bbox_crs: EPSG:4326
+  asset_host_scope: [usgs-landsat.s3.us-west-2.amazonaws.com]
+  asset_selection:
+    item_limit: 10
+    item_order: [datetime, id]
+    required_media_types:
+      - image/tiff; application=geotiff; profile=cloud-optimized
+    required_roles: [red]

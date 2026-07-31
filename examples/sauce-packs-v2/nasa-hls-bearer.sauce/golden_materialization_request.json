@@ -1,0 +1,33 @@
+{
+  "authorization": {
+    "allow_chargeable_access": false,
+    "credential_ref": "nasa-earthdata",
+    "project_ref": null
+  },
+  "earth_engine_selection": null,
+  "limits": {
+    "max_compute_requests": 0,
+    "max_network_bytes": 201000000,
+    "max_network_requests": 3
+  },
+  "materialization_content_sha256": "ce9764e5b50a2ede76067c244b680e2fbbc0257389fe541ee1d3fe47e92261a7",
+  "materialization_request_sha256": "a3473a79c7b26ca0f8086b96a3423a9b740a6ac20de81635dbd1c03bdffb6fae",
+  "original_source_plan_unchanged": true,
+  "output_grid": null,
+  "pack_id": "nasa-hls-bearer",
+  "requested_asset_roles": [
+    "red"
+  ],
+  "schema_version": "fasterraster.source-materialization-request/v2",
+  "source_plan_sha256": "1bc24c8bb9e178218d71e57e814bcffc5c8f56575f3751a1d0c38a3828fd9051",
+  "spatial_request": {
+    "bbox": [
+      -101.06,
+      39.38,
+      -101.04,
+      39.4
+    ],
+    "bbox_crs": "EPSG:4326",
+    "mode": "bbox"
+  }
+}

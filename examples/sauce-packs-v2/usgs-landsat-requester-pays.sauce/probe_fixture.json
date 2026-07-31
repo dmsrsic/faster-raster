@@ -1,0 +1,13 @@
+{
+  "identity": {
+    "collection": "landsat-c2l2-sr",
+    "product": "Landsat Collection 2 Level 2 Surface Reflectance",
+    "provider": "USGS"
+  },
+  "provider_evidence": {
+    "official_documentation": [
+      "https://www.usgs.gov/landsat-missions/landsat-commercial-cloud-data-access"
+    ],
+    "status": "complete"
+  }
+}

@@ -48,6 +48,8 @@ and drift tests bind the CLI, website, and GPT grounding export to it.
 | Classification confidence-threshold provenance | `experimental` | yes | yes | yes | yes | `fail_closed_provenance` |
 | Coherent NAIP-CDL temporal repair | `experimental` | yes | no | no | no | `explicit_selection_only` |
 | Public credential-requirement contract | `experimental` | yes | no | no | no | `fails_before_network_without_resolver` |
+| Versioned generic STAC asset-access contracts | `experimental` | yes | no | no | no | `frozen_contract_only` |
+| Closed Earth Engine computation contracts | `experimental` | yes | no | no | no | `contract_compilation_only` |
 | Authenticated parallel execution backend | `private` | no | no | yes | yes | `unavailable` |
 | Arbitrary-code source plugins | `unsupported` | no | no | no | no | `unavailable` |
 <!-- END GENERATED CAPABILITY MATRIX -->

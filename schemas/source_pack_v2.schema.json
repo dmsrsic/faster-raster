@@ -1,0 +1,903 @@
+{
+  "$defs": {
+    "AccessContractV2": {
+      "additionalProperties": false,
+      "properties": {
+        "allowed_hosts": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Allowed Hosts",
+          "type": "array"
+        },
+        "asset_host_suffixes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Asset Host Suffixes",
+          "type": "array"
+        },
+        "asset_hosts": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Asset Hosts",
+          "type": "array"
+        },
+        "authentication_scheme": {
+          "default": "none",
+          "enum": [
+            "none",
+            "bearer",
+            "api_key",
+            "oauth2"
+          ],
+          "title": "Authentication Scheme",
+          "type": "string"
+        },
+        "redirect_hosts": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Redirect Hosts",
+          "type": "array"
+        },
+        "resolver_host_suffixes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Resolver Host Suffixes",
+          "type": "array"
+        },
+        "resolver_hosts": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Resolver Hosts",
+          "type": "array"
+        }
+      },
+      "title": "AccessContractV2",
+      "type": "object"
+    },
+    "AdapterContractV2": {
+      "additionalProperties": false,
+      "properties": {
+        "asset_roles": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Asset Roles",
+          "type": "array"
+        },
+        "endpoint": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Endpoint"
+        },
+        "family": {
+          "enum": [
+            "static_https_template",
+            "arcgis_imageserver",
+            "stac_search",
+            "verified_local_raster",
+            "earth_engine_compute"
+          ],
+          "title": "Family",
+          "type": "string"
+        },
+        "local_path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Local Path"
+        },
+        "local_sha256": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Local Sha256"
+        },
+        "media_types": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Media Types",
+          "type": "array"
+        },
+        "url_template": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Url Template"
+        }
+      },
+      "required": [
+        "family",
+        "media_types",
+        "asset_roles"
+      ],
+      "title": "AdapterContractV2",
+      "type": "object"
+    },
+    "BearerHttpsAssetAccess": {
+      "additionalProperties": false,
+      "properties": {
+        "credential_scheme": {
+          "const": "oauth2_bearer",
+          "default": "oauth2_bearer",
+          "title": "Credential Scheme",
+          "type": "string"
+        },
+        "mode": {
+          "const": "bearer_https",
+          "title": "Mode",
+          "type": "string"
+        },
+        "stable_identity": {
+          "$ref": "#/$defs/StableHrefIdentity"
+        }
+      },
+      "required": [
+        "mode",
+        "stable_identity"
+      ],
+      "title": "BearerHttpsAssetAccess",
+      "type": "object"
+    },
+    "BrokeredSignedHttpsAssetAccess": {
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "const": "brokered_signed_https",
+          "title": "Mode",
+          "type": "string"
+        },
+        "resolver": {
+          "$ref": "#/$defs/ResolverContract"
+        },
+        "stable_identity": {
+          "$ref": "#/$defs/StableHrefIdentity"
+        }
+      },
+      "required": [
+        "mode",
+        "stable_identity",
+        "resolver"
+      ],
+      "title": "BrokeredSignedHttpsAssetAccess",
+      "type": "object"
+    },
+    "CapabilityContract": {
+      "additionalProperties": false,
+      "properties": {
+        "analysis": {
+          "default": false,
+          "title": "Analysis",
+          "type": "boolean"
+        },
+        "materialization": {
+          "default": false,
+          "title": "Materialization",
+          "type": "boolean"
+        },
+        "planning": {
+          "default": true,
+          "title": "Planning",
+          "type": "boolean"
+        },
+        "preview": {
+          "default": false,
+          "title": "Preview",
+          "type": "boolean"
+        },
+        "temporal_discovery": {
+          "default": false,
+          "title": "Temporal Discovery",
+          "type": "boolean"
+        }
+      },
+      "title": "CapabilityContract",
+      "type": "object"
+    },
+    "DirectHttpsAssetAccess": {
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "const": "direct_https",
+          "title": "Mode",
+          "type": "string"
+        },
+        "stable_identity": {
+          "$ref": "#/$defs/StableHrefIdentity"
+        }
+      },
+      "required": [
+        "mode",
+        "stable_identity"
+      ],
+      "title": "DirectHttpsAssetAccess",
+      "type": "object"
+    },
+    "EarthEngineBandContract": {
+      "additionalProperties": false,
+      "properties": {
+        "data_type": {
+          "title": "Data Type",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "semantic_type": {
+          "enum": [
+            "categorical",
+            "continuous"
+          ],
+          "title": "Semantic Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "semantic_type",
+        "data_type"
+      ],
+      "title": "EarthEngineBandContract",
+      "type": "object"
+    },
+    "EarthEngineContract": {
+      "additionalProperties": false,
+      "properties": {
+        "allowed_operations": {
+          "items": {
+            "enum": [
+              "load_image",
+              "load_collection",
+              "filter_bounds",
+              "filter_date",
+              "sort_acquisition_time",
+              "tie_break_system_index",
+              "select_first",
+              "select_bands"
+            ],
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Allowed Operations",
+          "type": "array"
+        },
+        "bands": {
+          "items": {
+            "$ref": "#/$defs/EarthEngineBandContract"
+          },
+          "minItems": 1,
+          "title": "Bands",
+          "type": "array"
+        },
+        "credential_scheme": {
+          "const": "google_adc",
+          "default": "google_adc",
+          "title": "Credential Scheme",
+          "type": "string"
+        },
+        "dataset_id": {
+          "title": "Dataset Id",
+          "type": "string"
+        },
+        "dataset_type": {
+          "enum": [
+            "image",
+            "image_collection"
+          ],
+          "title": "Dataset Type",
+          "type": "string"
+        },
+        "max_bands": {
+          "exclusiveMinimum": 0,
+          "maximum": 1024,
+          "title": "Max Bands",
+          "type": "integer"
+        },
+        "max_height": {
+          "exclusiveMinimum": 0,
+          "maximum": 32000,
+          "title": "Max Height",
+          "type": "integer"
+        },
+        "max_uncompressed_response_bytes": {
+          "exclusiveMinimum": 0,
+          "maximum": 48000000,
+          "title": "Max Uncompressed Response Bytes",
+          "type": "integer"
+        },
+        "max_width": {
+          "exclusiveMinimum": 0,
+          "maximum": 32000,
+          "title": "Max Width",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "dataset_id",
+        "dataset_type",
+        "bands",
+        "allowed_operations",
+        "max_uncompressed_response_bytes",
+        "max_width",
+        "max_height",
+        "max_bands"
+      ],
+      "title": "EarthEngineContract",
+      "type": "object"
+    },
+    "NetworkContract": {
+      "additionalProperties": false,
+      "properties": {
+        "max_asset_bytes": {
+          "default": 64000000,
+          "maximum": 1000000000,
+          "minimum": 1,
+          "title": "Max Asset Bytes",
+          "type": "integer"
+        },
+        "max_bytes": {
+          "default": 65536,
+          "maximum": 1000000,
+          "minimum": 1,
+          "title": "Max Bytes",
+          "type": "integer"
+        },
+        "max_parallel_requests": {
+          "default": 1,
+          "maximum": 8,
+          "minimum": 1,
+          "title": "Max Parallel Requests",
+          "type": "integer"
+        },
+        "max_requests": {
+          "default": 1,
+          "maximum": 4,
+          "minimum": 1,
+          "title": "Max Requests",
+          "type": "integer"
+        },
+        "max_total_bytes": {
+          "default": 128000000,
+          "maximum": 2000000000,
+          "minimum": 1,
+          "title": "Max Total Bytes",
+          "type": "integer"
+        },
+        "maximum_redirects": {
+          "default": 0,
+          "maximum": 2,
+          "minimum": 0,
+          "title": "Maximum Redirects",
+          "type": "integer"
+        },
+        "timeout_seconds": {
+          "default": 8.0,
+          "exclusiveMinimum": 0,
+          "maximum": 30,
+          "title": "Timeout Seconds",
+          "type": "number"
+        }
+      },
+      "title": "NetworkContract",
+      "type": "object"
+    },
+    "PreviewContract": {
+      "additionalProperties": false,
+      "properties": {
+        "role": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Role"
+        },
+        "target_crs": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Target Crs"
+        },
+        "template_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Template Id"
+        },
+        "theme": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Theme"
+        }
+      },
+      "title": "PreviewContract",
+      "type": "object"
+    },
+    "PublicS3AssetAccess": {
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "const": "s3_public",
+          "title": "Mode",
+          "type": "string"
+        },
+        "stable_identity": {
+          "$ref": "#/$defs/StableS3Identity"
+        }
+      },
+      "required": [
+        "mode",
+        "stable_identity"
+      ],
+      "title": "PublicS3AssetAccess",
+      "type": "object"
+    },
+    "RequesterPaysBilling": {
+      "additionalProperties": false,
+      "properties": {
+        "explicit_runtime_permission_required": {
+          "const": true,
+          "default": true,
+          "title": "Explicit Runtime Permission Required",
+          "type": "boolean"
+        },
+        "explicit_study_consent_required": {
+          "const": true,
+          "default": true,
+          "title": "Explicit Study Consent Required",
+          "type": "boolean"
+        },
+        "mode": {
+          "const": "requester_pays",
+          "title": "Mode",
+          "type": "string"
+        }
+      },
+      "required": [
+        "mode"
+      ],
+      "title": "RequesterPaysBilling",
+      "type": "object"
+    },
+    "RequesterPaysS3AssetAccess": {
+      "additionalProperties": false,
+      "properties": {
+        "billing": {
+          "$ref": "#/$defs/RequesterPaysBilling"
+        },
+        "credential_scheme": {
+          "const": "aws_sigv4",
+          "default": "aws_sigv4",
+          "title": "Credential Scheme",
+          "type": "string"
+        },
+        "mode": {
+          "const": "s3_requester_pays",
+          "title": "Mode",
+          "type": "string"
+        },
+        "stable_identity": {
+          "$ref": "#/$defs/StableS3Identity"
+        }
+      },
+      "required": [
+        "mode",
+        "stable_identity",
+        "billing"
+      ],
+      "title": "RequesterPaysS3AssetAccess",
+      "type": "object"
+    },
+    "ResolverContract": {
+      "additionalProperties": false,
+      "properties": {
+        "endpoint": {
+          "title": "Endpoint",
+          "type": "string"
+        },
+        "href_parameter": {
+          "const": "href",
+          "default": "href",
+          "title": "Href Parameter",
+          "type": "string"
+        },
+        "method": {
+          "const": "GET",
+          "default": "GET",
+          "title": "Method",
+          "type": "string"
+        },
+        "response_field": {
+          "const": "href",
+          "default": "href",
+          "title": "Response Field",
+          "type": "string"
+        },
+        "scheme": {
+          "const": "ephemeral_https_signer",
+          "title": "Scheme",
+          "type": "string"
+        }
+      },
+      "required": [
+        "scheme",
+        "endpoint"
+      ],
+      "title": "ResolverContract",
+      "type": "object"
+    },
+    "S3CompatibleCredentialedAssetAccess": {
+      "additionalProperties": false,
+      "properties": {
+        "credential_scheme": {
+          "const": "s3_compatible",
+          "default": "s3_compatible",
+          "title": "Credential Scheme",
+          "type": "string"
+        },
+        "endpoint": {
+          "title": "Endpoint",
+          "type": "string"
+        },
+        "executable": {
+          "const": false,
+          "default": false,
+          "title": "Executable",
+          "type": "boolean"
+        },
+        "mode": {
+          "const": "s3_compatible_credentialed",
+          "title": "Mode",
+          "type": "string"
+        },
+        "stable_identity": {
+          "$ref": "#/$defs/StableS3Identity"
+        }
+      },
+      "required": [
+        "mode",
+        "stable_identity",
+        "endpoint"
+      ],
+      "title": "S3CompatibleCredentialedAssetAccess",
+      "type": "object"
+    },
+    "SourceContract": {
+      "additionalProperties": false,
+      "properties": {
+        "crs": {
+          "title": "Crs",
+          "type": "string"
+        },
+        "mask_policy": {
+          "enum": [
+            "explicit_nodata",
+            "alpha_or_dataset_mask",
+            "none"
+          ],
+          "title": "Mask Policy",
+          "type": "string"
+        },
+        "nodata": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Nodata"
+        },
+        "resampling": {
+          "title": "Resampling",
+          "type": "string"
+        },
+        "semantic_type": {
+          "enum": [
+            "categorical",
+            "continuous"
+          ],
+          "title": "Semantic Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "semantic_type",
+        "crs",
+        "resampling",
+        "mask_policy"
+      ],
+      "title": "SourceContract",
+      "type": "object"
+    },
+    "StableHrefIdentity": {
+      "additionalProperties": false,
+      "properties": {
+        "href_policy": {
+          "enum": [
+            "selected_stac_asset",
+            "unsigned_selected_stac_asset"
+          ],
+          "title": "Href Policy",
+          "type": "string"
+        }
+      },
+      "required": [
+        "href_policy"
+      ],
+      "title": "StableHrefIdentity",
+      "type": "object"
+    },
+    "StableS3Identity": {
+      "additionalProperties": false,
+      "properties": {
+        "bucket": {
+          "title": "Bucket",
+          "type": "string"
+        },
+        "key_policy": {
+          "const": "selected_stac_asset",
+          "title": "Key Policy",
+          "type": "string"
+        },
+        "region": {
+          "title": "Region",
+          "type": "string"
+        },
+        "scheme": {
+          "const": "s3",
+          "default": "s3",
+          "title": "Scheme",
+          "type": "string"
+        }
+      },
+      "required": [
+        "bucket",
+        "region",
+        "key_policy"
+      ],
+      "title": "StableS3Identity",
+      "type": "object"
+    },
+    "TemporalContract": {
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "default": "exact",
+          "enum": [
+            "exact",
+            "static"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "requested": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Requested"
+        },
+        "template_variables": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              }
+            ]
+          },
+          "title": "Template Variables",
+          "type": "object"
+        },
+        "tolerance_days": {
+          "anyOf": [
+            {
+              "maximum": 36600,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tolerance Days"
+        }
+      },
+      "title": "TemporalContract",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "access": {
+      "$ref": "#/$defs/AccessContractV2"
+    },
+    "adapter": {
+      "$ref": "#/$defs/AdapterContractV2"
+    },
+    "asset_access": {
+      "anyOf": [
+        {
+          "discriminator": {
+            "mapping": {
+              "bearer_https": "#/$defs/BearerHttpsAssetAccess",
+              "brokered_signed_https": "#/$defs/BrokeredSignedHttpsAssetAccess",
+              "direct_https": "#/$defs/DirectHttpsAssetAccess",
+              "s3_compatible_credentialed": "#/$defs/S3CompatibleCredentialedAssetAccess",
+              "s3_public": "#/$defs/PublicS3AssetAccess",
+              "s3_requester_pays": "#/$defs/RequesterPaysS3AssetAccess"
+            },
+            "propertyName": "mode"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/DirectHttpsAssetAccess"
+            },
+            {
+              "$ref": "#/$defs/PublicS3AssetAccess"
+            },
+            {
+              "$ref": "#/$defs/RequesterPaysS3AssetAccess"
+            },
+            {
+              "$ref": "#/$defs/BrokeredSignedHttpsAssetAccess"
+            },
+            {
+              "$ref": "#/$defs/BearerHttpsAssetAccess"
+            },
+            {
+              "$ref": "#/$defs/S3CompatibleCredentialedAssetAccess"
+            }
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Asset Access"
+    },
+    "capabilities": {
+      "$ref": "#/$defs/CapabilityContract"
+    },
+    "description": {
+      "title": "Description",
+      "type": "string"
+    },
+    "display_name": {
+      "title": "Display Name",
+      "type": "string"
+    },
+    "earth_engine": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/EarthEngineContract"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "family_contract": {
+      "additionalProperties": true,
+      "title": "Family Contract",
+      "type": "object"
+    },
+    "network": {
+      "$ref": "#/$defs/NetworkContract"
+    },
+    "pack_id": {
+      "title": "Pack Id",
+      "type": "string"
+    },
+    "preview": {
+      "$ref": "#/$defs/PreviewContract"
+    },
+    "schema_version": {
+      "const": "fasterraster.source-pack/v2",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "source": {
+      "$ref": "#/$defs/SourceContract"
+    },
+    "temporal": {
+      "$ref": "#/$defs/TemporalContract"
+    }
+  },
+  "required": [
+    "schema_version",
+    "pack_id",
+    "display_name",
+    "description",
+    "adapter",
+    "capabilities",
+    "source",
+    "access",
+    "network",
+    "temporal",
+    "preview",
+    "family_contract"
+  ],
+  "title": "FasterRaster declarative Source Pack v2",
+  "type": "object"
+}

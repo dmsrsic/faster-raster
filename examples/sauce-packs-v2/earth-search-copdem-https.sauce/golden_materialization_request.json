@@ -1,0 +1,33 @@
+{
+  "authorization": {
+    "allow_chargeable_access": false,
+    "credential_ref": null,
+    "project_ref": null
+  },
+  "earth_engine_selection": null,
+  "limits": {
+    "max_compute_requests": 0,
+    "max_network_bytes": 76000000,
+    "max_network_requests": 2
+  },
+  "materialization_content_sha256": "f77c69120dd33bb312a668e6d5b66e8a0dcdcf83d75f52b3bdc09a92b3cdc663",
+  "materialization_request_sha256": "c67023f5588fb8d4bd7d964570ae53fdb00a30b3f5132622076733545a822fe4",
+  "original_source_plan_unchanged": true,
+  "output_grid": null,
+  "pack_id": "earth-search-copdem-https",
+  "requested_asset_roles": [
+    "data"
+  ],
+  "schema_version": "fasterraster.source-materialization-request/v2",
+  "source_plan_sha256": "0c4bd0b5b28344f7351036fecf7c6e18be63c1c64154ced4bfad96d0550b400a",
+  "spatial_request": {
+    "bbox": [
+      -101.06,
+      39.38,
+      -101.04,
+      39.4
+    ],
+    "bbox_crs": "EPSG:4326",
+    "mode": "bbox"
+  }
+}

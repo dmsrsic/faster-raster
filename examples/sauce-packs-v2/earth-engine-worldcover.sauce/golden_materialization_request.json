@@ -1,0 +1,78 @@
+{
+  "authorization": {
+    "allow_chargeable_access": false,
+    "credential_ref": "local-google-adc",
+    "project_ref": "earth-engine-research"
+  },
+  "earth_engine_selection": [
+    {
+      "dataset_id": "ESA/WorldCover/v200",
+      "operation": "load_collection"
+    },
+    {
+      "bbox": [
+        -101.06,
+        39.38,
+        -101.04,
+        39.4
+      ],
+      "operation": "filter_bounds"
+    },
+    {
+      "direction": "ascending",
+      "operation": "sort_acquisition_time",
+      "property": "system:time_start"
+    },
+    {
+      "direction": "ascending",
+      "operation": "tie_break_system_index",
+      "property": "system:index"
+    },
+    {
+      "operation": "select_first"
+    },
+    {
+      "bands": [
+        "Map"
+      ],
+      "operation": "select_bands"
+    }
+  ],
+  "limits": {
+    "max_compute_requests": 1,
+    "max_network_bytes": 5000000,
+    "max_network_requests": 1
+  },
+  "materialization_content_sha256": "9540943dae9a6e2696c39942016151cf4c8092e73d4d47add07e76a9602dc1e6",
+  "materialization_request_sha256": "c7ce016d5fa15774984eb830ff5a65f7bf584422e886f8d9076a4d2c5b1baa61",
+  "original_source_plan_unchanged": true,
+  "output_grid": {
+    "crs": "EPSG:32614",
+    "height": 256,
+    "transform": [
+      10.0,
+      0.0,
+      322000.0,
+      0.0,
+      -10.0,
+      4363000.0
+    ],
+    "width": 256
+  },
+  "pack_id": "earth-engine-worldcover",
+  "requested_asset_roles": [
+    "Map"
+  ],
+  "schema_version": "fasterraster.source-materialization-request/v2",
+  "source_plan_sha256": "9e1b73b0d0e4bd60698b26cc5d7529048afba0f2327c62a20966b3a1385f40e4",
+  "spatial_request": {
+    "bbox": [
+      -101.06,
+      39.38,
+      -101.04,
+      39.4
+    ],
+    "bbox_crs": "EPSG:4326",
+    "mode": "bbox"
+  }
+}

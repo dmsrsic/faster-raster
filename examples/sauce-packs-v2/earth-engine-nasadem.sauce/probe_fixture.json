@@ -1,0 +1,13 @@
+{
+  "identity": {
+    "collection": null,
+    "product": "NASADEM",
+    "provider": "GOOGLE_EARTH_ENGINE"
+  },
+  "provider_evidence": {
+    "official_documentation": [
+      "https://developers.google.com/earth-engine/datasets/catalog/NASA_NASADEM_HGT_001"
+    ],
+    "status": "complete"
+  }
+}

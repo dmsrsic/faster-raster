@@ -49,6 +49,8 @@ nav:
       - Supported sources: supported-sources.md
       - Flavortown Sauce Wizard: flavortown-wizard.md
       - Bring Your Own Sauce: bring-your-own-sauce.md
+      - STAC asset access: stac-asset-access.md
+      - Earth Engine compute contracts: earth-engine-compute.md
       - Sauce Time: sauce-time.md
       - Preview templates: preview-templates.md
       - Human-development workflow: human-development.md

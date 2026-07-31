@@ -1,0 +1,183 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "asset_access": {
+            "properties": {
+              "mode": {
+                "const": "s3_requester_pays"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "credential_requirement": {
+            "properties": {
+              "credential_scheme": {
+                "const": "aws_sigv4"
+              }
+            },
+            "required": [
+              "credential_scheme"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "properties": {
+    "adapter": {
+      "type": "object"
+    },
+    "asset_access": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "blocked_before_network": {
+      "type": "boolean"
+    },
+    "blocked_details": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "capabilities": {
+      "type": "object"
+    },
+    "credential_requirement": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "endpoint_contract": {
+      "type": "object"
+    },
+    "evidence_bundle_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "executable": {
+      "type": "boolean"
+    },
+    "identity": {
+      "type": "object"
+    },
+    "network_policy": {
+      "type": "object"
+    },
+    "original_pack_unchanged": {
+      "const": true
+    },
+    "pack_id": {
+      "pattern": "^[a-z][a-z0-9_-]{2,63}$",
+      "type": "string"
+    },
+    "plan_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "preview": {
+      "type": "object"
+    },
+    "provider_evidence": {
+      "type": "object"
+    },
+    "public_capability": {
+      "type": "object"
+    },
+    "requested_time": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "resolved_time": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "schema_version": {
+      "const": "fasterraster.source-pack-plan/v2"
+    },
+    "source_content_identity_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "source_contract": {
+      "type": "object"
+    },
+    "source_pack_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "READY",
+        "CREDENTIAL_REQUIRED",
+        "BLOCKED_PROVIDER_EVIDENCE",
+        "AWAITING_TEMPORAL_SELECTION",
+        "NO_TEMPORAL_ALTERNATIVES"
+      ]
+    },
+    "temporal_alternatives": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "temporal_contract": {
+      "type": "object"
+    },
+    "temporal_resolution": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "validation": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema_version",
+    "pack_id",
+    "source_pack_sha256",
+    "status",
+    "executable",
+    "blocked_before_network",
+    "blocked_details",
+    "identity",
+    "provider_evidence",
+    "adapter",
+    "endpoint_contract",
+    "capabilities",
+    "public_capability",
+    "source_contract",
+    "source_content_identity_sha256",
+    "requested_time",
+    "resolved_time",
+    "temporal_contract",
+    "temporal_alternatives",
+    "temporal_resolution",
+    "credential_requirement",
+    "asset_access",
+    "network_policy",
+    "preview",
+    "validation",
+    "original_pack_unchanged",
+    "evidence_bundle_sha256",
+    "plan_sha256"
+  ],
+  "title": "FasterRaster frozen Source Pack plan v2",
+  "type": "object"
+}

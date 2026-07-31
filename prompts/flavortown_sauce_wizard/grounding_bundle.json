@@ -1,11 +1,15 @@
 {
   "bundle_version": "1.0.0",
-  "capability_registry_sha256": "65da21e291fcd03a496993bb0fe25b1af17038a140bdace5d45a8b08de03a0c2",
+  "capability_registry_sha256": "b9033f32ccb882b0265547697949b56c6a888922a46ba8d1157b74fdec144955",
   "contract_schema_versions": [
     "fasterraster.source-pack/v1",
     "fasterraster.source-pack-plan/v1",
     "fasterraster.source-materialization-request/v1",
     "fasterraster.credential-requirement/v1",
+    "fasterraster.source-pack/v2",
+    "fasterraster.source-pack-plan/v2",
+    "fasterraster.source-materialization-request/v2",
+    "fasterraster.credential-requirement/v2",
     "fasterraster.temporal-alternatives/v1",
     "fasterraster.temporal-resolution/v1",
     "fasterraster.classification-temporal-alternatives/v1",
@@ -22,16 +26,40 @@
       "sha256": "3f92893c219827cc0459239d52e45a787f55e19c65b3486f24059ab63695c4f8"
     },
     {
+      "bytes": 21357,
+      "path": "schemas/source_pack_v2.schema.json",
+      "role": "source_pack_schema",
+      "sha256": "509e23c64bcdbbdac0525b59f0ac862c49edbb78d82d533c23164863509bdad6"
+    },
+    {
+      "bytes": 3590,
+      "path": "schemas/source_pack_plan_v2.schema.json",
+      "role": "source_pack_plan_schema",
+      "sha256": "f6504e59ee8a6c18fdecee0eab5f153c830f6da52dfb08f7d74a3069b9f60bd1"
+    },
+    {
       "bytes": 2826,
       "path": "schemas/source_materialization_request.schema.json",
       "role": "source_materialization_request_schema",
       "sha256": "9453576bb4495a437509781f64888db3741e3c64461857c9e92440830acb7bfd"
     },
     {
+      "bytes": 3298,
+      "path": "schemas/source_materialization_request_v2.schema.json",
+      "role": "source_materialization_request_schema",
+      "sha256": "f4c4b970bd4d21046d8c64805513dbcc3777d5afcd2b632c5ed802106c1318eb"
+    },
+    {
       "bytes": 1221,
       "path": "schemas/credential_requirement.schema.json",
       "role": "credential_schema",
       "sha256": "655e7c7bcb69f9efdb22956866ce0a0526798093e6ec1f17533951b7334e8034"
+    },
+    {
+      "bytes": 1271,
+      "path": "schemas/credential_requirement_v2.schema.json",
+      "role": "credential_schema",
+      "sha256": "56304f14c8ba86b4e9474de89d2731d15cb3937d74ae40c249f624df36574c2e"
     },
     {
       "bytes": 2256,
@@ -76,10 +104,10 @@
       "sha256": "bde0c5829c1df99be12676dd617e20ba8fdf9535695444a1acdf6a4ab885d458"
     },
     {
-      "bytes": 6884,
+      "bytes": 7868,
       "path": "configs/public_capabilities.yaml",
       "role": "capability_registry",
-      "sha256": "0288d6cabc61158f9e38bab14ce11971a87ddde1d0dfb2f65e2f0eed3bd19ef5"
+      "sha256": "f827942f883e70ece27c40c244dc15ac4620a0faef299a1e9f2bba3c0bd63ba6"
     },
     {
       "bytes": 7247,
@@ -88,10 +116,10 @@
       "sha256": "cdc1a20986856eaad562255755569dc68f3f45d32b8e429c54cf18c279453c09"
     },
     {
-      "bytes": 2240,
+      "bytes": 2467,
       "path": "docs/generated/capabilities.md",
       "role": "capability_reference",
-      "sha256": "0b6a16f0c879e9db45773eba2b3b5ec5d7da7d7b79b5732b0ebac1e5f485d34f"
+      "sha256": "19cb11f6d3b89df3e37d9147e2477a99b3c7250f5c1ad51e5a58b6bc94547a84"
     },
     {
       "bytes": 3305,
@@ -100,10 +128,22 @@
       "sha256": "bc86f1ae31f1a31ffa55db8d173ef0dc371a1b8aa5bb729888fecac4eb1ed76f"
     },
     {
-      "bytes": 7722,
+      "bytes": 8495,
       "path": "docs/bring-your-own-sauce.md",
       "role": "source_pack_guide",
-      "sha256": "11a0ed5be1990f9c99d20d1b1d67703c8e7196cecc660657814072f9841a8ba1"
+      "sha256": "cd458ba30b2b89da993b0b2d02c628a2fee07aafd5234e267cdc5b243e070b37"
+    },
+    {
+      "bytes": 2124,
+      "path": "docs/stac-asset-access.md",
+      "role": "source_access_guide",
+      "sha256": "d572ca84fe41fb6074f81ab2764007f36a686f7a5ae3c66fb12100c98e2fafc5"
+    },
+    {
+      "bytes": 1508,
+      "path": "docs/earth-engine-compute.md",
+      "role": "compute_contract_guide",
+      "sha256": "ec34c8b18f1b1166d40c1598d3a074c31d1f72578bddefb674d3fd842691033b"
     },
     {
       "bytes": 2927,
@@ -232,6 +272,24 @@
       "sha256": "8f287d3310f08ef59f323ad111e6efa81a33aa117d5e2ed587859c39c9de871e"
     },
     {
+      "bytes": 1720,
+      "path": "examples/sauce-packs-v2/earth-search-copdem-https.sauce/sauce.yaml",
+      "role": "direct_https_v2_example",
+      "sha256": "06406c0d43d8ca4af41357678fd77e262a83dc23644e494feeacbcdc8b67c4dc"
+    },
+    {
+      "bytes": 1923,
+      "path": "examples/sauce-packs-v2/usgs-landsat-requester-pays.sauce/sauce.yaml",
+      "role": "requester_pays_v2_example",
+      "sha256": "2822a32dd7ea84119c46fd8d8e687644de130c463e1ed182399d7438c5a4943f"
+    },
+    {
+      "bytes": 1913,
+      "path": "examples/sauce-packs-v2/earth-engine-sentinel2.sauce/sauce.yaml",
+      "role": "earth_engine_contract_example",
+      "sha256": "a834a544f5d37a1d7110fa2ce2c26448b1bd7ce8118f4c736da74d006629641b"
+    },
+    {
       "bytes": 1967,
       "path": "prompts/flavortown_sauce_wizard/CLI_REFERENCE.md",
       "role": "cli_reference",
@@ -250,13 +308,13 @@
       "sha256": "61d5845f6a5587065f326eae3277d32c462d98fd21645bc43eb9c443d01f6554"
     },
     {
-      "bytes": 8400,
+      "bytes": 9546,
       "path": "prompts/flavortown_sauce_wizard/capabilities.json",
       "role": "machine_capabilities",
-      "sha256": "000ca5266e676c42f54b4fc838cd0ff751d89987c79246bfc27b7ef763cea728"
+      "sha256": "ef960c2fe1b6f813f707c73ab4c2b906c0cff89db42db6bf31147cae10c4978b"
     }
   ],
-  "grounding_bundle_sha256": "712ca7f150c7454427e3aeb68f04d49989ff6e68a02f2643bfa58a7a41dc6b5c",
+  "grounding_bundle_sha256": "8eaf01c04869ee3df124e5b73b18a57f531d7b2e9e7f57159d62f911501415e0",
   "release": {
     "contract_status": "experimental",
     "development_label": "Unreleased",

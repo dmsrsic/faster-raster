@@ -32,7 +32,10 @@ SCHEMA_FILENAMES = [
     "workfile_v1.schema.json",
     "workfile_v2.schema.json",
     "source_pack.schema.json",
+    "source_pack_v2.schema.json",
+    "source_pack_plan_v2.schema.json",
     "source_materialization_request.schema.json",
+    "source_materialization_request_v2.schema.json",
     "temporal_alternatives.schema.json",
     "temporal_resolution.schema.json",
     "classification_temporal_alternatives.schema.json",
@@ -41,6 +44,7 @@ SCHEMA_FILENAMES = [
     "preview_template.schema.json",
     "capability_registry.schema.json",
     "credential_requirement.schema.json",
+    "credential_requirement_v2.schema.json",
 ]
 
 
@@ -1014,9 +1018,13 @@ def all_schemas() -> dict[str, dict]:
         classification_temporal_alternatives_schema,
         classification_temporal_resolution_schema,
         credential_requirement_schema,
+        credential_requirement_v2_schema,
         preview_template_schema,
         source_materialization_request_schema,
+        source_materialization_request_v2_schema,
         source_pack_schema,
+        source_pack_plan_v2_schema,
+        source_pack_v2_schema,
         temporal_alternatives_schema,
         temporal_resolution_schema,
     )
@@ -1049,8 +1057,13 @@ def all_schemas() -> dict[str, dict]:
         "workfile_v1.schema.json": workfile_schema(),
         "workfile_v2.schema.json": human_development_workfile_schema(),
         "source_pack.schema.json": source_pack_schema(),
+        "source_pack_v2.schema.json": source_pack_v2_schema(),
+        "source_pack_plan_v2.schema.json": source_pack_plan_v2_schema(),
         "source_materialization_request.schema.json": (
             source_materialization_request_schema()
+        ),
+        "source_materialization_request_v2.schema.json": (
+            source_materialization_request_v2_schema()
         ),
         "temporal_alternatives.schema.json": temporal_alternatives_schema(),
         "temporal_resolution.schema.json": temporal_resolution_schema(),
@@ -1066,6 +1079,7 @@ def all_schemas() -> dict[str, dict]:
         "preview_template.schema.json": preview_template_schema(),
         "capability_registry.schema.json": capability_registry_schema(),
         "credential_requirement.schema.json": credential_requirement_schema(),
+        "credential_requirement_v2.schema.json": credential_requirement_v2_schema(),
     }
 
 
