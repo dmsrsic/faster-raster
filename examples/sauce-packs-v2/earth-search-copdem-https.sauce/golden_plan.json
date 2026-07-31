@@ -68,7 +68,7 @@
     "max_asset_bytes": 75000000,
     "max_bytes": 65536,
     "max_parallel_requests": 1,
-    "max_requests": 2,
+    "max_requests": 3,
     "max_total_bytes": 76000000,
     "maximum_redirects": 0,
     "redirect_hosts": [],
@@ -77,11 +77,11 @@
     ],
     "resolver_host_suffixes": [],
     "resolver_hosts": [],
-    "timeout_seconds": 10.0
+    "timeout_seconds": 30.0
   },
   "original_pack_unchanged": true,
   "pack_id": "earth-search-copdem-https",
-  "plan_sha256": "0c4bd0b5b28344f7351036fecf7c6e18be63c1c64154ced4bfad96d0550b400a",
+  "plan_sha256": "4f4b094a35a7823b5c910426e6a91b017c870cad9013e194e470f11c2afcfe80",
   "preview": {
     "role": "natural_color",
     "target_crs": "EPSG:32614",
@@ -112,7 +112,7 @@
     "resampling": "bilinear",
     "semantic_type": "continuous"
   },
-  "source_pack_sha256": "5895c78d9c8f00f24d373c0f2f2c040b1ec3abec0582a52c4ebaeafca81fb221",
+  "source_pack_sha256": "787c5678ec89539e327b3571e9c5b04db51492f46a96229d69c01a20cbd2e466",
   "status": "READY",
   "temporal_alternatives": null,
   "temporal_contract": {
@@ -127,6 +127,6 @@
     "offline_planning": "READY_FOR_OFFLINE_DETERMINISTIC_PLANNING",
     "provider_evidence": "COMPLETE",
     "schema": "SCHEMA_VALID",
-    "validation_sha256": "5054e0d3047e2d5b8b58bceb7011ed42520c527e5170f76a9a8128a6401871ff"
+    "validation_sha256": "75d9b94d67ce9dc963566228a4a29ce27ecc34ae7508cdfd4c683e3460e69faf"
   }
 }

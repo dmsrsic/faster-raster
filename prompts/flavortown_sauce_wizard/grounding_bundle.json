@@ -275,7 +275,7 @@
       "bytes": 1720,
       "path": "examples/sauce-packs-v2/earth-search-copdem-https.sauce/sauce.yaml",
       "role": "direct_https_v2_example",
-      "sha256": "06406c0d43d8ca4af41357678fd77e262a83dc23644e494feeacbcdc8b67c4dc"
+      "sha256": "8ef4e242ce8d6add0fc236ecc62e6b746dbd4489654a8f619a4a264844e30d98"
     },
     {
       "bytes": 1923,
@@ -314,7 +314,7 @@
       "sha256": "ef960c2fe1b6f813f707c73ab4c2b906c0cff89db42db6bf31147cae10c4978b"
     }
   ],
-  "grounding_bundle_sha256": "8eaf01c04869ee3df124e5b73b18a57f531d7b2e9e7f57159d62f911501415e0",
+  "grounding_bundle_sha256": "04166ce35a515418a69d8399424dd7dd38b0df14e4f03ad27b2401a07b4d7d1e",
   "release": {
     "contract_status": "experimental",
     "development_label": "Unreleased",

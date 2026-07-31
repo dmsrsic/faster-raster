@@ -8,10 +8,10 @@
   "limits": {
     "max_compute_requests": 0,
     "max_network_bytes": 76000000,
-    "max_network_requests": 2
+    "max_network_requests": 3
   },
   "materialization_content_sha256": "e2991cf7d62b4b92e9f519819db9906939a0b536a4e0dba2e676da9c59db05bb",
-  "materialization_request_sha256": "8af20c2d5c5e782d70220a54c6a7a48bf1d32b5325032e13e8daa1d1d68a8485",
+  "materialization_request_sha256": "5e624262c9f4c99f1b785c8c14be85480ffdc84d82dbd2971cfc30ea34f7e20b",
   "original_source_plan_unchanged": true,
   "output_grid": null,
   "pack_id": "copdem-public-s3",
@@ -19,7 +19,7 @@
     "data"
   ],
   "schema_version": "fasterraster.source-materialization-request/v2",
-  "source_plan_sha256": "e01ea44ecaf68ff8e41ac2fd56ea3f62429f7d3413118d2f02013f936fccdb33",
+  "source_plan_sha256": "d9020a114c0a2aa941a7757b389c13cdc058c97510fd354484b3419cf776318f",
   "spatial_request": {
     "bbox": [
       -101.06,
