@@ -16,10 +16,10 @@ capabilities:
   temporal_discovery: true
 source:
   semantic_type: continuous
-  crs: EPSG:4326
+  crs: EPSG:32614
   resampling: bilinear
-  nodata: null
-  mask_policy: alpha_or_dataset_mask
+  nodata: 0
+  mask_policy: explicit_nodata
 access:
   authentication_scheme: none
   allowed_hosts: [planetarycomputer.microsoft.com]
@@ -40,7 +40,7 @@ asset_access:
     response_field: href
 network:
   max_requests: 4
-  max_bytes: 65536
+  max_bytes: 1000000
   max_asset_bytes: 250000000
   max_total_bytes: 251000000
   timeout_seconds: 10

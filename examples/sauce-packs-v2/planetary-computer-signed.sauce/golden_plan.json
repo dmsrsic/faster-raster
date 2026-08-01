@@ -95,7 +95,7 @@
     "asset_hosts": [],
     "default": "disabled",
     "max_asset_bytes": 250000000,
-    "max_bytes": 65536,
+    "max_bytes": 1000000,
     "max_parallel_requests": 1,
     "max_requests": 4,
     "max_total_bytes": 251000000,
@@ -112,7 +112,7 @@
   },
   "original_pack_unchanged": true,
   "pack_id": "planetary-computer-signed",
-  "plan_sha256": "a9557eb4a627ea8bcd735682698700cc08580a50bf8168f2516b6cd58cd1be30",
+  "plan_sha256": "9dab670e7445e048c6219aa2e2b88bf1e7ab72fd494324a7284beb3c3ad5d4e9",
   "preview": {
     "role": "natural_color",
     "target_crs": "EPSG:32614",
@@ -135,15 +135,15 @@
   "requested_time": "2023-06",
   "resolved_time": "2023-06",
   "schema_version": "fasterraster.source-pack-plan/v2",
-  "source_content_identity_sha256": "a66f41655e5daac45dbdf7887a84cecc3765a6210b2784aec8b43d6e67bfaec8",
+  "source_content_identity_sha256": "acacb1f4d3e33d222e5d378b48a8cd57e15f19639b71623aa44637b3c8b3fbd0",
   "source_contract": {
-    "crs": "EPSG:4326",
-    "mask_policy": "alpha_or_dataset_mask",
-    "nodata": null,
+    "crs": "EPSG:32614",
+    "mask_policy": "explicit_nodata",
+    "nodata": 0,
     "resampling": "bilinear",
     "semantic_type": "continuous"
   },
-  "source_pack_sha256": "ea4331da70f9d3e4ff570540f7695d696c73113edcdb217454c067a04afcd973",
+  "source_pack_sha256": "e744f04ff1df94067a7e173e0c5593c2ab632ff495c960f6a359df16f8749bca",
   "status": "CREDENTIAL_REQUIRED",
   "temporal_alternatives": null,
   "temporal_contract": {
@@ -158,6 +158,6 @@
     "offline_planning": "READY_FOR_OFFLINE_DETERMINISTIC_PLANNING",
     "provider_evidence": "COMPLETE",
     "schema": "SCHEMA_VALID",
-    "validation_sha256": "a78c9aec76e417070fdbb090a57de565c7f37cd64083f500fec712ee69568f5b"
+    "validation_sha256": "8a1f2f43b3552c85fbf6273c230170b6c541034253cdcb5a0ae9c536a21520f6"
   }
 }

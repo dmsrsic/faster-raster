@@ -10,8 +10,8 @@
     "max_network_bytes": 251000000,
     "max_network_requests": 4
   },
-  "materialization_content_sha256": "22d170895520c0ae9a5562e406dfaf9061d35a19b704a1a31bdff3216c378c1e",
-  "materialization_request_sha256": "c2a73d1c09c06c1e77947fde8bbb17a509c728a35a19e1c212320f0a3be4a4b5",
+  "materialization_content_sha256": "30b83d624ee9add6a98b893a7d286dc3e173f4f5035812ee732815bb3dd3652a",
+  "materialization_request_sha256": "5124d58518933bb6c2fee17fcf657f8d8fa2f406d032a139a7c64277d3410b40",
   "original_source_plan_unchanged": true,
   "output_grid": null,
   "pack_id": "planetary-computer-signed",
@@ -19,7 +19,7 @@
     "red"
   ],
   "schema_version": "fasterraster.source-materialization-request/v2",
-  "source_plan_sha256": "a9557eb4a627ea8bcd735682698700cc08580a50bf8168f2516b6cd58cd1be30",
+  "source_plan_sha256": "9dab670e7445e048c6219aa2e2b88bf1e7ab72fd494324a7284beb3c3ad5d4e9",
   "spatial_request": {
     "bbox": [
       -101.06,
