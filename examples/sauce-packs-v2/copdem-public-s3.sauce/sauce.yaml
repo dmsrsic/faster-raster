@@ -19,7 +19,7 @@ source:
   crs: EPSG:4326
   resampling: bilinear
   nodata: null
-  mask_policy: alpha_or_dataset_mask
+  mask_policy: all_valid
 access:
   authentication_scheme: none
   allowed_hosts: [earth-search.aws.element84.com]

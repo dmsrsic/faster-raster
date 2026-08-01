@@ -84,7 +84,7 @@
   },
   "original_pack_unchanged": true,
   "pack_id": "copdem-public-s3",
-  "plan_sha256": "d9020a114c0a2aa941a7757b389c13cdc058c97510fd354484b3419cf776318f",
+  "plan_sha256": "65eb3070d1ad43eb3c3f84a31899e1db8f74373c8a271f81cd7976731647fe10",
   "preview": {
     "role": "natural_color",
     "target_crs": "EPSG:32614",
@@ -107,15 +107,15 @@
   "requested_time": null,
   "resolved_time": null,
   "schema_version": "fasterraster.source-pack-plan/v2",
-  "source_content_identity_sha256": "be283dd6e9e1159a2d0bd5667d21eaa66a5942bf88d580827bb57d7a8e4ad27b",
+  "source_content_identity_sha256": "45632013f3b5d881b09abfc10bc356e1946a3cbe99d42f214ba9849cbb372e6f",
   "source_contract": {
     "crs": "EPSG:4326",
-    "mask_policy": "alpha_or_dataset_mask",
+    "mask_policy": "all_valid",
     "nodata": null,
     "resampling": "bilinear",
     "semantic_type": "continuous"
   },
-  "source_pack_sha256": "9ad5ccbda01f6e2e69ffa70f80a36df96b81d59a47f0c0c76d0b22fb554c81de",
+  "source_pack_sha256": "b28e06e43fa04165462ea666c26a9593b44f2111af7566b81847fed0e765364b",
   "status": "READY",
   "temporal_alternatives": null,
   "temporal_contract": {
@@ -130,6 +130,6 @@
     "offline_planning": "READY_FOR_OFFLINE_DETERMINISTIC_PLANNING",
     "provider_evidence": "COMPLETE",
     "schema": "SCHEMA_VALID",
-    "validation_sha256": "4120d2c2da859bc21063e87f80bee278178637f343a3a2ce76a38c9a4ab190b8"
+    "validation_sha256": "efab7d8bcbd3554f29836ff5de2079c720ec45d0cc455f3c0477299d5eadbfb4"
   }
 }

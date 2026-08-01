@@ -619,7 +619,7 @@
       "title": "S3CompatibleCredentialedAssetAccess",
       "type": "object"
     },
-    "SourceContract": {
+    "SourceContractV2": {
       "additionalProperties": false,
       "properties": {
         "crs": {
@@ -630,6 +630,7 @@
           "enum": [
             "explicit_nodata",
             "alpha_or_dataset_mask",
+            "all_valid",
             "none"
           ],
           "title": "Mask Policy",
@@ -672,7 +673,7 @@
         "resampling",
         "mask_policy"
       ],
-      "title": "SourceContract",
+      "title": "SourceContractV2",
       "type": "object"
     },
     "StableHrefIdentity": {
@@ -878,7 +879,7 @@
       "type": "string"
     },
     "source": {
-      "$ref": "#/$defs/SourceContract"
+      "$ref": "#/$defs/SourceContractV2"
     },
     "temporal": {
       "$ref": "#/$defs/TemporalContract"

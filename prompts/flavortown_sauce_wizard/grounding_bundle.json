@@ -26,10 +26,10 @@
       "sha256": "3f92893c219827cc0459239d52e45a787f55e19c65b3486f24059ab63695c4f8"
     },
     {
-      "bytes": 21357,
+      "bytes": 21388,
       "path": "schemas/source_pack_v2.schema.json",
       "role": "source_pack_schema",
-      "sha256": "509e23c64bcdbbdac0525b59f0ac862c49edbb78d82d533c23164863509bdad6"
+      "sha256": "9108fe5406ab84099117910ddcce5d1aa7b4c36d49e08219118f336ef6706e4b"
     },
     {
       "bytes": 3590,
@@ -272,10 +272,10 @@
       "sha256": "8f287d3310f08ef59f323ad111e6efa81a33aa117d5e2ed587859c39c9de871e"
     },
     {
-      "bytes": 1720,
+      "bytes": 1708,
       "path": "examples/sauce-packs-v2/earth-search-copdem-https.sauce/sauce.yaml",
       "role": "direct_https_v2_example",
-      "sha256": "8ef4e242ce8d6add0fc236ecc62e6b746dbd4489654a8f619a4a264844e30d98"
+      "sha256": "1cf409ebc883129d1afbc417b3921c9872c9d97fd028216f0b742b0e9033203d"
     },
     {
       "bytes": 1923,
@@ -314,7 +314,7 @@
       "sha256": "ef960c2fe1b6f813f707c73ab4c2b906c0cff89db42db6bf31147cae10c4978b"
     }
   ],
-  "grounding_bundle_sha256": "04166ce35a515418a69d8399424dd7dd38b0df14e4f03ad27b2401a07b4d7d1e",
+  "grounding_bundle_sha256": "244908f6ccf31fea1b882e4b7863b95e42126e232345e97502f83b5e26f29ebe",
   "release": {
     "contract_status": "experimental",
     "development_label": "Unreleased",

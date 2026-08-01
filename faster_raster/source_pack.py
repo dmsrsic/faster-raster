@@ -172,6 +172,15 @@ class SourceContract(BaseModel):
     mask_policy: Literal["explicit_nodata", "alpha_or_dataset_mask", "none"]
 
 
+class SourceContractV2(SourceContract):
+    mask_policy: Literal[
+        "explicit_nodata",
+        "alpha_or_dataset_mask",
+        "all_valid",
+        "none",
+    ]
+
+
 class AccessContract(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -396,7 +405,7 @@ class SourcePackManifestV2(BaseModel):
     description: str
     adapter: AdapterContractV2
     capabilities: CapabilityContract
-    source: SourceContract
+    source: SourceContractV2
     access: AccessContractV2
     asset_access: AssetAccessContract | None = None
     network: NetworkContract
@@ -1058,6 +1067,10 @@ def validate_loaded_source_pack(pack: SourcePack) -> dict[str, Any]:
         "average",
     }:
         errors.append("continuous source resampling is unsupported")
+    if source.mask_policy == "explicit_nodata" and source.nodata is None:
+        errors.append("explicit_nodata mask semantics require a nodata value")
+    if source.mask_policy == "all_valid" and source.nodata is not None:
+        errors.append("all_valid mask semantics require nodata to be null")
     if source.nodata is None and source.mask_policy == "none":
         errors.append("source must declare nodata or mask semantics")
     identity, provider_evidence, family_contract = _family_contract(

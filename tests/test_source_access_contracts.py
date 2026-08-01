@@ -322,6 +322,42 @@ def test_v2_schema_surfaces_are_versioned() -> None:
         ]
         == "fasterraster.credential-requirement/v2"
     )
+    mask_policies = source_pack_v2_schema()["$defs"]["SourceContractV2"][
+        "properties"
+    ]["mask_policy"]["enum"]
+    assert "all_valid" in mask_policies
+
+
+def test_all_valid_contract_requires_null_nodata(tmp_path: Path) -> None:
+    manifest = _base_manifest(_direct_access())
+    manifest["source"] = {
+        **manifest["source"],
+        "mask_policy": "all_valid",
+        "nodata": -9999,
+    }
+    pack = _write_pack(
+        tmp_path,
+        _direct_access(),
+        manifest_update=manifest,
+    )
+    validation = validate_source_pack(pack)
+    assert validation["status"] == "FAIL"
+    assert "all_valid mask semantics require nodata to be null" in validation[
+        "errors"
+    ]
+
+
+def test_copdem_routes_declare_identical_all_valid_semantics() -> None:
+    source_contracts = []
+    for name in (
+        "earth-search-copdem-https.sauce",
+        "copdem-public-s3.sauce",
+    ):
+        plan = compile_source_pack_plan(V2_EXAMPLES / name)
+        source_contracts.append(plan["source_contract"])
+    assert source_contracts[0] == source_contracts[1]
+    assert source_contracts[0]["mask_policy"] == "all_valid"
+    assert source_contracts[0]["nodata"] is None
 
 
 def test_earth_engine_contract_is_closed_and_requires_grid(

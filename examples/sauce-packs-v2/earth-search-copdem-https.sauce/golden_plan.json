@@ -81,7 +81,7 @@
   },
   "original_pack_unchanged": true,
   "pack_id": "earth-search-copdem-https",
-  "plan_sha256": "4f4b094a35a7823b5c910426e6a91b017c870cad9013e194e470f11c2afcfe80",
+  "plan_sha256": "949624942daf983330478ef22dd52c1f75de83b88a1b9ee473f9fc6a64d45ba4",
   "preview": {
     "role": "natural_color",
     "target_crs": "EPSG:32614",
@@ -104,15 +104,15 @@
   "requested_time": null,
   "resolved_time": null,
   "schema_version": "fasterraster.source-pack-plan/v2",
-  "source_content_identity_sha256": "0743de99c10d02088cc1046669f016e8fd54311481ca7e7d96fa755f24e40bd4",
+  "source_content_identity_sha256": "9aa3a492146c14dc7e5d2a06a85f76e34ebecc02c11c6198626edd101be72b60",
   "source_contract": {
     "crs": "EPSG:4326",
-    "mask_policy": "alpha_or_dataset_mask",
+    "mask_policy": "all_valid",
     "nodata": null,
     "resampling": "bilinear",
     "semantic_type": "continuous"
   },
-  "source_pack_sha256": "787c5678ec89539e327b3571e9c5b04db51492f46a96229d69c01a20cbd2e466",
+  "source_pack_sha256": "3ae6192ca1be367e09efb371ba435377b272901fdbc048c67ab14369c024971e",
   "status": "READY",
   "temporal_alternatives": null,
   "temporal_contract": {
@@ -127,6 +127,6 @@
     "offline_planning": "READY_FOR_OFFLINE_DETERMINISTIC_PLANNING",
     "provider_evidence": "COMPLETE",
     "schema": "SCHEMA_VALID",
-    "validation_sha256": "75d9b94d67ce9dc963566228a4a29ce27ecc34ae7508cdfd4c683e3460e69faf"
+    "validation_sha256": "8fd37207630e4b332f3e18f423f1279c7d9c103fdd096b0a4e52f54d102ef117"
   }
 }

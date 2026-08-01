@@ -10,8 +10,8 @@
     "max_network_bytes": 76000000,
     "max_network_requests": 3
   },
-  "materialization_content_sha256": "f77c69120dd33bb312a668e6d5b66e8a0dcdcf83d75f52b3bdc09a92b3cdc663",
-  "materialization_request_sha256": "910238364a34ed502c490887f4ee5c098fd6acea5608eb3923b693c71be5b35b",
+  "materialization_content_sha256": "d05109ad1fe21d1daedb25cb33b7cdd68f504540a5cdd42e00a140a38db561d4",
+  "materialization_request_sha256": "b9b44baecfd0226cfcdb61eb8ba6a4fbd594460fac5ff496c0adbc647baab50a",
   "original_source_plan_unchanged": true,
   "output_grid": null,
   "pack_id": "earth-search-copdem-https",
@@ -19,7 +19,7 @@
     "data"
   ],
   "schema_version": "fasterraster.source-materialization-request/v2",
-  "source_plan_sha256": "4f4b094a35a7823b5c910426e6a91b017c870cad9013e194e470f11c2afcfe80",
+  "source_plan_sha256": "949624942daf983330478ef22dd52c1f75de83b88a1b9ee473f9fc6a64d45ba4",
   "spatial_request": {
     "bbox": [
       -101.06,
