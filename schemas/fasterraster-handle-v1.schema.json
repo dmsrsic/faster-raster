@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dmsrsic.github.io/faster-raster/schemas/fasterraster-handle-v1.schema.json",
+  "title": "FasterRaster public handle record v1",
+  "type": "object",
+  "required": ["schema_version", "handle", "member_id", "joined_at", "status", "visibility", "control", "profile"],
+  "properties": {
+    "schema_version": {"const": "fasterraster.handle/v1"},
+    "handle": {"type": "string", "pattern": "^(?!.*--)[a-z0-9](?:[a-z0-9-]{1,28}[a-z0-9])$"},
+    "member_id": {"type": "string", "pattern": "^frh_[a-z2-7]{25}[aeimquy4]$"},
+    "joined_at": {"type": "string", "format": "date"},
+    "status": {"enum": ["active", "suspended", "retired", "removed"]},
+    "visibility": {"const": "public"},
+    "control": {
+      "type": "object",
+      "required": ["method", "public_key", "public_key_fingerprint", "sequence", "last_claim_sha256"],
+      "properties": {
+        "method": {"const": "ed25519"},
+        "public_key": {"type": "string", "pattern": "^[A-Za-z0-9_-]{42}[AEIMQUYcgkosw048]$"},
+        "public_key_fingerprint": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "sequence": {"type": "integer", "minimum": 1},
+        "last_claim_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      },
+      "additionalProperties": false
+    },
+    "profile": {
+      "type": "object",
+      "required": ["interests"],
+      "properties": {"interests": {"type": "array", "maxItems": 5, "uniqueItems": true, "items": {"enum": ["remote-sensing", "reproducibility", "source-packs", "stac", "classification", "climate", "cartography"]}}},
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

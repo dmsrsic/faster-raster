@@ -42,6 +42,7 @@ nav:
   - Start:
       - Installation: installation.md
       - Five-minute quickstart: quickstart.md
+      - Update lifecycle: update-lifecycle.md
       - First-cook troubleshooting: first-cook-troubleshooting.md
       - Terminal playground: terminal-playground.md
   - Workflows:
@@ -74,6 +75,11 @@ nav:
       - Security: security.md
       - Release notes: release-notes.md
       - Capability matrix: generated/capabilities.md
+      - Release status: generated/release-status.md
+      - Adoption metrics: adoption-metrics.md
+      - Handle Registry: community/index.md
+      - Handle Registry joining: community/join.md
+      - Handle Registry privacy: community/privacy.md
 extra_css:
   - stylesheets/extra.css
 markdown_extensions:

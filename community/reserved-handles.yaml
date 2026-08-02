@@ -1,0 +1,25 @@
+reserved:
+  - admin
+  - api
+  - contact
+  - fasterraster
+  - help
+  - maintainer
+  - maintainers
+  - moderator
+  - owner
+  - developer
+  - official
+  - official-status
+  - provider
+  - support
+  - security
+  - status
+  - team
+  - www
+prohibited_tokens:
+  - github
+  - pypi
+  - nasa
+  - usgs
+  - usda

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dmsrsic.github.io/faster-raster/schemas/fasterraster-handle-claim-v1.schema.json",
+  "title": "FasterRaster signed handle claim envelope v1",
+  "description": "Schema-only foundation. Local Ed25519 claim generation is separately reviewable and not enabled by this release.",
+  "type": "object",
+  "required": ["schema_version", "action", "member_id", "handle", "sequence", "previous_record_sha256", "claim_nonce", "signature"],
+  "properties": {
+    "schema_version": {"const": "fasterraster.handle-claim/v1"},
+    "action": {"enum": ["create", "update", "rename", "retire", "suspend", "remove"]},
+    "member_id": {"type": "string", "pattern": "^frh_[a-z2-7]{25}[aeimquy4]$"},
+    "handle": {"type": "string", "pattern": "^(?!.*--)[a-z0-9](?:[a-z0-9-]{1,28}[a-z0-9])$"},
+    "sequence": {"type": "integer", "minimum": 1},
+    "previous_record_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "claim_nonce": {"type": "string", "pattern": "^[A-Za-z0-9_-]{21}[AQgw]$"},
+    "signature": {"type": "string", "pattern": "^[A-Za-z0-9_-]{85}[AQgw]$"}
+  },
+  "additionalProperties": false
+}
