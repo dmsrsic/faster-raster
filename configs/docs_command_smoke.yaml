@@ -1,0 +1,44 @@
+schema_version: fasterraster.docs-command-smoke/v1
+commands:
+  - id: version
+    classification: offline-smoke
+    argv: [--version]
+  - id: doctor-offline
+    classification: offline-smoke
+    argv: [doctor, --offline]
+  - id: templates-list
+    classification: offline-smoke
+    argv: [templates, list]
+  - id: capabilities-json
+    classification: offline-smoke
+    argv: [capabilities, --json]
+  - id: preview-templates-list
+    classification: offline-smoke
+    argv: [preview-templates, list]
+  - id: indices-list
+    classification: offline-smoke
+    argv: [indices, list]
+  - id: indices-show-ndvi
+    classification: offline-smoke
+    argv: [indices, show, ndvi]
+  - id: update-status
+    classification: offline-smoke
+    argv: [update, status, --json]
+  - id: prism-sauce-validate
+    classification: offline-smoke
+    argv: [sauce, validate, examples/sauce-packs/prism-daily.sauce]
+  - id: prism-sauce-test
+    classification: offline-smoke
+    argv: [sauce, test, examples/sauce-packs/prism-daily.sauce]
+  - id: index-init
+    classification: offline-smoke
+    argv: [init, studies/index-hybrid.fr.md, --template, ag-naip-index-hybrid-classification, --name, index-hybrid-demo, --bbox, "-83.2000", "39.8500", "-83.1990", "39.8510", --years, "2023"]
+  - id: index-validate
+    classification: offline-smoke
+    argv: [validate, studies/index-hybrid.fr.md]
+  - id: index-plan
+    classification: offline-smoke
+    argv: [plan, studies/index-hybrid.fr.md, --offline]
+  - id: index-explain
+    classification: offline-smoke
+    argv: [explain, studies/index-hybrid.fr.md, --offline]

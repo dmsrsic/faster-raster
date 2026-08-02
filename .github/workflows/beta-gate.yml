@@ -93,6 +93,15 @@ jobs:
       - name: Build documentation
         run: mkdocs build --strict
 
+      - name: Enforce documentation command classifications
+        run: python scripts/check_docs_contracts.py
+
+      - name: Run offline documentation smoke manifest
+        run: python scripts/run_docs_smoke.py
+
+      - name: Verify built-site references
+        run: python scripts/check_docs_contracts.py --site site
+
       - name: Verify clean patches and tracked outputs
         run: |
           git diff --check
