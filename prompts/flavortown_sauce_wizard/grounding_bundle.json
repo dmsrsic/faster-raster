@@ -1,6 +1,6 @@
 {
   "bundle_version": "1.0.0",
-  "capability_registry_sha256": "25236c94ccb9acbdcde74ac5289588063a609a44d50fdf58334bf5f4fba146c4",
+  "capability_registry_sha256": "a1787363a87007acebd03f8f3276f0bfab3fca903f389caac03442695306ae55",
   "contract_schema_versions": [
     "fasterraster.source-pack/v1",
     "fasterraster.source-pack-plan/v1",
@@ -104,10 +104,10 @@
       "sha256": "ed56b7c7892b96746c9c798a1665b4ea78cf369a488ecabb0220f646651437b6"
     },
     {
-      "bytes": 14513,
+      "bytes": 14526,
       "path": "configs/public_capabilities.yaml",
       "role": "capability_registry",
-      "sha256": "ed9864b024cd373ee298340e080b34156b462d8473bb10e113fc5fcaf0b93fd6"
+      "sha256": "6ee6e03b37b8a015d9c8d573a8c24818dd4e7db6e030e9a347777371f40844ce"
     },
     {
       "bytes": 7247,
@@ -116,10 +116,10 @@
       "sha256": "cdc1a20986856eaad562255755569dc68f3f45d32b8e429c54cf18c279453c09"
     },
     {
-      "bytes": 3451,
+      "bytes": 3347,
       "path": "docs/generated/capabilities.md",
       "role": "capability_reference",
-      "sha256": "ff1e0bcfa33956c0e45315c312202fb420c94893c424827f3a7fb7b0eb2648af"
+      "sha256": "e8cc2e7e19296145a44e123685e9a9100875eb5a175b517cb57c2fcdece40e3d"
     },
     {
       "bytes": 3339,
@@ -308,13 +308,13 @@
       "sha256": "61d5845f6a5587065f326eae3277d32c462d98fd21645bc43eb9c443d01f6554"
     },
     {
-      "bytes": 17575,
+      "bytes": 17614,
       "path": "prompts/flavortown_sauce_wizard/capabilities.json",
       "role": "machine_capabilities",
-      "sha256": "9c3196c5dd443a5b75bcf53b89c447963cca928393db1c3447cf88696e0102f1"
+      "sha256": "67603726ae7c5754658da9b777467f189dbaa333278bbf41578b984a0a907f58"
     }
   ],
-  "grounding_bundle_sha256": "49dd9b34a2b6d5a43601e9da5833c8dae403b7b4ee75581ed5a8b6c294f20ced",
+  "grounding_bundle_sha256": "66ae4fa1358431456eb132733c3c791b339d5e174fc7e86e15256fe4b9acd499",
   "release": {
     "contract_status": "published",
     "development_label": "1.0.0b5 (published beta)",

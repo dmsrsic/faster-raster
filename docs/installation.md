@@ -8,7 +8,7 @@
 
 Ubuntu is the public CI target. WSL2 is exercised during local release validation. macOS and native Windows are not yet in the beta CI matrix.
 
-## Install the published beta.4 wheel
+## Install the published beta.5 wheel
 
 The reproducible public installation starts from the immutable GitHub release asset:
 ```sh { .release-operator }
@@ -19,7 +19,7 @@ fr --version
 fr doctor --offline
 ```
 
-The beta.4 release has wheel and source assets on GitHub. Verify the release page and retain the asset digest with your study record.
+The beta.5 release has wheel and source assets on GitHub. Verify the release page and retain the asset digest with your study record.
 
 ## Use the development checkout
 ```sh { .illustrative }

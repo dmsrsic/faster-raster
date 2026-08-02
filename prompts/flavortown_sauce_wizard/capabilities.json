@@ -49,7 +49,7 @@
         "contract_validated"
       ],
       "evidence_refs": [],
-      "introduced_in": null,
+      "introduced_in": "v1.0.0-beta.5",
       "kind": "workflow",
       "label": "Bring Your Own Sauce / declarative Source Packs",
       "materialization": false,
@@ -57,7 +57,7 @@
       "planning": true,
       "preview": true,
       "public_execution": "validation_and_bounded_probe_only",
-      "release_state": "unreleased_public",
+      "release_state": "published",
       "scientific_scope": "Declarative Source Pack validation and planning contracts; no arbitrary code execution.",
       "status": "experimental"
     },
@@ -70,7 +70,7 @@
         "contract_validated"
       ],
       "evidence_refs": [],
-      "introduced_in": null,
+      "introduced_in": "v1.0.0-beta.5",
       "kind": "workflow",
       "label": "Declarative Source Pack v2 contracts",
       "materialization": false,
@@ -78,7 +78,7 @@
       "planning": true,
       "preview": true,
       "public_execution": "frozen_contract_only",
-      "release_state": "unreleased_public",
+      "release_state": "published",
       "scientific_scope": "Versioned v2 asset-access and materialization contracts; public execution remains bounded and provider-specific.",
       "status": "experimental"
     },
@@ -91,7 +91,7 @@
         "contract_validated"
       ],
       "evidence_refs": [],
-      "introduced_in": null,
+      "introduced_in": "v1.0.0-beta.5",
       "kind": "workflow",
       "label": "Sauce Time ranked temporal alternatives",
       "materialization": false,
@@ -99,7 +99,7 @@
       "planning": true,
       "preview": false,
       "public_execution": "advisory_only",
-      "release_state": "unreleased_public",
+      "release_state": "published",
       "scientific_scope": "Explicit temporal-alternative planning without silent substitution.",
       "status": "experimental"
     },
@@ -112,7 +112,7 @@
         "contract_validated"
       ],
       "evidence_refs": [],
-      "introduced_in": null,
+      "introduced_in": "v1.0.0-beta.5",
       "kind": "workflow",
       "label": "Reusable preview templates",
       "materialization": false,
@@ -120,7 +120,7 @@
       "planning": true,
       "preview": true,
       "public_execution": "render_contract_compilation",
-      "release_state": "unreleased_public",
+      "release_state": "published",
       "scientific_scope": "Declarative preview layout and provenance contracts only.",
       "status": "experimental"
     },
@@ -133,7 +133,7 @@
         "contract_validated"
       ],
       "evidence_refs": [],
-      "introduced_in": null,
+      "introduced_in": "v1.0.0-beta.5",
       "kind": "scientific_contract",
       "label": "CRS-aware categorical area accounting",
       "materialization": true,
@@ -141,7 +141,7 @@
       "planning": false,
       "preview": true,
       "public_execution": "equal_area_inventory",
-      "release_state": "unreleased_public",
+      "release_state": "published",
       "scientific_scope": "Equal-area categorical inventory and reconciled valid-footprint accounting.",
       "status": "experimental"
     },
@@ -154,7 +154,7 @@
         "contract_validated"
       ],
       "evidence_refs": [],
-      "introduced_in": null,
+      "introduced_in": "v1.0.0-beta.5",
       "kind": "scientific_contract",
       "label": "Classification confidence-threshold provenance",
       "materialization": true,
@@ -162,7 +162,7 @@
       "planning": true,
       "preview": true,
       "public_execution": "fail_closed_provenance",
-      "release_state": "unreleased_public",
+      "release_state": "published",
       "scientific_scope": "Provenance-preserving confidence and threshold metadata; not an accuracy claim.",
       "status": "experimental"
     },
@@ -175,7 +175,7 @@
         "contract_validated"
       ],
       "evidence_refs": [],
-      "introduced_in": null,
+      "introduced_in": "v1.0.0-beta.5",
       "kind": "workflow",
       "label": "Coherent NAIP-CDL temporal repair",
       "materialization": false,
@@ -183,7 +183,7 @@
       "planning": true,
       "preview": false,
       "public_execution": "explicit_selection_only",
-      "release_state": "unreleased_public",
+      "release_state": "published",
       "scientific_scope": "Explicit temporal repair selection for NAIP/CDL planning.",
       "status": "experimental"
     },
@@ -195,7 +195,7 @@
         "contract_validated"
       ],
       "evidence_refs": [],
-      "introduced_in": null,
+      "introduced_in": "v1.0.0-beta.5",
       "kind": "boundary",
       "label": "Public credential-requirement contract",
       "materialization": false,
@@ -203,7 +203,7 @@
       "planning": true,
       "preview": false,
       "public_execution": "fails_before_network_without_resolver",
-      "release_state": "unreleased_public",
+      "release_state": "published",
       "scientific_scope": "Public credential-reference and pre-network failure boundary only.",
       "status": "experimental"
     },
@@ -216,7 +216,7 @@
         "contract_validated"
       ],
       "evidence_refs": [],
-      "introduced_in": null,
+      "introduced_in": "v1.0.0-beta.5",
       "kind": "boundary",
       "label": "Versioned generic STAC asset-access contracts",
       "materialization": false,
@@ -224,7 +224,7 @@
       "planning": true,
       "preview": false,
       "public_execution": "frozen_contract_only",
-      "release_state": "unreleased_public",
+      "release_state": "published",
       "scientific_scope": "Provider-neutral STAC asset-access contracts without universal execution.",
       "status": "experimental"
     },
@@ -236,7 +236,7 @@
         "contract_validated"
       ],
       "evidence_refs": [],
-      "introduced_in": null,
+      "introduced_in": "v1.0.0-beta.5",
       "kind": "boundary",
       "label": "Closed Earth Engine computation contracts",
       "materialization": false,
@@ -244,7 +244,7 @@
       "planning": true,
       "preview": false,
       "public_execution": "contract_compilation_only",
-      "release_state": "unreleased_public",
+      "release_state": "published",
       "scientific_scope": "Closed Earth Engine computation contract compilation without public execution.",
       "status": "experimental"
     },
@@ -289,7 +289,7 @@
       "status": "unsupported"
     }
   ],
-  "capability_registry_sha256": "25236c94ccb9acbdcde74ac5289588063a609a44d50fdf58334bf5f4fba146c4",
+  "capability_registry_sha256": "a1787363a87007acebd03f8f3276f0bfab3fca903f389caac03442695306ae55",
   "evidence_definitions": {
     "contract_validated": "Schema/compiler validation only; no live dataset claim.",
     "fixture_validated": "Deterministic checked-in fixtures exercise the contract.",
@@ -396,7 +396,7 @@
       "evidence_refs": [
         "prism_ames_2023"
       ],
-      "introduced_in": null,
+      "introduced_in": "v1.0.0-beta.5",
       "kind": "source",
       "label": "PRISM daily precipitation ZIP",
       "materialization": true,
@@ -404,7 +404,7 @@
       "planning": true,
       "preview": true,
       "public_execution": "guarded_bounded",
-      "release_state": "unreleased_public",
+      "release_state": "published",
       "scientific_scope": "Guarded PRISM daily precipitation validation and bounded materialization only.",
       "status": "experimental"
     },
@@ -417,7 +417,7 @@
         "contract_validated"
       ],
       "evidence_refs": [],
-      "introduced_in": null,
+      "introduced_in": "v1.0.0-beta.5",
       "kind": "source",
       "label": "CHIRPS, gridMET, TerraClimate, and WorldClim",
       "materialization": false,
@@ -425,7 +425,7 @@
       "planning": true,
       "preview": true,
       "public_execution": "bounded_probe_and_fixture_paths",
-      "release_state": "unreleased_public",
+      "release_state": "published",
       "scientific_scope": "Bounded probe and fixture paths for catalog-backed climate sources; no universal workflow execution.",
       "status": "experimental"
     },
@@ -437,7 +437,7 @@
         "contract_validated"
       ],
       "evidence_refs": [],
-      "introduced_in": null,
+      "introduced_in": "v1.0.0-beta.5",
       "kind": "source",
       "label": "Copernicus Data Space STAC",
       "materialization": false,
@@ -445,7 +445,7 @@
       "planning": true,
       "preview": false,
       "public_execution": "resolver_required",
-      "release_state": "unreleased_public",
+      "release_state": "published",
       "scientific_scope": "Public Copernicus contract and resolver boundary without credential resolution.",
       "status": "experimental"
     }

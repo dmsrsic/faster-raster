@@ -29,29 +29,36 @@ FasterRaster is useful when a raster workflow needs more than a download script:
 
 ## Capability status
 
-The published package is `v1.0.0-beta.5` / `1.0.0b5`. It includes the post-beta.4
-public development tranche: Source Packs, PRISM runnable execution, STAC v2,
-update inspection, deterministic generated surfaces, aggregate adoption-metric
-foundations, and the public Handle Registry contract. Authenticated execution
-remains private, and capability state, evidence, and execution boundary remain
-independent claims. `configs/public_capabilities.yaml` is authoritative, and drift
-tests bind the CLI, website, and GPT grounding export to it.
+The published package is `v1.0.0-beta.5` / `1.0.0b5`. Beta.5 includes
+published experimental contracts for Source Packs, Sauce Time, reusable preview
+templates, guarded PRISM execution, STAC v2, bounded climate-source probes,
+credential requirements, and closed Earth Engine computation planning. Their
+release inclusion does not imply universal provider, geography, date, or output
+execution; the capability matrix records each evidence tier and public execution
+boundary independently.
+
+Beta.5 also adds user-facing update inspection. Its aggregate adoption-metric
+and Handle Registry work is foundation-level only: FasterRaster does not
+automatically archive GitHub traffic, collect usage telemetry, accept registry
+submissions, or verify handle ownership. Authenticated execution remains private.
+`configs/public_capabilities.yaml` is authoritative, and drift tests bind the CLI,
+website, and GPT grounding export to it.
 
 <!-- BEGIN GENERATED CAPABILITY MATRIX -->
 | Capability | Release state | Evidence | Plan | Preview | Materialize | Analyze | Public execution |
 |---|---|---|:---:|:---:|:---:|:---:|---|
 | Index-guided hybrid classification | `published` | `contract_validated` | yes | yes | yes | yes | `bounded_local_and_declared_sources` |
 | Markdown workfiles and deterministic planning | `published` | `contract_validated` | yes | yes | yes | yes | `bounded_local` |
-| Bring Your Own Sauce / declarative Source Packs | `unreleased_public` | `fixture_validated, contract_validated` | yes | yes | no | no | `validation_and_bounded_probe_only` |
-| Declarative Source Pack v2 contracts | `unreleased_public` | `fixture_validated, contract_validated` | yes | yes | no | no | `frozen_contract_only` |
-| Sauce Time ranked temporal alternatives | `unreleased_public` | `fixture_validated, contract_validated` | yes | no | no | no | `advisory_only` |
-| Reusable preview templates | `unreleased_public` | `fixture_validated, contract_validated` | yes | yes | no | no | `render_contract_compilation` |
-| CRS-aware categorical area accounting | `unreleased_public` | `fixture_validated, contract_validated` | no | yes | yes | yes | `equal_area_inventory` |
-| Classification confidence-threshold provenance | `unreleased_public` | `fixture_validated, contract_validated` | yes | yes | yes | yes | `fail_closed_provenance` |
-| Coherent NAIP-CDL temporal repair | `unreleased_public` | `fixture_validated, contract_validated` | yes | no | no | no | `explicit_selection_only` |
-| Public credential-requirement contract | `unreleased_public` | `contract_validated` | yes | no | no | no | `fails_before_network_without_resolver` |
-| Versioned generic STAC asset-access contracts | `unreleased_public` | `fixture_validated, contract_validated` | yes | no | no | no | `frozen_contract_only` |
-| Closed Earth Engine computation contracts | `unreleased_public` | `contract_validated` | yes | no | no | no | `contract_compilation_only` |
+| Bring Your Own Sauce / declarative Source Packs | `published` | `fixture_validated, contract_validated` | yes | yes | no | no | `validation_and_bounded_probe_only` |
+| Declarative Source Pack v2 contracts | `published` | `fixture_validated, contract_validated` | yes | yes | no | no | `frozen_contract_only` |
+| Sauce Time ranked temporal alternatives | `published` | `fixture_validated, contract_validated` | yes | no | no | no | `advisory_only` |
+| Reusable preview templates | `published` | `fixture_validated, contract_validated` | yes | yes | no | no | `render_contract_compilation` |
+| CRS-aware categorical area accounting | `published` | `fixture_validated, contract_validated` | no | yes | yes | yes | `equal_area_inventory` |
+| Classification confidence-threshold provenance | `published` | `fixture_validated, contract_validated` | yes | yes | yes | yes | `fail_closed_provenance` |
+| Coherent NAIP-CDL temporal repair | `published` | `fixture_validated, contract_validated` | yes | no | no | no | `explicit_selection_only` |
+| Public credential-requirement contract | `published` | `contract_validated` | yes | no | no | no | `fails_before_network_without_resolver` |
+| Versioned generic STAC asset-access contracts | `published` | `fixture_validated, contract_validated` | yes | no | no | no | `frozen_contract_only` |
+| Closed Earth Engine computation contracts | `published` | `contract_validated` | yes | no | no | no | `contract_compilation_only` |
 | Authenticated parallel execution backend | `private` | `contract_validated` | no | no | yes | yes | `unavailable` |
 | Arbitrary-code source plugins | `unsupported` | `contract_validated` | no | no | no | no | `unavailable` |
 <!-- END GENERATED CAPABILITY MATRIX -->
@@ -246,13 +253,19 @@ Plans, grids, source mappings, receipts, and publication compatibility are conte
 ## Project status and boundaries
 
 This beta is release-engineered around the implemented local community core.
-Declarative Source Packs, advisory temporal alternatives, reusable preview
-templates, and opaque credential requirements are current Unreleased public
-contracts, not already-published beta.4 features. Resolved credential handling,
-authenticated materialization, paid or restricted adapters, and parallel
-cluster execution remain private or planned. Index-guided hybrid classification
-described above is included in the published beta.4 contract; its catalog and
-geography limits remain authoritative.
+Beta.5 publishes experimental contracts for declarative Source Packs, advisory
+temporal alternatives, reusable preview templates, categorical area accounting,
+confidence provenance, coherent temporal repair, credential requirements,
+provider-neutral STAC access, closed Earth Engine computation planning, guarded
+PRISM execution, bounded climate-source probes, and Copernicus CDSE planning.
+Their experimental status and declared execution boundaries remain authoritative;
+publication does not imply unrestricted or universal execution.
+
+Resolved credential handling, authenticated materialization, paid or restricted
+adapters, registry intake and ownership verification, automatic traffic archival,
+usage telemetry, and parallel cluster execution remain unavailable, private, or
+planned. Index-guided hybrid classification was introduced in beta.4; its catalog,
+scientific, and geography limits remain authoritative.
 
 Public-source adapters and core orchestration are part of the community beta. Managed infrastructure, private integrations, paid-source adapters, enterprise authentication, specialized classifiers, and cluster services may be developed separately.
 
@@ -265,7 +278,7 @@ Public-source adapters and core orchestration are part of the community beta. Ma
 - [Index-guided hybrid classification](docs/index-guided-classification.md)
 - [Human-development methodology](docs/human-development.md)
 - [Errors and recovery](docs/errors-recovery.md)
-- [Release notes](release/v1.0.0-beta.4.md)
+- [Release notes](release/v1.0.0-beta.5.md)
 - [Contributing](CONTRIBUTING.md)
 - [Security](SECURITY.md)
 - [Citation](docs/citation.md) and [`CITATION.cff`](CITATION.cff)

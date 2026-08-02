@@ -36,16 +36,67 @@ def test_beta5_release_identity_is_synchronized():
 
 def test_frozen_capability_membership():
     registry = load_capability_registry()
-    rows = {row["capability_id"]: row for row in registry["capabilities"] + registry["sources"]}
-    assert rows["index_guided_hybrid_classification"]["release_state"] == "published"
-    assert rows["prism_daily"]["release_state"] == "unreleased_public"
-    assert rows["earth_engine_compute_contract"]["public_execution"] == "contract_compilation_only"
+    rows = {
+        row["capability_id"]: row
+        for row in registry["capabilities"] + registry["sources"]
+    }
+
+    beta5_published = {
+        "sauce_pack",
+        "sauce_pack_v2",
+        "sauce_time",
+        "preview_templates",
+        "categorical_area_accounting",
+        "classification_confidence_provenance",
+        "classification_temporal_repair",
+        "credential_reference",
+        "stac_asset_access_v2",
+        "earth_engine_compute_contract",
+        "prism_daily",
+        "static_http_range_wave",
+        "copernicus_cdse",
+    }
+
+    assert (
+        rows["index_guided_hybrid_classification"]["release_state"]
+        == "published"
+    )
+    assert (
+        rows["index_guided_hybrid_classification"]["introduced_in"]
+        == "v1.0.0-beta.4"
+    )
+
+    for capability_id in beta5_published:
+        row = rows[capability_id]
+        assert row["status"] == "experimental"
+        assert row["release_state"] == "published"
+        assert row["introduced_in"] == "v1.0.0-beta.5"
+
+    assert (
+        rows["earth_engine_compute_contract"]["public_execution"]
+        == "contract_compilation_only"
+    )
     assert rows["private_execution_backend"]["release_state"] == "private"
-    assert rows["sauce_pack"]["release_state"] == "unreleased_public"
-    assert rows["sauce_pack_v2"]["release_state"] == "unreleased_public"
+
     for row in rows.values():
-        assert set(("release_state", "introduced_in", "evidence_levels", "evidence_refs", "public_execution", "scientific_scope")) <= set(row)
-        if row["release_state"] == "published" and row["capability_id"] != "index_guided_hybrid_classification":
+        assert {
+            "release_state",
+            "introduced_in",
+            "evidence_levels",
+            "evidence_refs",
+            "public_execution",
+            "scientific_scope",
+        } <= set(row)
+
+        if row["release_state"] != "published":
+            continue
+
+        capability_id = row["capability_id"]
+        if capability_id == "index_guided_hybrid_classification":
+            assert row["introduced_in"] == "v1.0.0-beta.4"
+        elif capability_id in beta5_published:
+            assert row["introduced_in"] == "v1.0.0-beta.5"
+        else:
             assert row["introduced_in"] is None
 
 

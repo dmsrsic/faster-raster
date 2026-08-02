@@ -1,9 +1,10 @@
 # Five-minute quickstart
 
-This quickstart starts from the published beta.4 wheel and creates the small
+This quickstart starts from the published beta.5 wheel and creates the small
 Meridian human-development plan without contacting a raster service. Source
-Pack and preview-template commands are labeled development-only below; the
-index-guided workflow is part of the published beta.4 contract.
+Pack and preview-template commands below are published experimental interfaces;
+their bounded execution and evidence limits remain authoritative. The
+index-guided workflow was introduced in beta.4.
 
 ```sh { .manual-network }
 python3.12 -m venv .venv
@@ -34,12 +35,14 @@ plan records `requires_coverage_validation: true`. It cannot be executed as
 evidence. Re-plan without `--offline` only when you are ready to authorize the
 bounded metadata coverage check.
 
-## Development checkout capabilities
+## Published experimental capabilities
 
-The following commands require the current `main` checkout (`1.0.0b5`).
-They are offline and prove schema, host, CRS, nodata, resampling,
-temporal, preview, secret-exclusion, canonicalization, and golden-plan
-behavior. Continue with [Bring Your Own Sauce](bring-your-own-sauce.md) or the
+The following commands are available in the beta.5 package. They exercise
+published experimental Source Pack and preview-template contracts offline,
+including schema, host, CRS, nodata, resampling, temporal, preview,
+secret-exclusion, canonicalization, and deterministic-plan checks. Their
+presence in the release does not imply universal materialization or analysis.
+Continue with [Bring Your Own Sauce](bring-your-own-sauce.md) or the
 [first-cook troubleshooting matrix](first-cook-troubleshooting.md).
 
 For a new provider, start from official documentation and

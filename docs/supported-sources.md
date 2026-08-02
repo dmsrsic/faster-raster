@@ -12,9 +12,9 @@ does not contact providers.
 | USDA NASS Cropland Data Layer | `published` | `contract_validated` | yes | yes | yes | yes | `exact_year_workflows` |
 | USGS NAIP imagery | `published` | `contract_validated` | yes | yes | yes | yes | `shipped_agricultural_workflows` |
 | USGS 3DEP | `published` | `contract_validated` | yes | yes | yes | yes | `recipe_bounded` |
-| PRISM daily precipitation ZIP | `unreleased_public` | `live_dataset_certified, fixture_validated` | yes | yes | yes | yes | `guarded_bounded` |
-| CHIRPS, gridMET, TerraClimate, and WorldClim | `unreleased_public` | `fixture_validated, contract_validated` | yes | yes | no | no | `bounded_probe_and_fixture_paths` |
-| Copernicus Data Space STAC | `unreleased_public` | `contract_validated` | yes | no | no | no | `resolver_required` |
+| PRISM daily precipitation ZIP | `published` | `live_dataset_certified, fixture_validated` | yes | yes | yes | yes | `guarded_bounded` |
+| CHIRPS, gridMET, TerraClimate, and WorldClim | `published` | `fixture_validated, contract_validated` | yes | yes | no | no | `bounded_probe_and_fixture_paths` |
+| Copernicus Data Space STAC | `published` | `contract_validated` | yes | no | no | no | `resolver_required` |
 <!-- END GENERATED SOURCE CAPABILITY MATRIX -->
 
 The four declarative Source Pack families—`static_https_template`,

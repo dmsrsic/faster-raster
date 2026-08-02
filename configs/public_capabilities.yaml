@@ -68,8 +68,8 @@ capabilities:
     label: Bring Your Own Sauce / declarative Source Packs
     kind: workflow
     status: experimental
-    release_state: unreleased_public
-    introduced_in: null
+    release_state: published
+    introduced_in: v1.0.0-beta.5
     evidence_levels: [fixture_validated, contract_validated]
     evidence_refs: []
     scientific_scope: Declarative Source Pack validation and planning contracts; no arbitrary code execution.
@@ -84,8 +84,8 @@ capabilities:
     label: Declarative Source Pack v2 contracts
     kind: workflow
     status: experimental
-    release_state: unreleased_public
-    introduced_in: null
+    release_state: published
+    introduced_in: v1.0.0-beta.5
     evidence_levels: [fixture_validated, contract_validated]
     evidence_refs: []
     scientific_scope: Versioned v2 asset-access and materialization contracts; public execution remains bounded and provider-specific.
@@ -100,8 +100,8 @@ capabilities:
     label: Sauce Time ranked temporal alternatives
     kind: workflow
     status: experimental
-    release_state: unreleased_public
-    introduced_in: null
+    release_state: published
+    introduced_in: v1.0.0-beta.5
     evidence_levels: [fixture_validated, contract_validated]
     evidence_refs: []
     scientific_scope: Explicit temporal-alternative planning without silent substitution.
@@ -116,8 +116,8 @@ capabilities:
     label: Reusable preview templates
     kind: workflow
     status: experimental
-    release_state: unreleased_public
-    introduced_in: null
+    release_state: published
+    introduced_in: v1.0.0-beta.5
     evidence_levels: [fixture_validated, contract_validated]
     evidence_refs: []
     scientific_scope: Declarative preview layout and provenance contracts only.
@@ -132,8 +132,8 @@ capabilities:
     label: CRS-aware categorical area accounting
     kind: scientific_contract
     status: experimental
-    release_state: unreleased_public
-    introduced_in: null
+    release_state: published
+    introduced_in: v1.0.0-beta.5
     evidence_levels: [fixture_validated, contract_validated]
     evidence_refs: []
     scientific_scope: Equal-area categorical inventory and reconciled valid-footprint accounting.
@@ -148,8 +148,8 @@ capabilities:
     label: Classification confidence-threshold provenance
     kind: scientific_contract
     status: experimental
-    release_state: unreleased_public
-    introduced_in: null
+    release_state: published
+    introduced_in: v1.0.0-beta.5
     evidence_levels: [fixture_validated, contract_validated]
     evidence_refs: []
     scientific_scope: Provenance-preserving confidence and threshold metadata; not an accuracy claim.
@@ -164,8 +164,8 @@ capabilities:
     label: Coherent NAIP-CDL temporal repair
     kind: workflow
     status: experimental
-    release_state: unreleased_public
-    introduced_in: null
+    release_state: published
+    introduced_in: v1.0.0-beta.5
     evidence_levels: [fixture_validated, contract_validated]
     evidence_refs: []
     scientific_scope: Explicit temporal repair selection for NAIP/CDL planning.
@@ -180,8 +180,8 @@ capabilities:
     label: Public credential-requirement contract
     kind: boundary
     status: experimental
-    release_state: unreleased_public
-    introduced_in: null
+    release_state: published
+    introduced_in: v1.0.0-beta.5
     evidence_levels: [contract_validated]
     evidence_refs: []
     scientific_scope: Public credential-reference and pre-network failure boundary only.
@@ -196,8 +196,8 @@ capabilities:
     label: Versioned generic STAC asset-access contracts
     kind: boundary
     status: experimental
-    release_state: unreleased_public
-    introduced_in: null
+    release_state: published
+    introduced_in: v1.0.0-beta.5
     evidence_levels: [fixture_validated, contract_validated]
     evidence_refs: []
     scientific_scope: Provider-neutral STAC asset-access contracts without universal execution.
@@ -212,8 +212,8 @@ capabilities:
     label: Closed Earth Engine computation contracts
     kind: boundary
     status: experimental
-    release_state: unreleased_public
-    introduced_in: null
+    release_state: published
+    introduced_in: v1.0.0-beta.5
     evidence_levels: [contract_validated]
     evidence_refs: []
     scientific_scope: Closed Earth Engine computation contract compilation without public execution.
@@ -309,8 +309,8 @@ sources:
     label: PRISM daily precipitation ZIP
     kind: source
     status: experimental
-    release_state: unreleased_public
-    introduced_in: null
+    release_state: published
+    introduced_in: v1.0.0-beta.5
     evidence_levels: [live_dataset_certified, fixture_validated]
     evidence_refs: [prism_ames_2023]
     scientific_scope: Guarded PRISM daily precipitation validation and bounded materialization only.
@@ -325,8 +325,8 @@ sources:
     label: CHIRPS, gridMET, TerraClimate, and WorldClim
     kind: source
     status: experimental
-    release_state: unreleased_public
-    introduced_in: null
+    release_state: published
+    introduced_in: v1.0.0-beta.5
     evidence_levels: [fixture_validated, contract_validated]
     evidence_refs: []
     scientific_scope: Bounded probe and fixture paths for catalog-backed climate sources; no universal workflow execution.
@@ -341,8 +341,8 @@ sources:
     label: Copernicus Data Space STAC
     kind: source
     status: experimental
-    release_state: unreleased_public
-    introduced_in: null
+    release_state: published
+    introduced_in: v1.0.0-beta.5
     evidence_levels: [contract_validated]
     evidence_refs: []
     scientific_scope: Public Copernicus contract and resolver boundary without credential resolution.

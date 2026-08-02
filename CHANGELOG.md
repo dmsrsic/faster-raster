@@ -17,8 +17,8 @@ public development branch.
   [FasterRaster Flavortown Sauce Wizard](https://chatgpt.com/g/g-6a692bb17b9c8191a318997fd0435bf7-fasterraster-flavortown-sauce-wizard)
   entry point, four family-specific Source Pack fixtures, explicit
   provider-evidence/readiness states, and deterministic frozen
-  `fasterraster.source-pack-plan/v1` handoff compilation. These remain
-  Unreleased / experimental.
+  `fasterraster.source-pack-plan/v1` handoff compilation. These are published
+  experimental contracts with bounded execution and evidence claims.
 - Declarative `fasterraster.source-pack/v1` Source Packs with offline
   validation, deterministic fixtures and archives, bounded opt-in probes,
   opaque credential requirements, two shipped examples, and `fr sauce`
@@ -56,8 +56,10 @@ public development branch.
   preview tasks compile through released compatibility templates; render
   contracts now additionally bind their template schema, ID, and hash.
 
-These contracts are included in beta.5. Their release state, evidence tier, and
-execution boundary remain independent claims.
+These contracts are included in beta.5 as published experimental surfaces.
+Their evidence tier and execution boundary remain independent claims; release
+inclusion does not imply universal provider access, materialization, analysis,
+or production maturity.
 
 ## 1.0.0-beta.4 - 2026-07-25
 
