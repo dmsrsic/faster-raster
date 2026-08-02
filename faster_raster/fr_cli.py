@@ -83,6 +83,7 @@ from faster_raster.workfiles import (
     load_workfile,
     workfile_template,
 )
+from faster_raster.updater.cli import command_update
 
 
 class CommandError(ValueError):
@@ -2079,6 +2080,19 @@ def build_parser() -> argparse.ArgumentParser:
     )
     capabilities.add_argument("--json", action="store_true")
     capabilities.set_defaults(handler=command_capabilities)
+
+    update = commands.add_parser("update", help="inspect installation state and check bounded release metadata")
+    update_commands = update.add_subparsers(dest="update_command", required=True)
+    update_status = update_commands.add_parser("status", help="offline installation and checkout status")
+    update_status.add_argument("--json", action="store_true")
+    update_status.add_argument("--verbose", action="store_true")
+    update_status.set_defaults(handler=command_update)
+    update_check = update_commands.add_parser("check", help="check GitHub release metadata; never installs")
+    update_check.add_argument("--channel", choices=("stable", "beta"), default=None)
+    update_check.add_argument("--allow-network", action="store_true", help="explicitly authorize one bounded metadata check")
+    update_check.add_argument("--json", action="store_true")
+    update_check.add_argument("--verbose", action="store_true")
+    update_check.set_defaults(handler=command_update)
 
     templates = commands.add_parser("templates", help="discover and inspect built-in study templates")
     template_commands = templates.add_subparsers(dest="templates_command", required=True)

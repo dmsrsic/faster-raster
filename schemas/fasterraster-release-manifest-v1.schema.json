@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dmsrsic.github.io/faster-raster/schemas/fasterraster-release-manifest-v1.schema.json",
+  "title": "FasterRaster release manifest v1",
+  "type": "object",
+  "required": ["schema_version", "tag", "package_version", "channel", "requires_python", "updater_manifest_major", "release_notes_url", "assets"],
+  "properties": {
+    "schema_version": {"const": "fasterraster.release-manifest/v1"},
+    "tag": {"type": "string", "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+(?:-(?:alpha|beta|rc)\\.[0-9]+)?$"},
+    "package_version": {"type": "string"},
+    "channel": {"enum": ["stable", "beta"]},
+    "requires_python": {"type": "string"},
+    "updater_manifest_major": {"const": 1},
+    "release_notes_url": {"type": "string", "format": "uri"},
+    "assets": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["kind", "name", "url", "sha256", "size_bytes"],
+        "properties": {
+          "kind": {"enum": ["wheel", "sdist", "checksums", "manifest"]},
+          "name": {"type": "string"},
+          "url": {"type": "string", "format": "uri", "pattern": "^https://"},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "size_bytes": {"type": "integer", "minimum": 0}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

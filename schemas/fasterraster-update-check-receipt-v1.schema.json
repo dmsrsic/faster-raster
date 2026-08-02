@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dmsrsic.github.io/faster-raster/schemas/fasterraster-update-check-receipt-v1.schema.json",
+  "title": "FasterRaster update check receipt v1",
+  "description": "The canonical stored receipt omits receipt_sha256 and is hashed byte-for-byte. Presentation JSON may add receipt_sha256 as external metadata; that field is never part of its own hash domain.",
+  "type": "object",
+  "required": ["schema_version", "status", "channel", "installation", "candidate", "recommendation", "error"],
+  "properties": {
+    "schema_version": {"const": "fasterraster.update-check-receipt/v1"},
+    "status": {"enum": ["offline", "blocked", "checked", "error"]},
+    "channel": {"enum": ["stable", "beta"]},
+    "installation": {"type": "object"},
+    "candidate": {"type": ["object", "null"]},
+    "recommendation": {"type": "object"},
+    "error": {"type": ["string", "null"]},
+    "receipt_sha256": {"description": "Optional presentation-only digest of the canonical stored receipt bytes.", "type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "additionalProperties": false
+}
