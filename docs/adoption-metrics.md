@@ -14,6 +14,6 @@ FasterRaster reports only explicitly defined aggregate signals. They are not a u
 | Documentation views | Unavailable without a separate analytics provider | Must not be inferred from repository views |
 | Active registered FasterRaster handles | Active validated public registry records | Unique humans, installations, or endorsement |
 
-GitHub traffic is a rolling 14-day view and covers full clones, not fetches. An owner-triggered workflow archives sanitized daily aggregates to the dedicated `metrics-archive` branch after that branch and the read-only secret are provisioned. If the secret is absent, no snapshot is written.
+GitHub traffic is a rolling 14-day view and covers full clones, not fetches. A daily scheduled run and an owner-triggered manual run can archive sanitized aggregates to the dedicated `metrics-archive` branch after the owner provisions both that branch and the read-only traffic API secret. If either prerequisite is absent, no snapshot is written.
 
 No Pages beacon, cookie, fingerprint, installation ID, updater telemetry, or raw IP is collected.

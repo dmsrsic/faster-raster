@@ -135,10 +135,11 @@ def test_duplicate_date_with_identical_input_is_byte_deduplicated(tmp_path):
     assert output.read_bytes() == first
 
 
-def test_archive_workflow_is_manual_only_and_branch_scoped():
+def test_archive_workflow_is_daily_manual_and_branch_scoped():
     workflow = (ROOT / ".github" / "workflows" / "archive-github-traffic.yml").read_text(encoding="utf-8")
-    assert "schedule:" not in workflow
     assert "workflow_dispatch:" in workflow
+    assert "schedule:" in workflow
+    assert 'cron: "37 7 * * *"' in workflow
     assert "HEAD:metrics-archive" in workflow
     assert "contents: write" in workflow
     assert "analytics" not in workflow.lower()

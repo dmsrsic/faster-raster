@@ -2,6 +2,8 @@ name: Archive honest GitHub adoption aggregates
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "37 7 * * *"
 
 permissions:
   contents: write
