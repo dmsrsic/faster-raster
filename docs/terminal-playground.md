@@ -7,8 +7,7 @@ doctor → templates → init → validate → plan → cook → inspect → pub
 ```
 
 ## Diagnose and create
-
-```sh
+```sh { .illustrative }
 fr doctor --offline
 fr templates list
 fr templates show human-development-cdl
@@ -18,8 +17,7 @@ fr init studies/example.fr.md --template human-development-cdl \
 ```
 
 ## Validate, plan, and explain
-
-```sh
+```sh { .illustrative }
 fr validate studies/example.fr.md
 fr plan studies/example.fr.md --offline --verbose --out build/example-plan
 fr explain studies/example.fr.md --offline --verbose --out build/example-explanation
@@ -28,8 +26,7 @@ fr explain studies/example.fr.md --offline --verbose --out build/example-explana
 Validation is offline. `--offline` on planning prohibits source refresh as well as raster transfer.
 
 ## Discover and plan spectral indices
-
-```sh
+```sh { .illustrative }
 fr indices list
 fr indices list --json
 fr indices show ndvi
@@ -48,8 +45,7 @@ Recommendation mode prompts only in an interactive terminal. With
 ## Cook and inspect
 
 After explicitly allowing network use in the workfile:
-
-```sh
+```sh { .illustrative }
 fr cook studies/example.fr.md --reuse auto --no-open
 fr inspect latest --verbose
 ```
@@ -57,8 +53,7 @@ fr inspect latest --verbose
 Use the reported handoff path rather than guessing by timestamp. A final handoff contains `manifest.json`, receipts, methodology, checksums, and a preview. `.staging-*` and `.failed-*` directories are not final results.
 
 ## Publish
-
-```sh
+```sh { .illustrative }
 fr publish human-development-hybrid outputs/handoffs/<handoff-id> \
   --mode combined \
   --imagery-year 2021 \
@@ -76,8 +71,7 @@ Publications are written beneath `outputs/publications/`.
 ## Verify strict reuse
 
 An identical compatible replay makes no network request:
-
-```sh
+```sh { .illustrative }
 fr publish human-development-hybrid outputs/handoffs/<handoff-id> \
   --mode combined \
   --imagery-year 2021 \

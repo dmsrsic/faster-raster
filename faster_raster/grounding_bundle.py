@@ -217,7 +217,7 @@ def build_grounding_bundle(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
             "fasterraster.classification-temporal-resolution/v1",
             "fasterraster.categorical-area-accounting/v1",
             "fasterraster.preview-template/v1",
-            "fasterraster.capability-registry/v1",
+            "fasterraster.capability-registry/v2",
         ],
         "files": files,
     }

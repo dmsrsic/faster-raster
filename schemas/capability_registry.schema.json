@@ -4,6 +4,7 @@
   "properties": {
     "capabilities": {
       "items": {
+        "additionalProperties": false,
         "properties": {
           "analysis": {
             "type": "boolean"
@@ -13,6 +14,33 @@
           },
           "credential_requirement": {
             "type": "string"
+          },
+          "evidence_levels": {
+            "items": {
+              "enum": [
+                "live_route_certified",
+                "live_dataset_certified",
+                "fixture_validated",
+                "contract_validated"
+              ]
+            },
+            "minItems": 1,
+            "type": "array",
+            "uniqueItems": true
+          },
+          "evidence_refs": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": true
+          },
+          "introduced_in": {
+            "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$",
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "kind": {
             "type": "string"
@@ -35,6 +63,21 @@
           "public_execution": {
             "type": "string"
           },
+          "release_state": {
+            "enum": [
+              "published",
+              "unreleased_public",
+              "private",
+              "planned",
+              "unsupported"
+            ]
+          },
+          "scientific_scope": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "status": {
             "enum": [
               "released",
@@ -56,23 +99,117 @@
           "analysis",
           "credential_requirement",
           "public_execution",
-          "notes"
+          "notes",
+          "release_state",
+          "introduced_in",
+          "evidence_levels",
+          "evidence_refs",
+          "scientific_scope"
         ],
         "type": "object"
       },
       "type": "array"
     },
+    "evidence_definitions": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "evidence_records": {
+      "additionalProperties": {
+        "additionalProperties": false,
+        "properties": {
+          "artifact": {
+            "type": "string"
+          },
+          "commit": {
+            "pattern": "^[0-9a-f]{40}$",
+            "type": "string"
+          },
+          "date": {
+            "format": "date",
+            "type": "string"
+          },
+          "evidence_levels": {
+            "items": {
+              "enum": [
+                "live_route_certified",
+                "live_dataset_certified",
+                "fixture_validated",
+                "contract_validated"
+              ]
+            },
+            "minItems": 1,
+            "type": "array",
+            "uniqueItems": true
+          },
+          "scope": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "scope",
+          "date",
+          "commit",
+          "artifact",
+          "evidence_levels"
+        ],
+        "type": "object"
+      },
+      "type": "object"
+    },
     "registry_version": {
       "type": "string"
     },
     "release": {
+      "additionalProperties": false,
+      "properties": {
+        "contract_status": {
+          "type": "string"
+        },
+        "development_label": {
+          "type": "string"
+        },
+        "next_release": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "package_version": {
+          "type": "string"
+        },
+        "public_release": {
+          "pattern": "^v",
+          "type": "string"
+        },
+        "published_package_version": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "package_version",
+        "published_package_version",
+        "public_release",
+        "development_label",
+        "contract_status",
+        "next_release"
+      ],
+      "type": "object"
+    },
+    "release_state_definitions": {
+      "additionalProperties": {
+        "type": "string"
+      },
       "type": "object"
     },
     "schema_version": {
-      "const": "fasterraster.capability-registry/v1"
+      "const": "fasterraster.capability-registry/v2"
     },
     "sources": {
       "items": {
+        "additionalProperties": false,
         "properties": {
           "analysis": {
             "type": "boolean"
@@ -82,6 +219,33 @@
           },
           "credential_requirement": {
             "type": "string"
+          },
+          "evidence_levels": {
+            "items": {
+              "enum": [
+                "live_route_certified",
+                "live_dataset_certified",
+                "fixture_validated",
+                "contract_validated"
+              ]
+            },
+            "minItems": 1,
+            "type": "array",
+            "uniqueItems": true
+          },
+          "evidence_refs": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": true
+          },
+          "introduced_in": {
+            "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$",
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "kind": {
             "type": "string"
@@ -104,6 +268,21 @@
           "public_execution": {
             "type": "string"
           },
+          "release_state": {
+            "enum": [
+              "published",
+              "unreleased_public",
+              "private",
+              "planned",
+              "unsupported"
+            ]
+          },
+          "scientific_scope": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "status": {
             "enum": [
               "released",
@@ -125,13 +304,21 @@
           "analysis",
           "credential_requirement",
           "public_execution",
-          "notes"
+          "notes",
+          "release_state",
+          "introduced_in",
+          "evidence_levels",
+          "evidence_refs",
+          "scientific_scope"
         ],
         "type": "object"
       },
       "type": "array"
     },
     "status_definitions": {
+      "additionalProperties": {
+        "type": "string"
+      },
       "type": "object"
     }
   },
@@ -140,9 +327,12 @@
     "registry_version",
     "release",
     "status_definitions",
+    "release_state_definitions",
+    "evidence_definitions",
+    "evidence_records",
     "capabilities",
     "sources"
   ],
-  "title": "FasterRaster public capability registry v1",
+  "title": "FasterRaster public capability registry v2",
   "type": "object"
 }

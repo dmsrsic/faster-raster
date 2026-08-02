@@ -1,10 +1,10 @@
 {
   "schema_version": "fasterraster.public-beta-readiness/v1",
-  "release_label": "v1.0.0-beta.1",
+  "release_label": "historical-v1.0.0-beta.1",
   "package_version": "1.0.0b1",
   "validation_date": "2026-07-20",
   "starting_commit": "900a61ecec85a1e0b368af7d211cad4c77e7a092",
-  "decision": "public_beta_local_ready",
+  "decision": "historical_record_only",
   "checks": {
     "complete_offline_pytest": {
       "status": "PASS",

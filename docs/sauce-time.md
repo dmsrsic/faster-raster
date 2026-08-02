@@ -9,8 +9,7 @@ candidate is selected explicitly.
 ## Exact time unavailable
 
 Ask the shipped PRISM fixture for a date it does not contain:
-
-```sh
+```sh { .illustrative }
 fr sauce time alternatives \
   examples/sauce-packs/prism-daily.sauce \
   --requested 2021-01-01 \
@@ -50,8 +49,7 @@ estimate, verification status, then earlier time and candidate ID.
 ## Explicit selection
 
 Create a new resolution contract:
-
-```sh
+```sh { .illustrative }
 fr sauce time select \
   examples/sauce-packs/prism-daily.sauce \
   --requested 2021-01-01 \
@@ -74,8 +72,7 @@ year pairs plus immutable hashes.
 
 For noninteractive use, pass both year arguments to `fr plan`, `fr explain`,
 or `fr cook`:
-
-```sh
+```sh { .illustrative }
 fr plan study.fr.md \
   --resolve-imagery-year 2019 \
   --resolve-cdl-year 2019

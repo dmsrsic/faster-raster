@@ -1,6 +1,6 @@
-# FasterRaster public beta scope
+# Historical beta.1 scope
 
-`v1.0.0-beta.1` packages the existing FasterRaster scientific and orchestration scope for public technical evaluation. It improves installation, portability, release validation, documentation, and repository hygiene without adding new source families or changing scientific semantics.
+This file records the historical `v1.0.0-beta.1` scope. It is not the current release contract. The latest published release is `v1.0.0-beta.4`; current development is `1.0.0b5.dev0`.
 
 ## Included
 

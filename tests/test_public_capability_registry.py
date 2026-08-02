@@ -2,12 +2,15 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import shutil
 
 from faster_raster.capability_registry import (
     load_capability_registry,
     markdown_table,
+    release_status_markdown,
     public_json,
     registry_markdown,
+    write_generated_surfaces,
 )
 from faster_raster.grounding_bundle import (
     _grounding_file_record,
@@ -115,4 +118,31 @@ def test_release_status_and_grounding_bundle_do_not_drift():
             / "grounding_bundle.json"
         ).read_text(encoding="utf-8")
     )
-    assert checked_in == build_grounding_bundle(ROOT)
+    first = build_grounding_bundle(ROOT)
+    second = build_grounding_bundle(ROOT)
+    assert first == second
+    assert checked_in == first
+
+
+def test_release_status_surface_does_not_drift():
+    registry = load_capability_registry()
+    checked_in = (ROOT / "docs" / "generated" / "release-status.md").read_text(encoding="utf-8")
+    assert checked_in == release_status_markdown(registry)
+
+
+def test_capability_surfaces_generate_twice_to_identical_temporary_bytes(tmp_path):
+    roots = [tmp_path / "first", tmp_path / "second"]
+    for root in roots:
+        (root / "configs").mkdir(parents=True)
+        shutil.copy2(ROOT / "configs" / "public_capabilities.yaml", root / "configs" / "public_capabilities.yaml")
+        artifact = root / "docs" / "validation" / "ames_prism_dem_ndvi_2023.md"
+        artifact.parent.mkdir(parents=True)
+        shutil.copy2(ROOT / "docs" / "validation" / "ames_prism_dem_ndvi_2023.md", artifact)
+        shutil.copy2(ROOT / "README.md", root / "README.md")
+        shutil.copy2(ROOT / "docs" / "supported-sources.md", root / "docs" / "supported-sources.md")
+        write_generated_surfaces(root)
+
+    relative_outputs = [path.relative_to(roots[0]) for path in write_generated_surfaces(roots[0])]
+    assert relative_outputs
+    for relative in relative_outputs:
+        assert (roots[0] / relative).read_bytes() == (roots[1] / relative).read_bytes()

@@ -1,11 +1,10 @@
-﻿# FasterRaster CLI Commands
+# FasterRaster CLI Commands
 
 ## Public `fr` Source Pack, time, and preview contracts
 
 The following commands are implemented in the current source tree as
 Unreleased / experimental public contracts:
-
-```bash
+```bash { .illustrative }
 fr capabilities --json
 fr sauce init my-source
 fr sauce validate my-source.sauce

@@ -18,8 +18,7 @@ preview defaults. It cannot execute Python, import a module, invoke a shell
 hook, or evaluate an unrestricted template.
 
 ## Evidence-to-validation path
-
-```text
+```text { .illustrative }
 Official provider documentation
 -> Flavortown Sauce Wizard
 -> generated or audited declarative Source Pack
@@ -39,8 +38,7 @@ state separately.
 ## Offline-first path
 
 From a fresh clone:
-
-```sh
+```sh { .illustrative }
 python3.12 -m venv .venv
 . .venv/bin/activate
 python -m pip install .
@@ -56,8 +54,7 @@ the existing `generic_https_template` adapter family and official URL-template
 shape. Its `golden_plan.json` proves deterministic offline compilation.
 
 Create a new pack:
-
-```sh
+```sh { .illustrative }
 fr sauce init my-source
 fr sauce validate my-source.sauce
 fr sauce explain my-source.sauce --json
@@ -172,8 +169,7 @@ The schema is
 ## Bounded probe
 
 Network access is a separate explicit step:
-
-```sh
+```sh { .illustrative }
 fr sauce probe examples/sauce-packs/prism-daily.sauce \
   --allow-network \
   --out build/prism-probe.json

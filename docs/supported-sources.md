@@ -7,14 +7,14 @@ capability registry. Routine CI uses offline mocks, fixtures, and contracts; it
 does not contact providers.
 
 <!-- BEGIN GENERATED SOURCE CAPABILITY MATRIX -->
-| Capability | Status | Plan | Preview | Materialize | Analyze | Public execution |
-|---|---:|:---:|:---:|:---:|:---:|---|
-| USDA NASS Cropland Data Layer | `released` | yes | yes | yes | yes | `exact_year_workflows` |
-| USGS NAIP imagery | `released` | yes | yes | yes | yes | `shipped_agricultural_workflows` |
-| USGS 3DEP | `released` | yes | yes | yes | yes | `recipe_bounded` |
-| PRISM daily precipitation ZIP | `released` | yes | yes | yes | yes | `guarded_bounded` |
-| CHIRPS, gridMET, TerraClimate, and WorldClim | `experimental` | yes | yes | no | no | `bounded_probe_and_fixture_paths` |
-| Copernicus Data Space STAC | `experimental` | yes | no | no | no | `resolver_required` |
+| Capability | Release state | Evidence | Plan | Preview | Materialize | Analyze | Public execution |
+|---|---|---|:---:|:---:|:---:|:---:|---|
+| USDA NASS Cropland Data Layer | `published` | `contract_validated` | yes | yes | yes | yes | `exact_year_workflows` |
+| USGS NAIP imagery | `published` | `contract_validated` | yes | yes | yes | yes | `shipped_agricultural_workflows` |
+| USGS 3DEP | `published` | `contract_validated` | yes | yes | yes | yes | `recipe_bounded` |
+| PRISM daily precipitation ZIP | `unreleased_public` | `live_dataset_certified, fixture_validated` | yes | yes | yes | yes | `guarded_bounded` |
+| CHIRPS, gridMET, TerraClimate, and WorldClim | `unreleased_public` | `fixture_validated, contract_validated` | yes | yes | no | no | `bounded_probe_and_fixture_paths` |
+| Copernicus Data Space STAC | `unreleased_public` | `contract_validated` | yes | no | no | no | `resolver_required` |
 <!-- END GENERATED SOURCE CAPABILITY MATRIX -->
 
 The four declarative Source Pack families—`static_https_template`,

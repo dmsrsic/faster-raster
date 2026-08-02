@@ -96,8 +96,7 @@ provider fact or resolve a credential.
 
 The Star, Idaho example keeps intent, commands, the 25 MB ceiling, the
 publication derivative, and its hashes connected:
-
-```sh
+```sh { .illustrative }
 fr validate examples/star-idaho-regional-growth-cdl-development-change.fr.md
 fr plan examples/star-idaho-regional-growth-cdl-development-change.fr.md --out build/star-plan
 fr cook examples/star-idaho-regional-growth-cdl-development-change.fr.md --reuse auto --no-open
@@ -114,9 +113,9 @@ to claim historical transfer bytes or runtime.
 
 <section class="fr-section" markdown="1">
 
-## Unreleased index-guided classification
+## Index-guided classification in beta.4
 
-Current development preserves the broad NAIP–CDL classifier and adds
+The published beta.4 contract preserves the broad NAIP–CDL classifier and adds
 source-aware spectral indices plus explicit specialist classes. User-defined,
 recommendation, and opt-in automatic modes retain formulas, calibration,
 nested spatial selection, overlap arbitration, analytical COGs, receipts, and
@@ -131,8 +130,7 @@ inspection evidence.
 ## A real offline start
 
 The beta ships a small Meridian study that can be initialized, validated, and planned without contacting a raster service.
-
-```sh
+```sh { .illustrative }
 python3.12 -m venv .venv
 . .venv/bin/activate
 python -m pip install .

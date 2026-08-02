@@ -2,8 +2,33 @@
   "capabilities": [
     {
       "analysis": true,
+      "capability_id": "index_guided_hybrid_classification",
+      "credential_requirement": "none",
+      "evidence_levels": [
+        "contract_validated"
+      ],
+      "evidence_refs": [],
+      "introduced_in": "v1.0.0-beta.4",
+      "kind": "scientific_workflow",
+      "label": "Index-guided hybrid classification",
+      "materialization": true,
+      "notes": "A catalog entry does not imply coverage for every product, date, geography, or output.",
+      "planning": true,
+      "preview": true,
+      "public_execution": "bounded_local_and_declared_sources",
+      "release_state": "published",
+      "scientific_scope": "Bounded index-guided selection and classification workflows documented for the beta.4 public release.",
+      "status": "released"
+    },
+    {
+      "analysis": true,
       "capability_id": "workfile_planning",
       "credential_requirement": "none",
+      "evidence_levels": [
+        "contract_validated"
+      ],
+      "evidence_refs": [],
+      "introduced_in": null,
       "kind": "workflow",
       "label": "Markdown workfiles and deterministic planning",
       "materialization": true,
@@ -11,12 +36,20 @@
       "planning": true,
       "preview": true,
       "public_execution": "bounded_local",
+      "release_state": "published",
+      "scientific_scope": "Workflow-specific deterministic planning with bounded local execution and explicit source limits.",
       "status": "released"
     },
     {
       "analysis": false,
       "capability_id": "sauce_pack",
       "credential_requirement": "opaque_reference_supported",
+      "evidence_levels": [
+        "fixture_validated",
+        "contract_validated"
+      ],
+      "evidence_refs": [],
+      "introduced_in": null,
       "kind": "workflow",
       "label": "Bring Your Own Sauce / declarative Source Packs",
       "materialization": false,
@@ -24,12 +57,41 @@
       "planning": true,
       "preview": true,
       "public_execution": "validation_and_bounded_probe_only",
+      "release_state": "unreleased_public",
+      "scientific_scope": "Declarative Source Pack validation and planning contracts; no arbitrary code execution.",
+      "status": "experimental"
+    },
+    {
+      "analysis": false,
+      "capability_id": "sauce_pack_v2",
+      "credential_requirement": "operation_scoped_opaque_reference",
+      "evidence_levels": [
+        "fixture_validated",
+        "contract_validated"
+      ],
+      "evidence_refs": [],
+      "introduced_in": null,
+      "kind": "workflow",
+      "label": "Declarative Source Pack v2 contracts",
+      "materialization": false,
+      "notes": "Source Pack v1 compatibility remains preserved; v2 adds explicit asset-access and credential boundaries.",
+      "planning": true,
+      "preview": true,
+      "public_execution": "frozen_contract_only",
+      "release_state": "unreleased_public",
+      "scientific_scope": "Versioned v2 asset-access and materialization contracts; public execution remains bounded and provider-specific.",
       "status": "experimental"
     },
     {
       "analysis": false,
       "capability_id": "sauce_time",
       "credential_requirement": "none",
+      "evidence_levels": [
+        "fixture_validated",
+        "contract_validated"
+      ],
+      "evidence_refs": [],
+      "introduced_in": null,
       "kind": "workflow",
       "label": "Sauce Time ranked temporal alternatives",
       "materialization": false,
@@ -37,12 +99,20 @@
       "planning": true,
       "preview": false,
       "public_execution": "advisory_only",
+      "release_state": "unreleased_public",
+      "scientific_scope": "Explicit temporal-alternative planning without silent substitution.",
       "status": "experimental"
     },
     {
       "analysis": false,
       "capability_id": "preview_templates",
       "credential_requirement": "none",
+      "evidence_levels": [
+        "fixture_validated",
+        "contract_validated"
+      ],
+      "evidence_refs": [],
+      "introduced_in": null,
       "kind": "workflow",
       "label": "Reusable preview templates",
       "materialization": false,
@@ -50,12 +120,20 @@
       "planning": true,
       "preview": true,
       "public_execution": "render_contract_compilation",
+      "release_state": "unreleased_public",
+      "scientific_scope": "Declarative preview layout and provenance contracts only.",
       "status": "experimental"
     },
     {
       "analysis": true,
       "capability_id": "categorical_area_accounting",
       "credential_requirement": "none",
+      "evidence_levels": [
+        "fixture_validated",
+        "contract_validated"
+      ],
+      "evidence_refs": [],
+      "introduced_in": null,
       "kind": "scientific_contract",
       "label": "CRS-aware categorical area accounting",
       "materialization": true,
@@ -63,12 +141,20 @@
       "planning": false,
       "preview": true,
       "public_execution": "equal_area_inventory",
+      "release_state": "unreleased_public",
+      "scientific_scope": "Equal-area categorical inventory and reconciled valid-footprint accounting.",
       "status": "experimental"
     },
     {
       "analysis": true,
       "capability_id": "classification_confidence_provenance",
       "credential_requirement": "none",
+      "evidence_levels": [
+        "fixture_validated",
+        "contract_validated"
+      ],
+      "evidence_refs": [],
+      "introduced_in": null,
       "kind": "scientific_contract",
       "label": "Classification confidence-threshold provenance",
       "materialization": true,
@@ -76,12 +162,20 @@
       "planning": true,
       "preview": true,
       "public_execution": "fail_closed_provenance",
+      "release_state": "unreleased_public",
+      "scientific_scope": "Provenance-preserving confidence and threshold metadata; not an accuracy claim.",
       "status": "experimental"
     },
     {
       "analysis": false,
       "capability_id": "classification_temporal_repair",
       "credential_requirement": "none",
+      "evidence_levels": [
+        "fixture_validated",
+        "contract_validated"
+      ],
+      "evidence_refs": [],
+      "introduced_in": null,
       "kind": "workflow",
       "label": "Coherent NAIP-CDL temporal repair",
       "materialization": false,
@@ -89,12 +183,19 @@
       "planning": true,
       "preview": false,
       "public_execution": "explicit_selection_only",
+      "release_state": "unreleased_public",
+      "scientific_scope": "Explicit temporal repair selection for NAIP/CDL planning.",
       "status": "experimental"
     },
     {
       "analysis": false,
       "capability_id": "credential_reference",
       "credential_requirement": "opaque_reference_only",
+      "evidence_levels": [
+        "contract_validated"
+      ],
+      "evidence_refs": [],
+      "introduced_in": null,
       "kind": "boundary",
       "label": "Public credential-requirement contract",
       "materialization": false,
@@ -102,12 +203,20 @@
       "planning": true,
       "preview": false,
       "public_execution": "fails_before_network_without_resolver",
+      "release_state": "unreleased_public",
+      "scientific_scope": "Public credential-reference and pre-network failure boundary only.",
       "status": "experimental"
     },
     {
       "analysis": false,
       "capability_id": "stac_asset_access_v2",
       "credential_requirement": "operation_scoped_opaque_reference",
+      "evidence_levels": [
+        "fixture_validated",
+        "contract_validated"
+      ],
+      "evidence_refs": [],
+      "introduced_in": null,
       "kind": "boundary",
       "label": "Versioned generic STAC asset-access contracts",
       "materialization": false,
@@ -115,12 +224,19 @@
       "planning": true,
       "preview": false,
       "public_execution": "frozen_contract_only",
+      "release_state": "unreleased_public",
+      "scientific_scope": "Provider-neutral STAC asset-access contracts without universal execution.",
       "status": "experimental"
     },
     {
       "analysis": false,
       "capability_id": "earth_engine_compute_contract",
       "credential_requirement": "opaque_google_adc_and_project_reference",
+      "evidence_levels": [
+        "contract_validated"
+      ],
+      "evidence_refs": [],
+      "introduced_in": null,
       "kind": "boundary",
       "label": "Closed Earth Engine computation contracts",
       "materialization": false,
@@ -128,12 +244,19 @@
       "planning": true,
       "preview": false,
       "public_execution": "contract_compilation_only",
+      "release_state": "unreleased_public",
+      "scientific_scope": "Closed Earth Engine computation contract compilation without public execution.",
       "status": "experimental"
     },
     {
       "analysis": true,
       "capability_id": "private_execution_backend",
       "credential_requirement": "resolver_required",
+      "evidence_levels": [
+        "contract_validated"
+      ],
+      "evidence_refs": [],
+      "introduced_in": null,
       "kind": "boundary",
       "label": "Authenticated parallel execution backend",
       "materialization": true,
@@ -141,12 +264,19 @@
       "planning": false,
       "preview": false,
       "public_execution": "unavailable",
+      "release_state": "private",
+      "scientific_scope": null,
       "status": "private"
     },
     {
       "analysis": false,
       "capability_id": "arbitrary_code_plugins",
       "credential_requirement": "unsupported",
+      "evidence_levels": [
+        "contract_validated"
+      ],
+      "evidence_refs": [],
+      "introduced_in": null,
       "kind": "boundary",
       "label": "Arbitrary-code source plugins",
       "materialization": false,
@@ -154,23 +284,56 @@
       "planning": false,
       "preview": false,
       "public_execution": "unavailable",
+      "release_state": "unsupported",
+      "scientific_scope": null,
       "status": "unsupported"
     }
   ],
-  "capability_registry_sha256": "b9033f32ccb882b0265547697949b56c6a888922a46ba8d1157b74fdec144955",
+  "capability_registry_sha256": "aec89454989f2037339c6992a53f47fc50615f33ea8209992d39eab95a01712f",
+  "evidence_definitions": {
+    "contract_validated": "Schema/compiler validation only; no live dataset claim.",
+    "fixture_validated": "Deterministic checked-in fixtures exercise the contract.",
+    "live_dataset_certified": "A checked-in sanitized receipt, present at the declared public commit, proves a named live dataset validation.",
+    "live_route_certified": "A checked-in sanitized receipt, present at the declared public commit, proves a bounded live route."
+  },
+  "evidence_records": {
+    "prism_ames_2023": {
+      "artifact": "docs/validation/ames_prism_dem_ndvi_2023.md",
+      "commit": "edfa3cdbfe4e75e194a3fe25012970a3bcc325a6",
+      "date": "2026-07-31",
+      "evidence_levels": [
+        "live_dataset_certified"
+      ],
+      "scope": "Ames PRISM daily ZIP validation, bounded public route"
+    }
+  },
   "registry_version": "1.0.0",
   "release": {
-    "contract_status": "experimental",
-    "development_label": "Unreleased",
-    "package_version": "1.0.0b4",
-    "public_release": "v1.0.0-beta.4"
+    "contract_status": "development",
+    "development_label": "1.0.0b5.dev0 (unreleased development)",
+    "next_release": "v1.0.0-beta.5",
+    "package_version": "1.0.0b5.dev0",
+    "public_release": "v1.0.0-beta.4",
+    "published_package_version": "1.0.0b4"
   },
-  "schema_version": "fasterraster.capability-registry/v1",
+  "release_state_definitions": {
+    "planned": "Directional work without an executable public contract.",
+    "private": "Consumed only by a proprietary execution backend; no private implementation is public.",
+    "published": "Included in the published public beta.",
+    "unreleased_public": "Implemented or contracted in the public source tree but not part of the published beta contract.",
+    "unsupported": "Explicitly outside the current public product."
+  },
+  "schema_version": "fasterraster.capability-registry/v2",
   "sources": [
     {
       "analysis": true,
       "capability_id": "usda_cdl",
       "credential_requirement": "none",
+      "evidence_levels": [
+        "contract_validated"
+      ],
+      "evidence_refs": [],
+      "introduced_in": null,
       "kind": "source",
       "label": "USDA NASS Cropland Data Layer",
       "materialization": true,
@@ -178,12 +341,19 @@
       "planning": true,
       "preview": true,
       "public_execution": "exact_year_workflows",
+      "release_state": "published",
+      "scientific_scope": "Exact-year categorical CDL workflows with declared resampling semantics.",
       "status": "released"
     },
     {
       "analysis": true,
       "capability_id": "usgs_naip",
       "credential_requirement": "none",
+      "evidence_levels": [
+        "contract_validated"
+      ],
+      "evidence_refs": [],
+      "introduced_in": null,
       "kind": "source",
       "label": "USGS NAIP imagery",
       "materialization": true,
@@ -191,12 +361,19 @@
       "planning": true,
       "preview": true,
       "public_execution": "shipped_agricultural_workflows",
+      "release_state": "published",
+      "scientific_scope": "Shipped agricultural NAIP workflows with fail-closed exact-year coverage.",
       "status": "released"
     },
     {
       "analysis": true,
       "capability_id": "usgs_3dep",
       "credential_requirement": "none",
+      "evidence_levels": [
+        "contract_validated"
+      ],
+      "evidence_refs": [],
+      "introduced_in": null,
       "kind": "source",
       "label": "USGS 3DEP",
       "materialization": true,
@@ -204,12 +381,22 @@
       "planning": true,
       "preview": true,
       "public_execution": "recipe_bounded",
+      "release_state": "published",
+      "scientific_scope": "Recipe-bounded terrain role in shipped workflows.",
       "status": "released"
     },
     {
       "analysis": true,
       "capability_id": "prism_daily",
       "credential_requirement": "none",
+      "evidence_levels": [
+        "live_dataset_certified",
+        "fixture_validated"
+      ],
+      "evidence_refs": [
+        "prism_ames_2023"
+      ],
+      "introduced_in": null,
       "kind": "source",
       "label": "PRISM daily precipitation ZIP",
       "materialization": true,
@@ -217,12 +404,20 @@
       "planning": true,
       "preview": true,
       "public_execution": "guarded_bounded",
-      "status": "released"
+      "release_state": "unreleased_public",
+      "scientific_scope": "Guarded PRISM daily precipitation validation and bounded materialization only.",
+      "status": "experimental"
     },
     {
       "analysis": false,
       "capability_id": "static_http_range_wave",
       "credential_requirement": "none",
+      "evidence_levels": [
+        "fixture_validated",
+        "contract_validated"
+      ],
+      "evidence_refs": [],
+      "introduced_in": null,
       "kind": "source",
       "label": "CHIRPS, gridMET, TerraClimate, and WorldClim",
       "materialization": false,
@@ -230,12 +425,19 @@
       "planning": true,
       "preview": true,
       "public_execution": "bounded_probe_and_fixture_paths",
+      "release_state": "unreleased_public",
+      "scientific_scope": "Bounded probe and fixture paths for catalog-backed climate sources; no universal workflow execution.",
       "status": "experimental"
     },
     {
       "analysis": false,
       "capability_id": "copernicus_cdse",
       "credential_requirement": "opaque_bearer_reference",
+      "evidence_levels": [
+        "contract_validated"
+      ],
+      "evidence_refs": [],
+      "introduced_in": null,
       "kind": "source",
       "label": "Copernicus Data Space STAC",
       "materialization": false,
@@ -243,14 +445,16 @@
       "planning": true,
       "preview": false,
       "public_execution": "resolver_required",
+      "release_state": "unreleased_public",
+      "scientific_scope": "Public Copernicus contract and resolver boundary without credential resolution.",
       "status": "experimental"
     }
   ],
   "status_definitions": {
-    "experimental": "Implemented in the source tree but not part of the published beta contract.",
+    "experimental": "Legacy alias for unreleased_public; retained for Source Pack v1 compatibility.",
     "planned": "Directional work without an executable public contract.",
     "private": "Consumed only by a proprietary execution backend; no private implementation is public.",
-    "released": "Included in the published public beta.",
+    "released": "Legacy alias for published; retained for Source Pack v1 compatibility.",
     "unsupported": "Explicitly outside the current public product."
   }
 }

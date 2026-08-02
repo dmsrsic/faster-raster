@@ -6,12 +6,11 @@ specialists. It is useful when a reproducible spectral rule separates a target
 that a broad classifier represents poorly. It does not turn spectral
 similarity into ground truth or physical causation.
 
-This feature is current **Unreleased** development. The published
-`v1.0.0-beta.3` V3 recipe remains unchanged.
+This feature is part of the published `v1.0.0-beta.4` contract. The older
+`v1.0.0-beta.3` V3 recipe remains unchanged and is still accepted.
 
 ## Start with the shipped workflow
-
-```sh
+```sh { .illustrative }
 fr indices list
 fr indices show ndvi
 fr templates show ag-naip-index-hybrid-classification
@@ -332,8 +331,7 @@ documentation derivative is written beside the 4K image. Normalized
 differences use zero-aware displays; specialist scores use
 sequential displays; no generic rainbow palette is used. Circular AOI masks
 apply to analysis and display statistics.
-
-```sh
+```sh { .illustrative }
 fr inspect latest
 fr inspect latest --verbose
 fr inspect latest --json

@@ -1,6 +1,6 @@
 {
   "bundle_version": "1.0.0",
-  "capability_registry_sha256": "b9033f32ccb882b0265547697949b56c6a888922a46ba8d1157b74fdec144955",
+  "capability_registry_sha256": "aec89454989f2037339c6992a53f47fc50615f33ea8209992d39eab95a01712f",
   "contract_schema_versions": [
     "fasterraster.source-pack/v1",
     "fasterraster.source-pack-plan/v1",
@@ -16,7 +16,7 @@
     "fasterraster.classification-temporal-resolution/v1",
     "fasterraster.categorical-area-accounting/v1",
     "fasterraster.preview-template/v1",
-    "fasterraster.capability-registry/v1"
+    "fasterraster.capability-registry/v2"
   ],
   "files": [
     {
@@ -98,16 +98,16 @@
       "sha256": "0132ec7ac94140ea07ccbcdebdab38ad20260c2867d1451e255b206f4981e10a"
     },
     {
-      "bytes": 3224,
+      "bytes": 7923,
       "path": "schemas/capability_registry.schema.json",
       "role": "capability_schema",
-      "sha256": "bde0c5829c1df99be12676dd617e20ba8fdf9535695444a1acdf6a4ab885d458"
+      "sha256": "ed56b7c7892b96746c9c798a1665b4ea78cf369a488ecabb0220f646651437b6"
     },
     {
-      "bytes": 7868,
+      "bytes": 14531,
       "path": "configs/public_capabilities.yaml",
       "role": "capability_registry",
-      "sha256": "f827942f883e70ece27c40c244dc15ac4620a0faef299a1e9f2bba3c0bd63ba6"
+      "sha256": "f954ed4cbf754588844258c42a8c00bff8362207472d70c0bb92a249de597a01"
     },
     {
       "bytes": 7247,
@@ -116,22 +116,22 @@
       "sha256": "cdc1a20986856eaad562255755569dc68f3f45d32b8e429c54cf18c279453c09"
     },
     {
-      "bytes": 2467,
+      "bytes": 3458,
       "path": "docs/generated/capabilities.md",
       "role": "capability_reference",
-      "sha256": "19cb11f6d3b89df3e37d9147e2477a99b3c7250f5c1ad51e5a58b6bc94547a84"
+      "sha256": "73dc9efb9707a3d0faf63649b3e3dcf355dfbfa74d987ce3dc786110b8d3dacb"
     },
     {
-      "bytes": 3305,
+      "bytes": 3339,
       "path": "docs/flavortown-wizard.md",
       "role": "wizard_workflow",
-      "sha256": "bc86f1ae31f1a31ffa55db8d173ef0dc371a1b8aa5bb729888fecac4eb1ed76f"
+      "sha256": "a38fb2fa1b33f08467353d1b1262665a550b450fe14b278d2dfb69b501e5a475"
     },
     {
-      "bytes": 8495,
+      "bytes": 8563,
       "path": "docs/bring-your-own-sauce.md",
       "role": "source_pack_guide",
-      "sha256": "cd458ba30b2b89da993b0b2d02c628a2fee07aafd5234e267cdc5b243e070b37"
+      "sha256": "9ab99895e308ea0385d9b784c53c2937f60d7845bfe978f6f1c8d864690c644d"
     },
     {
       "bytes": 2124,
@@ -146,28 +146,28 @@
       "sha256": "ec34c8b18f1b1166d40c1598d3a074c31d1f72578bddefb674d3fd842691033b"
     },
     {
-      "bytes": 2927,
+      "bytes": 2978,
       "path": "docs/sauce-time.md",
       "role": "temporal_guide",
-      "sha256": "d515bb7df9d3d7c378362a7d030980f2af28051537d3c87cf094fa7030bb0ffd"
+      "sha256": "1beb28e1e5241ca80e337b891aedb393a02d7717055f11d27149679d23e25996"
     },
     {
-      "bytes": 2825,
+      "bytes": 2842,
       "path": "docs/preview-templates.md",
       "role": "preview_guide",
-      "sha256": "ec0adb65607f89109511e6620330d82d7bfe4191ae75c17d1b4d10f820b5fd29"
+      "sha256": "b6b5788336085b6f57a343053d9952510feb73e86928fb8cc7d0edf363bf3882"
     },
     {
-      "bytes": 18967,
+      "bytes": 19021,
       "path": "docs/ag-classification.md",
       "role": "classification_methodology",
-      "sha256": "04b3365a22a0845879cb543fd2c7bc2aafcf45adc6cbfdf3e8eeb2f70c1ea408"
+      "sha256": "a67c8e2025f65758f41dcd111ad1bdba26edd756d6b573d425367d46e6e6f25a"
     },
     {
-      "bytes": 14448,
+      "bytes": 14512,
       "path": "docs/index-guided-classification.md",
       "role": "hybrid_classification_methodology",
-      "sha256": "11bc414ed0c0765e55af4ebd41a2c20994b699110056d0ac5ab2bd27d931f160"
+      "sha256": "e4c76c88d507e84e30c814d5078c525d69afe7cbffb416e76601637cf1383f6c"
     },
     {
       "bytes": 3152,
@@ -308,18 +308,20 @@
       "sha256": "61d5845f6a5587065f326eae3277d32c462d98fd21645bc43eb9c443d01f6554"
     },
     {
-      "bytes": 9546,
+      "bytes": 17595,
       "path": "prompts/flavortown_sauce_wizard/capabilities.json",
       "role": "machine_capabilities",
-      "sha256": "ef960c2fe1b6f813f707c73ab4c2b906c0cff89db42db6bf31147cae10c4978b"
+      "sha256": "f0f176c00e53cd7fd78575d7360ddc1049c9035bf9860fa26ebe0b84d898300d"
     }
   ],
-  "grounding_bundle_sha256": "244908f6ccf31fea1b882e4b7863b95e42126e232345e97502f83b5e26f29ebe",
+  "grounding_bundle_sha256": "3af3a060d68ea5cbb8756cdcc6c18636893749817ef409fcae6130bfa38d9ae4",
   "release": {
-    "contract_status": "experimental",
-    "development_label": "Unreleased",
-    "package_version": "1.0.0b4",
-    "public_release": "v1.0.0-beta.4"
+    "contract_status": "development",
+    "development_label": "1.0.0b5.dev0 (unreleased development)",
+    "next_release": "v1.0.0-beta.5",
+    "package_version": "1.0.0b5.dev0",
+    "public_release": "v1.0.0-beta.4",
+    "published_package_version": "1.0.0b4"
   },
   "schema_version": "fasterraster.grounding-bundle/v1",
   "validation_authority": [

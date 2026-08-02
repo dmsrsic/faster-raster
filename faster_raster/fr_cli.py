@@ -391,7 +391,7 @@ def command_capabilities(args: argparse.Namespace) -> int:
         release = registry["release"]
         print(
             f"Published: {release['public_release']} "
-            f"({release['package_version']}); development: "
+            f"({release['published_package_version']}); development: "
             f"{release['development_label']} / {release['contract_status']}"
         )
         print(

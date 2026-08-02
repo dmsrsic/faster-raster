@@ -75,8 +75,7 @@ specialist strategies/labels/parents, and selection mode. Recommendation review
 does not rewrite the workfile; an accepted choice applies only to that run.
 
 ## Commands
-
-```text
+```text { .illustrative }
 fr init STUDY.fr.md [--project-config]
 fr configure --show | --path | --validate
 fr configure [deterministic update flags] [--apply-recommendations]

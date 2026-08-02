@@ -48,8 +48,7 @@ Read its failure receipt. Correct the source, coverage, cache, or configuration 
 ## Finding the result
 
 Use:
-
-```sh
+```sh { .illustrative }
 fr inspect latest --verbose
 ```
 

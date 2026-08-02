@@ -13,8 +13,7 @@ the render-contract builder. Their render contracts additionally bind the
 template ID, schema version, and template SHA-256.
 
 ## Discover and validate
-
-```sh
+```sh { .illustrative }
 fr preview-templates list
 fr preview-templates show ag_classification_audit_v1 --json
 fr preview-templates validate general_multisource_v1

@@ -7,6 +7,7 @@ from types import SimpleNamespace
 
 import pytest
 
+from faster_raster import __version__
 from faster_raster import fr_cli
 from faster_raster.local_paths import resolve_local_paths
 from faster_raster.preview_open import (
@@ -25,7 +26,7 @@ def test_fr_version(capsys):
     with pytest.raises(SystemExit) as raised:
         fr_cli.main(["--version"])
     assert raised.value.code == 0
-    assert capsys.readouterr().out == "fr 1.0.0b4\n"
+    assert capsys.readouterr().out == f"fr {__version__}\n"
 
 
 def isolate(monkeypatch, tmp_path: Path) -> None:

@@ -1,22 +1,17 @@
 # Five-minute quickstart
 
-This quickstart begins from a fresh clone, validates a declarative source
-integration, and creates the small Meridian human-development plan without
-contacting a raster service.
+This quickstart starts from the published beta.4 wheel and creates the small
+Meridian human-development plan without contacting a raster service. Source
+Pack and preview-template commands are labeled development-only below; the
+index-guided workflow is part of the published beta.4 contract.
 
-```sh
-git clone https://github.com/dmsrsic/faster-raster.git
-cd faster-raster
+```sh { .manual-network }
 python3.12 -m venv .venv
 . .venv/bin/activate
-python -m pip install .
+python -m pip install https://github.com/dmsrsic/faster-raster/releases/download/v1.0.0-beta.4/faster_raster-1.0.0b4-py3-none-any.whl
 
 fr --version
 fr doctor --offline
-fr capabilities --json
-fr sauce validate examples/sauce-packs/prism-daily.sauce
-fr sauce test examples/sauce-packs/prism-daily.sauce
-fr preview-templates list
 fr templates list
 
 mkdir -p studies
@@ -39,8 +34,10 @@ plan records `requires_coverage_validation: true`. It cannot be executed as
 evidence. Re-plan without `--offline` only when you are ready to authorize the
 bounded metadata coverage check.
 
-The Source Pack commands above are Unreleased / experimental in this source
-tree. They are offline and prove schema, host, CRS, nodata, resampling,
+## Development checkout capabilities
+
+The following commands require the current `main` checkout (`1.0.0b5.dev0`).
+They are offline and prove schema, host, CRS, nodata, resampling,
 temporal, preview, secret-exclusion, canonicalization, and golden-plan
 behavior. Continue with [Bring Your Own Sauce](bring-your-own-sauce.md) or the
 [first-cook troubleshooting matrix](first-cook-troubleshooting.md).
@@ -52,7 +49,14 @@ for authoritative checks; the Wizard is an authoring and audit aid.
 
 For a live cook, explicitly set `data.allow_network: true` in the workfile, confirm the study byte ceiling, then run:
 
-```sh
+```sh { .offline-smoke }
+fr capabilities --json
+fr sauce validate examples/sauce-packs/prism-daily.sauce
+fr sauce test examples/sauce-packs/prism-daily.sauce
+fr preview-templates list
+```
+
+```sh { .manual-network }
 fr cook studies/meridian.fr.md --reuse auto --no-open
 fr inspect latest --verbose
 ```
@@ -63,7 +67,7 @@ Final handoffs are under `outputs/handoffs/`. See [Network and byte budgets](net
 
 Index discovery and workfile validation do not contact a provider:
 
-```sh
+```sh { .offline-smoke }
 fr indices list
 fr indices show ndvi
 fr init studies/index-hybrid.fr.md \
@@ -84,8 +88,7 @@ enabling a cook. See
 If planning reports that a requested NAIP/CDL pair is unavailable, review its
 ranked coherent and imagery-only alternatives. A noninteractive coherent
 selection is explicit:
-
-```sh
+```sh { .illustrative }
 fr plan studies/index-hybrid.fr.md \
   --resolve-imagery-year 2019 \
   --resolve-cdl-year 2019

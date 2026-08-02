@@ -28,8 +28,7 @@ The public workfile is
 [`examples/star-idaho-regional-growth-cdl-development-change.fr.md`](https://github.com/dmsrsic/faster-raster/blob/main/examples/star-idaho-regional-growth-cdl-development-change.fr.md).
 It declares CDL analytical years 2008, 2016, and 2021; EPSG:5070 at 30 metres;
 nearest-neighbour categorical resampling; and a 25 MB network ceiling.
-
-```sh
+```sh { .illustrative }
 fr validate examples/star-idaho-regional-growth-cdl-development-change.fr.md
 fr plan examples/star-idaho-regional-growth-cdl-development-change.fr.md --out build/star-plan
 fr cook examples/star-idaho-regional-growth-cdl-development-change.fr.md --reuse auto --no-open

@@ -1,21 +1,62 @@
-schema_version: fasterraster.capability-registry/v1
+schema_version: fasterraster.capability-registry/v2
 registry_version: 1.0.0
 release:
-  package_version: 1.0.0b4
+  package_version: 1.0.0b5.dev0
+  published_package_version: 1.0.0b4
   public_release: v1.0.0-beta.4
-  development_label: Unreleased
-  contract_status: experimental
+  development_label: 1.0.0b5.dev0 (unreleased development)
+  contract_status: development
+  next_release: v1.0.0-beta.5
 status_definitions:
-  released: Included in the published public beta.
-  experimental: Implemented in the source tree but not part of the published beta contract.
+  released: Legacy alias for published; retained for Source Pack v1 compatibility.
+  experimental: Legacy alias for unreleased_public; retained for Source Pack v1 compatibility.
   private: Consumed only by a proprietary execution backend; no private implementation is public.
   planned: Directional work without an executable public contract.
   unsupported: Explicitly outside the current public product.
+release_state_definitions:
+  published: Included in the published public beta.
+  unreleased_public: Implemented or contracted in the public source tree but not part of the published beta contract.
+  private: Consumed only by a proprietary execution backend; no private implementation is public.
+  planned: Directional work without an executable public contract.
+  unsupported: Explicitly outside the current public product.
+evidence_definitions:
+  live_route_certified: A checked-in sanitized receipt, present at the declared public commit, proves a bounded live route.
+  live_dataset_certified: A checked-in sanitized receipt, present at the declared public commit, proves a named live dataset validation.
+  fixture_validated: Deterministic checked-in fixtures exercise the contract.
+  contract_validated: Schema/compiler validation only; no live dataset claim.
+evidence_records:
+  prism_ames_2023:
+    scope: Ames PRISM daily ZIP validation, bounded public route
+    date: "2026-07-31"
+    commit: edfa3cdbfe4e75e194a3fe25012970a3bcc325a6
+    artifact: docs/validation/ames_prism_dem_ndvi_2023.md
+    evidence_levels: [live_dataset_certified]
 capabilities:
+  - capability_id: index_guided_hybrid_classification
+    label: Index-guided hybrid classification
+    kind: scientific_workflow
+    status: released
+    release_state: published
+    introduced_in: v1.0.0-beta.4
+    evidence_levels: [contract_validated]
+    evidence_refs: []
+    scientific_scope: Bounded index-guided selection and classification workflows documented for the beta.4 public release.
+    planning: true
+    preview: true
+    materialization: true
+    analysis: true
+    credential_requirement: none
+    public_execution: bounded_local_and_declared_sources
+    notes: A catalog entry does not imply coverage for every product, date, geography, or output.
   - capability_id: workfile_planning
     label: Markdown workfiles and deterministic planning
     kind: workflow
     status: released
+    release_state: published
+    introduced_in: null
+    evidence_levels: [contract_validated]
+    evidence_refs: []
+    scientific_scope: Workflow-specific deterministic planning with bounded local execution and explicit source limits.
     planning: true
     preview: true
     materialization: true
@@ -27,6 +68,11 @@ capabilities:
     label: Bring Your Own Sauce / declarative Source Packs
     kind: workflow
     status: experimental
+    release_state: unreleased_public
+    introduced_in: null
+    evidence_levels: [fixture_validated, contract_validated]
+    evidence_refs: []
+    scientific_scope: Declarative Source Pack validation and planning contracts; no arbitrary code execution.
     planning: true
     preview: true
     materialization: false
@@ -34,10 +80,31 @@ capabilities:
     credential_requirement: opaque_reference_supported
     public_execution: validation_and_bounded_probe_only
     notes: No arbitrary Python, dynamic imports, shell hooks, or unrestricted templates.
+  - capability_id: sauce_pack_v2
+    label: Declarative Source Pack v2 contracts
+    kind: workflow
+    status: experimental
+    release_state: unreleased_public
+    introduced_in: null
+    evidence_levels: [fixture_validated, contract_validated]
+    evidence_refs: []
+    scientific_scope: Versioned v2 asset-access and materialization contracts; public execution remains bounded and provider-specific.
+    planning: true
+    preview: true
+    materialization: false
+    analysis: false
+    credential_requirement: operation_scoped_opaque_reference
+    public_execution: frozen_contract_only
+    notes: Source Pack v1 compatibility remains preserved; v2 adds explicit asset-access and credential boundaries.
   - capability_id: sauce_time
     label: Sauce Time ranked temporal alternatives
     kind: workflow
     status: experimental
+    release_state: unreleased_public
+    introduced_in: null
+    evidence_levels: [fixture_validated, contract_validated]
+    evidence_refs: []
+    scientific_scope: Explicit temporal-alternative planning without silent substitution.
     planning: true
     preview: false
     materialization: false
@@ -49,6 +116,11 @@ capabilities:
     label: Reusable preview templates
     kind: workflow
     status: experimental
+    release_state: unreleased_public
+    introduced_in: null
+    evidence_levels: [fixture_validated, contract_validated]
+    evidence_refs: []
+    scientific_scope: Declarative preview layout and provenance contracts only.
     planning: true
     preview: true
     materialization: false
@@ -60,6 +132,11 @@ capabilities:
     label: CRS-aware categorical area accounting
     kind: scientific_contract
     status: experimental
+    release_state: unreleased_public
+    introduced_in: null
+    evidence_levels: [fixture_validated, contract_validated]
+    evidence_refs: []
+    scientific_scope: Equal-area categorical inventory and reconciled valid-footprint accounting.
     planning: false
     preview: true
     materialization: true
@@ -71,6 +148,11 @@ capabilities:
     label: Classification confidence-threshold provenance
     kind: scientific_contract
     status: experimental
+    release_state: unreleased_public
+    introduced_in: null
+    evidence_levels: [fixture_validated, contract_validated]
+    evidence_refs: []
+    scientific_scope: Provenance-preserving confidence and threshold metadata; not an accuracy claim.
     planning: true
     preview: true
     materialization: true
@@ -82,6 +164,11 @@ capabilities:
     label: Coherent NAIP-CDL temporal repair
     kind: workflow
     status: experimental
+    release_state: unreleased_public
+    introduced_in: null
+    evidence_levels: [fixture_validated, contract_validated]
+    evidence_refs: []
+    scientific_scope: Explicit temporal repair selection for NAIP/CDL planning.
     planning: true
     preview: false
     materialization: false
@@ -93,6 +180,11 @@ capabilities:
     label: Public credential-requirement contract
     kind: boundary
     status: experimental
+    release_state: unreleased_public
+    introduced_in: null
+    evidence_levels: [contract_validated]
+    evidence_refs: []
+    scientific_scope: Public credential-reference and pre-network failure boundary only.
     planning: true
     preview: false
     materialization: false
@@ -104,6 +196,11 @@ capabilities:
     label: Versioned generic STAC asset-access contracts
     kind: boundary
     status: experimental
+    release_state: unreleased_public
+    introduced_in: null
+    evidence_levels: [fixture_validated, contract_validated]
+    evidence_refs: []
+    scientific_scope: Provider-neutral STAC asset-access contracts without universal execution.
     planning: true
     preview: false
     materialization: false
@@ -115,6 +212,11 @@ capabilities:
     label: Closed Earth Engine computation contracts
     kind: boundary
     status: experimental
+    release_state: unreleased_public
+    introduced_in: null
+    evidence_levels: [contract_validated]
+    evidence_refs: []
+    scientific_scope: Closed Earth Engine computation contract compilation without public execution.
     planning: true
     preview: false
     materialization: false
@@ -126,6 +228,11 @@ capabilities:
     label: Authenticated parallel execution backend
     kind: boundary
     status: private
+    release_state: private
+    introduced_in: null
+    evidence_levels: [contract_validated]
+    evidence_refs: []
+    scientific_scope: null
     planning: false
     preview: false
     materialization: true
@@ -137,6 +244,11 @@ capabilities:
     label: Arbitrary-code source plugins
     kind: boundary
     status: unsupported
+    release_state: unsupported
+    introduced_in: null
+    evidence_levels: [contract_validated]
+    evidence_refs: []
+    scientific_scope: null
     planning: false
     preview: false
     materialization: false
@@ -149,6 +261,11 @@ sources:
     label: USDA NASS Cropland Data Layer
     kind: source
     status: released
+    release_state: published
+    introduced_in: null
+    evidence_levels: [contract_validated]
+    evidence_refs: []
+    scientific_scope: Exact-year categorical CDL workflows with declared resampling semantics.
     planning: true
     preview: true
     materialization: true
@@ -160,6 +277,11 @@ sources:
     label: USGS NAIP imagery
     kind: source
     status: released
+    release_state: published
+    introduced_in: null
+    evidence_levels: [contract_validated]
+    evidence_refs: []
+    scientific_scope: Shipped agricultural NAIP workflows with fail-closed exact-year coverage.
     planning: true
     preview: true
     materialization: true
@@ -171,6 +293,11 @@ sources:
     label: USGS 3DEP
     kind: source
     status: released
+    release_state: published
+    introduced_in: null
+    evidence_levels: [contract_validated]
+    evidence_refs: []
+    scientific_scope: Recipe-bounded terrain role in shipped workflows.
     planning: true
     preview: true
     materialization: true
@@ -181,7 +308,12 @@ sources:
   - capability_id: prism_daily
     label: PRISM daily precipitation ZIP
     kind: source
-    status: released
+    status: experimental
+    release_state: unreleased_public
+    introduced_in: null
+    evidence_levels: [live_dataset_certified, fixture_validated]
+    evidence_refs: [prism_ames_2023]
+    scientific_scope: Guarded PRISM daily precipitation validation and bounded materialization only.
     planning: true
     preview: true
     materialization: true
@@ -193,6 +325,11 @@ sources:
     label: CHIRPS, gridMET, TerraClimate, and WorldClim
     kind: source
     status: experimental
+    release_state: unreleased_public
+    introduced_in: null
+    evidence_levels: [fixture_validated, contract_validated]
+    evidence_refs: []
+    scientific_scope: Bounded probe and fixture paths for catalog-backed climate sources; no universal workflow execution.
     planning: true
     preview: true
     materialization: false
@@ -204,6 +341,11 @@ sources:
     label: Copernicus Data Space STAC
     kind: source
     status: experimental
+    release_state: unreleased_public
+    introduced_in: null
+    evidence_levels: [contract_validated]
+    evidence_refs: []
+    scientific_scope: Public Copernicus contract and resolver boundary without credential resolution.
     planning: true
     preview: false
     materialization: false

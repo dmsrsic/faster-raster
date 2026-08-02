@@ -778,8 +778,22 @@ def preview_template_schema() -> dict[str, Any]:
 
 
 def capability_registry_schema() -> dict[str, Any]:
+    evidence_levels = {
+        "type": "array",
+        "minItems": 1,
+        "uniqueItems": True,
+        "items": {
+            "enum": [
+                "live_route_certified",
+                "live_dataset_certified",
+                "fixture_validated",
+                "contract_validated",
+            ]
+        },
+    }
     row = {
         "type": "object",
+        "additionalProperties": False,
         "required": [
             "capability_id",
             "label",
@@ -792,6 +806,11 @@ def capability_registry_schema() -> dict[str, Any]:
             "credential_requirement",
             "public_execution",
             "notes",
+            "release_state",
+            "introduced_in",
+            "evidence_levels",
+            "evidence_refs",
+            "scientific_scope",
         ],
         "properties": {
             "capability_id": {"type": "string"},
@@ -813,11 +832,49 @@ def capability_registry_schema() -> dict[str, Any]:
             "credential_requirement": {"type": "string"},
             "public_execution": {"type": "string"},
             "notes": {"type": "string"},
+            "release_state": {"enum": ["published", "unreleased_public", "private", "planned", "unsupported"]},
+            "introduced_in": {"type": ["string", "null"], "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$"},
+            "evidence_levels": evidence_levels,
+            "evidence_refs": {"type": "array", "uniqueItems": True, "items": {"type": "string"}},
+            "scientific_scope": {"type": ["string", "null"]},
+        },
+    }
+    release = {
+        "type": "object",
+        "additionalProperties": False,
+        "required": [
+            "package_version",
+            "published_package_version",
+            "public_release",
+            "development_label",
+            "contract_status",
+            "next_release",
+        ],
+        "properties": {
+            "package_version": {"type": "string"},
+            "published_package_version": {"type": "string"},
+            "public_release": {"type": "string", "pattern": "^v"},
+            "development_label": {"type": "string"},
+            "contract_status": {"type": "string"},
+            "next_release": {"type": ["string", "null"]},
+        },
+    }
+    definitions = {"type": "object", "additionalProperties": {"type": "string"}}
+    evidence_record = {
+        "type": "object",
+        "additionalProperties": False,
+        "required": ["scope", "date", "commit", "artifact", "evidence_levels"],
+        "properties": {
+            "scope": {"type": "string"},
+            "date": {"type": "string", "format": "date"},
+            "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+            "artifact": {"type": "string"},
+            "evidence_levels": evidence_levels,
         },
     }
     return {
         "$schema": DRAFT,
-        "title": "FasterRaster public capability registry v1",
+        "title": "FasterRaster public capability registry v2",
         "type": "object",
         "additionalProperties": False,
         "required": [
@@ -825,14 +882,20 @@ def capability_registry_schema() -> dict[str, Any]:
             "registry_version",
             "release",
             "status_definitions",
+            "release_state_definitions",
+            "evidence_definitions",
+            "evidence_records",
             "capabilities",
             "sources",
         ],
         "properties": {
-            "schema_version": {"const": "fasterraster.capability-registry/v1"},
+            "schema_version": {"const": "fasterraster.capability-registry/v2"},
             "registry_version": {"type": "string"},
-            "release": {"type": "object"},
-            "status_definitions": {"type": "object"},
+            "release": release,
+            "status_definitions": definitions,
+            "release_state_definitions": definitions,
+            "evidence_definitions": definitions,
+            "evidence_records": {"type": "object", "additionalProperties": evidence_record},
             "capabilities": {"type": "array", "items": row},
             "sources": {"type": "array", "items": row},
         },

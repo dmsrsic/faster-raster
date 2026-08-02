@@ -1,7 +1,7 @@
 # Agricultural Recipe Runtime
 
 `scripts/fr-cook-ag` supports the original version-2 agricultural recipes plus
-the V3 NAIP–CDL classification audit and additive Unreleased V4 index-guided
+the V3 NAIP–CDL classification audit and the published beta.4 index-guided
 hybrid classification audit.
 
 - `crop_vigor_classification` compares natural color, NAIP NDVI, and raw USDA CDL classes.

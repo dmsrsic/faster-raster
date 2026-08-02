@@ -3,6 +3,10 @@
 The current published public release is `v1.0.0-beta.4`, mapped to Python
 package version `1.0.0b4`.
 
+The current checkout is development identity `1.0.0b5.dev0 (unreleased development)`;
+it must not be confused with the published wheel. See the generated
+[release status](generated/release-status.md) for capability evidence tiers.
+
 Beta.4 adds source-aware, index-guided hybrid classification to the existing
 deterministic workfile, exact-year validation, bounded local execution,
 transactional evidence, reuse, and publication workflows.
@@ -13,6 +17,10 @@ credential-requirement contracts. Those additions are **Unreleased /
 experimental** and are not retroactively claimed as beta.4 capabilities. The
 canonical status matrix is the
 [public capability registry](generated/capabilities.md).
+
+PRISM runnable execution is also post-beta.4 public development. Its scoped
+Ames validation is recorded as `live_dataset_certified`; this does not imply
+all PRISM products, dates, geographies, or outputs execute.
 
 The Unreleased Source Pack path also links the public
 [FasterRaster Flavortown Sauce Wizard](https://chatgpt.com/g/g-6a692bb17b9c8191a318997fd0435bf7-fasterraster-flavortown-sauce-wizard),

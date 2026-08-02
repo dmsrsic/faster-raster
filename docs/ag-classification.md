@@ -16,7 +16,7 @@ ownership map, construction or occupancy evidence, population or economic
 activity, irrigation status, yield, causal land-use change, independent
 accuracy assessment, or historical change.
 
-The additive Unreleased V4 workflow preserves this broad result and applies
+The additive V4 workflow published in beta.4 preserves this broad result and applies
 explicit spectral specialist classes afterward. See
 [Index-guided hybrid classification](index-guided-classification.md). Existing
 V3 recipes, features, output meanings, handoffs, inspection, and zero-network
@@ -267,8 +267,7 @@ Selection is explicit and produces
 years plus search, alternatives, and resolution hashes. The original workfile
 is unchanged, and selection authorizes no raster acquisition. Noninteractive
 planning, explanation, or cooking can resolve a pair directly:
-
-```bash
+```bash { .illustrative }
 fr plan study.fr.md --resolve-imagery-year 2019 --resolve-cdl-year 2019
 fr cook study.fr.md --resolve-imagery-year 2019 --resolve-cdl-year 2019
 ```
@@ -294,8 +293,7 @@ Prompting is enabled by default only when both standard input and standard
 output are interactive terminals. Use `--interactive` to opt in when terminal
 detection is unavailable, or `--non-interactive` to require fail-closed
 behavior:
-
-```bash
+```bash { .illustrative }
 fr cook study.fr.md --interactive
 fr cook study.fr.md --non-interactive
 ```
@@ -385,16 +383,15 @@ the human repair visible rather than hiding it. Publication-only rerendering
 reuses the recorded imagery year, CDL year, AOI mask, and intervention
 reference.
 
-Repair is available to both the V3 classification audit and its additive
-Unreleased V4 index-guided workflow. There is no place-name or address
+Repair is available to both the V3 classification audit and the published
+beta.4 index-guided workflow. There is no place-name or address
 geocoding, arbitrary polygon drawing, cloud optimization, arbitrary resolution
 repair, or automatic workfile write-back.
 
 ## Workfile and bounded examples
 
 Create and inspect the built-in study:
-
-```bash
+```bash { .illustrative }
 fr templates show ag-naip-classification
 fr init study.fr.md --template ag-naip-classification \
   --name "classification audit" \

@@ -10,8 +10,7 @@ the frozen Source Pack handoff are **Unreleased / experimental**. The Wizard
 does not make them released capabilities.
 
 ## Evidence-to-validation workflow
-
-```text
+```text { .illustrative }
 Official provider documentation
 -> Flavortown Sauce Wizard
 -> generated or audited declarative Source Pack
@@ -30,8 +29,7 @@ date, CRS, nodata value, license, or provider behavior.
 
 The Wizard is not the validator. Checked-in JSON Schemas, the public capability
 registry, and public CLI validators are authoritative. Run:
-
-```sh
+```sh { .illustrative }
 fr sauce validate path/to/source.sauce
 fr sauce explain path/to/source.sauce --json
 fr sauce test path/to/source.sauce

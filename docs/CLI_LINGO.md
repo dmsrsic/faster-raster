@@ -1,4 +1,4 @@
-﻿# FasterRaster Kitchen Mode Lingo
+# FasterRaster Kitchen Mode Lingo
 
 Kitchen Mode is a display overlay for the CLI. It makes exploratory commands easier to scan while keeping JSON keys, schemas, manifests, and automation contracts canonical.
 

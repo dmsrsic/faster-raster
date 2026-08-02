@@ -48,8 +48,7 @@ The first public workflow is intentionally bounded:
 See `examples/champaign-prism-dem-ndvi-correlation.fr.md` for a seven-day test.
 
 ## Normal lifecycle
-
-```bash
+```bash { .illustrative }
 fr validate examples/champaign-prism-dem-ndvi-correlation.fr.md
 fr plan examples/champaign-prism-dem-ndvi-correlation.fr.md
 fr cook examples/champaign-prism-dem-ndvi-correlation.fr.md

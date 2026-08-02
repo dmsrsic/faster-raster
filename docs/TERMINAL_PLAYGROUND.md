@@ -5,8 +5,7 @@ recipes, cooking finalized handoffs, and publishing classification-directed
 NAIP maps. Commands are run from the repository root and do not require Codex.
 
 ## 1. Activate and check the environment
-
-```sh
+```sh { .illustrative }
 source .beta-tools/recipe-env/bin/activate
 python --version                       # Python 3.12+
 fr --help
@@ -18,8 +17,7 @@ For another environment, install the checkout with
 receipts.
 
 ## 2. Discover and generate recipes
-
-```sh
+```sh { .illustrative }
 fr templates list
 fr templates show human-development-cdl
 mkdir -p studies
@@ -61,8 +59,7 @@ contract; its Markdown body explains the study. Common safe edits are:
   `all_transitions`.
 
 Then run:
-
-```sh
+```sh { .illustrative }
 fr validate studies/my-study.fr.md
 fr plan studies/my-study.fr.md --offline --verbose
 fr explain studies/my-study.fr.md --offline --verbose
@@ -72,8 +69,7 @@ fr explain studies/my-study.fr.md --offline --verbose
 intentional action with a bounded workfile ceiling.
 
 ## 4. Cook, inspect, and open
-
-```sh
+```sh { .illustrative }
 fr cook studies/my-study.fr.md --reuse auto --no-open
 fr inspect latest --verbose
 fr open latest
@@ -85,8 +81,7 @@ Temporary `.staging-*` and `.failed-*` directories are not finalized
 results.
 
 For a deterministic zero-network replay, generate or edit a reuse-only recipe:
-
-```sh
+```sh { .illustrative }
 fr init studies/my-replay.fr.md \
   --template human-development-cdl-reuse \
   --name my-replay \
@@ -104,8 +99,7 @@ therefore requires explicit network permission.
 ## 5. Complete study examples
 
 Small Meridian CDL proxy study:
-
-```sh
+```sh { .illustrative }
 fr init studies/meridian.fr.md \
   --template human-development-cdl \
   --name meridian-cdl-development \
@@ -117,8 +111,7 @@ fr cook studies/meridian.fr.md --reuse auto --no-open
 ```
 
 Regional Star CDL proxy study:
-
-```sh
+```sh { .illustrative }
 fr init studies/star-regional.fr.md \
   --template human-development-cdl \
   --name star-idaho-regional-growth \
@@ -142,8 +135,7 @@ Publications consume a finalized human-development handoff and are written to
 `outputs/publications/<publication-id>/`.
 
 Regional change publication:
-
-```sh
+```sh { .illustrative }
 fr publish human-development-hybrid outputs/handoffs/<handoff-id> \
   --mode regional-change \
   --imagery-year 2021 \
@@ -156,8 +148,7 @@ fr publish human-development-hybrid outputs/handoffs/<handoff-id> \
 ```
 
 Classification-directed 1 m hotspot:
-
-```sh
+```sh { .illustrative }
 fr publish human-development-hybrid outputs/handoffs/<handoff-id> \
   --mode hotspot \
   --imagery-year 2021 \
@@ -176,8 +167,7 @@ mapping contract controls the developed classes) and `regional-change`
 (endpoint change codes 3–6 receive imagery).
 
 An identical strict publication replay is:
-
-```sh
+```sh { .illustrative }
 fr publish human-development-hybrid outputs/handoffs/<handoff-id> \
   --mode combined \
   --imagery-year 2021 \

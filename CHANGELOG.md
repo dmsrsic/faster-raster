@@ -2,7 +2,10 @@
 
 All notable changes are documented here. Versions follow [Semantic Versioning](https://semver.org/) for release labels and PEP 440 for Python package metadata.
 
-## Unreleased
+## Unreleased — development `1.0.0b5.dev0`
+
+This section describes post-beta.4 work in the current checkout. It is not part
+of the published `v1.0.0-beta.4` wheel.
 
 ### Added
 

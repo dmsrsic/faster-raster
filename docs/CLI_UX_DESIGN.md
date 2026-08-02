@@ -1,4 +1,4 @@
-﻿# CLI UX Design
+# CLI UX Design
 
 FasterRaster uses a read-first command-line product surface. Standard commands are direct and professional. Kitchen Mode adds a branded vocabulary for exploratory work without mutating schemas or JSON contracts.
 
