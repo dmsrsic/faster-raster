@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dmsrsic.github.io/faster-raster/schemas/fasterraster-adoption-metric-v1.schema.json",
+  "type": "object",
+  "required": ["schema_version", "date", "source", "metrics", "gap_note"],
+  "properties": {
+    "schema_version": {"const": "fasterraster.adoption-metric/v1"},
+    "date": {"type": "string", "format": "date"},
+    "source": {"const": "github-traffic-api"},
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository_clone_count", "github_unique_cloners", "repository_page_views", "github_unique_visitors"],
+      "properties": {
+        "repository_clone_count": {"type": "integer", "minimum": 0},
+        "github_unique_cloners": {"type": "integer", "minimum": 0},
+        "repository_page_views": {"type": "integer", "minimum": 0},
+        "github_unique_visitors": {"type": "integer", "minimum": 0}
+      }
+    },
+    "gap_note": {"type": "string"}
+  },
+  "additionalProperties": false
+}

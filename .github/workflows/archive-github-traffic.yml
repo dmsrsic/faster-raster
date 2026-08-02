@@ -1,0 +1,53 @@
+name: Archive honest GitHub adoption aggregates
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: main
+          path: source
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Require the owner-created archive branch
+        id: archive_branch
+        run: |
+          if ! git ls-remote --exit-code origin refs/heads/metrics-archive >/dev/null; then
+            echo "metrics-archive is not provisioned; leaving the archive workflow inactive"
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "available=true" >> "$GITHUB_OUTPUT"
+          git fetch --no-tags origin metrics-archive
+          git checkout --detach FETCH_HEAD
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        if: steps.archive_branch.outputs.available == 'true'
+        with:
+          python-version: "3.12"
+      - name: Collect and sanitize aggregate traffic
+        if: steps.archive_branch.outputs.available == 'true'
+        env:
+          FASTER_RASTER_GITHUB_TRAFFIC_TOKEN: ${{ secrets.FASTER_RASTER_GITHUB_TRAFFIC_TOKEN }}
+        run: |
+          if [ -z "$FASTER_RASTER_GITHUB_TRAFFIC_TOKEN" ]; then
+            echo "traffic secret is absent; recording no snapshot"
+            exit 0
+          fi
+          mkdir -p archive
+          python source/scripts/archive_github_traffic.py --output "archive/$(date -u +%F).json"
+      - name: Commit only the metrics branch
+        if: steps.archive_branch.outputs.available == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add archive
+          git diff --cached --quiet || git commit -m "metrics: archive GitHub aggregate traffic"
+          git push origin HEAD:metrics-archive
