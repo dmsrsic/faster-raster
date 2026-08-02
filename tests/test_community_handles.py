@@ -234,3 +234,58 @@ def test_registry_rendering_is_sorted_and_deterministic(tmp_path):
 def test_reserved_and_affiliation_handles_are_rejected(handle):
     with pytest.raises(HandleValidationError):
         validate_record(_record(handle=handle), root=ROOT)
+
+
+def test_handle_request_issue_form_contract():
+    form = yaml.safe_load(
+        (ROOT / ".github" / "ISSUE_TEMPLATE" / "fasterraster-handle-request.yml").read_text(encoding="utf-8")
+    )
+    assert form["name"] == "Request a FasterRaster handle"
+    assert form["title"] == "[Handle request] "
+    assert form.get("assignees", []) == []
+    assert form.get("labels", []) == []
+
+    fields = {item["id"]: item for item in form["body"] if "id" in item}
+    assert set(fields) == {"requested_handle", "interests", "acknowledgements"}
+    assert fields["requested_handle"]["validations"]["required"] is True
+    assert fields["interests"]["validations"]["required"] is True
+    assert fields["interests"]["attributes"]["multiple"] is True
+    assert fields["interests"]["attributes"]["options"] == [
+        "remote-sensing",
+        "reproducibility",
+        "source-packs",
+        "stac",
+        "classification",
+        "climate",
+        "cartography",
+    ]
+    assert fields["acknowledgements"]["validations"]["required"] is True
+    assert all(option["required"] is True for option in fields["acknowledgements"]["attributes"]["options"])
+
+
+def test_handle_request_form_states_public_request_only_boundaries():
+    form = yaml.safe_load(
+        (ROOT / ".github" / "ISSUE_TEMPLATE" / "fasterraster-handle-request.yml").read_text(encoding="utf-8")
+    )
+    form_text = json.dumps(form).lower()
+    assert "github username" in form_text and "public" in form_text
+    for term in ("cloned", "installed", "executed", "used"):
+        assert term in form_text
+    assert "does not create an active registry record" in form_text
+    assert "maintainer review" in form_text
+    for term in ("private key", "credential", "token", "password", "contact information"):
+        assert term in form_text
+
+    forbidden_fields = ("email", "real name", "legal name", "location", "biography", "private key", "password", "token", "credential")
+    for field in (item for item in form["body"] if "id" in item):
+        field_name = f'{field["id"]} {field.get("attributes", {}).get("label", "")}'.lower()
+        assert not any(forbidden in field_name for forbidden in forbidden_fields)
+
+
+def test_handle_request_documentation_contract():
+    join = (ROOT / "docs" / "community" / "join.md").read_text(encoding="utf-8")
+    privacy = (ROOT / "docs" / "community" / "privacy.md").read_text(encoding="utf-8")
+    assert "https://github.com/dmsrsic/faster-raster/issues/new?template=fasterraster-handle-request.yml" in join
+    assert "does not create an active registry record" in join
+    assert "Automatic activation" in privacy and "identity verification remain disabled" in privacy
+    assert "does not automatically copy that username into the generated Handle Registry index" in privacy

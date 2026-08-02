@@ -1,0 +1,55 @@
+name: Request a FasterRaster handle
+description: Public, opt-in request for a pseudonymous FasterRaster handle
+title: "[Handle request] "
+labels: []
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This is a public, opt-in handle request. The GitHub username opening this issue will be publicly visible.
+
+        A request does not prove that anyone cloned, installed, executed, or used FasterRaster, and submitting it does not create an active registry record. Activation requires maintainer review and a separately approved control/claim process.
+
+        Never submit private keys, credentials, tokens, passwords, contact details, or personal identity information.
+  - type: input
+    id: requested_handle
+    attributes:
+      label: Requested handle
+      description: ASCII lowercase only; 3–30 characters; letters, digits, and single hyphens; no consecutive hyphens. Approval remains subject to the reserved and prohibited-name policy.
+      placeholder: pixel-ranger
+    validations:
+      required: true
+  - type: dropdown
+    id: interests
+    attributes:
+      label: Interests
+      description: Select one or more fixed public interests.
+      multiple: true
+      options:
+        - remote-sensing
+        - reproducibility
+        - source-packs
+        - stac
+        - classification
+        - climate
+        - cartography
+    validations:
+      required: true
+  - type: checkboxes
+    id: acknowledgements
+    attributes:
+      label: Acknowledgements
+      options:
+        - label: I understand that this request and my GitHub username are public.
+          required: true
+        - label: I understand that this is not proof of cloning, installation, execution, use, endorsement, or unique identity.
+          required: true
+        - label: I confirm that I submitted no private key, credential, token, password, contact information, or other sensitive data.
+          required: true
+        - label: I understand that this is a request only and does not create an active registry record.
+          required: true
+        - label: I understand that maintainer review may approve, reject, or close this request.
+          required: true
+    validations:
+      required: true

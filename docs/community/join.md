@@ -1,5 +1,7 @@
 # Joining the Handle Registry
 
-Joining is temporarily unavailable while the moderation and signed-claim workflow is reviewed. The registry remains readable and locally verifiable.
+Public, opt-in handle request intake is open through the [FasterRaster Handle Request GitHub Issue Form](https://github.com/dmsrsic/faster-raster/issues/new?template=fasterraster-handle-request.yml). The issue author's GitHub username is publicly visible, and the requested FasterRaster handle may differ from that username.
 
-When intake opens, it will remain optional and will never unlock execution, data access, or private runtime features. Do not send private keys, passphrases, credentials, or personal contact information to FasterRaster.
+Requests are manually reviewed. Submitting a request does not create an active registry record; active registration still requires a separately approved control/claim process. Do not submit private keys, passphrases, credentials, tokens, contact details, or personal identity information.
+
+Registration never unlocks execution, data access, or private runtime features. A handle does not establish that anyone cloned, installed, executed, or used FasterRaster.
