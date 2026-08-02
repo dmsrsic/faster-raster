@@ -8,7 +8,7 @@
 
 FasterRaster turns public raster sources into bounded, reproducible, and publication-ready geospatial workflows. It compiles explicit source contracts, validates inputs, harmonizes grids, and preserves the evidence required to reproduce every output.
 
-**Published beta:** `v1.0.0-beta.4` (`1.0.0b4`). **Current development:** `1.0.0b5.dev0` on `main`. Install the immutable release wheel for published behavior; use the checkout only for clearly labeled development capabilities.
+**Published beta:** `v1.0.0-beta.5` (`1.0.0b5`). Install the immutable release wheel for published behavior.
 
 FasterRaster is useful when a raster workflow needs more than a download script: exact source years, byte ceilings, categorical resampling rules, deterministic plans, transactional handoffs, checksums, provenance, and a clear record of what was reused or transferred.
 
@@ -29,17 +29,13 @@ FasterRaster is useful when a raster workflow needs more than a download script:
 
 ## Capability status
 
-The published package remains `v1.0.0-beta.4` / `1.0.0b4`. Index-guided hybrid
-classification is part of that published release. Source Packs, PRISM runnable
-execution, STAC v2, and Earth Engine compilation remain public development
-contracts with bounded evidence; authenticated execution remains private. Bring
-Your Own
-Sauce, Sauce Time, reusable preview templates, CRS-aware categorical area
-accounting, classification confidence provenance, coherent NAIP–CDL temporal
-repair, and the public credential-requirement seam below are implemented
-**Unreleased / experimental** contracts in this source tree; they are not retroactively
-claimed as beta.4 features. `configs/public_capabilities.yaml` is authoritative,
-and drift tests bind the CLI, website, and GPT grounding export to it.
+The published package is `v1.0.0-beta.5` / `1.0.0b5`. It includes the post-beta.4
+public development tranche: Source Packs, PRISM runnable execution, STAC v2,
+update inspection, deterministic generated surfaces, aggregate adoption-metric
+foundations, and the public Handle Registry contract. Authenticated execution
+remains private, and capability state, evidence, and execution boundary remain
+independent claims. `configs/public_capabilities.yaml` is authoritative, and drift
+tests bind the CLI, website, and GPT grounding export to it.
 
 <!-- BEGIN GENERATED CAPABILITY MATRIX -->
 | Capability | Release state | Evidence | Plan | Preview | Materialize | Analyze | Public execution |
@@ -199,10 +195,10 @@ fr plan studies/meridian.fr.md --offline --out build/meridian-plan
 
 Those commands make no network requests and write the deterministic plan beneath `build/meridian-plan/`. Review the generated workfile before enabling network access.
 
-To install the current development wheel instead (not the published beta.4 artifact):
+To install a locally built beta.5 wheel:
 
 ```sh
-python -m pip install dist/faster_raster-1.0.0b5.dev0-py3-none-any.whl
+python -m pip install dist/faster_raster-1.0.0b5-py3-none-any.whl
 ```
 
 See [Installation](docs/installation.md) and the [five-minute quickstart](docs/quickstart.md) for clean-environment and live-study instructions.

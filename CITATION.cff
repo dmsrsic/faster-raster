@@ -4,8 +4,8 @@ title: "FasterRaster"
 type: software
 authors:
   - name: "Duncan"
-version: "1.0.0b4"
-date-released: 2026-07-25
+version: "1.0.0b5"
+date-released: 2026-08-02
 license: MPL-2.0
 repository-code: "https://github.com/dmsrsic/faster-raster"
 url: "https://dmsrsic.github.io/faster-raster/"

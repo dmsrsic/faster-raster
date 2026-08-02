@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "faster-raster"
-version = "1.0.0b5.dev0"
+version = "1.0.0b5"
 description = "Source-aware raster orchestration from explicit study contracts to reproducible evidence and publications."
 readme = "README.md"
 requires-python = ">=3.12"

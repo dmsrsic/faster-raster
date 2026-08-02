@@ -1,6 +1,6 @@
 # Historical beta.1 readiness
 
-This is archived beta.1 evidence, not a current release checklist. The published release is `v1.0.0-beta.4`; current development is `1.0.0b5.dev0`.
+This is archived beta.1 evidence, not a current release checklist. The latest published release is `v1.0.0-beta.5` (`1.0.0b5`).
 
 - Release label: **`v1.0.0-beta.1`**
 - Python package: **`1.0.0b1`**

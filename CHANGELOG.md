@@ -2,13 +2,17 @@
 
 All notable changes are documented here. Versions follow [Semantic Versioning](https://semver.org/) for release labels and PEP 440 for Python package metadata.
 
-## Unreleased — development `1.0.0b5.dev0`
+## 1.0.0b5 - 2026-08-02
 
-This section describes post-beta.4 work in the current checkout. It is not part
-of the published `v1.0.0-beta.4` wheel.
+This release publishes the post-beta.4 work that was previously carried on the
+public development branch.
 
 ### Added
 
+- Safe offline installation inspection with `fr update status` and explicitly
+  authorized, bounded beta/stable release checking with `fr update check`.
+- Release-manifest and deterministic update-receipt contracts, aggregate
+  adoption-metric foundations, and public Handle Registry contracts.
 - A public
   [FasterRaster Flavortown Sauce Wizard](https://chatgpt.com/g/g-6a692bb17b9c8191a318997fd0435bf7-fasterraster-flavortown-sauce-wizard)
   entry point, four family-specific Source Pack fixtures, explicit
@@ -52,9 +56,8 @@ of the published `v1.0.0-beta.4` wheel.
   preview tasks compile through released compatibility templates; render
   contracts now additionally bind their template schema, ID, and hash.
 
-These contracts are implemented in the current tree but remain experimental
-until a separate release decision; they are not retroactively part of
-`v1.0.0-beta.4`.
+These contracts are included in beta.5. Their release state, evidence tier, and
+execution boundary remain independent claims.
 
 ## 1.0.0-beta.4 - 2026-07-25
 

@@ -1,12 +1,12 @@
 schema_version: fasterraster.capability-registry/v2
 registry_version: 1.0.0
 release:
-  package_version: 1.0.0b5.dev0
-  published_package_version: 1.0.0b4
-  public_release: v1.0.0-beta.4
-  development_label: 1.0.0b5.dev0 (unreleased development)
-  contract_status: development
-  next_release: v1.0.0-beta.5
+  package_version: 1.0.0b5
+  published_package_version: 1.0.0b5
+  public_release: v1.0.0-beta.5
+  development_label: 1.0.0b5 (published beta)
+  contract_status: published
+  next_release: "not scheduled"
 status_definitions:
   released: Legacy alias for published; retained for Source Pack v1 compatibility.
   experimental: Legacy alias for unreleased_public; retained for Source Pack v1 compatibility.

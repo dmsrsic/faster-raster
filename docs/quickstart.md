@@ -8,7 +8,7 @@ index-guided workflow is part of the published beta.4 contract.
 ```sh { .manual-network }
 python3.12 -m venv .venv
 . .venv/bin/activate
-python -m pip install https://github.com/dmsrsic/faster-raster/releases/download/v1.0.0-beta.4/faster_raster-1.0.0b4-py3-none-any.whl
+python -m pip install https://github.com/dmsrsic/faster-raster/releases/download/v1.0.0-beta.5/faster_raster-1.0.0b5-py3-none-any.whl
 
 fr --version
 fr doctor --offline
@@ -36,7 +36,7 @@ bounded metadata coverage check.
 
 ## Development checkout capabilities
 
-The following commands require the current `main` checkout (`1.0.0b5.dev0`).
+The following commands require the current `main` checkout (`1.0.0b5`).
 They are offline and prove schema, host, CRS, nodata, resampling,
 temporal, preview, secret-exclusion, canonicalization, and golden-plan
 behavior. Continue with [Bring Your Own Sauce](bring-your-own-sauce.md) or the

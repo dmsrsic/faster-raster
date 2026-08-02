@@ -22,15 +22,15 @@ def _temporary_registry(tmp_path: Path) -> Path:
     return path
 
 
-def test_development_and_published_identities_are_distinct():
-    assert __version__ == "1.0.0b5.dev0"
+def test_beta5_release_identity_is_synchronized():
+    assert __version__ == "1.0.0b5"
     pyproject = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
-    assert 'version = "1.0.0b5.dev0"' in pyproject
+    assert 'version = "1.0.0b5"' in pyproject
     citation = (ROOT / "CITATION.cff").read_text(encoding="utf-8")
-    assert 'version: "1.0.0b4"' in citation
+    assert 'version: "1.0.0b5"' in citation
     registry = load_capability_registry()
-    assert registry["release"]["public_release"] == "v1.0.0-beta.4"
-    assert registry["release"]["published_package_version"] == "1.0.0b4"
+    assert registry["release"]["public_release"] == "v1.0.0-beta.5"
+    assert registry["release"]["published_package_version"] == "1.0.0b5"
     assert registry["release"]["package_version"] == __version__
 
 

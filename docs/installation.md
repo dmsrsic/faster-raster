@@ -14,7 +14,7 @@ The reproducible public installation starts from the immutable GitHub release as
 ```sh { .release-operator }
 python3.12 -m venv .venv
 . .venv/bin/activate
-python -m pip install https://github.com/dmsrsic/faster-raster/releases/download/v1.0.0-beta.4/faster_raster-1.0.0b4-py3-none-any.whl
+python -m pip install https://github.com/dmsrsic/faster-raster/releases/download/v1.0.0-beta.5/faster_raster-1.0.0b5-py3-none-any.whl
 fr --version
 fr doctor --offline
 ```
@@ -40,7 +40,7 @@ python -m pip install -e '.[dev,docs]'
 ```sh { .release-operator }
 python -m build
 python3.12 -m venv /tmp/fasterraster-wheel-test
-/tmp/fasterraster-wheel-test/bin/pip install dist/faster_raster-1.0.0b5.dev0-py3-none-any.whl
+/tmp/fasterraster-wheel-test/bin/pip install dist/faster_raster-1.0.0b5-py3-none-any.whl
 cd /tmp
 /tmp/fasterraster-wheel-test/bin/fr --help
 /tmp/fasterraster-wheel-test/bin/fr doctor --offline

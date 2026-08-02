@@ -1,6 +1,6 @@
 {
   "bundle_version": "1.0.0",
-  "capability_registry_sha256": "aec89454989f2037339c6992a53f47fc50615f33ea8209992d39eab95a01712f",
+  "capability_registry_sha256": "25236c94ccb9acbdcde74ac5289588063a609a44d50fdf58334bf5f4fba146c4",
   "contract_schema_versions": [
     "fasterraster.source-pack/v1",
     "fasterraster.source-pack-plan/v1",
@@ -104,10 +104,10 @@
       "sha256": "ed56b7c7892b96746c9c798a1665b4ea78cf369a488ecabb0220f646651437b6"
     },
     {
-      "bytes": 14531,
+      "bytes": 14513,
       "path": "configs/public_capabilities.yaml",
       "role": "capability_registry",
-      "sha256": "f954ed4cbf754588844258c42a8c00bff8362207472d70c0bb92a249de597a01"
+      "sha256": "ed9864b024cd373ee298340e080b34156b462d8473bb10e113fc5fcaf0b93fd6"
     },
     {
       "bytes": 7247,
@@ -116,10 +116,10 @@
       "sha256": "cdc1a20986856eaad562255755569dc68f3f45d32b8e429c54cf18c279453c09"
     },
     {
-      "bytes": 3458,
+      "bytes": 3451,
       "path": "docs/generated/capabilities.md",
       "role": "capability_reference",
-      "sha256": "73dc9efb9707a3d0faf63649b3e3dcf355dfbfa74d987ce3dc786110b8d3dacb"
+      "sha256": "ff1e0bcfa33956c0e45315c312202fb420c94893c424827f3a7fb7b0eb2648af"
     },
     {
       "bytes": 3339,
@@ -308,20 +308,20 @@
       "sha256": "61d5845f6a5587065f326eae3277d32c462d98fd21645bc43eb9c443d01f6554"
     },
     {
-      "bytes": 17595,
+      "bytes": 17575,
       "path": "prompts/flavortown_sauce_wizard/capabilities.json",
       "role": "machine_capabilities",
-      "sha256": "f0f176c00e53cd7fd78575d7360ddc1049c9035bf9860fa26ebe0b84d898300d"
+      "sha256": "9c3196c5dd443a5b75bcf53b89c447963cca928393db1c3447cf88696e0102f1"
     }
   ],
-  "grounding_bundle_sha256": "3af3a060d68ea5cbb8756cdcc6c18636893749817ef409fcae6130bfa38d9ae4",
+  "grounding_bundle_sha256": "49dd9b34a2b6d5a43601e9da5833c8dae403b7b4ee75581ed5a8b6c294f20ced",
   "release": {
-    "contract_status": "development",
-    "development_label": "1.0.0b5.dev0 (unreleased development)",
-    "next_release": "v1.0.0-beta.5",
-    "package_version": "1.0.0b5.dev0",
-    "public_release": "v1.0.0-beta.4",
-    "published_package_version": "1.0.0b4"
+    "contract_status": "published",
+    "development_label": "1.0.0b5 (published beta)",
+    "next_release": "not scheduled",
+    "package_version": "1.0.0b5",
+    "public_release": "v1.0.0-beta.5",
+    "published_package_version": "1.0.0b5"
   },
   "schema_version": "fasterraster.grounding-bundle/v1",
   "validation_authority": [

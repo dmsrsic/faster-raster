@@ -1,6 +1,6 @@
 # Public capability matrix
 
-Published release: `v1.0.0-beta.4` (`1.0.0b4`). Development tranche: `1.0.0b5.dev0` / `development`.
+Published release: `v1.0.0-beta.5` (`1.0.0b5`). Development tranche: `1.0.0b5` / `published`.
 
 A catalog entry never implies that every product, geography, date, or output is executable.
 
@@ -34,4 +34,4 @@ A catalog entry never implies that every product, geography, date, or output is 
 | CHIRPS, gridMET, TerraClimate, and WorldClim | `unreleased_public` | `fixture_validated, contract_validated` | yes | yes | no | no | `bounded_probe_and_fixture_paths` |
 | Copernicus Data Space STAC | `unreleased_public` | `contract_validated` | yes | no | no | no | `resolver_required` |
 
-Registry SHA-256: `aec89454989f2037339c6992a53f47fc50615f33ea8209992d39eab95a01712f`
+Registry SHA-256: `25236c94ccb9acbdcde74ac5289588063a609a44d50fdf58334bf5f4fba146c4`

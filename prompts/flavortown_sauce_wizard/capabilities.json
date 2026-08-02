@@ -289,7 +289,7 @@
       "status": "unsupported"
     }
   ],
-  "capability_registry_sha256": "aec89454989f2037339c6992a53f47fc50615f33ea8209992d39eab95a01712f",
+  "capability_registry_sha256": "25236c94ccb9acbdcde74ac5289588063a609a44d50fdf58334bf5f4fba146c4",
   "evidence_definitions": {
     "contract_validated": "Schema/compiler validation only; no live dataset claim.",
     "fixture_validated": "Deterministic checked-in fixtures exercise the contract.",
@@ -309,12 +309,12 @@
   },
   "registry_version": "1.0.0",
   "release": {
-    "contract_status": "development",
-    "development_label": "1.0.0b5.dev0 (unreleased development)",
-    "next_release": "v1.0.0-beta.5",
-    "package_version": "1.0.0b5.dev0",
-    "public_release": "v1.0.0-beta.4",
-    "published_package_version": "1.0.0b4"
+    "contract_status": "published",
+    "development_label": "1.0.0b5 (published beta)",
+    "next_release": "not scheduled",
+    "package_version": "1.0.0b5",
+    "public_release": "v1.0.0-beta.5",
+    "published_package_version": "1.0.0b5"
   },
   "release_state_definitions": {
     "planned": "Directional work without an executable public contract.",

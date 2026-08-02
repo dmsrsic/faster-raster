@@ -1,8 +1,8 @@
 # Release status
 
-Published public release: `v1.0.0-beta.4` (`1.0.0b4`).
-Current development identity: `1.0.0b5.dev0`.
-Next planned beta: `v1.0.0-beta.5`.
+Published public release: `v1.0.0-beta.5` (`1.0.0b5`).
+Current development identity: `1.0.0b5`.
+Next planned beta: `not scheduled`.
 
 This page is generated from the capability registry. Release state, evidence, and execution boundary are independent claims.
 
