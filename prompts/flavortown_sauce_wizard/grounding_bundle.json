@@ -122,16 +122,16 @@
       "sha256": "e8cc2e7e19296145a44e123685e9a9100875eb5a175b517cb57c2fcdece40e3d"
     },
     {
-      "bytes": 3339,
+      "bytes": 3360,
       "path": "docs/flavortown-wizard.md",
       "role": "wizard_workflow",
-      "sha256": "a38fb2fa1b33f08467353d1b1262665a550b450fe14b278d2dfb69b501e5a475"
+      "sha256": "9b88aef9ac0d9cd94c952194045b720948c272da27f5724db4687db2af930b5a"
     },
     {
-      "bytes": 8563,
+      "bytes": 8606,
       "path": "docs/bring-your-own-sauce.md",
       "role": "source_pack_guide",
-      "sha256": "9ab99895e308ea0385d9b784c53c2937f60d7845bfe978f6f1c8d864690c644d"
+      "sha256": "3775d390b113241587c29982a9411ecd0b1a1b24082b374699a8ebb31ef71610"
     },
     {
       "bytes": 2124,
@@ -146,16 +146,16 @@
       "sha256": "ec34c8b18f1b1166d40c1598d3a074c31d1f72578bddefb674d3fd842691033b"
     },
     {
-      "bytes": 2978,
+      "bytes": 2989,
       "path": "docs/sauce-time.md",
       "role": "temporal_guide",
-      "sha256": "1beb28e1e5241ca80e337b891aedb393a02d7717055f11d27149679d23e25996"
+      "sha256": "5d49725ab02326d6a4e430b3db06737521c28cd6df760bfb32fc3730ef0c3c24"
     },
     {
-      "bytes": 2842,
+      "bytes": 2853,
       "path": "docs/preview-templates.md",
       "role": "preview_guide",
-      "sha256": "b6b5788336085b6f57a343053d9952510feb73e86928fb8cc7d0edf363bf3882"
+      "sha256": "3209711d137a07907711af28142a8280fb8692ca9b09519a2b4abd81ccac364e"
     },
     {
       "bytes": 19021,
@@ -314,7 +314,7 @@
       "sha256": "67603726ae7c5754658da9b777467f189dbaa333278bbf41578b984a0a907f58"
     }
   ],
-  "grounding_bundle_sha256": "66ae4fa1358431456eb132733c3c791b339d5e174fc7e86e15256fe4b9acd499",
+  "grounding_bundle_sha256": "8587dd4ff16d951a04a49b87cc3226623cc9bcee19eaeb10e791605664797b94",
   "release": {
     "contract_status": "published",
     "development_label": "1.0.0b5 (published beta)",

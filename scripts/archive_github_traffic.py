@@ -124,7 +124,7 @@ def main(argv: list[str] | None = None) -> int:
             payload = json.loads(args.fixture.read_text(encoding="utf-8"))
         except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
             print(f"invalid traffic fixture: {exc}")
-            return 0
+            return 1
         gap = "offline fixture"
     else:
         try:
@@ -132,12 +132,12 @@ def main(argv: list[str] | None = None) -> int:
             gap = ""
         except RuntimeError as exc:
             print(str(exc))
-            return 0
+            return 1
     try:
         record = sanitize(payload, date=args.date, gap_note=gap)
     except ValueError as exc:
         print(str(exc))
-        return 0
+        return 1
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(record, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return 0

@@ -44,7 +44,12 @@ jobs:
             exit 0
           fi
           mkdir -p archive
-          python source/scripts/archive_github_traffic.py --output "archive/$(date -u +%F).json"
+          snapshot="archive/$(date -u +%F).json"
+          temporary="${snapshot}.tmp"
+          rm -f "$temporary"
+          python source/scripts/archive_github_traffic.py --output "$temporary"
+          test -s "$temporary"
+          mv "$temporary" "$snapshot"
       - name: Commit only the metrics branch
         if: steps.archive_branch.outputs.available == 'true'
         run: |

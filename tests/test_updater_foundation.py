@@ -99,6 +99,8 @@ def test_check_requires_explicit_network_authorization_and_writes_canonical_rece
     assert set(payload) <= set(schema["properties"])
     assert schema["additionalProperties"] is False
     assert "receipt_sha256" not in schema["required"]
+    assert schema["properties"]["installation"]["required"] == ["active_version", "python_version", "git_context", "distribution_origin", "compatible"]
+    assert schema["properties"]["recommendation"]["required"] == ["action"]
     assert result.as_dict()["receipt_sha256"] == receipt.stem
     serialized = json.dumps(payload, sort_keys=True)
     assert str(tmp_path) not in serialized

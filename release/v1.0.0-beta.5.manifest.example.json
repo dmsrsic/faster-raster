@@ -12,21 +12,21 @@
       "name": "faster_raster-1.0.0b5-py3-none-any.whl",
       "url": "https://github.com/dmsrsic/faster-raster/releases/download/v1.0.0-beta.5/faster_raster-1.0.0b5-py3-none-any.whl",
       "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-      "size_bytes": 0
+      "size_bytes": 1
     },
     {
       "kind": "sdist",
       "name": "faster_raster-1.0.0b5.tar.gz",
       "url": "https://github.com/dmsrsic/faster-raster/releases/download/v1.0.0-beta.5/faster_raster-1.0.0b5.tar.gz",
       "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-      "size_bytes": 0
+      "size_bytes": 1
     },
     {
       "kind": "checksums",
       "name": "SHA256SUMS",
       "url": "https://github.com/dmsrsic/faster-raster/releases/download/v1.0.0-beta.5/SHA256SUMS",
       "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-      "size_bytes": 0
+      "size_bytes": 1
     }
   ]
 }

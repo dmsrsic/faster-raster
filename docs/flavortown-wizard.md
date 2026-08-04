@@ -6,8 +6,8 @@ audit assistant for declarative Source Packs.
 [Open the FasterRaster Flavortown Sauce Wizard](https://chatgpt.com/g/g-6a692bb17b9c8191a318997fd0435bf7-fasterraster-flavortown-sauce-wizard)
 
 Source Packs, Sauce Time, preview templates, opaque credential references, and
-the frozen Source Pack handoff are **Unreleased / experimental**. The Wizard
-does not make them released capabilities.
+the frozen Source Pack handoff are published beta.5 experimental contracts.
+The Wizard does not expand their declared execution boundaries.
 
 ## Evidence-to-validation workflow
 ```text { .illustrative }

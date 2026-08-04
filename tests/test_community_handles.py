@@ -8,7 +8,9 @@ import shutil
 import pytest
 import yaml
 
-from faster_raster.community_handles import HandleValidationError, load_records, normalize_handle, render_json, render_public_index, validate_record, write_surfaces
+from faster_raster.community_handles import HandleValidationError, build_manual_record, load_records, normalize_handle, render_json, render_public_index, validate_record, write_surfaces
+from scripts import manage_handle_registry
+from scripts.manage_handle_registry import activate, check
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -85,16 +87,140 @@ def test_valid_record_and_minimal_public_json():
     assert record["control"]["public_key"] not in render_public_index([record])
 
 
+def test_v2_manual_record_has_only_review_control(tmp_path):
+    shutil.copytree(ROOT / "community", tmp_path / "community")
+    record = build_manual_record(
+        root=tmp_path,
+        handle="pixel-ranger",
+        joined_at="2026-08-04",
+        interests=["stac", "reproducibility"],
+    )
+    assert record["schema_version"] == "fasterraster.handle/v2"
+    assert record["control"] == {"method": "maintainer-reviewed-request"}
+    assert "member_id" in record and record["member_id"].startswith("frh_")
+    assert "github" not in json.dumps(record).lower()
+    with pytest.raises(HandleValidationError):
+        validate_record({**_record(), "schema_version": "fasterraster.handle/v1", "control": {"method": "maintainer-reviewed-request"}}, root=tmp_path)
+
+
+def test_manual_activation_writes_record_and_surfaces(tmp_path):
+    shutil.copytree(ROOT / "community", tmp_path / "community")
+    path = activate(
+        root=tmp_path,
+        handle="pixel-ranger",
+        joined_at="2026-08-04",
+        interests=["stac"],
+        approved_request=True,
+    )
+    assert path == tmp_path / "community" / "handles" / "pixel-ranger.yaml"
+    records = load_records(tmp_path)
+    assert records[0]["control"] == {"method": "maintainer-reviewed-request"}
+    assert not check(tmp_path)
+    assert "pixel-ranger" in (tmp_path / "docs" / "community" / "index.md").read_text(encoding="utf-8")
+    assert "public_key" not in (tmp_path / "docs" / "generated" / "handles.json").read_text(encoding="utf-8")
+
+
+def test_registry_check_reports_stale_surface(tmp_path):
+    shutil.copytree(ROOT / "community", tmp_path / "community")
+    write_surfaces(tmp_path)
+    assert not check(tmp_path)
+    index = tmp_path / "docs" / "community" / "index.md"
+    index.write_text(index.read_text(encoding="utf-8") + "stale\n", encoding="utf-8")
+    assert check(tmp_path) == [index]
+
+
+@pytest.mark.parametrize("failure_at", [1, 2])
+def test_manual_activation_rolls_back_partial_replacements(tmp_path, monkeypatch, failure_at):
+    shutil.copytree(ROOT / "community", tmp_path / "community")
+    original_replace = manage_handle_registry.os.replace
+    calls = 0
+
+    def fail_on_second_replace(source, destination):
+        nonlocal calls
+        calls += 1
+        if calls == failure_at:
+            raise OSError("simulated replacement failure")
+        return original_replace(source, destination)
+
+    monkeypatch.setattr(manage_handle_registry.os, "replace", fail_on_second_replace)
+    with pytest.raises(OSError, match="simulated"):
+        activate(
+            root=tmp_path,
+            handle="pixel-ranger",
+            joined_at="2026-08-04",
+            interests=["stac"],
+            approved_request=True,
+        )
+    assert not list((tmp_path / "community" / "handles").glob("*.yaml"))
+    assert not (tmp_path / "docs").exists()
+
+
+def test_manual_activation_rollback_preserves_preexisting_directories_and_files(tmp_path, monkeypatch):
+    shutil.copytree(ROOT / "community", tmp_path / "community")
+    (tmp_path / "docs").mkdir()
+    unrelated = tmp_path / "docs" / "keep.txt"
+    unrelated.write_text("unrelated\n", encoding="utf-8")
+    original_replace = manage_handle_registry.os.replace
+
+    def fail_on_second_replace(source, destination):
+        if destination.name == "handles.json":
+            raise OSError("simulated replacement failure")
+        return original_replace(source, destination)
+
+    monkeypatch.setattr(manage_handle_registry.os, "replace", fail_on_second_replace)
+    with pytest.raises(OSError, match="simulated"):
+        activate(
+            root=tmp_path,
+            handle="pixel-ranger",
+            joined_at="2026-08-04",
+            interests=["stac"],
+            approved_request=True,
+        )
+    assert (tmp_path / "docs").is_dir()
+    assert unrelated.read_text(encoding="utf-8") == "unrelated\n"
+    assert not (tmp_path / "docs" / "community").exists()
+    assert not (tmp_path / "docs" / "generated").exists()
+    assert not list((tmp_path / "community" / "handles").glob("*.yaml"))
+
+
+def test_manual_activation_rolls_back_temporary_staging_failure(tmp_path, monkeypatch):
+    shutil.copytree(ROOT / "community", tmp_path / "community")
+    original_named_temporary_file = manage_handle_registry.tempfile.NamedTemporaryFile
+    calls = 0
+
+    def fail_on_second_temporary_file(*args, **kwargs):
+        nonlocal calls
+        calls += 1
+        if calls == 2:
+            raise OSError("simulated temporary-file failure")
+        return original_named_temporary_file(*args, **kwargs)
+
+    monkeypatch.setattr(manage_handle_registry.tempfile, "NamedTemporaryFile", fail_on_second_temporary_file)
+    with pytest.raises(OSError, match="simulated temporary-file failure"):
+        activate(
+            root=tmp_path,
+            handle="pixel-ranger",
+            joined_at="2026-08-04",
+            interests=["stac"],
+            approved_request=True,
+        )
+    assert not list((tmp_path / "community" / "handles").glob("*.yaml"))
+    assert not (tmp_path / "docs").exists()
+
+
 def test_member_id_and_schema_encodings_are_canonical():
     with pytest.raises(HandleValidationError):
         validate_record(_record(member_id="frh_" + "a" * 25 + "b"), root=ROOT)
     schema = json.loads((ROOT / "schemas" / "fasterraster-handle-v1.schema.json").read_text(encoding="utf-8"))
+    v2_schema = json.loads((ROOT / "schemas" / "fasterraster-handle-v2.schema.json").read_text(encoding="utf-8"))
     claim_schema = json.loads((ROOT / "schemas" / "fasterraster-handle-claim-v1.schema.json").read_text(encoding="utf-8"))
     assert "(?!.*--)" in schema["properties"]["handle"]["pattern"]
     assert "(?!.*--)" in claim_schema["properties"]["handle"]["pattern"]
     assert schema["properties"]["member_id"]["pattern"].endswith("[aeimquy4]$")
     assert claim_schema["properties"]["member_id"]["pattern"].endswith("[aeimquy4]$")
     assert schema["properties"]["control"]["properties"]["public_key"]["pattern"].endswith("[AEIMQUYcgkosw048]$")
+    assert v2_schema["properties"]["schema_version"]["const"] == "fasterraster.handle/v2"
+    assert v2_schema["properties"]["control"]["oneOf"][0]["properties"]["method"]["const"] == "maintainer-reviewed-request"
     assert claim_schema["properties"]["claim_nonce"]["pattern"].endswith("[AQgw]$")
     assert claim_schema["properties"]["signature"]["pattern"].endswith("[AQgw]$")
 
@@ -287,5 +413,6 @@ def test_handle_request_documentation_contract():
     privacy = (ROOT / "docs" / "community" / "privacy.md").read_text(encoding="utf-8")
     assert "https://github.com/dmsrsic/faster-raster/issues/new?template=fasterraster-handle-request.yml" in join
     assert "does not create an active registry record" in join
+    assert "maintainer-reviewed-request" in join
     assert "Automatic activation" in privacy and "identity verification remain disabled" in privacy
     assert "does not automatically copy that username into the generated Handle Registry index" in privacy

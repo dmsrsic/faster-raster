@@ -1,7 +1,8 @@
 # Sauce Time
 
 Sauce Time is the explicit temporal-repair protocol
-`fasterraster.temporal-alternatives/v1`. It is **Unreleased / experimental**.
+`fasterraster.temporal-alternatives/v1`. It is a published beta.5 experimental
+contract.
 The requested date remains authoritative. FasterRaster can rank bounded
 metadata candidates, but it does not change a Source Pack or workfile until a
 candidate is selected explicitly.

@@ -2,6 +2,15 @@
 
 All notable changes are documented here. Versions follow [Semantic Versioning](https://semver.org/) for release labels and PEP 440 for Python package metadata.
 
+## Unreleased
+
+- Opened the opt-in public Handle Request Issue Form and added explicit,
+  maintainer-reviewed v2 registry activation without copying GitHub identity
+  or issue metadata into records.
+- Operationalized the scheduled sanitized GitHub aggregate archive on the
+  dedicated `metrics-archive` branch.
+- Hardened generated-surface, updater-schema, and archive failure contracts.
+
 ## 1.0.0b5 - 2026-08-02
 
 This release publishes the post-beta.4 work that was previously carried on the

@@ -91,6 +91,14 @@ def test_missing_secret_safely_skips_snapshot(tmp_path, monkeypatch):
     assert not output.exists()
 
 
+def test_configured_collection_failure_is_nonzero_and_writes_no_snapshot(tmp_path, monkeypatch):
+    monkeypatch.setenv("FASTER_RASTER_GITHUB_TRAFFIC_TOKEN", "configured")
+    monkeypatch.setattr("scripts.archive_github_traffic._get", lambda path: (_ for _ in ()).throw(RuntimeError("request failed")))
+    output = tmp_path / "2026-08-01.json"
+    assert main(["--output", str(output), "--date", "2026-08-01"]) == 1
+    assert not output.exists()
+
+
 def test_fixture_writes_only_sanitized_aggregate(tmp_path):
     fixture = tmp_path / "traffic.json"
     fixture.write_text(
@@ -108,7 +116,7 @@ def test_malformed_fixture_writes_no_snapshot_or_traceback(tmp_path, capsys):
     fixture = tmp_path / "malformed.json"
     fixture.write_text("[not an object]", encoding="utf-8")
     output = tmp_path / "archive" / "2026-08-01.json"
-    assert main(["--fixture", str(fixture), "--output", str(output), "--date", "2026-08-01"]) == 0
+    assert main(["--fixture", str(fixture), "--output", str(output), "--date", "2026-08-01"]) == 1
     assert not output.exists()
     assert "Traceback" not in capsys.readouterr().out
 
@@ -148,6 +156,8 @@ def test_archive_workflow_is_daily_manual_and_branch_scoped():
     assert uses
     assert all(re.fullmatch(r"[^@]+@[0-9a-f]{40}", value) for value in uses)
     assert "git push origin HEAD:metrics-archive" in workflow
+    assert 'test -s "$temporary"' in workflow
+    assert 'mv "$temporary" "$snapshot"' in workflow
 
 
 def test_metric_dictionary_states_honest_semantics():
@@ -156,3 +166,4 @@ def test_metric_dictionary_states_honest_semantics():
     assert "Repository clone count" in dictionary
     assert "Active registered FasterRaster handles" in dictionary
     assert "No Pages beacon, cookie, fingerprint, installation ID" in dictionary
+    assert "configured request or validation fails" in dictionary

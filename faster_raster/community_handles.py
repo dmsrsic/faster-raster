@@ -4,6 +4,7 @@ import base64
 import hashlib
 import json
 import re
+import secrets
 from datetime import date
 from pathlib import Path
 from typing import Any, Iterable
@@ -45,6 +46,7 @@ FORBIDDEN_KEYS = {
 }
 RECORD_KEYS = {"schema_version", "handle", "member_id", "joined_at", "status", "visibility", "control", "profile"}
 CONTROL_KEYS = {"method", "public_key", "public_key_fingerprint", "sequence", "last_claim_sha256"}
+MANUAL_CONTROL_KEYS = {"method"}
 PROFILE_KEYS = {"interests"}
 MEMBER_ID_RE = re.compile(r"^frh_([a-z2-7]{26})$")
 HASH_RE = re.compile(r"^[0-9a-f]{64}$")
@@ -113,8 +115,31 @@ def _decode_public_key(value: Any) -> bytes:
     return raw
 
 
+def generate_member_id() -> str:
+    """Return a fresh random 128-bit registry member identifier."""
+    return "frh_" + base64.b32encode(secrets.token_bytes(16)).decode("ascii").rstrip("=").lower()
+
+
+def build_manual_record(*, root: Path, handle: str, joined_at: str, interests: Iterable[str]) -> dict[str, Any]:
+    """Build and validate a maintainer-reviewed, non-cryptographic record."""
+    record = {
+        "schema_version": "fasterraster.handle/v2",
+        "handle": handle,
+        "member_id": generate_member_id(),
+        "joined_at": joined_at,
+        "status": "active",
+        "visibility": "public",
+        "control": {"method": "maintainer-reviewed-request"},
+        "profile": {"interests": list(interests)},
+    }
+    return validate_record(record, root=root)
+
+
 def validate_record(record: dict[str, Any], *, root: Path) -> dict[str, Any]:
-    if not isinstance(record, dict) or record.get("schema_version") != "fasterraster.handle/v1":
+    if not isinstance(record, dict) or record.get("schema_version") not in {
+        "fasterraster.handle/v1",
+        "fasterraster.handle/v2",
+    }:
         raise HandleValidationError("unsupported handle record schema")
     if set(record) != RECORD_KEYS:
         raise HandleValidationError("handle record contains unknown or missing fields")
@@ -153,18 +178,25 @@ def validate_record(record: dict[str, Any], *, root: Path) -> dict[str, Any]:
     if not isinstance(interests, list) or len(interests) > 5 or len(set(interests)) != len(interests) or any(item not in INTERESTS for item in interests):
         raise HandleValidationError("profile interests must use the fixed unique enum")
     control = record["control"]
-    if not isinstance(control, dict) or set(control) != CONTROL_KEYS or control["method"] != "ed25519":
-        raise HandleValidationError("record control must declare the complete Ed25519 metadata")
-    raw_key = _decode_public_key(control["public_key"])
-    if not isinstance(control["public_key_fingerprint"], str) or not FINGERPRINT_RE.fullmatch(control["public_key_fingerprint"]):
-        raise HandleValidationError("control public key fingerprint is invalid")
-    expected_fingerprint = "sha256:" + hashlib.sha256(raw_key).hexdigest()
-    if control["public_key_fingerprint"] != expected_fingerprint:
-        raise HandleValidationError("control public key fingerprint does not match the key")
-    if isinstance(control["sequence"], bool) or not isinstance(control["sequence"], int) or control["sequence"] < 1:
-        raise HandleValidationError("control sequence must be a positive integer")
-    if not isinstance(control["last_claim_sha256"], str) or not HASH_RE.fullmatch(control["last_claim_sha256"]):
-        raise HandleValidationError("last claim hash is invalid")
+    if not isinstance(control, dict):
+        raise HandleValidationError("record control must be an object")
+    if record["schema_version"] == "fasterraster.handle/v1" or control.get("method") == "ed25519":
+        if set(control) != CONTROL_KEYS or control["method"] != "ed25519":
+            raise HandleValidationError("record control must declare the complete Ed25519 metadata")
+        raw_key = _decode_public_key(control["public_key"])
+        if not isinstance(control["public_key_fingerprint"], str) or not FINGERPRINT_RE.fullmatch(control["public_key_fingerprint"]):
+            raise HandleValidationError("control public key fingerprint is invalid")
+        expected_fingerprint = "sha256:" + hashlib.sha256(raw_key).hexdigest()
+        if control["public_key_fingerprint"] != expected_fingerprint:
+            raise HandleValidationError("control public key fingerprint does not match the key")
+        if isinstance(control["sequence"], bool) or not isinstance(control["sequence"], int) or control["sequence"] < 1:
+            raise HandleValidationError("control sequence must be a positive integer")
+        if not isinstance(control["last_claim_sha256"], str) or not HASH_RE.fullmatch(control["last_claim_sha256"]):
+            raise HandleValidationError("last claim hash is invalid")
+    elif record["schema_version"] == "fasterraster.handle/v2" and set(control) == MANUAL_CONTROL_KEYS and control.get("method") == "maintainer-reviewed-request":
+        pass
+    else:
+        raise HandleValidationError("record control is not a supported v2 method")
     return record
 
 
@@ -181,13 +213,14 @@ def load_records(root: Path) -> list[dict[str, Any]]:
             raise HandleValidationError(f"duplicate handle: {validated['handle']}")
         if validated["member_id"] in seen_members:
             raise HandleValidationError(f"duplicate member_id: {validated['member_id']}")
-        if control["public_key"] in seen_keys:
+        if control.get("public_key") in seen_keys:
             raise HandleValidationError("duplicate control public key")
         if path.stem != validated["handle"]:
             raise HandleValidationError(f"record filename does not match handle: {path.name}")
         seen_handles.add(validated["handle"])
         seen_members.add(validated["member_id"])
-        seen_keys.add(control["public_key"])
+        if control.get("public_key"):
+            seen_keys.add(control["public_key"])
         records.append(validated)
     return sorted(records, key=lambda item: item["handle"])
 
