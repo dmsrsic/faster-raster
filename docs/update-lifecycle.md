@@ -1,6 +1,6 @@
 # Update lifecycle
 
-The published beta.4 package and the current development checkout are separate identities. FasterRaster currently ships read-only update inspection:
+The published beta.5 package and the current development checkout are separate identities. FasterRaster currently ships read-only update inspection:
 
 ```bash { .offline-smoke }
 fr update status --json

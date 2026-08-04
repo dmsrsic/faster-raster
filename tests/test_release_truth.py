@@ -198,3 +198,13 @@ def test_grounding_uses_capability_v2_without_registry_identity_schemas():
     assert "fasterraster.capability-registry/v2" in bundle["contract_schema_versions"]
     assert "fasterraster.capability-registry/v1" not in bundle["contract_schema_versions"]
     assert not any(item["role"].startswith("handle") for item in bundle["files"])
+
+
+def test_post_tag_tranche_truth_is_explicit():
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
+    lifecycle = (ROOT / "docs" / "update-lifecycle.md").read_text(encoding="utf-8")
+    assert "dedicated branch" in readme and "public Issue Form" in readme
+    assert "## Unreleased" in changelog
+    assert "published beta.5 package" in lifecycle
+    assert "published beta.4 package" not in lifecycle

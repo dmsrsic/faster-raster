@@ -2,8 +2,8 @@
 
 ## Public `fr` Source Pack, time, and preview contracts
 
-The following commands are implemented in the current source tree as
-Unreleased / experimental public contracts:
+The following commands are implemented in the published beta.5 source tree as
+experimental public contracts:
 ```bash { .illustrative }
 fr capabilities --json
 fr sauce init my-source

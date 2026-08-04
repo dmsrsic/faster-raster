@@ -97,6 +97,9 @@ jobs:
       - name: Enforce documentation command classifications
         run: python scripts/check_docs_contracts.py
 
+      - name: Verify public handle registry surfaces
+        run: python scripts/manage_handle_registry.py check
+
       - name: Run offline documentation smoke manifest
         run: python scripts/run_docs_smoke.py
 

@@ -3,8 +3,9 @@
 Bring Your Own Sauce, also called the Flavortown Sauce Wizard, is the public
 declarative source-extension seam. Its stable v1 contract remains supported;
 new generic asset-access and computation planning use the separately versioned
-`fasterraster.source-pack/v2` contract. Both are **Unreleased / experimental** in this
-source tree and is not part of the published beta.4 contract.
+`fasterraster.source-pack/v2` contract. Both are published beta.5 experimental
+contracts in this source tree; release inclusion does not imply unrestricted
+provider access or materialization.
 
 [Open the FasterRaster Flavortown Sauce Wizard](https://chatgpt.com/g/g-6a692bb17b9c8191a318997fd0435bf7-fasterraster-flavortown-sauce-wizard)
 to research, draft, or audit a pack from official provider documentation. The

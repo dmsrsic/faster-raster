@@ -20,10 +20,10 @@
         "required": ["kind", "name", "url", "sha256", "size_bytes"],
         "properties": {
           "kind": {"enum": ["wheel", "sdist", "checksums", "manifest"]},
-          "name": {"type": "string"},
+          "name": {"type": "string", "minLength": 1},
           "url": {"type": "string", "format": "uri", "pattern": "^https://"},
           "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-          "size_bytes": {"type": "integer", "minimum": 0}
+          "size_bytes": {"type": "integer", "minimum": 1}
         },
         "additionalProperties": false
       }

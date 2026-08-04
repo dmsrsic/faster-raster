@@ -37,10 +37,12 @@ release inclusion does not imply universal provider, geography, date, or output
 execution; the capability matrix records each evidence tier and public execution
 boundary independently.
 
-Beta.5 also adds user-facing update inspection. Its aggregate adoption-metric
-and Handle Registry work is foundation-level only: FasterRaster does not
-automatically archive GitHub traffic, collect usage telemetry, accept registry
-submissions, or verify handle ownership. Authenticated execution remains private.
+Beta.5 also adds user-facing update inspection. The post-tag public tranche
+now archives sanitized GitHub traffic aggregates on a dedicated branch and
+accepts opt-in Handle Registry requests through a public Issue Form. Requests
+still require explicit maintainer activation, and no registry record proves
+handle ownership. FasterRaster does not collect usage telemetry. Authenticated
+execution remains private.
 `configs/public_capabilities.yaml` is authoritative, and drift tests bind the CLI,
 website, and GPT grounding export to it.
 
@@ -262,10 +264,12 @@ Their experimental status and declared execution boundaries remain authoritative
 publication does not imply unrestricted or universal execution.
 
 Resolved credential handling, authenticated materialization, paid or restricted
-adapters, registry intake and ownership verification, automatic traffic archival,
-usage telemetry, and parallel cluster execution remain unavailable, private, or
-planned. Index-guided hybrid classification was introduced in beta.4; its catalog,
-scientific, and geography limits remain authoritative.
+adapters, cryptographic handle ownership verification, usage telemetry, and
+parallel cluster execution remain unavailable, private, or planned. Public
+request intake and aggregate traffic archival are deliberately bounded and do
+not imply identity, installation, or active-use claims. Index-guided hybrid
+classification was introduced in beta.4; its catalog, scientific, and geography
+limits remain authoritative.
 
 Public-source adapters and core orchestration are part of the community beta. Managed infrastructure, private integrations, paid-source adapters, enterprise authentication, specialized classifiers, and cluster services may be developed separately.
 

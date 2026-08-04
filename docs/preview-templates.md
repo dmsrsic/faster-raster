@@ -7,7 +7,7 @@ for sources, adapters, AOI, CRS, dimensions, bands, opacity, blend mode,
 resampling, byte ceilings, network policy, capability hashes, theme hash, and
 renderer version.
 
-This feature is **Unreleased / experimental**. Existing alpha.2 and alpha.3
+This feature is a published beta.5 experimental contract. Existing alpha.2 and alpha.3
 preview tasks now select registry entries instead of branching on task IDs in
 the render-contract builder. Their render contracts additionally bind the
 template ID, schema version, and template SHA-256.
