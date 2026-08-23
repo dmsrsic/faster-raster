@@ -1,0 +1,12 @@
+{
+  "date": "2026-08-23",
+  "gap_note": "GitHub reports a rolling window; these aggregates do not represent people, installations, or active users.",
+  "metrics": {
+    "github_unique_cloners": 20,
+    "github_unique_visitors": 1,
+    "repository_clone_count": 74,
+    "repository_page_views": 9
+  },
+  "schema_version": "fasterraster.adoption-metric/v1",
+  "source": "github-traffic-api"
+}
